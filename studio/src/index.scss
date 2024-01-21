@@ -52,10 +52,11 @@
 		--success: #0e9c58;
 		--error: #c6395b;
 
-		--theme-base-background: #ffffff;
-		--theme-subtle-background: #f9f9fb;
+		--theme-base-background: ##ebeced;
+		--theme-subtle-background: #fcfcfc;
 		--theme-lighter-background: #edeef3;
-		--theme-border: #edeef3;
+		--theme-border: #d2d4d6;
+		--theme-border-hover: #afb1b3;
 
 		--theme-base-reverse-background: #191c29;
 		--theme-subtle-reverse-background: #212530;
@@ -85,10 +86,10 @@
 		--form-input-disabled-background: #f9f9fb;
 		--form-input-disabled-border: #edeef3;
 
-		--button-background-base-primary: #0053a6;
-		--button-background-hover-primary: #0079f2;
-		--button-background-base-secondary: #edeef3;
-		--button-background-hover-secondary: #dbdde6;
+		--button-background-base-primary: #0f87ff;
+		--button-background-hover-primary: #6bb5ff;
+		--button-background-base-secondary: #fcfcfc;
+		--button-background-hover-secondary: #f0f1f2;
 		--button-background-disabled: #f9f9fb;
 
 		--button-border-hover: #929ab5;
@@ -150,8 +151,8 @@
 		--surface-yellow: #4e3e04;
 		--surface-red: #4f1724;
 
-		--button-background-base-secondary: #323849;
-		--button-background-hover-secondary: #424a61;
+		--button-background-base-secondary: #1c2333;
+		--button-background-hover-secondary: #2b3245;
 		--button-background-border-secondary: #46474e;
 		--button-background-border-hover-secondary: #636f92;
 		--button-background-disabled: #212530;

@@ -19,17 +19,16 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { cn, joinChannel } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 export default function Version() {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-	const { getVersionById } = useVersionStore();
+	const { getVersionById, toggleSearchCommandMenu } = useVersionStore();
 	const { toggleSidebar } = useUtilsStore();
 	const { getAppById, application } = useApplicationStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
-	const [open, setOpen] = useState(false);
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const { deleteCache, closeDeleteCacheModal, toDeleteCache, isDeleteCacheModalOpen } =
 		useCacheStore();
@@ -128,7 +127,7 @@ export default function Version() {
 		const down = (e: KeyboardEvent) => {
 			if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
 				e.preventDefault();
-				setOpen((open) => !open);
+				toggleSearchCommandMenu();
 			}
 
 			if (e.key === 'b' && (e.metaKey || e.ctrlKey)) {
@@ -149,7 +148,7 @@ export default function Version() {
 				)}
 			>
 				<Outlet />
-				<CommandMenu open={open} setOpen={setOpen} />
+				<CommandMenu />
 			</VersionLayout>
 			<CreateCache />
 			<CreateTask />

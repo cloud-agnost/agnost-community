@@ -8,14 +8,17 @@ import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { NotificationDropdown } from '@/features/version/Notification';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
 import { useAuthorizeVersion } from '@/hooks';
+import useVersionStore from '@/store/version/versionStore';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { Link, useParams } from 'react-router-dom';
+import { Button } from '../Button';
 import { Separator } from '../Separator';
 import Feedback from './Feedback';
 import './header.scss';
 
 export function Header() {
 	const { versionId, appId, orgId } = useParams();
+	const { toggleSearchCommandMenu } = useVersionStore();
 	const canViewNotf = useAuthorizeVersion('viewLogs');
 	return (
 		<header className='header-menu'>
@@ -43,24 +46,26 @@ export function Header() {
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
 					<Feedback />
-					{MENU_ITEMS.map((item, index) => (
-						<Link
-							className='header-menu-right-nav-item'
-							key={index}
-							to={item.url}
-							target='_blank'
-							rel='noopener noreferrer'
+					{MENU_ITEMS.map((item) => (
+						<Button
+							key={item.title}
+							variant='blank'
+							className='header-menu-right-nav-item text-subtle'
+							onClick={() => {
+								window.open(item.url, '_blank', 'noreferrer');
+							}}
 						>
-							<span className='header-menu-right-nav-item-icon'>
-								<item.icon />
-							</span>
-							<span className='header-menu-right-nav-item-title'>{item.title}</span>
-						</Link>
+							<item.icon className='header-menu-right-nav-item-icon' />
+
+							<span className='header-menu-right-nav-item-title font-sfCompact'>{item.title}</span>
+						</Button>
 					))}
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
-					<MagnifyingGlass />
+					<Button variant='icon' onClick={toggleSearchCommandMenu}>
+						<MagnifyingGlass size={24} />
+					</Button>
 					<ReleaseDropdown />
 					{versionId && (
 						<>

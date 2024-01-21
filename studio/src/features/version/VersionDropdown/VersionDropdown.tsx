@@ -17,11 +17,9 @@ import {
 import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import './versionDropdown.scss';
 import { resetAfterVersionChange } from '@/utils';
 
 export default function VersionDropdown() {
-	const [open, setOpen] = useState(false);
 	const { toast } = useToast();
 	const { version } = useVersionStore();
 	const { t } = useTranslation();
@@ -84,35 +82,39 @@ export default function VersionDropdown() {
 				closeModal={() => useVersionStore.setState({ deleteVersionDrawerIsOpen: false })}
 				closable
 			/>
-			<DropdownMenu open={open} onOpenChange={setOpen}>
-				<div className='version-dropdown'>
+			<DropdownMenu>
+				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden'>
 					<Button
 						variant='blank'
-						className='version-dropdown-label'
+						className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm'
 						onClick={() => addSettingsTab(version._id)}
 					>
-						<div className='version-label-icon'>
+						<div className='w-8 h-8 bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
 							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
 						</div>
-						<div className='version-dropdown-label-desc'>
-							<div className='version-dropdown-label-desc-name'>{version?.name}</div>
+						<div className='text-left flex-1 font-sfCompact h-full flex flex-col justify-center'>
+							<div className=' text-sm leading-none text-default whitespace-nowrap truncate max-w-[12ch]'>
+								{version?.name}
+							</div>
 							<div className='text-xs text-subtle'>
 								{version?.readOnly ? 'Read Only' : 'Read/Write'}
 							</div>
 						</div>
 					</Button>
 					<DropdownMenuTrigger asChild>
-						<div className='version-dropdown-button'>
-							<Button variant='blank' role='combobox' aria-expanded={open} rounded>
-								<span className='version-dropdown-icon'>
-									<CaretUpDown size={20} />
-								</span>
-							</Button>
-						</div>
+						<Button
+							variant='blank'
+							className='absolute z-50 top-0 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
+							rounded
+						>
+							<div className='rounded-full hover:bg-wrapper-background-hover w-8 h-8 flex items-center justify-center'>
+								<CaretUpDown size={20} />
+							</div>
+						</Button>
 					</DropdownMenuTrigger>
 				</div>
 
-				<DropdownMenuContent align='end' className='version-dropdown-content'>
+				<DropdownMenuContent align='end' className='min-w-[210px]'>
 					<DropdownMenuItemContainer>
 						{versionDropdownItems.map((option) => (
 							<DropdownMenuItem

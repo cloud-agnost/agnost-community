@@ -7,8 +7,8 @@ import {
 	CommandList,
 	CommandLoading,
 } from '@/components/Command';
-import { HTTP_METHOD_BADGE_MAP, TAB_ICON_MAP } from '@/constants';
-import { useDebounce, useSearchTabClick, useUpdateEffect } from '@/hooks';
+import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { useDebounce, useSearchTabClick, useTabIcon, useUpdateEffect } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -16,25 +16,16 @@ import _ from 'lodash';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
-export default function CommandMenu({
-	open,
-	setOpen,
-}: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-}) {
+export default function CommandMenu() {
 	const handleClickElement = useSearchTabClick();
 
 	const [search, setSearch] = useState('');
 	const searchTerm = useDebounce(search, 500);
-	const { searchDesignElements } = useVersionStore();
+	const { searchDesignElements, isSearchCommandMenuOpen, toggleSearchCommandMenu } =
+		useVersionStore();
 	const { appId, orgId, versionId } = useParams() as Record<string, string>;
 
-	function getIcon(type: TabTypes): JSX.Element {
-		const IconComponent = TAB_ICON_MAP[type];
-		return <IconComponent className='w-5 h-5 text-icon-secondary' />;
-	}
-
+	const getIcon = useTabIcon('w-5 h-5');
 	useUpdateEffect(() => {
 		if (!open) {
 			setSearch('');
@@ -53,7 +44,7 @@ export default function CommandMenu({
 		enabled: !!searchTerm,
 	});
 	return (
-		<CommandDialog open={open} onOpenChange={setOpen}>
+		<CommandDialog open={isSearchCommandMenuOpen} onOpenChange={toggleSearchCommandMenu}>
 			<CommandInput value={search} onValueChange={setSearch} />
 			<CommandList>
 				{isFetching ? (
@@ -82,10 +73,10 @@ export default function CommandMenu({
 										text={item.meta.method}
 									/>
 								)}
-								<p className='text-sm leading-6 text-subtle tracking-wide '>
+								<p className='text-xs leading-6 text-subtle tracking-wide '>
 									{_.capitalize(item.type) === TabTypes.Field && ` ${item.meta.modelName}`}
 								</p>
-								<p className='text-sm leading-6 tracking-wide font-sfCompact'>
+								<p className='text-xs text-subtle leading-6 tracking-wide font-sfCompact'>
 									{_.capitalize(item.type)}
 								</p>
 							</div>
