@@ -116,7 +116,7 @@ export default function Models() {
 	return (
 		<>
 			<VersionTabLayout<Model>
-				breadCrumb={<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />}
+				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				isEmpty={!filteredModels.length}
 				type={TabTypes.Model}
 				openCreateModal={() => setIsCreateModelOpen(true)}

@@ -69,7 +69,7 @@ export default function Fields() {
 		<>
 			<VersionTabLayout<Field>
 				searchable
-				breadCrumb={<BreadCrumb goBackLink={databaseUrl} items={breadcrumbItems} />}
+				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
 				type={TabTypes.Field}
 				handlerButton={<CreateFieldButton />}

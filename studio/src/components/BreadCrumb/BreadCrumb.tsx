@@ -1,8 +1,8 @@
+import { Button } from '@/components/Button';
 import useTabStore from '@/store/version/tabStore';
 import { TabTypes } from '@/types';
 import { cn, generateId } from '@/utils';
-import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
+import { CaretRight } from '@phosphor-icons/react';
 import { Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 export interface BreadCrumbItem {
@@ -11,12 +11,11 @@ export interface BreadCrumbItem {
 }
 
 type BreadCrumbProps = {
-	goBackLink: string;
 	className?: string;
 	items: BreadCrumbItem[];
 };
 
-export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbProps) {
+export default function BreadCrumb({ className, items }: BreadCrumbProps) {
 	const filteredItems = items.filter((item) => Boolean(item.name));
 	const { addTab, getCurrentTab } = useTabStore();
 	const versionId = useParams<{ versionId: string }>().versionId as string;

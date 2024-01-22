@@ -4,7 +4,6 @@ import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
-import { is } from 'date-fns/locale';
 import { ReactNode } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { Link } from 'react-router-dom';

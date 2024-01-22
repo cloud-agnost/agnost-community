@@ -2,7 +2,7 @@ import type { ToastProps } from '@/components/Toast';
 import * as React from 'react';
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000000000000;
+const TOAST_REMOVE_DELAY = 1000000;
 
 type ToasterToast = ToastProps & {
 	id: string;
@@ -38,6 +38,10 @@ type Action =
 	| {
 			type: ActionType['DISMISS_TOAST'];
 			toastId?: ToasterToast['id'];
+	  }
+	| {
+			type: ActionType['REMOVE_TOAST'];
+			toastId?: ToasterToast['id'];
 	  };
 
 interface State {
@@ -51,15 +55,15 @@ const addToRemoveQueue = (toastId: string) => {
 		return;
 	}
 
-	// const timeout = setTimeout(() => {
-	// 	toastTimeouts.delete(toastId);
-	// 	dispatch({
-	// 		type: 'REMOVE_TOAST',
-	// 		toastId: toastId,
-	// 	});
-	// }, TOAST_REMOVE_DELAY);
+	const timeout = setTimeout(() => {
+		toastTimeouts.delete(toastId);
+		dispatch({
+			type: 'REMOVE_TOAST',
+			toastId: toastId,
+		});
+	}, TOAST_REMOVE_DELAY);
 
-	// toastTimeouts.set(toastId, timeout);
+	toastTimeouts.set(toastId, timeout);
 };
 
 export const reducer = (state: State, action: Action): State => {
@@ -103,9 +107,15 @@ export const reducer = (state: State, action: Action): State => {
 		}
 		case 'REMOVE_TOAST':
 			if (action.toastId === undefined) {
-				return state;
+				return {
+					...state,
+					toasts: [],
+				};
 			}
-			return state;
+			return {
+				...state,
+				toasts: state.toasts.filter((t) => t.id !== action.toastId),
+			};
 	}
 };
 

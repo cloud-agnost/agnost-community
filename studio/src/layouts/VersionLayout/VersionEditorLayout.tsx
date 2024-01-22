@@ -5,10 +5,10 @@ import { InfoModal } from '@/components/InfoModal';
 import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn, formatCode } from '@/utils';
-import { FloppyDisk, TestTube, Pencil } from '@phosphor-icons/react';
+import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 interface VersionEditorLayoutProps {
 	children?: React.ReactNode;
@@ -54,7 +54,6 @@ export default function VersionEditorLayout({
 	deleteLogic,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
-	const { pathname } = useLocation();
 	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
 	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
@@ -83,12 +82,7 @@ export default function VersionEditorLayout({
 	return (
 		<div className={cn('h-full space-y-2', className)}>
 			<div className='flex items-center justify-between gap-6 p-2'>
-				{breadCrumbItems && (
-					<BreadCrumb
-						goBackLink={pathname.split('/').slice(0, -1).join('/')}
-						items={breadCrumbItems}
-					/>
-				)}
+				{breadCrumbItems && <BreadCrumb items={breadCrumbItems} />}
 				{children}
 				<div className='flex items-center gap-2'>
 					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit} size='xs'>
