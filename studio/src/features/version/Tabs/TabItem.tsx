@@ -1,8 +1,10 @@
 import { Button } from '@/components/Button';
 import { useTabIcon } from '@/hooks';
+import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
+import { is } from 'date-fns/locale';
 import { ReactNode } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { Link } from 'react-router-dom';
@@ -37,9 +39,15 @@ export default function TabItem({
 		onClose?.();
 	}
 	const getTabIcon = useTabIcon('w-3.5 h-3.5');
+	const { isSidebarOpen } = useUtilsStore();
 	return (
 		<div
-			className={cn('tab-item icon', closeable && 'closeable', active && 'active')}
+			className={cn(
+				'tab-item icon',
+				isSidebarOpen && 'border-l-0',
+				closeable && 'closeable',
+				active && 'active border-x border-border',
+			)}
 			{...props}
 			{...provided.draggableProps}
 			{...provided.dragHandleProps}

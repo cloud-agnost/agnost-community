@@ -25,8 +25,8 @@ export default function VersionError() {
 	}, []);
 	return (
 		<Error>
-			<Button className='mt-8' variant='primary' onClick={closeCurrentTab}>
-				<X className='mr-2' />
+			<Button className='mt-8' variant='primary' onClick={closeCurrentTab} size='xs'>
+				<X className='mr-1' />
 				{t('version.close_tab')}
 			</Button>
 		</Error>

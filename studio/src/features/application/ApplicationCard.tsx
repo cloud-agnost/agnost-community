@@ -40,7 +40,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 					</div>
 					<div
 						className={cn(
-							'absolute bg-base opacity-50 w-full h-full z-40',
+							'absolute bg-base/50 w-full h-full z-40',
 							loading ? 'transition-all duration-100 fade-in' : 'animate-out fade-out',
 						)}
 					/>

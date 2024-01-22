@@ -13,7 +13,11 @@ export default function AddCustomDomainButton() {
 	const { clusterDomainError } = useClusterStore();
 	return (
 		<>
-			<Button onClick={() => setOpen(true)} disabled={!canCreate || !_.isNil(clusterDomainError)}>
+			<Button
+				onClick={() => setOpen(true)}
+				disabled={!canCreate || !_.isNil(clusterDomainError)}
+				size='xs'
+			>
 				{t('cluster.add_domain')}
 			</Button>
 			<AddVersionDomain key={open.toString()} open={open} onClose={() => setOpen(false)} />

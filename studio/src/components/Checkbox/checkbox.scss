@@ -1,5 +1,5 @@
 .checkbox {
-	@apply h-6 w-6 shrink-0 rounded-sm;
+	@apply h-4 w-4 shrink-0 rounded-sm;
 	@apply border border-input-border ring-offset-wrapper-background-base;
 	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2;
 	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-border disabled:text-icon-disabled disabled:data-[state=checked]:opacity-50  disabled:pointer-events-none;

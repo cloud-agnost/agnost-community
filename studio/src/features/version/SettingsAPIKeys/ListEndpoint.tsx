@@ -44,11 +44,11 @@ export default function ListEndpoint({
 					<div className='flex items-center flex-wrap gap-2'>
 						{endpoints.map((item, index) => (
 							<Badge
-								className='whitespace-nowrap'
 								onClear={() => clear(index)}
 								text={`${item.method} ${item.name}`}
 								key={index}
 								variant={HTTP_METHOD_BADGE_MAP[item.method]}
+								className='min-w-[52px] whitespace-nowrap'
 							/>
 						))}
 					</div>

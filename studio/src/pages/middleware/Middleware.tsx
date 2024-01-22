@@ -60,7 +60,6 @@ export default function MainMiddleware() {
 	return (
 		<VersionTabLayout<Middleware>
 			searchable
-			className='p-0'
 			type={TabTypes.Middleware}
 			title={t('version.settings.middlewares') as string}
 			emptyStateTitle={t('version.middleware.no_middleware_found')}

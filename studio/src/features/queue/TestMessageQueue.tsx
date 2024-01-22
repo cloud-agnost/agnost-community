@@ -88,11 +88,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	}, [open]);
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
-			<DrawerContent
-				position='right'
-				size='lg'
-				className='gap-y-6 h-full flex [&>*]:w-full flex-col'
-			>
+			<DrawerContent position='right' size='lg' className='h-full flex [&>*]:w-full flex-col'>
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.test.title')}</DrawerTitle>
 				</DrawerHeader>

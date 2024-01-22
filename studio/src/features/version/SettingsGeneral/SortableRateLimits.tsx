@@ -60,7 +60,7 @@ export default function SortableRateLimits({
 						</Draggable>
 					))
 				) : (
-					<p className='text-default font-sfCompact text-sm text-center'>
+					<p className='text-default font-sfCompact text-xs text-center'>
 						{t('version.rate_limiters_empty')}
 					</p>
 				)}

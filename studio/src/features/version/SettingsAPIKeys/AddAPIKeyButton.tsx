@@ -10,7 +10,7 @@ export default function AddAPIKeyButton() {
 	const canCreate = useAuthorizeVersion('version.key.create');
 	return (
 		<>
-			<Button onClick={() => setOpen(true)} disabled={!canCreate}>
+			<Button onClick={() => setOpen(true)} disabled={!canCreate} size='xs'>
 				{t('version.api_key.add')}
 			</Button>
 			<AddOrEditAPIKeyDrawer key={open.toString()} open={open} onOpenChange={setOpen} />

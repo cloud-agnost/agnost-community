@@ -83,7 +83,7 @@ export default function DeploymentStatusCard() {
 								<span className={cn('relative inline-flex rounded-full h-2 w-2', classes?.[1])} />
 							</span>
 						</div>
-						<Cloud size={24} />
+						<Cloud size={18} />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='overflow-hidden relative w-[21rem]' align='end'>
@@ -124,7 +124,7 @@ export default function DeploymentStatusCard() {
 						<Resources />
 					</div>
 
-					<footer className='deployment-status-footer p-2'>
+					<footer className='deployment-status-footer'>
 						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
 							{t('version.view_logs')}
 						</Button>

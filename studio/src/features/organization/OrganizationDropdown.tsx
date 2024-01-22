@@ -79,18 +79,19 @@ export function OrganizationDropdown() {
 				<CommandItem className='flex !justify-center'>
 					<Button
 						disabled={organization?.ownerUserId === user?._id}
-						className='w-full'
+						className='w-full font-normal'
 						variant='text'
 						onClick={() => setOpenModal(true)}
 					>
 						{t('organization.leave.main')}
 					</Button>
 				</CommandItem>
-				<CommandItem>
+				<CommandItem className='hover:bg-[unset]'>
 					<Button
+						className='font-normal'
 						disabled={!user?.isClusterOwner}
 						size='full'
-						variant='secondary'
+						variant='primary'
 						onClick={() => setOpenCreateModal(true)}
 					>
 						<Plus size={16} className='mr-2' />

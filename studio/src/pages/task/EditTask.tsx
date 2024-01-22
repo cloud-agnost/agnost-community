@@ -69,7 +69,7 @@ export default function EditTask() {
 		>
 			<div className='flex items-center gap-4 flex-1'>
 				<Separator orientation='vertical' className='h-[24px] w-[1px]' />
-				<span className='text-default font-sfCompact text-sm'>
+				<span className='text-default font-sfCompact text-xs'>
 					{describeCronExpression(task.cronExpression)}
 				</span>
 			</div>

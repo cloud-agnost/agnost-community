@@ -13,6 +13,7 @@ interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onClear?: () => void;
 	urlKey?: string;
 	canAddParam?: boolean;
+	inputClassName?: string;
 }
 
 export default function SearchInput({
@@ -21,8 +22,10 @@ export default function SearchInput({
 	onClear,
 	onSearch,
 	value,
+	inputClassName,
 	urlKey = 'q',
 	canAddParam = true,
+
 	...props
 }: SearchInputProps) {
 	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
@@ -61,17 +64,17 @@ export default function SearchInput({
 
 	return (
 		<div className={cn('search-input-wrapper', className)} {...props}>
-			<MagnifyingGlass size={20} className='search-input-icon' />
+			<MagnifyingGlass size={16} className='search-input-icon' />
 			<Input
 				ref={ref}
 				value={inputValue}
 				onChange={(e) => setInputValue(e.target.value)}
 				placeholder={placeholder ?? t('general.search').toString()}
-				className='search-input'
+				className={cn('search-input', inputClassName)}
 			/>
 			{inputValue && (
 				<Button className='search-input-button' onClick={clear} variant='icon'>
-					<X size={20} />
+					<X size={16} />
 				</Button>
 			)}
 		</div>

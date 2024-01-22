@@ -47,11 +47,11 @@ export default function NewTabDropdown() {
 							onClick={() => handleAddTab(item)}
 							asChild
 							key={item.path}
-							className='flex items-center gap-4 relative'
+							className='flex items-center gap-2 relative'
 						>
 							<div>
 								{getIcon(capitalize(item.type) as TabTypes)}
-								<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
+								<h1 title={item.title} className='flex-1 truncate max-w-[15ch] text-xs'>
 									{item.title}
 								</h1>
 							</div>

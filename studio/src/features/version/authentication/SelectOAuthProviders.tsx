@@ -34,7 +34,7 @@ export default function SelectOAuthProviders() {
 
 	function getIcon(provider: OAuthProviderTypes): JSX.Element {
 		const Icon = OAUTH_ICON_MAP[provider];
-		return <Icon className='w-6 h-6' />;
+		return <Icon className='w-5 h-5' />;
 	}
 	function handleDeleteOAuthConfig() {
 		deleteOAuthConfig({
@@ -69,7 +69,9 @@ export default function SelectOAuthProviders() {
 			description={t('version.authentication.auth_providers_desc')}
 		>
 			<div className='flex items-center justify-between'>
-				<p className='text-subtle font-sfCompact'>{t('version.authentication.providers')}</p>
+				<p className='text-subtle text-xs font-sfCompact'>
+					{t('version.authentication.providers')}
+				</p>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild disabled={!providers.length || !canEdit}>
 						<Button variant='secondary'>
@@ -83,13 +85,15 @@ export default function SelectOAuthProviders() {
 							{providers.map((p) => (
 								<DropdownMenuItem
 									key={p.provider}
-									className='flex items-center gap-4'
+									className='flex items-center gap-2'
 									onClick={() => {
 										setSelectedProvider(p);
 									}}
 								>
 									{getIcon(p.provider)}
-									<span className='font-sfCompact text-default'>{capitalize(p.provider)}</span>
+									<span className='font-sfCompact text-default text-xs'>
+										{capitalize(p.provider)}
+									</span>
 								</DropdownMenuItem>
 							))}
 						</DropdownMenuItemContainer>
@@ -119,7 +123,7 @@ export default function SelectOAuthProviders() {
 						</div>
 					))
 				) : (
-					<p className='text-subtle font-sfCompact text-center'>
+					<p className='text-subtle font-sfCompact text-center text-xs'>
 						{t('version.authentication.no_providers')}
 					</p>
 				)}

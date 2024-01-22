@@ -3,7 +3,7 @@
 		@apply flex flex-col items-center justify-center gap-8 lg:gap-20 h-screen;
 	}
 	&-title {
-		@apply text-default text-2xl md:text-3xl font-semibold;
+		@apply text-default text-2xl font-semibold;
 	}
 	&-items {
 		@apply flex flex-wrap justify-center gap-4 w-1/2;

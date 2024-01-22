@@ -82,7 +82,10 @@ export default function AddOrEditAPIKeyDrawer({
 	async function setDefaultForEdit() {
 		if (open && selectedAPIKey) {
 			form.setValue('ip.type', selectedAPIKey.IPAuthorization);
-			form.setValue('ip.list', selectedAPIKey?.authorizedIPs.map((ip) => ({ ip })) ?? [{ ip: '' }]);
+			form.setValue(
+				'ip.list',
+				selectedAPIKey?.authorizedIPs?.map((ip) => ({ ip })) ?? [{ ip: '' }],
+			);
 			form.setValue('domain.type', selectedAPIKey.domainAuthorization);
 			form.setValue(
 				'domain.list',

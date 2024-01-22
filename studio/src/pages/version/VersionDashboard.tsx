@@ -86,9 +86,8 @@ export default function VersionDashboard() {
 			<BeatLoader color='#6884FD' size={24} margin={18} />
 		</div>
 	) : (
-		<div className='space-y-8 max-w-7xl'>
-			<h1 className='text-default text-2xl'>{t('version.dashboard.title')}</h1>
-			<div className='grid grid-cols-4 gap-6 mt-10 '>
+		<div className='space-y-8 max-w-7xl p-4'>
+			<div className='grid grid-cols-4 gap-6'>
 				{Object.entries(dashboard).map(([key, value]) => (
 					<Button
 						variant='blank'
@@ -171,8 +170,8 @@ export default function VersionDashboard() {
 									<guide.icon className='w-6 h-6 text-default' />
 								</div>
 								<div className='flex-1'>
-									<h1 className='text-default'>{guide.title}</h1>
-									<h2 className='text-subtle text-sm'>{guide.description}</h2>
+									<h1 className='text-default text-sm'>{guide.title}</h1>
+									<h2 className='text-subtle text-xs'>{guide.description}</h2>
 								</div>
 							</div>
 						</Link>

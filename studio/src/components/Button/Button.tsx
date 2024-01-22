@@ -17,12 +17,13 @@ const buttonVariants = cva('btn', {
 			link: 'btn-link',
 			blank: 'btn-blank',
 			outline: 'btn-outline',
-			icon: 'btn-icon',
+			icon: 'btn-icon btn-rounded',
 		},
 		iconOnly: {
 			true: 'btn-icon-only',
 		},
 		size: {
+			xs: 'btn-xs',
 			md: 'btn-md',
 			sm: 'btn-sm',
 			lg: 'btn-lg',
@@ -86,7 +87,7 @@ const Button = React.forwardRef<
 					ref={ref}
 					{...props}
 				>
-					{loading && <CircleNotch size={20} className='loading' />}
+					{loading && <CircleNotch size={16} className='loading' />}
 					{children}
 				</Link>
 			);
@@ -98,7 +99,7 @@ const Button = React.forwardRef<
 				type={type ?? 'button'}
 				{...props}
 			>
-				{loading && <CircleNotch size={20} className='loading' />}
+				{loading && <CircleNotch size={16} className='loading' />}
 				{children}
 			</Comp>
 		);

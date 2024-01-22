@@ -31,13 +31,7 @@ export default function VersionSettingsAPIKeys() {
 		>
 			{apiKeys.length > 0 ? (
 				<>
-					<div className='data-table-container'>
-						<DataTable<APIKey>
-							table={table}
-							className='version-settings-table table-fixed'
-							containerClassName='version-settings-table-container'
-						/>
-					</div>
+					<DataTable<APIKey> table={table} />
 					<AddOrEditAPIKeyDrawer
 						key={editAPIKeyDrawerIsOpen.toString()}
 						open={editAPIKeyDrawerIsOpen}

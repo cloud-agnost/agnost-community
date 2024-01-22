@@ -32,7 +32,7 @@ export default function SettingsFormItem({
 			<div>
 				<div className='text-sm leading-6 text-default tracking-tight font-medium'>{title}</div>
 				{description && (
-					<p className='text-subtle text-sm tracking-tight font-normal'>{description}</p>
+					<p className='text-subtle text-xs tracking-tight font-normal'>{description}</p>
 				)}
 			</div>
 			<div className={contentClassName}>{children}</div>

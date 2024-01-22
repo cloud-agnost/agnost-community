@@ -1,6 +1,6 @@
 .btn {
 	@apply inline-flex items-center justify-center h-9;
-	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
+	@apply rounded-sm text-xs transition-colors leading-[normal];
 	@apply disabled:opacity-50 disabled:pointer-events-none;
 
 	&-primary {
@@ -22,8 +22,11 @@
 	&-outline {
 		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-button-secondary-hover #{!important};
 	}
+	&-xs {
+		@apply h-[unset] p-2;
+	}
 	&-md {
-		@apply py-2 px-4;
+		@apply py-1 px-2;
 	}
 	&-sm {
 		@apply py-[6px] px-2;
@@ -44,7 +47,7 @@
 		@apply cursor-wait pointer-events-none;
 	}
 	&-rounded {
-		@apply rounded-full;
+		@apply rounded-full p-2 h-[unset];
 	}
 	&-group {
 		@apply inline-flex items-center justify-center;

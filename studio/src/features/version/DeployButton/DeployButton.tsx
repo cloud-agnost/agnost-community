@@ -41,6 +41,8 @@ export default function DeployButton(props: Omit<ButtonProps, 'loading' | 'onCli
 			onClick={redeploy}
 			loading={isPending}
 			disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
+			size='xs'
+			className='w-24'
 			{...props}
 		>
 			{t('version.redeploy')}

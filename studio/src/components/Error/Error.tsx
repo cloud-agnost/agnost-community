@@ -72,16 +72,17 @@ export default function Error({ children }: { children: React.ReactNode }) {
 	return (
 		<div className='w-full h-screen flex flex-col items-center justify-center'>
 			<div className='flex flex-col items-center space-y-2'>
-				<ErrorPage className='w-36 h-32' />
-				<h2 className='text-default text-2xl font-semibold'>{t('general.internalServerError')}</h2>
-				<p className='text-lg text-subtle font-sfCompact'>
+				<ErrorPage className='w-16 h-16' />
+				<h2 className='text-default text-sm font-semibold'>{t('general.internalServerError')}</h2>
+				<p className='text-xs text-subtle font-sfCompact'>{t('general.errorPageDescription')}</p>
+				<p className='text-xs text-subtle font-sfCompact'>
 					{t('general.internalServerErrorDescription')}
 				</p>
 			</div>
 
 			<div className='flex items-center'>
 				{children}
-				<Button className='mt-8 ml-4' variant='secondary' onClick={() => setIsOpen(true)}>
+				<Button className='mt-8 ml-2' variant='secondary' onClick={() => setIsOpen(true)} size='xs'>
 					{t('general.messageUs')}
 				</Button>
 			</div>
@@ -111,10 +112,10 @@ export default function Error({ children }: { children: React.ReactNode }) {
 								)}
 							/>
 							<div className='flex justify-end gap-4 mt-2'>
-								<Button variant='text' size='lg' onClick={closeModal}>
+								<Button variant='text' size='xs' onClick={closeModal}>
 									{t('general.cancel')}
 								</Button>
-								<Button variant='primary' size='lg' loading={loading} type='submit'>
+								<Button variant='primary' size='xs' loading={loading} type='submit'>
 									{t('general.ok')}
 								</Button>
 							</div>

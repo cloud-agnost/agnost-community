@@ -49,7 +49,6 @@ export default function VersionDatabase() {
 	return (
 		<VersionTabLayout<Database>
 			searchable
-			className='p-0'
 			isEmpty={databases.length === 0}
 			title={t('database.page_title') as string}
 			type={TabTypes.Database}

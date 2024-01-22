@@ -1,6 +1,6 @@
 .dropdown {
 	&-sub-trigger {
-		@apply flex cursor-default select-none items-center px-2 py-1.5 text-sm outline-none;
+		@apply flex cursor-default select-none items-center px-2 py-1.5 text-xs outline-none;
 	}
 
 	&-sub-content {
@@ -13,8 +13,8 @@
 	}
 
 	&-item {
-		@apply relative flex cursor-pointer select-none items-center font-sfCompact;
-		@apply px-3 py-1 text-sm text-default outline-none transition-colors;
+		@apply relative flex cursor-pointer select-none items-center font-sfCompact text-xs;
+		@apply px-3 py-1 text-default outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		&:hover,
 		&:focus-visible,
@@ -25,7 +25,7 @@
 
 	&-checkbox-item {
 		@apply relative flex cursor-pointer select-none items-center text-default;
-		@apply font-sfCompact py-1.5 pl-8 pr-2 text-sm outline-none transition-colors;
+		@apply font-sfCompact py-1.5 pl-8 pr-2 text-xs outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		> span {
 			@apply absolute left-2 flex h-3.5 w-3.5 items-center justify-center;
@@ -37,7 +37,7 @@
 	}
 
 	&-radio-item {
-		@apply relative flex cursor-default select-none items-center font-sfCompact py-1.5 pl-8 pr-2 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+		@apply relative flex cursor-default select-none items-center font-sfCompact py-1.5 pl-8 pr-2 text-xs outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 
 		> span {
 			@apply absolute left-2 flex h-3.5 w-3.5 items-center justify-center;
@@ -45,7 +45,7 @@
 	}
 
 	&-label {
-		@apply p-2 text-sm font-semibold;
+		@apply p-2 text-xs font-semibold;
 	}
 
 	&-item-container {

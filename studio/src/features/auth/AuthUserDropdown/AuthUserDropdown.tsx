@@ -41,17 +41,17 @@ export default function AuthUserDropdown() {
 		{
 			id: 'light',
 			title: 'Light',
-			icon: <SunDim size={24} />,
+			icon: <SunDim />,
 		},
 		{
 			id: 'dark',
 			title: 'Dark',
-			icon: <MoonStars size={24} />,
+			icon: <MoonStars />,
 		},
 		{
 			id: 'system',
 			title: 'System',
-			icon: <Laptop size={24} />,
+			icon: <Laptop />,
 		},
 	];
 
@@ -151,13 +151,8 @@ export default function AuthUserDropdown() {
 					</DropdownMenuItem>
 				</DropdownMenuItemContainer>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					className='flex text-sm text-default leading-6 font-normal items-center gap-2'
-					onClick={logoutHandler}
-				>
-					<span className='w-6 h-6 flex items-center justify-center'>
-						<SignOut className='text-icon-base text-lg' />
-					</span>
+				<DropdownMenuItem onClick={logoutHandler}>
+					<SignOut className='text-icon-base text-lg mr-2' />
 					{t('general.logout')}
 				</DropdownMenuItem>
 			</DropdownMenuContent>

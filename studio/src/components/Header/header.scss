@@ -27,15 +27,15 @@
 					@apply w-4 h-4;
 				}
 				&-title {
-					@apply leading-6 font-normal text-sm;
+					@apply leading-6 font-normal text-xs;
 				}
 			}
 		}
 		&-actions {
-			@apply flex gap-2 items-center;
+			@apply flex items-center;
 
 			.btn {
-				@apply w-[36px] h-[36px] p-0 rounded-full;
+				@apply w-[32px] h-[32px] p-0 rounded-full;
 				svg {
 					@apply text-[17px];
 				}

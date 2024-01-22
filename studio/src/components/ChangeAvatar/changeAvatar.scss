@@ -2,7 +2,7 @@
 	&-actions {
 		@apply inline-flex relative;
 		&-button {
-			@apply absolute bottom-0 left-1/2 bg-base opacity-70 w-full hidden;
+			@apply absolute bottom-0 left-1/2 bg-base/70 w-full hidden;
 			@apply transform -translate-x-1/2 rounded-none space-x-2;
 		}
 		&:hover {

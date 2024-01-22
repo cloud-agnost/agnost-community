@@ -2,11 +2,10 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
-import { Pencil } from '@/components/icons';
 import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn, formatCode } from '@/utils';
-import { FloppyDisk, TestTube } from '@phosphor-icons/react';
+import { FloppyDisk, TestTube, Pencil } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
@@ -82,8 +81,8 @@ export default function VersionEditorLayout({
 	}, [logic]);
 
 	return (
-		<div className={cn('space-y-6 h-full', className)}>
-			<div className='flex items-center justify-between gap-6'>
+		<div className={cn('h-full space-y-2', className)}>
+			<div className='flex items-center justify-between gap-6 p-2'>
 				{breadCrumbItems && (
 					<BreadCrumb
 						goBackLink={pathname.split('/').slice(0, -1).join('/')}
@@ -91,20 +90,26 @@ export default function VersionEditorLayout({
 					/>
 				)}
 				{children}
-				<div className='flex items-center gap-4'>
-					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit}>
-						<Pencil className='text-icon-default w-5 h-5 mr-2' />
+				<div className='flex items-center gap-2'>
+					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit} size='xs'>
+						<Pencil size={14} className='text-icon-default mr-1' />
 						{t('general.edit')}
 					</Button>
 
 					{onTestModalOpen && (
-						<Button variant='secondary' onClick={onTestModalOpen}>
-							<TestTube size={20} className='text-icon-default mr-2' />
+						<Button variant='secondary' onClick={onTestModalOpen} size='xs'>
+							<TestTube size={14} className='text-icon-default mr-1' />
 							{t('endpoint.test.test')}
 						</Button>
 					)}
-					<Button variant='primary' onClick={handleSaveLogic} loading={loading} disabled={!canEdit}>
-						{!loading && <FloppyDisk size={20} className='text-icon-default mr-2' />}
+					<Button
+						variant='primary'
+						onClick={handleSaveLogic}
+						loading={loading}
+						disabled={!canEdit}
+						size='xs'
+					>
+						{!loading && <FloppyDisk size={14} className='text-icon-default mr-1' />}
 						{t('general.save')}
 					</Button>
 				</div>
@@ -112,7 +117,7 @@ export default function VersionEditorLayout({
 
 			<CodeEditor
 				className='h-full'
-				containerClassName='h-[95%]'
+				containerClassName='h-[calc(100%-48px)]'
 				value={editedLogic}
 				onChange={(val) => setLogic(val as string)}
 				onSave={(val) => onSaveLogic(val as string)}

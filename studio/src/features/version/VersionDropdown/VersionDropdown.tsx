@@ -86,14 +86,21 @@ export default function VersionDropdown() {
 				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden'>
 					<Button
 						variant='blank'
-						className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm'
+						className='flex items-center px-1.5 h-full w-full hover:bg-button-secondary-hover transition font-normal rounded-sm'
 						onClick={() => addSettingsTab(version._id)}
 					>
-						<div className='w-8 h-8 bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
-							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
+						<div className='w-7 h-7 bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
+							{version?.readOnly ? (
+								<LockSimple size={20} className='text-elements-subtle-red dark:text-elements-red' />
+							) : (
+								<LockSimpleOpen
+									size={20}
+									className='text-elements-subtle-green dark:text-elements-green'
+								/>
+							)}
 						</div>
 						<div className='text-left flex-1 font-sfCompact h-full flex flex-col justify-center'>
-							<div className=' text-sm leading-none text-default whitespace-nowrap truncate max-w-[12ch]'>
+							<div className=' text-xs leading-none text-default whitespace-nowrap truncate max-w-[12ch]'>
 								{version?.name}
 							</div>
 							<div className='text-xs text-subtle'>
@@ -107,7 +114,7 @@ export default function VersionDropdown() {
 							className='absolute z-50 top-0 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
 							rounded
 						>
-							<div className='rounded-full hover:bg-wrapper-background-hover w-8 h-8 flex items-center justify-center'>
+							<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>
 								<CaretUpDown size={20} />
 							</div>
 						</Button>

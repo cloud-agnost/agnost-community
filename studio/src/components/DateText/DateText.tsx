@@ -11,7 +11,7 @@ interface DateTextProps {
 }
 export default function DateText({ date, children, className, user, ...props }: DateTextProps) {
 	return (
-		<div className={cn('flex items-center gap-4 whitespace-nowrap', className)} {...props}>
+		<div className={cn('flex items-center gap-2 whitespace-nowrap', className)} {...props}>
 			{children}
 			{user && (
 				<Avatar size='sm'>
@@ -21,12 +21,10 @@ export default function DateText({ date, children, className, user, ...props }: 
 			)}
 			{date ? (
 				<div>
-					<span className='block text-default text-sm leading-6'>
+					<p className='block text-default text-xs'>
 						{formatDate(date, DATE_FORMAT_MONTH_DAY_YEAR)}
-					</span>
-					<time className='text-[11px] text-subtle leading-[21px]'>
-						{formatDate(date, TIME_FORMAT)}
-					</time>
+					</p>
+					<time className='text-[11px] text-subtle'>{formatDate(date, TIME_FORMAT)}</time>
 				</div>
 			) : (
 				<div className='text-default text-sm leading-6'>-</div>
