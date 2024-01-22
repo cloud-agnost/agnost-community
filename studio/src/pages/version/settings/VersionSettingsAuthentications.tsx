@@ -41,7 +41,7 @@ export default function VersionSettingsAuthentications() {
 			contentClassName='!overflow-hidden !p-0 h-full'
 		>
 			<div className='h-full'>
-				<nav className='flex border-b pt-6 px-6'>
+				<nav className='flex border-b'>
 					{AUTH_MENU_ITEMS.map((item) => (
 						<OrganizationMenuItem
 							key={item.name}
