@@ -31,7 +31,7 @@ export default function SideBarButton({
 			className={cn(
 				'flex items-center [&>*]:min-w-0 justify-between gap-1 group',
 				active
-					? 'bg-button-primary/50 text-default'
+					? 'bg-button-primary/70 text-default'
 					: 'hover:bg-subtle text-subtle hover:text-default',
 			)}
 			{...props}
@@ -41,7 +41,7 @@ export default function SideBarButton({
 				variant='blank'
 				size='full'
 				className={cn(
-					'justify-start text-left gap-2 text-sm  font-normal cursor-pointer !h-6 !rounded-none whitespace-nowrap  pl-5 flex-1',
+					'justify-start text-left gap-2 text-xs  font-normal cursor-pointer !h-6 !rounded-none whitespace-nowrap  pl-5 flex-1',
 					className,
 				)}
 			>

@@ -9,9 +9,7 @@ export default function SortableContainer({ title, children, actions }: Sortable
 	return (
 		<div className='p-4 border rounded-lg flex flex-col gap-4'>
 			<div className='flex justify-between items-center'>
-				<span className='uppercase font-sfCompact text-subtle leading-6 text-sm font-normal'>
-					{title}
-				</span>
+				<span className='uppercase font-sfCompact text-subtle text-xs font-normal'>{title}</span>
 				{actions}
 			</div>
 			{children}

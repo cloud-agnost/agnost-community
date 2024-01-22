@@ -298,8 +298,8 @@ export default function UpdateAPIServer() {
 					<Button
 						type='submit'
 						variant='primary'
-						size='lg'
-						className=' self-end'
+						size='xs'
+						className='w-24 self-end'
 						loading={isPending}
 						disabled={!canEdit}
 					>

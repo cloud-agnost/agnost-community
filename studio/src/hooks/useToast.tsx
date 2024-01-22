@@ -100,7 +100,7 @@ export const reducer = (state: State, action: Action): State => {
 						? {
 								...t,
 								open: false,
-						  }
+							}
 						: t,
 				),
 			};

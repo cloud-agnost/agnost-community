@@ -197,11 +197,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
-			<DrawerContent
-				position='right'
-				size='lg'
-				className={cn('gap-y-6 h-full flex [&>*]:w-full flex-col')}
-			>
+			<DrawerContent position='right' size='lg' className={cn('h-full flex [&>*]:w-full flex-col')}>
 				<DrawerHeader>
 					<DrawerTitle>{t('endpoint.test.title')}</DrawerTitle>
 				</DrawerHeader>
@@ -214,8 +210,9 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							</Alert>
 						</div>
 					)}
+
 					<div className='flex items-center px-5 my-6'>
-						<div className='border border-input-disabled-border rounded-l w-16 h-9'>
+						<div className='rounded-l w-16 h-9'>
 							<Badge
 								className='w-full h-full rounded-l rounded-r-none'
 								variant={HTTP_METHOD_BADGE_MAP[endpoint?.method as string]}
@@ -223,10 +220,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							/>
 						</div>
 						<div className='relative w-full'>
-							<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
+							<Input className='rounded-none rounded-r !bg-base' value={endpoint.path} disabled />
 							<CopyButton
 								text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
-								className='absolute right-0 top-0 w-8 h-9'
+								className='absolute right-2 top-1 w-7 h-7'
 							/>
 						</div>
 						<Button
@@ -257,7 +254,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					</nav>
 				</div>
 				<Form {...form}>
-					<PanelGroup className={cn('p-6 pt-0')} direction='vertical' autoSaveId={endpoint._id}>
+					<PanelGroup className='p-6' direction='vertical' autoSaveId={endpoint._id}>
 						<Panel defaultSize={32} className='max-h-full !overflow-y-auto' minSize={20}>
 							<div
 								className={cn(

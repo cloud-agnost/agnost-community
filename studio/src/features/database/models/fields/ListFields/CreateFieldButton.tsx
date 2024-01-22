@@ -73,8 +73,8 @@ export default function CreateFieldButton() {
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild disabled={!canCreateField}>
-					<Button className='gap-2 whitespace-nowrap' disabled={!canCreateField}>
-						<Plus weight='bold' />
+					<Button className='gap-1 whitespace-nowrap' disabled={!canCreateField} size='xs'>
+						<Plus size={14} weight='bold' />
 						{t('database.fields.add')}
 					</Button>
 				</DropdownMenuTrigger>

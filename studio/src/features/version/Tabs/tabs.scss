@@ -27,7 +27,7 @@
 				}
 			}
 			&.active {
-				@apply bg-subtle hover:bg-button-secondary-hover border-x border-border;
+				@apply bg-subtle hover:bg-button-secondary-hover;
 				&::before {
 					@apply opacity-100;
 				}

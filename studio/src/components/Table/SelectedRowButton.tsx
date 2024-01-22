@@ -19,8 +19,8 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 
 	return (
 		<>
-			<div className={cn('flex items-center rounded-md bg-lighter', className)}>
-				<div className='flex items-center gap-2 border-r border-button-border p-1.5'>
+			<div className={cn('flex items-center rounded-sm bg-lighter', className)}>
+				<div className='flex items-center gap-2 border-r border-button-border px-1.5'>
 					{table && (
 						<Button
 							size='sm'
@@ -28,11 +28,11 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 							className='bg-button-primary h-1/2 p-1'
 							onClick={() => table?.resetRowSelection()}
 						>
-							<Minus size={16} weight='bold' className='text-icon-default' />
+							<Minus size={14} weight='bold' className='text-icon-default' />
 						</Button>
 					)}
 
-					<span className='font-sfCompact text-sm text-elements-blue'>
+					<span className='font-sfCompact link text-xs'>
 						{t('general.selected', {
 							count: table.getSelectedRowModel().rows.length,
 						})}
@@ -40,7 +40,7 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 				</div>
 
 				<Button variant='icon' onClick={() => setOpenInfoModal(true)} disabled={disabled}>
-					<Trash size={20} className='text-icon-base' />
+					<Trash size={14} className='text-icon-base' />
 				</Button>
 			</div>
 			<InfoModal

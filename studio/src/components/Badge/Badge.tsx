@@ -48,7 +48,11 @@ export default function Badge({ text, variant, rounded, onClear, className }: Ba
 			{rounded && variant !== 'gray' && <div className='badge-dot' />}
 			<span className={cn('badge-text')}>{text}</span>
 			{onClear && (
-				<Button variant='icon' className='badge-clear p-0 h-4 w-4 text-default' onClick={onClear}>
+				<Button
+					variant='icon'
+					className='bg-inherit bg-opacity-70 p-0 h-4 w-4 text-default'
+					onClick={onClear}
+				>
 					<X size={12} />
 				</Button>
 			)}

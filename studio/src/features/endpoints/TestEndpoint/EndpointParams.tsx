@@ -74,7 +74,7 @@ export default function EndpointParams() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button variant='secondary' onClick={() => removeQueryParamFields(index)}>
+						<Button variant='secondary' rounded onClick={() => removeQueryParamFields(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>

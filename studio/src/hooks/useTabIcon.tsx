@@ -20,15 +20,7 @@ export default function useTabIcon(className: string) {
 	};
 	function getTabIcon(type: TabTypes) {
 		const Icon = TAB_ICON_MAP[type];
-		return (
-			<Icon
-				className={cn(
-					'text-subtle hover:text-default group-hover:text-default',
-					`transition-colors duration-200 ${color[type]}`,
-					className,
-				)}
-			/>
-		);
+		return <Icon className={cn(`${color[type]}`, className)} />;
 	}
 
 	return getTabIcon;

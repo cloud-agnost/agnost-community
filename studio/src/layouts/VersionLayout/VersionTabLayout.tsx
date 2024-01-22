@@ -91,16 +91,17 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4', className)}>
+		<div className={cn('h-full space-y-4 p-4', className)}>
 			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
 				{breadCrumb}
 				<div className='flex items-center justify-between flex-1'>
-					<h1 className='text-default text-xl text-center'>{title}</h1>
-					<div className='flex items-center justify-center gap-4'>
+					<h1 className='text-default text-sm text-center'>{title}</h1>
+					<div className='flex items-center justify-center gap-2'>
 						{searchable && (
 							<SearchInput
 								value={searchParams.get('q') ?? undefined}
 								className='sm:w-[450px] flex-1'
+								inputClassName='h-[30px] text-xs placeholder:text-xs [&>svg]:text-[16px]'
 							/>
 						)}
 						{table?.getSelectedRowModel()?.rows?.length ? (
@@ -112,9 +113,9 @@ export default function VersionTabLayout<T>({
 						) : null}
 						{handlerButton}
 						{!!createButtonTitle && !!openCreateModal && (
-							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
-								<Plus size={16} />
-								<span className='ml-2'>{createButtonTitle}</span>
+							<Button variant='primary' onClick={openCreateModal} disabled={disabled} size='xs'>
+								<Plus size={14} />
+								<span className='ml-1'>{createButtonTitle}</span>
 							</Button>
 						)}
 					</div>

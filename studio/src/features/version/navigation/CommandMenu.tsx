@@ -71,6 +71,7 @@ export default function CommandMenu() {
 									<Badge
 										variant={HTTP_METHOD_BADGE_MAP[item.meta.method]}
 										text={item.meta.method}
+										className='min-w-[52px]'
 									/>
 								)}
 								<p className='text-xs leading-6 text-subtle tracking-wide '>

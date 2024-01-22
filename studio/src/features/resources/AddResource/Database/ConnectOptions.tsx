@@ -72,6 +72,7 @@ export default function ConnectOptions() {
 					<Button
 						iconOnly
 						variant='secondary'
+						rounded
 						className={cn(
 							!index && 'self-end',
 							!isEmpty(errors) && !index && 'self-center mt-2',

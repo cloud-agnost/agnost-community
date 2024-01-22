@@ -97,7 +97,7 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 				<DropdownMenuItemContainer className='max-h-[25rem] overflow-auto'>
 					{tabs.map((tab) => (
 						<DropdownMenuItem
-							className={cn(tab.isActive && 'active', 'flex items-center gap-4 relative')}
+							className={cn(tab.isActive && 'active', 'flex items-center gap-2 relative')}
 							key={tab.id}
 							onClick={() => {
 								setCurrentTab(versionId, tab.id);

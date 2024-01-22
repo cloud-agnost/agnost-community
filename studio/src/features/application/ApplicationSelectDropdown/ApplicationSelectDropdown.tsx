@@ -37,7 +37,12 @@ export default function ApplicationSelectDropdown() {
 				onClick={() => openEditAppDrawer(application as Application)}
 			>
 				<CommandItem>
-					<Button variant='secondary' size='full' onClick={() => setOpenCreateModal(true)}>
+					<Button
+						variant='primary'
+						size='full'
+						onClick={() => setOpenCreateModal(true)}
+						className='font-normal '
+					>
 						<Plus size={16} className='mr-2' />
 						{t('application.create')}
 					</Button>

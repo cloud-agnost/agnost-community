@@ -79,7 +79,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return <Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} />;
+			return (
+				<Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} className='min-w-[52px]' />
+			);
 		},
 	},
 	{
@@ -91,7 +93,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 			const { path } = row.original;
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
 			return (
-				<div className='flex items-center gap-8 group'>
+				<div className='flex items-center gap-4 group'>
 					<div className='truncate font-mono'>{path}</div>
 					<CopyButton text={copyText} className='hidden group-hover:block' />
 				</div>

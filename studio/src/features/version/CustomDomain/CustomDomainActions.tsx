@@ -43,7 +43,11 @@ export default function CustomDomainActions({ table, refetch }: CustomDomainActi
 
 	return (
 		<div className='flex gap-4'>
-			<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
+			<SearchInput
+				value={searchParams.get('q') ?? undefined}
+				className='sm:w-[450px] flex-1'
+				inputClassName='h-[30px]'
+			/>
 			{!!table?.getSelectedRowModel().rows?.length && (
 				<SelectedRowButton<CustomDomain>
 					table={table}

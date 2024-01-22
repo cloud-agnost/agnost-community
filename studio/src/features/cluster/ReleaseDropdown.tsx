@@ -76,7 +76,7 @@ export default function ReleaseDropdown() {
 							</span>
 						</div>
 					)}
-					<Package size={24} />
+					<Package size={18} />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='relative max-w-md bg-subtle h-full' align='end'>
@@ -122,8 +122,8 @@ function ReleaseInfo({ loading = false }: { loading: boolean }) {
 	) : (
 		<DataTable
 			table={table}
-			containerClassName='!border-none pl-2'
-			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-2 [&_th]:p-2'
+			containerClassName='!border-none pl-3.5'
+			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-0.5 [&_th]:p-0.5 [&_th]:h-8'
 		/>
 	);
 }
@@ -170,7 +170,7 @@ function ReleaseSettings() {
 			<DropdownMenuSeparator className='!m-0' />
 			<DropdownMenuItem>
 				<Link
-					className='flex items-center gap-1'
+					className='flex items-center'
 					to={`https://github.com/cloud-agnost/agnost-community/releases/tag/${clusterReleaseInfo?.latest?.release}`}
 					rel='noopener noreferrer'
 					target='_blank'

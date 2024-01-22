@@ -48,13 +48,13 @@ export default function AddRateLimiterDropdown({
 					</Button>
 				</DropdownMenuTrigger>
 
-				<DropdownMenuContent align='end' className='version-dropdown-content'>
+				<DropdownMenuContent align='end' className='version-dropdown-content bg-input-background'>
 					<DropdownMenuItemContainer>
 						<DropdownMenuItem
 							onClick={() => setAddRateLimitDrawerIsOpen(true)}
-							className='flex gap-[10px] text-sm font-medium'
+							className='flex gap-[10px] text-xs font-medium'
 						>
-							<Plus weight='bold' />
+							<Plus weight='bold' size={14} />
 							<span>{t('version.add_new_limiter')}</span>
 						</DropdownMenuItem>
 						{options && options.length > 1 && <DropdownMenuSeparator />}
@@ -62,7 +62,7 @@ export default function AddRateLimiterDropdown({
 						{options?.map((limiter, index) => (
 							<DropdownMenuItem onClick={() => onSelect(limiter)} key={index}>
 								<div className='flex flex-col'>
-									<span>{limiter.name}</span>
+									<span className='text-xs'>{limiter.name}</span>
 									<span className='font-sfCompact text-[11px] text-subtle leading-[21px]'>
 										{t('version.limiter_detail', {
 											rate: limiter.rate,

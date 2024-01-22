@@ -138,7 +138,11 @@ export default function EndpointSelectModal({
 									key={index}
 									className='flex items-center justify-between p-[6px]'
 								>
-									<Badge text={method} variant={HTTP_METHOD_BADGE_MAP[method]} />
+									<Badge
+										variant={HTTP_METHOD_BADGE_MAP[method]}
+										text={method}
+										className='min-w-[52px]'
+									/>
 									{methods.includes(method) && <Check />}
 								</DropdownMenuItem>
 							))}
@@ -203,12 +207,13 @@ export default function EndpointSelectModal({
 													checked={checked}
 													onCheckedChange={(checked) => addList(endpoint, checked)}
 												/>
-												<label htmlFor={id} className='flex items-center gap-4 cursor-pointer'>
+												<label htmlFor={id} className='mt-2'>
 													<Badge
 														variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
 														text={endpoint.method}
+														className='min-w-[52px]'
 													/>
-													<p className='text-sm text-default leading-6'>{endpoint.name}</p>
+													<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
 												</label>
 											</div>
 										);

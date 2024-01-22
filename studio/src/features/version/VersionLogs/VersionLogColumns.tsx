@@ -44,7 +44,9 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return <Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} />;
+			return (
+				<Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} className='min-w-[52px]' />
+			);
 		},
 	},
 	{

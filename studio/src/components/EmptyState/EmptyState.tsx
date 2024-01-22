@@ -50,11 +50,13 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		notification: Bell,
 		'custom-domain': GlobeSimple,
 	};
-	const getTabIcon = useTabIcon('w-44 h-44');
+	const getTabIcon = useTabIcon('w-16 h-16');
 	const Icon = ICON_MAP[type];
+	const IC = Icon ?? getTabIcon(type as TabTypes);
+	console.log(IC);
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
-			{getTabIcon(type as TabTypes) ?? <Icon className='w-44 h-44 text-icon-base' />}
+			<div className='empty-state-icon'>{getTabIcon(type as TabTypes)}</div>
 			<h2 className='empty-state-title'>{title}</h2>
 			{children}
 		</div>

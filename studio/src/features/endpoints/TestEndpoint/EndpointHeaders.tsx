@@ -69,7 +69,7 @@ export default function EndpointHeaders() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button variant='secondary' onClick={() => remove(index)}>
+						<Button variant='secondary' rounded onClick={() => remove(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>

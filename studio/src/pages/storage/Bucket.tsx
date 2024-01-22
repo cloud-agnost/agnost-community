@@ -111,7 +111,7 @@ export default function Buckets() {
 				emptyStateTitle={t('storage.bucket.empty_text')}
 				onMultipleDelete={deleteMultipleBucketsMutation}
 				loading={isFetching && !buckets.length}
-				breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
+				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				table={table}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>

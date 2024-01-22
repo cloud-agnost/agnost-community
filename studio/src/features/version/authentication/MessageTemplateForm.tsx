@@ -160,13 +160,14 @@ export default function MessageTemplateForm({
 						{showButton && (
 							<div className='flex items-center gap-4'>
 								<Button
+									size='xs'
 									type='submit'
 									variant='primary'
 									onClick={(e) => e.stopPropagation()}
 									loading={isPending}
 									disabled={!canEdit}
 								>
-									{!isPending && <FloppyDisk className='mr-2' />}
+									{!isPending && <FloppyDisk className='mr-2' size={14} />}
 									{t('general.save')}
 								</Button>
 							</div>
@@ -184,7 +185,9 @@ export default function MessageTemplateForm({
 										render={({ field }) => {
 											return (
 												<FormItem className='flex-1'>
-													<FormLabel>{t('version.authentication.fromName')}</FormLabel>
+													<FormLabel className='text-xs'>
+														{t('version.authentication.fromName')}
+													</FormLabel>
 													<FormControl>
 														<Input
 															error={!!form.formState.errors.fromName}
@@ -207,7 +210,9 @@ export default function MessageTemplateForm({
 										render={({ field }) => {
 											return (
 												<FormItem className='flex-1'>
-													<FormLabel>{t('version.authentication.fromEmail')}</FormLabel>
+													<FormLabel className='text-xs'>
+														{t('version.authentication.fromEmail')}
+													</FormLabel>
 													<FormControl>
 														<Input
 															error={!!form.formState.errors.fromEmail}
@@ -231,7 +236,9 @@ export default function MessageTemplateForm({
 									render={({ field }) => {
 										return (
 											<FormItem>
-												<FormLabel>{t('version.authentication.subject')}</FormLabel>
+												<FormLabel className='text-xs'>
+													{t('version.authentication.subject')}
+												</FormLabel>
 												<FormControl>
 													<Input
 														error={!!form.formState.errors.subject}
@@ -259,10 +266,10 @@ export default function MessageTemplateForm({
 								return (
 									<FormItem className='flex-1'>
 										<div className='flex items-center gap-4'>
-											<FormLabel>{t('version.authentication.body')}</FormLabel>
+											<FormLabel className='text-xs'>{t('version.authentication.body')}</FormLabel>
 											<DropdownMenu modal={false}>
 												<DropdownMenuTrigger asChild>
-													<Button variant='secondary' iconOnly>
+													<Button variant='icon'>
 														<Document className='w-4 h-4' />
 													</Button>
 												</DropdownMenuTrigger>
@@ -270,10 +277,13 @@ export default function MessageTemplateForm({
 													className='w-56 max-h-96 overflow-auto'
 													onCloseAutoFocus={handleOnCloseAutoFocus}
 												>
-													<DropdownMenuLabel className='text-subtle'>User</DropdownMenuLabel>
+													<DropdownMenuLabel className='text-subtle text-xs'>
+														User
+													</DropdownMenuLabel>
 													<DropdownMenuGroup>
 														{USER_VARIABLES.map((variable) => (
 															<DropdownMenuItem
+																className='text-xs'
 																onClick={() => insertVariable(`user.${variable}`)}
 																key={variable}
 															>
@@ -282,10 +292,13 @@ export default function MessageTemplateForm({
 														))}
 													</DropdownMenuGroup>
 													<DropdownMenuSeparator />
-													<DropdownMenuLabel className='text-subtle'>Email</DropdownMenuLabel>
+													<DropdownMenuLabel className='text-subtle text-xs'>
+														Email
+													</DropdownMenuLabel>
 													<DropdownMenuGroup>
 														{EMAIL_TOKEN_VARIABLES.map((variable) => (
 															<DropdownMenuItem
+																className='text-xs'
 																onClick={() => insertVariable(`token.${variable}`)}
 																key={variable}
 															>
@@ -294,10 +307,13 @@ export default function MessageTemplateForm({
 														))}
 													</DropdownMenuGroup>
 													<DropdownMenuSeparator />
-													<DropdownMenuLabel className='text-subtle'>Phone</DropdownMenuLabel>
+													<DropdownMenuLabel className='text-subtle text-xs'>
+														Phone
+													</DropdownMenuLabel>
 													<DropdownMenuGroup>
 														{PHONE_TOKEN_VARIABLES.map((variable) => (
 															<DropdownMenuItem
+																className='text-xs'
 																onClick={() => insertVariable(`token.${variable}`)}
 																key={variable}
 															>

@@ -132,7 +132,7 @@ export default function Files() {
 			)}
 			<VersionTabLayout
 				searchable
-				breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
+				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				isEmpty={files?.length === 0}
 				type={TabTypes.File}
 				openCreateModal={uploadFileHandler}

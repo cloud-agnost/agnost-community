@@ -141,6 +141,7 @@ export default function InviteMemberForm({
 						<Button
 							type='button'
 							variant='secondary'
+							rounded
 							disabled={fields.length === 1}
 							className={cn(
 								!index && 'self-end',

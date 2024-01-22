@@ -24,9 +24,9 @@ export function Header() {
 		<header className='header-menu'>
 			<div className='header-menu-left'>
 				<Link to='/'>
-					<Agnost width='40' height='40' />
+					<Agnost width='36' height='36' />
 				</Link>
-				<div className='header-menu-divider' />
+				<Separator orientation='vertical' className='h-8 transform rotate-12' />
 				<div className='flex items-center gap-4'>
 					{orgId && <OrganizationDropdown />}
 					{appId && (
@@ -64,7 +64,7 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
 					<Button variant='icon' onClick={toggleSearchCommandMenu}>
-						<MagnifyingGlass size={24} />
+						<MagnifyingGlass size={18} />
 					</Button>
 					<ReleaseDropdown />
 					{versionId && (

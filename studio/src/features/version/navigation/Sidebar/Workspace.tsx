@@ -183,10 +183,14 @@ export default function Workspace() {
 										variant='icon'
 										rounded
 										className={cn(
-											window.location.pathname.includes(data._id) && 'hover:bg-button-primary',
-											'!p-0 !h-5 hidden group-hover:inline-flex hover:text-default',
+											window.location.pathname.includes(data._id) &&
+												'hover:bg-button-primary text-default',
+											'!p-0 !h-5 hidden group-hover:inline-flex',
 										)}
-										onClick={() => openEditDialog(data, item.type)}
+										onClick={(e) => {
+											e.stopPropagation();
+											openEditDialog(data, item.type);
+										}}
 									>
 										<Pencil size={14} />
 									</Button>
@@ -194,8 +198,9 @@ export default function Workspace() {
 									<Button
 										rounded
 										className={cn(
-											window.location.pathname.includes(data._id) && 'hover:bg-button-primary',
-											'p-0 !h-5 hidden group-hover:inline-flex hover:text-default',
+											window.location.pathname.includes(data._id) &&
+												'hover:bg-button-primary text-default',
+											'p-0 !h-5 hidden group-hover:inline-flex',
 										)}
 										variant='icon'
 										onClick={() => deleteHandler(data, item.type)}
@@ -266,7 +271,7 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 				<h1
 					title={item.title}
 					className={cn(
-						'truncate max-w-[15ch] text-sm text-default font-sfCompact',
+						'truncate max-w-[15ch] text-xs text-default font-sfCompact',
 						sidebar[versionId]?.openedTabs?.includes(item.type)
 							? 'text-default'
 							: 'text-subtle group-hover:text-default',

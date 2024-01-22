@@ -73,7 +73,7 @@ export default function VersionSettingsCustomDomain() {
 					<DataTable
 						table={table}
 						className='version-settings-table table-fixed'
-						containerClassName='version-settings-table-container border-none rounded-none'
+						containerClassName='version-settings-table-container'
 					/>
 				</InfiniteScroll>
 			) : (

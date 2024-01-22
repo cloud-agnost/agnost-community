@@ -74,15 +74,19 @@ export default function EditEndpoint() {
 			]}
 		>
 			<div className='flex items-center flex-1'>
-				<div className='border border-input-disabled-border rounded-l w-16 h-9'>
+				<div className='w-16 h-7'>
 					<Badge
-						className='w-full h-full rounded-l rounded-r-none'
+						className='w-full h-full rounded-none rounded-l'
 						variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
 						text={endpoint.method}
 					/>
 				</div>
 				<div className='relative flex-[0.8] flex flex-col items-center justify-center'>
-					<Input className='rounded-none rounded-r w-full' value={endpoint.path} disabled />
+					<Input
+						className='rounded-none rounded-r w-full !h-7 text-xs'
+						value={endpoint.path}
+						disabled
+					/>
 					<CopyButton
 						text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
 						className='absolute right-1'

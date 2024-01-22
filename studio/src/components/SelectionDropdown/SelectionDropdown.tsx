@@ -47,10 +47,10 @@ export default function SelectionDropdown({
 				<PopoverTrigger asChild>
 					<Button
 						variant='blank'
-						className='absolute z-50 top-0 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
+						className='absolute z-50 top-0 -right-1 p-1.5 text-icon-base hover:text-icon-secondary'
 						rounded
 					>
-						<div className='rounded-full hover:bg-wrapper-background-hover w-8 h-8 flex items-center justify-center'>
+						<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>
 							<CaretUpDown size={20} />
 						</div>
 					</Button>
@@ -105,12 +105,12 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 
 	const label = (
 		<>
-			<Avatar className='mr-2' size='sm' square>
+			<Avatar className='mr-2' size='xs' square>
 				<AvatarImage src={selectedData?.pictureUrl} alt={selectedData?.name} />
 				<AvatarFallback name={selectedData?.name} color={selectedData?.color as string} />
 			</Avatar>
 			<div className='text-left flex-1 font-sfCompact h-full flex flex-col justify-center'>
-				<div className=' text-sm leading-none text-default whitespace-nowrap truncate max-w-[12ch]'>
+				<div className='text-xs leading-none text-default whitespace-nowrap truncate max-w-[80%]'>
 					{selectedData?.name}
 				</div>
 				<div className='text-xs text-subtle'>{selectedData?.role}</div>
@@ -118,17 +118,13 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 		</>
 	);
 
-	return onClick ? (
+	return (
 		<Button
 			variant='blank'
-			className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm'
+			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-button-secondary-hover'
 			onClick={openAppSettings}
 		>
 			{label}
 		</Button>
-	) : (
-		<div className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm'>
-			{label}
-		</div>
 	);
 }

@@ -54,7 +54,7 @@ export function ExplorerCollapsibleTrigger({
 						{title && (
 							<h1
 								className={cn(
-									'flex-1 text-left font-normal text-sm',
+									'flex-1 text-left font-normal text-xs',
 									active ? 'text-default' : 'text-subtle group-hover:text-default',
 								)}
 							>

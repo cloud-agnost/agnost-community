@@ -1,5 +1,5 @@
 .drawer {
-	@apply fixed z-50  gap-4 bg-subtle opacity-100 shadow-lg border outline-none;
+	@apply fixed z-50 bg-subtle opacity-100 shadow-lg border outline-none;
 	&-left {
 		@apply animate-in slide-in-from-left h-full duration-300;
 	}
@@ -35,7 +35,7 @@
 		@supports (max-height: 100dvh) {
 			max-height: 100dvh;
 		}
-		@apply fixed inset-0 z-50 bg-base opacity-50  transition-all;
+		@apply fixed inset-0 z-50 bg-base/50  transition-all;
 		@apply duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in;
 	}
 	&-md {
@@ -49,7 +49,7 @@
 		@apply text-icon-base hover:text-icon-secondary;
 	}
 	&-header {
-		@apply flex items-center justify-between text-center sm:text-left border-b border-border px-6 pb-6 pt-10;
+		@apply flex items-center justify-between text-center sm:text-left border-b border-border p-6;
 	}
 	&-title {
 		@apply text-xl font-semibold text-default;
