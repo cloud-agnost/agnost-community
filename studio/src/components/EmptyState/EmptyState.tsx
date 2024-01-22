@@ -52,8 +52,17 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 	};
 	const getTabIcon = useTabIcon('w-16 h-16');
 	const Icon = ICON_MAP[type];
-	const IC = Icon ?? getTabIcon(type as TabTypes);
-	console.log(IC);
+	if (Icon) {
+		return (
+			<div className={cn('empty-state h-[95%]', className)}>
+				<div className='empty-state-icon'>
+					<Icon />
+				</div>
+				<h2 className='empty-state-title'>{title}</h2>
+				{children}
+			</div>
+		);
+	}
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
 			<div className='empty-state-icon'>{getTabIcon(type as TabTypes)}</div>
