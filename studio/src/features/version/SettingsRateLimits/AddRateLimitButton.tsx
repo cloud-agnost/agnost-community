@@ -10,7 +10,7 @@ export default function AddRateLimitButton() {
 	const canCreate = useAuthorizeVersion('version.limit.create');
 	return (
 		<>
-			<Button onClick={() => setOpen(true)} disabled={!canCreate} size='xs'>
+			<Button onClick={() => setOpen(true)} disabled={!canCreate}>
 				{t('version.add_new_limiter')}
 			</Button>
 			<CreateRateLimit open={open} onOpenChange={setOpen} />

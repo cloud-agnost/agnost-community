@@ -8,7 +8,13 @@ interface CopyButtonProps {
 }
 export default function CopyButton({ text, className }: CopyButtonProps) {
 	return (
-		<Button onClick={() => copyToClipboard(text)} className={cn('!p-1', className)} variant='icon'>
+		<Button
+			onClick={() => copyToClipboard(text)}
+			className={cn('!p-1', className)}
+			variant='icon'
+			size='sm'
+			rounded
+		>
 			<Copy />
 		</Button>
 	);

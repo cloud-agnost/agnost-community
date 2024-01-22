@@ -8,7 +8,7 @@ export default function VersionNotFound() {
 	const { closeCurrentTab } = useTabStore();
 	return (
 		<NotFound>
-			<Button className='mt-8' variant='primary' onClick={closeCurrentTab} size='xs'>
+			<Button className='mt-8' variant='primary' onClick={closeCurrentTab}>
 				<X className='mr-1' />
 				{t('version.close_tab')}
 			</Button>

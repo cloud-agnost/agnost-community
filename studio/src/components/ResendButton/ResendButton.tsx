@@ -14,7 +14,7 @@ export default function ResendButton({ onResend, disabled }: Props) {
 		<TooltipProvider>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<Button variant='icon' rounded disabled={disabled} onClick={onResend}>
+					<Button variant='icon' size='sm' rounded disabled={disabled} onClick={onResend}>
 						<EnvelopeSimple size={20} />
 					</Button>
 				</TooltipTrigger>

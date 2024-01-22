@@ -53,6 +53,7 @@ export default function OpenTabs() {
 								{!tab.isDashboard && (
 									<Button
 										variant='icon'
+										size='sm'
 										rounded
 										className={cn(
 											tab.isActive && 'hover:bg-button-primary',

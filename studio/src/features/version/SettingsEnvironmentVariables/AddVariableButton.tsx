@@ -10,7 +10,7 @@ export default function AddVariableButton() {
 	const canCreate = useAuthorizeVersion('version.param.create');
 	return (
 		<>
-			<Button disabled={!canCreate} onClick={() => setOpen(true)} size='xs'>
+			<Button disabled={!canCreate} onClick={() => setOpen(true)}>
 				{t('version.variable.add')}
 			</Button>
 			<CreateEnvVariable open={open} onOpenChange={setOpen} />

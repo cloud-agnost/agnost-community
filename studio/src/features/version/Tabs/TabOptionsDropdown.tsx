@@ -78,7 +78,7 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button rounded variant='icon'>
+				<Button rounded variant='icon' size='sm'>
 					<DotsThreeVertical size={15} weight='bold' />
 				</Button>
 			</DropdownMenuTrigger>

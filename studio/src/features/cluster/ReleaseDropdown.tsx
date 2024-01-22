@@ -62,7 +62,7 @@ export default function ReleaseDropdown() {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant='icon' className='relative'>
+				<Button variant='icon' size='sm' rounded className='relative'>
 					{getReleaseStatus() !== 'OK' && (
 						<div className='absolute top-1 right-0.5'>
 							<span className='relative flex items-center justify-center h-3 w-3'>

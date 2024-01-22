@@ -89,7 +89,7 @@ export default function ReadReplicas() {
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<Button variant='icon'>
+										<Button variant='icon' size='sm' rounded>
 											<Pencil
 												className='w-5 h-5 text-icon-base'
 												onClick={() => editReplica(index)}
@@ -102,7 +102,7 @@ export default function ReadReplicas() {
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<Button variant='icon' onClick={() => removeReplica(index)}>
+										<Button variant='icon' size='sm' rounded onClick={() => removeReplica(index)}>
 											<Trash size={20} className='text-icon-base' />
 										</Button>
 									</TooltipTrigger>
@@ -131,13 +131,9 @@ export default function ReadReplicas() {
 								<div className='flex justify-end gap-4 mt-8'>
 									<TestConnectionButton replica />
 									<DialogClose asChild>
-										<Button size='lg' variant='secondary'>
-											{t('general.cancel')}
-										</Button>
+										<Button variant='secondary'>{t('general.cancel')}</Button>
 									</DialogClose>
-									<Button size='lg' onClick={onSubmit}>
-										{t('resources.database.add_replica')}
-									</Button>
+									<Button onClick={onSubmit}>{t('resources.database.add_replica')}</Button>
 								</div>
 							</DialogFooter>
 						</form>

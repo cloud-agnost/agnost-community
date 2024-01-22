@@ -63,9 +63,9 @@ export default function SideBar() {
 						<TooltipTrigger asChild>
 							<Button
 								variant='icon'
+								size='sm'
 								rounded
 								className='!p-0 !h-6 mr-2 invisible group-hover:visible'
-								size='sm'
 								onClick={collapseAll}
 							>
 								<MinusSquare size={16} />

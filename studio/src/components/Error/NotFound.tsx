@@ -15,7 +15,7 @@ export default function NotFound({ children }: { children?: React.ReactNode }) {
 			</div>
 
 			{children ?? (
-				<Button className='mt-8' variant='primary' to='/organization' size='xs'>
+				<Button className='mt-8' variant='primary' to='/organization'>
 					<ArrowLeft className='mr-1' />
 					{t('general.backToHome')}
 				</Button>

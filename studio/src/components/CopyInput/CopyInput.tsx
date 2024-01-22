@@ -29,6 +29,7 @@ const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithout
 					className='copy-input-button'
 					onClick={() => copyToClipboard(inputValue)}
 					variant='icon'
+					size='sm'
 					rounded
 				>
 					<Copy size={14} />

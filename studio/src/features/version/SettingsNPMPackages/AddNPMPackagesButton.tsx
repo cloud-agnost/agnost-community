@@ -11,7 +11,7 @@ export default function AddNPMPackagesButton() {
 
 	return (
 		<>
-			<Button disabled={!canAdd} onClick={() => setOpen(true)} size='xs'>
+			<Button disabled={!canAdd} onClick={() => setOpen(true)}>
 				{t('version.npm.install')}
 			</Button>
 			<AddNPMPackagesDrawer open={open} onOpenChange={setOpen} />

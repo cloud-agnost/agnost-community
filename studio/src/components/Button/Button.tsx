@@ -17,15 +17,15 @@ const buttonVariants = cva('btn', {
 			link: 'btn-link',
 			blank: 'btn-blank',
 			outline: 'btn-outline',
-			icon: 'btn-icon btn-rounded',
+			icon: 'btn-icon',
 		},
 		iconOnly: {
 			true: 'btn-icon-only',
 		},
 		size: {
 			xs: 'btn-xs',
-			md: 'btn-md',
 			sm: 'btn-sm',
+			md: 'btn-md',
 			lg: 'btn-lg',
 			xl: 'btn-xl',
 			'2xl': 'btn-2xl',

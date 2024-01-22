@@ -65,7 +65,7 @@ export default function TabItem({
 					<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
 				)}
 				{closeable && (
-					<Button rounded variant='icon' onClick={close} className='!h-[unset] !p-1'>
+					<Button rounded variant='icon' size='sm' onClick={close} className='!h-[unset] !p-1'>
 						<X size={12} />
 					</Button>
 				)}

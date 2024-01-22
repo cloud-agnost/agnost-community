@@ -22,14 +22,15 @@
 	&-outline {
 		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-button-secondary-hover #{!important};
 	}
+
 	&-xs {
-		@apply h-[unset] p-2;
-	}
-	&-md {
-		@apply py-1 px-2;
+		@apply py-[6px] px-2;
 	}
 	&-sm {
-		@apply py-[6px] px-2;
+		@apply py-1 px-2;
+	}
+	&-md {
+		@apply h-[unset] p-2 min-w-24 #{!important};
 	}
 	&-lg {
 		@apply w-[165px];

@@ -82,7 +82,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 
 			<div className='flex items-center'>
 				{children}
-				<Button className='mt-8 ml-2' variant='secondary' onClick={() => setIsOpen(true)} size='xs'>
+				<Button className='mt-8 ml-2' variant='secondary' onClick={() => setIsOpen(true)}>
 					{t('general.messageUs')}
 				</Button>
 			</div>
@@ -112,10 +112,10 @@ export default function Error({ children }: { children: React.ReactNode }) {
 								)}
 							/>
 							<div className='flex justify-end gap-4 mt-2'>
-								<Button variant='text' size='xs' onClick={closeModal}>
+								<Button variant='text' onClick={closeModal}>
 									{t('general.cancel')}
 								</Button>
-								<Button variant='primary' size='xs' loading={loading} type='submit'>
+								<Button variant='primary' loading={loading} type='submit'>
 									{t('general.ok')}
 								</Button>
 							</div>

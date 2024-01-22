@@ -30,6 +30,7 @@ function ActionsCell<T>({
 					<TooltipTrigger asChild>
 						<Button
 							variant='icon'
+							size='sm'
 							rounded
 							className='text-xl'
 							onClick={() => onEdit?.(original)}
@@ -47,8 +48,9 @@ function ActionsCell<T>({
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								rounded
 								variant='icon'
+								rounded
+								size='sm'
 								onClick={() => onDelete?.(original)}
 								disabled={disabled || !canDelete}
 							>

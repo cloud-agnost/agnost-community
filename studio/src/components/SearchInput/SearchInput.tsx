@@ -73,7 +73,7 @@ export default function SearchInput({
 				className={cn('search-input', inputClassName)}
 			/>
 			{inputValue && (
-				<Button className='search-input-button' onClick={clear} variant='icon'>
+				<Button className='search-input-button' onClick={clear} variant='icon' size='sm' rounded>
 					<X size={16} />
 				</Button>
 			)}

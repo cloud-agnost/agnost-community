@@ -181,6 +181,7 @@ export default function Workspace() {
 								<div className='flex items-center justify-end'>
 									<Button
 										variant='icon'
+										size='sm'
 										rounded
 										className={cn(
 											window.location.pathname.includes(data._id) &&
@@ -203,6 +204,7 @@ export default function Workspace() {
 											'p-0 !h-5 hidden group-hover:inline-flex',
 										)}
 										variant='icon'
+										size='sm'
 										onClick={() => deleteHandler(data, item.type)}
 									>
 										<Trash size={14} />
@@ -283,6 +285,7 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 
 			<Button
 				variant='icon'
+				size='sm'
 				rounded
 				className='h-full !w-5 p-0.5 mr-2 invisible group-hover:visible'
 				onClick={STORES[item.type].toggleCreateModal}
