@@ -1,6 +1,6 @@
-import { cn, copyToClipboard } from '@/utils';
-import { Copy } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
+import { copyToClipboard } from '@/utils';
+import { Copy } from '@phosphor-icons/react';
 
 interface CopyButtonProps {
 	text: string;
@@ -10,12 +10,12 @@ export default function CopyButton({ text, className }: CopyButtonProps) {
 	return (
 		<Button
 			onClick={() => copyToClipboard(text)}
-			className={cn('!p-1', className)}
+			className={className}
 			variant='icon'
 			size='sm'
 			rounded
 		>
-			<Copy />
+			<Copy size={14} className='flex-1' />
 		</Button>
 	);
 }

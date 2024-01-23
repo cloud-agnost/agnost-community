@@ -9,7 +9,7 @@ const ReleaseColumns: ColumnDef<ClusterComponentReleaseInfo>[] = [
 	{
 		id: 'module',
 		accessorKey: 'module',
-		size: 300,
+		size: 200,
 		enableResizing: false,
 		header: () => <span>{t('cluster.component')}</span>,
 	},

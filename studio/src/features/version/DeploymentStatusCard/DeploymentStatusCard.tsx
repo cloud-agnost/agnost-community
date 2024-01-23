@@ -72,11 +72,11 @@ export default function DeploymentStatusCard() {
 			<DropdownMenu onOpenChange={(open) => handleOpenChange(open)}>
 				<DropdownMenuTrigger asChild>
 					<Button variant='icon' size='sm' rounded className='relative'>
-						<div className='absolute top-1 right-0.5'>
-							<span className='relative flex items-center justify-center h-3 w-3'>
+						<div className='absolute top-1.5 right-1'>
+							<span className='relative flex items-center justify-center h-2.5 w-2.5'>
 								<span
 									className={cn(
-										'animate-ping absolute inline-flex h-full w-full rounded-full ',
+										'ping absolute inline-flex h-full w-full rounded-full ',
 										classes?.[0],
 									)}
 								/>
@@ -116,7 +116,7 @@ export default function DeploymentStatusCard() {
 						</TooltipProvider>
 					</DropdownMenuLabel>
 					{environment.suspended && (
-						<Alert variant='warning' size='sm' className='!rounded-none !gap-2 !p-2'>
+						<Alert variant='warning' size='sm'>
 							<AlertTitle className='font-normal'>{t('version.suspended_desc')}</AlertTitle>
 						</Alert>
 					)}

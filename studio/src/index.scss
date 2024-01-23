@@ -185,10 +185,6 @@
 	}
 }
 
-.flex > * {
-	min-width: 0;
-}
-
 @layer base {
 	* {
 		@apply border-border;
@@ -557,9 +553,6 @@ button:focus-visible {
 	line-height: var(--font-size-xs-line-height) !important;
 	font-family: var(--font-sf) !important;
 }
-.animate-ping {
-	animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite !important;
-}
 
 .active-resizer {
 	background: radial-gradient(
@@ -567,4 +560,14 @@ button:focus-visible {
 		rgb(var(--brand-color-primary)) calc(100% - 140px),
 		transparent
 	);
+}
+@keyframes ping {
+	75%,
+	100% {
+		transform: scale(1.5);
+		opacity: 0;
+	}
+}
+.ping {
+	animation: 2s ease 0s infinite normal none running ping;
 }
