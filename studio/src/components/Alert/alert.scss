@@ -1,14 +1,28 @@
 .alert {
-	@apply relative rounded-lg border border-transparent p-4 flex items-center justify-center gap-6 w-full;
-
+	@apply relative  border border-transparent flex items-center justify-center w-full;
+	&-title {
+		@apply text-default font-semibold [&_p]:leading-tight;
+	}
 	&-md {
+		&.alert {
+			@apply rounded-lg gap-6 p-4;
+		}
 		.alert-icon {
-			@apply rounded-full flex items-center justify-center text-6xl;
+			@apply text-6xl;
+		}
+		.alert-title {
+			@apply text-sm;
 		}
 	}
 	&-sm {
+		&.alert {
+			@apply rounded-none gap-2 p-1.5;
+		}
 		.alert-icon {
-			@apply rounded-full flex items-center justify-center text-xl;
+			@apply text-lg;
+		}
+		.alert-title {
+			@apply text-xs;
 		}
 	}
 
@@ -27,8 +41,8 @@
 	&-body {
 		@apply flex-1;
 	}
-	&-title {
-		@apply text-default text-sm font-semibold [&_p]:leading-tight font-sfCompact;
+	&-icon {
+		@apply rounded-full flex items-center justify-center;
 	}
 
 	&-description {
