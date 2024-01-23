@@ -122,7 +122,7 @@ export const clusterComponents = [
         description: t("Caches a subset of MongoDB data to speed up application design data retrieval."),
     },
     {
-        deploymentName: "minio",
+        deploymentName: "minio-storage",
         title: "Platform Storage",
         hasHpa: false,
         editable: false,

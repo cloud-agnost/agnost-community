@@ -1003,9 +1003,11 @@ export class ResourceManager {
 
             for (const comp of clusterComponents) {
                 if (comp.k8sType === "Deployment") {
-                    clusterInfo.push(this.getDeploymentInfo(comp, deployments.body.items, hpas.body.items));
+                    const info = this.getDeploymentInfo(comp, deployments.body.items, hpas.body.items);
+                    if (info) clusterInfo.push(info);
                 } else if (comp.k8sType === "StatefulSet") {
-                    clusterInfo.push(this.getStatefulSetInfo(comp, statefulSets.body.items));
+                    const info = this.getStatefulSetInfo(comp, statefulSets.body.items);
+                    if (info) clusterInfo.push(info);
                 }
             }
 
@@ -1020,6 +1022,7 @@ export class ResourceManager {
      */
     getDeploymentInfo(component, deployments, hpas) {
         const deployment = deployments.find((entry) => entry.metadata.name === component.deploymentName);
+        if (!deployment) return null;
         const hpa = component.hasHpa ? hpas.find((entry) => entry.metadata.name === component.hpaName) : null;
         let container = deployment.spec.template.spec.containers[0];
 
@@ -1044,6 +1047,7 @@ export class ResourceManager {
      */
     getStatefulSetInfo(component, statefulSets) {
         const statefulSet = statefulSets.find((entry) => entry.metadata.name === component.statefulSetName);
+        if (!statefulSet) return null;
         let container = statefulSet.spec.template.spec.containers[0];
 
         const info = {

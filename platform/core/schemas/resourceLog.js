@@ -60,8 +60,8 @@ export const ResourceLogModel = mongoose.model(
 			default: Date.now,
 			index: true,
 			immutable: true,
-			//expire records after 6 months
-			expires: helper.constants["6months"],
+			//expire records after 1 month
+			expires: helper.constants["1month"],
 		},
 		// Last telemetry update for this environment
 		updatedAt: { type: Date, default: Date.now },

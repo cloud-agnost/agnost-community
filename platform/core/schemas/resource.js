@@ -555,6 +555,7 @@ export const applyRules = (type) => {
 								"redis-headless",
 								"rabbitmq",
 								"minio",
+								"minio-storage",
 							].includes(value.toLowerCase())
 						) {
 							throw new AgnostError(
