@@ -7,7 +7,7 @@
 	&-item {
 		@apply list-none;
 		&-name {
-			@apply text-default text-[13px] font-sfCompact;
+			@apply text-default text-xs font-sfCompact;
 		}
 		&.active {
 			.org-menu-link {
