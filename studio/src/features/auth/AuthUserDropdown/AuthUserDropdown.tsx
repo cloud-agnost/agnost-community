@@ -83,7 +83,7 @@ export default function AuthUserDropdown() {
 	}
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger>
+			<DropdownMenuTrigger className='ml-2'>
 				<AuthUserAvatar size='sm' />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-[210px]' align='end'>
