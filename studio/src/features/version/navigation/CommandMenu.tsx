@@ -1,4 +1,3 @@
-import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import {
 	CommandDialog,
@@ -7,7 +6,7 @@ import {
 	CommandList,
 	CommandLoading,
 } from '@/components/Command';
-import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { MethodBadge } from '@/components/Endpoint';
 import { useDebounce, useSearchTabClick, useTabIcon, useUpdateEffect } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
@@ -67,13 +66,7 @@ export default function CommandMenu() {
 								<p className='text-sm leading-6 tracking-wide font-sfCompact'>{item.name}</p>
 							</div>
 							<div className='flex items-center gap-4'>
-								{item.meta?.method && (
-									<Badge
-										variant={HTTP_METHOD_BADGE_MAP[item.meta.method]}
-										text={item.meta.method}
-										className='min-w-[52px]'
-									/>
-								)}
+								{item.meta?.method && <MethodBadge method={item.meta?.method} />}
 								<p className='text-xs leading-6 text-subtle tracking-wide '>
 									{_.capitalize(item.type) === TabTypes.Field && ` ${item.meta.modelName}`}
 								</p>

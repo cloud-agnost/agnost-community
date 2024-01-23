@@ -29,8 +29,9 @@ export default function BreadCrumb({ className, items }: BreadCrumbProps) {
 						<Fragment key={item.name}>
 							<Component
 								variant='blank'
+								size='sm'
 								className={cn(
-									'hover:text-default',
+									'hover:text-default !p-0 s',
 									item.url && 'hover:underline',
 									index === filteredItems.length - 1 ? 'text-default' : 'text-subtle',
 								)}

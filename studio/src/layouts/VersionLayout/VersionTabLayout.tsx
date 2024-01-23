@@ -113,7 +113,7 @@ export default function VersionTabLayout<T>({
 						) : null}
 						{handlerButton}
 						{!!createButtonTitle && !!openCreateModal && (
-							<Button variant='primary' onClick={openCreateModal} disabled={disabled} size='xs'>
+							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 								<Plus size={14} />
 								<span className='ml-1'>{createButtonTitle}</span>
 							</Button>

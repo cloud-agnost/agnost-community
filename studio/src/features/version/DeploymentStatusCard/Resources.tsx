@@ -13,19 +13,19 @@ export default function Resources() {
 	}
 	return (
 		<div className='w-full max-h-[300px] px-4 py-1 overflow-y-scroll'>
-			<div className='text-subtle text-sm font-sfCompact leading-6 flex justify-between gap-4 mb-2'>
+			<div className='text-subtle text-xs font-sfCompact leading-6 flex justify-between gap-4 mb-2'>
 				<p>{t('version.resources')}</p>
 				<p>{t('version.status')}</p>
 			</div>
 			<div className='text-white'>
 				{resources.map((resource) => (
-					<div key={resource._id} className='pb-3 flex justify-between gap-4'>
+					<div key={resource._id} className='pb-3.5 flex justify-between gap-4'>
 						<div className='flex items-center gap-2'>
 							<span className='w-10 h-10 rounded-full bg-lighter flex items-center justify-center p-2'>
 								{getIcon(resource.instance)}
 							</span>
 							<div className='flex flex-col mb-1.5'>
-								<p className='text-sm font-sfCompact font-normal text-default'>
+								<p className='text-xs font-sfCompact font-normal text-default'>
 									{resource.name}
 									{(resource.availableReplicas ?? 0) + (resource.unavailableReplicas ?? 0) > 1 && (
 										<span className='text-subtle font-normal'>

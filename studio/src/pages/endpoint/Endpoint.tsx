@@ -80,7 +80,7 @@ export default function MainEndpoint() {
 			disabled={!canCreate}
 			loading={isFetching && !endpoints.length}
 			handlerButton={
-				<Button variant='secondary' onClick={openLogTab} size='xs'>
+				<Button variant='secondary' onClick={openLogTab}>
 					{t('queue.view_logs')}
 				</Button>
 			}

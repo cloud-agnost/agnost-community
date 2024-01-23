@@ -34,6 +34,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
+		size: 50,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -50,7 +51,6 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		className: '!pr-1',
 	},
 	{
 		id: 'name',

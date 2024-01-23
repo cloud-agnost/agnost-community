@@ -18,18 +18,6 @@
 		@apply flex gap-3 items-center text-icon-base;
 		&-nav {
 			@apply hidden 2xl:flex gap-1 items-center;
-			&-item {
-				@apply flex items-center gap-1 p-2 transition rounded;
-				&:hover {
-					@apply bg-button-secondary-hover text-default;
-				}
-				&-icon {
-					@apply w-4 h-4;
-				}
-				&-title {
-					@apply leading-6 font-normal text-xs;
-				}
-			}
 		}
 		&-actions {
 			@apply flex items-center;

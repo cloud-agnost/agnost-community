@@ -47,7 +47,7 @@ export interface VersionLog {
 	message: any;
 	errors: any;
 	responseBody: object;
-	method: string;
+	method: HttpMethod;
 	path: string;
 }
 

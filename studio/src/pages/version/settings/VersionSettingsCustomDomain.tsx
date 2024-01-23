@@ -1,32 +1,59 @@
 import { Feedback } from '@/components/Alert';
 import { DataTable } from '@/components/DataTable';
-import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
-import {
-	AddVersionDomain,
-	CustomDomainActions,
-	VersionDomainColumns,
-} from '@/features/version/CustomDomain';
-import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { useInfiniteScroll, useTable } from '@/hooks';
+import { AddVersionDomain, VersionDomainColumns } from '@/features/version/CustomDomain';
+import { useAuthorizeVersion, useInfiniteScroll, useTable, useToast } from '@/hooks';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useSettingsStore from '@/store/version/settingsStore';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useParams } from 'react-router-dom';
 
 export default function VersionSettingsCustomDomain() {
 	const { t } = useTranslation();
+	const canCreate = useAuthorizeVersion('domain.create');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-	const { getCustomDomainsOfVersion, versionDomains, lastFetchedDomainPage } = useSettingsStore();
+	const { toast } = useToast();
+	const { versionId, orgId, appId } = useParams() as Record<string, string>;
+	const {
+		getCustomDomainsOfVersion,
+		versionDomains,
+		lastFetchedDomainPage,
+		deleteMultipleCustomDomains,
+	} = useSettingsStore();
 	const { checkDomainStatus, clusterDomainError } = useClusterStore();
 	const { getClusterInfo, cluster } = useClusterStore();
 	const table = useTable({
 		data: versionDomains,
 		columns: VersionDomainColumns,
 	});
+
+	const { mutateAsync: deleteDomain } = useMutation({
+		mutationFn: deleteMultipleCustomDomains,
+		onSuccess: () => {
+			refetch();
+			table?.toggleAllRowsSelected(false);
+		},
+		onError: (error) => {
+			toast({
+				title: error.details,
+				action: 'error',
+			});
+		},
+	});
+
+	function deleteMultipleDomainsHandler() {
+		deleteDomain({
+			domainIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
+			orgId,
+			appId,
+			versionId,
+		});
+	}
 
 	const { fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteScroll({
 		queryFn: getCustomDomainsOfVersion,
@@ -49,11 +76,7 @@ export default function VersionSettingsCustomDomain() {
 	});
 
 	return (
-		<SettingsContainer
-			pageTitle={t('cluster.custom_domain')}
-			action={<CustomDomainActions table={table} refetch={refetch} />}
-			className='table-view'
-		>
+		<>
 			{!_.isNil(clusterDomainError) ? (
 				<div className='h-full flex flex-col items-center justify-center'>
 					<Feedback
@@ -62,25 +85,36 @@ export default function VersionSettingsCustomDomain() {
 						className='max-w-2xl'
 					/>
 				</div>
-			) : versionDomains.length > 0 ? (
-				<InfiniteScroll
-					scrollableTarget='setting-container-content'
-					dataLength={versionDomains.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable
-						table={table}
-						className='version-settings-table table-fixed'
-						containerClassName='version-settings-table-container'
-					/>
-				</InfiniteScroll>
 			) : (
-				<EmptyState type='custom-domain' title={t('cluster.empty_domain')} />
+				<VersionTabLayout
+					className='p-0'
+					type='custom-domain'
+					title={t('cluster.custom_domain') as string}
+					createButtonTitle={t('cluster.add_domain')}
+					emptyStateTitle={t('cluster.empty_domain')}
+					isEmpty={!versionDomains.length}
+					openCreateModal={() => setIsCreateModalOpen(true)}
+					onMultipleDelete={deleteMultipleDomainsHandler}
+					table={table}
+					disabled={!canCreate}
+					loading={false}
+				>
+					<InfiniteScroll
+						scrollableTarget='setting-container-content'
+						dataLength={versionDomains.length}
+						next={fetchNextPage}
+						hasMore={hasNextPage}
+						loader={isFetchingNextPage && <TableLoading />}
+					>
+						<DataTable
+							table={table}
+							className='version-settings-table table-fixed'
+							containerClassName='version-settings-table-container'
+						/>
+					</InfiniteScroll>
+				</VersionTabLayout>
 			)}
-
 			<AddVersionDomain open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-		</SettingsContainer>
+		</>
 	);
 }

@@ -42,10 +42,10 @@ export default function TabItem({
 	return (
 		<div
 			className={cn(
-				'tab-item icon',
+				'tab-item icon border-x border-border',
 				isSidebarOpen && 'border-l-0',
 				closeable && 'closeable',
-				active && 'active border-x border-border',
+				active && 'active',
 			)}
 			{...props}
 			{...provided.draggableProps}

@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Notification, TabTypes } from '@/types';
@@ -86,21 +87,26 @@ function NotificationItem({ notification }: { notification: Notification }) {
 	const { notificationLastSeen } = useVersionStore();
 	return (
 		<div className='py-1.5 px-4 relative flex items-center gap-4'>
-			<Avatar size='sm' className='self-start'>
-				<AvatarImage src={notification.actor.pictureUrl as string} />
-				<AvatarFallback
-					isUserAvatar
-					color={notification.actor.color as string}
-					name={notification.actor.name}
-					className='text-sm'
-				/>
-			</Avatar>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Avatar size='sm' className='self-start cursor-default mt-1'>
+							<AvatarImage src={notification.actor.pictureUrl as string} />
+							<AvatarFallback
+								isUserAvatar
+								color={notification.actor.color as string}
+								name={notification.actor.name}
+								className='text-sm'
+							/>
+						</Avatar>
+					</TooltipTrigger>
+					<TooltipContent>{notification.actor.name}</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+
 			<div className='space-y-1 flex-1'>
-				<div className='space-x-2'>
-					<span className='text-default font-sfCompact text-sm'>{notification.actor.name}</span>
-					<Description description={notification.description} />
-				</div>
-				<div className='text-subtle text-xs italic'>{getRelativeTime(notification.createdAt)}</div>
+				<Description description={notification.description} />
+				<div className='text-subtle text-[10px]'>{getRelativeTime(notification.createdAt)}</div>
 			</div>
 			{notificationLastSeen < new Date(notification.createdAt) && (
 				<div className='w-2 h-2 rounded-full bg-elements-blue' />
