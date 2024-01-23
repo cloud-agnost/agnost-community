@@ -4,20 +4,32 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
-import { CaretUpDown, LockSimple, LockSimpleOpen, Trash } from '@phosphor-icons/react';
+import {
+	CaretUpDown,
+	GearSix,
+	LockSimple,
+	LockSimpleOpen,
+	SunDim,
+	Trash,
+} from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuItemContainer,
+	DropdownMenuPortal,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { resetAfterVersionChange } from '@/utils';
+import { cn, resetAfterVersionChange } from '@/utils';
+import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
 
 export default function VersionDropdown() {
 	const { toast } = useToast();
@@ -31,8 +43,15 @@ export default function VersionDropdown() {
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
-	const { addSettingsTab } = useTabStore();
+	const { addSettingsTab, updateCurrentTab } = useTabStore();
 	const versionDropdownItems = useVersionDropdownItems();
+
+	function handleAddTab(item: (typeof VERSION_SETTINGS_MENU_ITEMS)[number]) {
+		addSettingsTab(versionId, item.href);
+		updateCurrentTab(versionId, {
+			title: item.title,
+		});
+	}
 
 	async function onConfirm() {
 		setLoading(true);
@@ -144,6 +163,28 @@ export default function VersionDropdown() {
 							</Fragment>
 						)}
 					</DropdownMenuItemContainer>
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger className='dropdown-item flex items-center gap-2'>
+							<GearSix className='w-5 h-5 mr-2' />
+							{t('version.settings.default')}
+						</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent
+								className='dropdown-content data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade'
+								sideOffset={2}
+								alignOffset={-5}
+							>
+								{VERSION_SETTINGS_MENU_ITEMS.map((item) => (
+									<DropdownMenuItem onClick={() => handleAddTab(item)} asChild key={item.id}>
+										<div className='flex items-center gap-2'>
+											<item.icon />
+											{item.title}
+										</div>
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</>

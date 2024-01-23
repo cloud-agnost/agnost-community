@@ -66,12 +66,6 @@ export default function useVersionDropdownItems() {
 				disabled: version?.master,
 				icon: !version?.private ? EyeSlash : Eye,
 			},
-			{
-				title: t('version.settings.default'),
-				action: () => addSettingsTab(version._id),
-				disabled: false,
-				icon: GearSix,
-			},
 		],
 		[versions, version],
 	);
