@@ -161,7 +161,7 @@ export default function VersionDashboard() {
 						<Link
 							to={guide.link}
 							key={guide.title}
-							className='border border-border hover:bg-button-secondary'
+							className='border border-border hover:border-border-hover rounded-md hover:bg-button-secondary'
 							target='_blank'
 							rel='noopener noreferrer'
 						>

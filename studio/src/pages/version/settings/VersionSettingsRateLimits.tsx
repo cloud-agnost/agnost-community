@@ -1,19 +1,23 @@
 import { DataTable } from '@/components/DataTable';
-import { EmptyState } from '@/components/EmptyState';
-import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { EditRateLimit } from '@/features/version/SettingsGeneral';
+import { CreateRateLimit, EditRateLimit } from '@/features/version/SettingsGeneral';
 import { RateLimitsColumns } from '@/features/version/SettingsRateLimits';
-import RateLimitsActions from '@/features/version/SettingsRateLimits/RateLimitsActions.tsx';
-import { useSearch, useTable } from '@/hooks';
+import { useAuthorizeVersion, useSearch, useTable } from '@/hooks';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { RateLimit } from '@/types';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function VersionSettingsRateLimits() {
 	const { t } = useTranslation();
+	const canCreate = useAuthorizeVersion('version.limit.create');
 	const limits = useVersionStore((state) => state.version?.limits ?? []);
-	const { editRateLimitDrawerIsOpen, setEditRateLimitDrawerIsOpen } = useSettingsStore();
+	const { version } = useVersionStore();
+	const [openCreateModal, setOpenCreateModal] = useState(false);
+	const { editRateLimitDrawerIsOpen, setEditRateLimitDrawerIsOpen, deleteMultipleRateLimits } =
+		useSettingsStore();
 	const sortedLimits = useSearch(limits);
 
 	const table = useTable({
@@ -21,20 +25,41 @@ export default function VersionSettingsRateLimits() {
 		columns: RateLimitsColumns,
 	});
 
+	const { mutateAsync: deleteMutate } = useMutation({
+		mutationFn: deleteMultipleRateLimits,
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+	});
+	async function deleteHandler() {
+		if (!version) return;
+		deleteMutate({
+			orgId: version.orgId,
+			versionId: version._id,
+			appId: version.appId,
+			limitIds: table?.getSortedRowModel().rows.map((row) => row.original._id) as string[],
+		});
+	}
+
 	return (
-		<SettingsContainer
-			action={<RateLimitsActions table={table} />}
-			pageTitle={t('version.settings.rate_limits')}
-			className='table-view'
-		>
-			{limits.length === 0 ? (
-				<div className='h-full flex items-center justify-center'>
-					<EmptyState type='rate-limit' title={t('version.no_rate_limiters')} />
-				</div>
-			) : (
+		<>
+			<VersionTabLayout
+				className='p-0'
+				type='rate-limit'
+				title={t('version.settings.rate_limits') as string}
+				createButtonTitle={t('version.add_new_limiter')}
+				emptyStateTitle={t('version.no_rate_limiters')}
+				isEmpty={!sortedLimits.length}
+				openCreateModal={() => setOpenCreateModal(true)}
+				onMultipleDelete={deleteHandler}
+				table={table}
+				disabled={!canCreate}
+				loading={false}
+			>
 				<DataTable<RateLimit> table={table} className='table-fixed' />
-			)}
+			</VersionTabLayout>
 			<EditRateLimit open={editRateLimitDrawerIsOpen} onOpenChange={setEditRateLimitDrawerIsOpen} />
-		</SettingsContainer>
+			<CreateRateLimit open={openCreateModal} onOpenChange={setOpenCreateModal} />
+		</>
 	);
 }

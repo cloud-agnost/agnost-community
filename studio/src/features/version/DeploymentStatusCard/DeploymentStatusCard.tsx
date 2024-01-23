@@ -71,7 +71,7 @@ export default function DeploymentStatusCard() {
 		<>
 			<DropdownMenu onOpenChange={(open) => handleOpenChange(open)}>
 				<DropdownMenuTrigger asChild>
-					<Button variant='icon' className='relative'>
+					<Button variant='icon' size='sm' rounded className='relative'>
 						<div className='absolute top-1 right-0.5'>
 							<span className='relative flex items-center justify-center h-3 w-3'>
 								<span
@@ -95,6 +95,7 @@ export default function DeploymentStatusCard() {
 									<Button
 										onClick={redeploy}
 										variant='icon'
+										size='sm'
 										rounded
 										disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
 									>

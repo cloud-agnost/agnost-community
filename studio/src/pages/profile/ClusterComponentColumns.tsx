@@ -58,7 +58,12 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 		className: 'actions',
 		cell: ({ row }) => {
 			return row.original.editable ? (
-				<Button variant='icon' size='sm' onClick={() => openEditClusterComponent(row.original)}>
+				<Button
+					variant='icon'
+					size='sm'
+					rounded
+					onClick={() => openEditClusterComponent(row.original)}
+				>
 					<Pencil className='w-4 h-4' />
 				</Button>
 			) : null;

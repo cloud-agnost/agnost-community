@@ -80,29 +80,23 @@ export default function VersionEditorLayout({
 	}, [logic]);
 
 	return (
-		<div className={cn('h-full space-y-2', className)}>
-			<div className='flex items-center justify-between gap-6 p-2'>
+		<div className={cn('h-full space-y-2 flex flex-col', className)}>
+			<div className='flex items-center justify-between gap-6 py-2 px-4'>
 				{breadCrumbItems && <BreadCrumb items={breadCrumbItems} />}
 				{children}
 				<div className='flex items-center gap-2'>
-					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit} size='xs'>
+					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit}>
 						<Pencil size={14} className='text-icon-default mr-1' />
 						{t('general.edit')}
 					</Button>
 
 					{onTestModalOpen && (
-						<Button variant='secondary' onClick={onTestModalOpen} size='xs'>
+						<Button variant='secondary' onClick={onTestModalOpen}>
 							<TestTube size={14} className='text-icon-default mr-1' />
 							{t('endpoint.test.test')}
 						</Button>
 					)}
-					<Button
-						variant='primary'
-						onClick={handleSaveLogic}
-						loading={loading}
-						disabled={!canEdit}
-						size='xs'
-					>
+					<Button variant='primary' onClick={handleSaveLogic} loading={loading} disabled={!canEdit}>
 						{!loading && <FloppyDisk size={14} className='text-icon-default mr-1' />}
 						{t('general.save')}
 					</Button>
@@ -111,7 +105,7 @@ export default function VersionEditorLayout({
 
 			<CodeEditor
 				className='h-full'
-				containerClassName='h-[calc(100%-48px)]'
+				containerClassName='flex-1'
 				value={editedLogic}
 				onChange={(val) => setLogic(val as string)}
 				onSave={(val) => onSaveLogic(val as string)}

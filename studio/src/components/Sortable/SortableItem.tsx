@@ -28,6 +28,7 @@ export default function SortableItem<T extends { name: string; iid: string }>({
 			<Button
 				onClick={() => onDelete(item?.iid)}
 				variant='icon'
+				size='sm'
 				loading={loading}
 				rounded
 				disabled={disabled}

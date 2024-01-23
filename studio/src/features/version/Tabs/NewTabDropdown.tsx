@@ -36,7 +36,7 @@ export default function NewTabDropdown() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button rounded variant='icon'>
+				<Button rounded variant='icon' size='sm'>
 					<Plus size={15} />
 				</Button>
 			</DropdownMenuTrigger>

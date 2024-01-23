@@ -50,6 +50,8 @@ export default function Badge({ text, variant, rounded, onClear, className }: Ba
 			{onClear && (
 				<Button
 					variant='icon'
+					size='sm'
+					rounded
 					className='bg-inherit bg-opacity-70 p-0 h-4 w-4 text-default'
 					onClick={onClear}
 				>

@@ -1,33 +1,62 @@
 import { DataTable } from '@/components/DataTable';
-import { EmptyState } from '@/components/EmptyState';
-import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { NPMActions } from '@/features/version/SettingsNPMPackages';
+import { AddNPMPackagesDrawer } from '@/features/version/SettingsNPMPackages';
 import NPMPackagesColumns from '@/features/version/SettingsNPMPackages/NPMPackagesColumns';
-import { useSearch, useTable } from '@/hooks';
+import { useAuthorizeVersion, useSearch, useTable } from '@/hooks';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { NPMPackage } from '@/types';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function VersionSettingsNPMPackages() {
 	const { t } = useTranslation();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
+	const { version } = useVersionStore();
+	const { deleteMultipleNPMPackages } = useSettingsStore();
 	const sortedPackages = useSearch(npmPackages);
+	const [open, setOpen] = useState(false);
+	const canCreate = useAuthorizeVersion('version.package.create');
 	const table = useTable({
 		data: sortedPackages,
 		columns: NPMPackagesColumns,
 	});
 
+	const { mutateAsync: deleteMutate } = useMutation({
+		mutationFn: deleteMultipleNPMPackages,
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+	});
+	async function deleteHandler() {
+		if (!version) return;
+		deleteMutate({
+			orgId: version.orgId,
+			versionId: version._id,
+			appId: version.appId,
+			packageIds: table.getSelectedRowModel().rows.map((row) => row.original._id) as string[],
+		});
+	}
+
 	return (
-		<SettingsContainer
-			action={<NPMActions table={table} />}
-			pageTitle={t('version.settings.npm_packages')}
-			className='table-view'
-		>
-			{npmPackages.length > 0 ? (
-				<DataTable<NPMPackage> table={table} />
-			) : (
-				<EmptyState type='package' title={t('version.npm.no_package_found')} />
-			)}
-		</SettingsContainer>
+		<>
+			<VersionTabLayout
+				className='p-0'
+				type='package'
+				title={t('version.settings.npm_packages') as string}
+				createButtonTitle={t('version.npm.install')}
+				emptyStateTitle={t('version.npm.no_package_found')}
+				isEmpty={!sortedPackages.length}
+				openCreateModal={() => setOpen(true)}
+				onMultipleDelete={deleteHandler}
+				table={table}
+				disabled={!canCreate}
+				loading={false}
+			>
+				<DataTable<NPMPackage> table={table} className='table-fixed' />
+			</VersionTabLayout>
+			<AddNPMPackagesDrawer open={open} onOpenChange={setOpen} />
+		</>
 	);
 }

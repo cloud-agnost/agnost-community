@@ -1,6 +1,7 @@
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { LightBulb } from '@/components/icons';
+import { toast } from '@/hooks/useToast';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Lightbulb } from '@phosphor-icons/react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from 'components/Form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import { Button } from '../Button';
 import { Textarea } from '../Input';
-import { toast } from '@/hooks/useToast';
 const FeedbackScheme = z.object({
 	feedback: z.string({
 		required_error: 'Feedback is required',
@@ -58,8 +58,8 @@ export default function Feedback() {
 			}}
 		>
 			<PopoverTrigger asChild>
-				<Button variant='blank' className='header-menu-right-nav-item text-subtle'>
-					<LightBulb className='header-menu-right-nav-item-icon' />
+				<Button variant='text' className='header-menu-right-nav-item text-subtle'>
+					<Lightbulb size={14} className='mr-1' />
 
 					<span className='header-menu-right-nav-item-title font-sfCompact'>Feedback</span>
 				</Button>

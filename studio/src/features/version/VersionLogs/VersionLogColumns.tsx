@@ -1,13 +1,14 @@
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
-import { Clock, Calendar, Files } from '@phosphor-icons/react';
-import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { CopyButton } from '@/components/CopyButton';
+import { SortButton } from '@/components/DataTable';
+import { MethodBadge } from '@/components/Endpoint';
+import { BADGE_COLOR_MAP, BASE_URL } from '@/constants';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, VersionLog } from '@/types';
-import { DATETIME_MED_WITH_SECONDS, capitalize, translate, formatDate } from '@/utils';
-import { CopyButton } from '@/components/CopyButton';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { SortButton } from '@/components/DataTable';
+import { DATETIME_MED_WITH_SECONDS, capitalize, formatDate, translate } from '@/utils';
+import { Calendar, Clock, Files } from '@phosphor-icons/react';
 
 const { openVersionLogDetails } = useVersionStore.getState();
 const env = useEnvironmentStore.getState().environment;
@@ -44,9 +45,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return (
-				<Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} className='min-w-[52px]' />
-			);
+			return <MethodBadge method={method} />;
 		},
 	},
 	{

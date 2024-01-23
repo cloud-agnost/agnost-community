@@ -34,13 +34,7 @@ export default function Restart() {
 			title={t('version.restart')}
 			description={t('version.restart_desc')}
 		>
-			<Button
-				variant='primary'
-				loading={isPending}
-				onClick={mutateAsync}
-				size='xs'
-				className='w-24'
-			>
+			<Button variant='primary' loading={isPending} onClick={mutateAsync}>
 				{t('version.restart')}
 			</Button>
 		</SettingsFormItem>

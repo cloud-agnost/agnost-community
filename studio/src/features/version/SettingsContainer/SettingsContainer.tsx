@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import './settingsContainer.scss';
 import { cn } from '@/utils';
 import { Description } from '@/components/Description';
 
@@ -16,23 +15,13 @@ export default function SettingsContainer({
 	pageTitle,
 	action,
 	className,
-	contentClassName,
 	description,
 }: Props) {
 	return (
-		<div className={cn('setting-container', className)}>
-			<div className='setting-container-header'>
-				<div className='setting-container-header-info'>
-					<Description title={pageTitle}>{description}</Description>
-				</div>
-				{action && <div className='setting-container-header-action'>{action}</div>}
-			</div>
-			<div
-				id='setting-container-content'
-				className={cn('setting-container-content', contentClassName)}
-			>
-				{children}
-			</div>
+		<div className={cn('flex-1 max-h-full overflow-auto space-y-4', className)}>
+			<Description title={pageTitle}>{description}</Description>
+			{action && action}
+			{children}
 		</div>
 	);
 }

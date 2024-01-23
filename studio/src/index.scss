@@ -176,14 +176,14 @@
 		--model: 108 217 126;
 		--field: 108 217 126;
 		--cache: 87 171 255;
-		--storage: 212 212 212;
-		--bucket: 212 212 212;
-		--file: 212 212 212;
 		--endpoint: 255 235 59;
 		--middleware: 166 148 255;
 		--function: 245 98 245;
 		--queue: 212 120 28;
 		--task: 255 102 102;
+		--storage: 54 183 168;
+		--bucket: 54 183 168;
+		--file: 54 183 168;
 	}
 }
 
@@ -279,7 +279,7 @@
 	}
 
 	.link {
-		@apply text-button-primary hover:underline hover:text-button-primary-hover  text-sm font-normal;
+		@apply text-button-primary hover:underline hover:text-button-primary-hover text-xs font-normal;
 	}
 }
 

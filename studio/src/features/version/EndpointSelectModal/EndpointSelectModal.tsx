@@ -1,12 +1,12 @@
 import { Button } from '@/components/Button';
-import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { MethodBadge } from '@/components/Endpoint';
+import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Endpoint, HttpMethod, SortOption, TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
 import { CheckedState } from '@radix-ui/react-checkbox';
-import { Badge } from 'components/Badge';
 import { Checkbox } from 'components/Checkbox';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from 'components/Drawer';
 import {
@@ -138,11 +138,7 @@ export default function EndpointSelectModal({
 									key={index}
 									className='flex items-center justify-between p-[6px]'
 								>
-									<Badge
-										variant={HTTP_METHOD_BADGE_MAP[method]}
-										text={method}
-										className='min-w-[52px]'
-									/>
+									<MethodBadge method={method} />
 									{methods.includes(method) && <Check />}
 								</DropdownMenuItem>
 							))}
@@ -197,7 +193,7 @@ export default function EndpointSelectModal({
 										return (
 											<div
 												className={cn(
-													'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid grid-cols-[24px_1fr] gap-2',
+													'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid items-center  grid-cols-[24px_1fr] gap-2',
 													checked && 'bg-wrapper-background-light',
 												)}
 												key={index}
@@ -207,12 +203,8 @@ export default function EndpointSelectModal({
 													checked={checked}
 													onCheckedChange={(checked) => addList(endpoint, checked)}
 												/>
-												<label htmlFor={id} className='mt-2'>
-													<Badge
-														variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
-														text={endpoint.method}
-														className='min-w-[52px]'
-													/>
+												<label htmlFor={id}>
+													<MethodBadge method={endpoint.method} />
 													<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
 												</label>
 											</div>

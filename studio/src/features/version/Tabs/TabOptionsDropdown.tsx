@@ -78,11 +78,11 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button rounded variant='icon'>
+				<Button rounded variant='icon' size='sm'>
 					<DotsThreeVertical size={15} weight='bold' />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='tab-options-dropdown-content'>
+			<DropdownMenuContent className='min-w-[208px] mr-1 mt-3'>
 				<DropdownMenuItemContainer>
 					{tabOptions.map((option, index) => (
 						<Fragment key={index}>
@@ -105,7 +105,7 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 							}}
 						>
 							{getTabIcon(tab.type)}
-							<h1 title={tab.title} className='flex-1 truncate max-w-[15ch]'>
+							<h1 title={tab.title} className='flex-1 truncate max-w-[200px]'>
 								{tab.title}
 							</h1>
 							{tab.isDirty && (

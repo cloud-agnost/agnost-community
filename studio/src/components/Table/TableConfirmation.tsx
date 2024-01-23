@@ -55,6 +55,7 @@ export function TableConfirmation({
 								rounded
 								disabled={!hasPermission || disabled}
 								variant='icon'
+								size='sm'
 								onClick={(e) => e.stopPropagation()}
 							>
 								{icon ?? <Trash size={20} />}

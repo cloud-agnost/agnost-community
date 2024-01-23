@@ -91,8 +91,8 @@ export default function ChangeAvatar({
 									rounded
 									disabled={disabled}
 									variant='icon'
-									onClick={onClickHandler}
 									size='sm'
+									onClick={onClickHandler}
 								>
 									<Trash className='avatar-actions-icon' />
 								</Button>

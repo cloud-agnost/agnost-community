@@ -49,21 +49,20 @@ export function Header() {
 					{MENU_ITEMS.map((item) => (
 						<Button
 							key={item.title}
-							variant='blank'
-							className='header-menu-right-nav-item text-subtle'
+							variant='text'
+							className='text-subtle'
 							onClick={() => {
 								window.open(item.url, '_blank', 'noreferrer');
 							}}
 						>
-							<item.icon className='header-menu-right-nav-item-icon' />
-
-							<span className='header-menu-right-nav-item-title font-sfCompact'>{item.title}</span>
+							<item.icon className='mr-1' />
+							{item.title}
 						</Button>
 					))}
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
-					<Button variant='icon' onClick={toggleSearchCommandMenu}>
+					<Button variant='icon' size='sm' rounded onClick={toggleSearchCommandMenu}>
 						<MagnifyingGlass size={18} />
 					</Button>
 					<ReleaseDropdown />

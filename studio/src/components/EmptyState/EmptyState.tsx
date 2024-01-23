@@ -4,7 +4,6 @@ import { cn } from '@/utils';
 import { AppWindow, Bell, Envelope, GlobeSimple, Key, Users } from '@phosphor-icons/react';
 import React, { ElementType } from 'react';
 import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
-import './emptyState.scss';
 
 export type Modules =
 	| 'org'
@@ -52,12 +51,13 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 	};
 	const getTabIcon = useTabIcon('w-16 h-16');
 	const Icon = ICON_MAP[type];
-	const IC = Icon ?? getTabIcon(type as TabTypes);
-	console.log(IC);
+
 	return (
-		<div className={cn('empty-state h-[95%]', className)}>
-			<div className='empty-state-icon'>{getTabIcon(type as TabTypes)}</div>
-			<h2 className='empty-state-title'>{title}</h2>
+		<div className={cn('flex flex-col items-center justify-center gap-4 h-[95%]', className)}>
+			<div className='border-2 border-border p-4 rounded-full'>
+				{Icon ? <Icon className='w-8 h-8 text-default' /> : getTabIcon(type as TabTypes)}
+			</div>
+			<h2 className='text-default text-xs font-normal leading-6 font-sfCompact'>{title}</h2>
 			{children}
 		</div>
 	);

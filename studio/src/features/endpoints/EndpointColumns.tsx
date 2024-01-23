@@ -4,8 +4,9 @@ import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
+import { MethodBadge } from '@/components/Endpoint';
 import { TableConfirmation } from '@/components/Table';
-import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, BASE_URL } from '@/constants';
 import { toast } from '@/hooks/useToast';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -79,9 +80,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return (
-				<Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} className='min-w-[52px]' />
-			);
+			return <MethodBadge method={method} />;
 		},
 	},
 	{
