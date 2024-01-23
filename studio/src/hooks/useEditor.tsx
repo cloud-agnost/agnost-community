@@ -78,7 +78,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	lineNumbersMinChars: 3,
 	scrollBeyondLastLine: false,
 	scrollbar: {},
-	renderLineHighlight: 'none', //Enable rendering of current line highlight
+	renderLineHighlight: 'all', //Enable rendering of current line highlight
 	folding: true, //Enable code folding
 	codeLens: true,
 };

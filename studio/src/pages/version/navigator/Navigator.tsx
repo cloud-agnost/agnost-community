@@ -155,7 +155,7 @@ export default function Navigator() {
 			breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 			handlerButton={
 				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-					{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
+					{!isRefreshing && <Refresh className='mr-1 text-sm' />}
 					{t('general.refresh')}
 				</Button>
 			}

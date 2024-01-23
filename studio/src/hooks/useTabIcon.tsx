@@ -3,8 +3,8 @@ import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 
 export default function useTabIcon(className: string) {
-	const color: Record<string, string> = {
-		[TabTypes.Bucket]: 'text-bucket',
+	const color: Record<TabTypes, string> = {
+		[TabTypes.Bucket]: 'text-storage',
 		[TabTypes.Cache]: 'text-cache',
 		[TabTypes.Dashboard]: 'text-dashboard',
 		[TabTypes.Function]: 'text-function',
@@ -13,10 +13,13 @@ export default function useTabIcon(className: string) {
 		[TabTypes.MessageQueue]: 'text-queue',
 		[TabTypes.Task]: 'text-task',
 		[TabTypes.Endpoint]: 'text-endpoint',
-		[TabTypes.File]: 'text-file',
-		[TabTypes.Field]: 'text-field',
-		[TabTypes.Model]: 'text-model',
+		[TabTypes.File]: 'text-storage',
+		[TabTypes.Field]: 'text-database',
+		[TabTypes.Model]: 'text-database',
+		[TabTypes.Navigator]: 'text-database',
 		[TabTypes.Storage]: 'text-storage',
+		[TabTypes.Settings]: 'text-settings',
+		[TabTypes.Notifications]: 'text-notification',
 	};
 	function getTabIcon(type: TabTypes) {
 		const Icon = TAB_ICON_MAP[type];

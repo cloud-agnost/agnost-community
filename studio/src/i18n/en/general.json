@@ -1,6 +1,7 @@
 {
 	"no_result": "No items matching search criteria",
 	"no_logs": "No logs found",
+	"no_console_logs": "No console logs found",
 	"reset_search_query": "Reset Search Query",
 	"schemas": "Schemas",
 	"schema": "Schema",

@@ -212,23 +212,29 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					)}
 
 					<div className='flex items-center px-5 my-6'>
-						<div className='rounded-l w-16 h-9'>
-							<Badge
-								className='w-full h-full rounded-l rounded-r-none'
-								variant={HTTP_METHOD_BADGE_MAP[endpoint?.method as string]}
-								text={endpoint?.method as string}
-							/>
-						</div>
-						<div className='relative w-full'>
-							<Input className='rounded-none rounded-r !bg-base' value={endpoint.path} disabled />
-							<CopyButton
-								text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
-								className='absolute right-2 top-1 w-7 h-7'
-							/>
+						<div className='flex items-center flex-1'>
+							<div className='w-16 !h-[30px]'>
+								<Badge
+									className='w-full h-full rounded-none rounded-l'
+									variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
+									text={endpoint.method}
+								/>
+							</div>
+							<div className='relative flex-1 flex flex-col items-center justify-center'>
+								<Input
+									className='rounded-none rounded-r w-full !bg-base'
+									value={endpoint.path}
+									disabled
+									variant='sm'
+								/>
+								<CopyButton
+									text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
+									className='absolute right-1'
+								/>
+							</div>
 						</div>
 						<Button
 							className='ml-3'
-							size='lg'
 							variant='primary'
 							onClick={() => form.handleSubmit(onSubmit)()}
 							loading={isPending}

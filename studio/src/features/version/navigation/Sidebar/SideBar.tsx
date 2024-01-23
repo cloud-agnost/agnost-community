@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
-import { cn, isElementInViewport } from '@/utils';
+import { isElementInViewport } from '@/utils';
 import { MinusSquare } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import VersionSettingsExplorer from './VersionSettingsExplorer';
 import Workspace from './Workspace';
 export default function SideBar() {
 	const { t } = useTranslation();
-	const { toggleSidebar, isSidebarOpen, collapseAll, sidebar } = useUtilsStore();
+	const { toggleSidebar, isSidebarOpen, collapseAll } = useUtilsStore();
 	const { getCurrentTab, tabs } = useTabStore();
 	const { versionId } = useParams() as Record<string, string>;
 
@@ -55,7 +55,7 @@ export default function SideBar() {
 		};
 	}, [isSidebarOpen, tabs]);
 	return (
-		<div className='h-full w-full bg-base shadow-xl' id='side-navigation'>
+		<div className='h-full w-full bg-base shadow-xl flex flex-col' id='side-navigation'>
 			<div className='pl-2 py-1 border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
 				<h1 className='text-xs text-white'>{t('version.explorer')}</h1>
 				<TooltipProvider>
@@ -76,12 +76,7 @@ export default function SideBar() {
 				</TooltipProvider>
 			</div>
 			<OpenTabs />
-			<div
-				className={cn(
-					'overflow-y-auto overflow-x-hidden pb-2',
-					sidebar[versionId].openEditor ? 'h-[calc(100%-13rem)]' : 'h-[calc(100%-4rem)]',
-				)}
-			>
+			<div className='overflow-y-auto overflow-x-hidden pb-2 flex-1'>
 				<Workspace />
 				<VersionSettingsExplorer />
 			</div>

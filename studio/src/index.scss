@@ -7,6 +7,7 @@
 @layer base {
 	:root {
 		--header-menu-height: 48px;
+		--base-height: 1.875rem;
 		--navigation-tab-menu-height: 32px;
 		--org-menu-height: 71px;
 
@@ -22,8 +23,9 @@
 
 		--font-size-sm: 0.875rem;
 		--font-size-sm-line-height: 1.5rem;
-		--brand-color-primary: 15 135 255;
 
+		--brand-color-primary: 15 135 255;
+		--brand-color-primary--darker: 11 97 182;
 		--elements-strong--blue: 49 72 169;
 		--elements-blue: 15 135 255;
 		--elements-subtle-blue: 195 206 254;
@@ -173,8 +175,6 @@
 		--form-input-disabled-border: 50 56 73;
 
 		--database: 108 217 126;
-		--model: 108 217 126;
-		--field: 108 217 126;
 		--cache: 87 171 255;
 		--endpoint: 255 235 59;
 		--middleware: 166 148 255;
@@ -182,8 +182,6 @@
 		--queue: 212 120 28;
 		--task: 255 102 102;
 		--storage: 54 183 168;
-		--bucket: 54 183 168;
-		--file: 54 183 168;
 	}
 }
 
@@ -207,12 +205,6 @@
 	}
 	.main-layout {
 		height: calc(100vh - var(--header-menu-height));
-	}
-	.editor {
-		.overflow-guard,
-		.monaco-editor {
-			border-radius: 8px !important;
-		}
 	}
 	[type='button'] {
 		@apply appearance-none;
@@ -561,6 +553,10 @@ button:focus-visible {
 	top: -0.5em !important;
 }
 .recharts-text.recharts-cartesian-axis-tick-value {
-	font-size: 14px !important;
+	font-size: var(--font-size-xs) !important;
+	line-height: var(--font-size-xs-line-height) !important;
 	font-family: var(--font-sf) !important;
+}
+.animate-ping {
+	animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite !important;
 }

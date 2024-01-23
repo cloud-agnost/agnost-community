@@ -1,5 +1,5 @@
 .input {
-	@apply flex h-9 w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
+	@apply flex w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
 	// @apply border border-input-border hover:border-input-hover;
 	@apply file:border-0 file:bg-transparent file:text-sm file:font-medium;
 	@apply placeholder:text-subtle placeholder:text-sm;
@@ -8,6 +8,15 @@
 	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
 	&-error {
 		@apply border-error;
+	}
+	&-sm {
+		@apply h-7 text-xs placeholder:text-xs file:text-xs;
+	}
+	&-md {
+		@apply h-9 text-sm placeholder:text-sm file:text-sm;
+	}
+	&-lg {
+		@apply h-12;
 	}
 }
 

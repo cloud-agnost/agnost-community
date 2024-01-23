@@ -83,7 +83,7 @@ export default function VersionDropdown() {
 				closable
 			/>
 			<DropdownMenu>
-				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden'>
+				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden flex items-center'>
 					<Button
 						variant='blank'
 						className='flex items-center px-1.5 h-full w-full hover:bg-button-secondary-hover transition font-normal rounded-sm'
@@ -110,13 +110,12 @@ export default function VersionDropdown() {
 					</Button>
 					<DropdownMenuTrigger asChild>
 						<Button
-							variant='blank'
-							className='absolute z-50 top-0 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
+							variant='icon'
+							className='absolute z-50 top-1 right-0 text-icon-base p-1.5'
 							rounded
+							size='sm'
 						>
-							<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>
-								<CaretUpDown size={20} />
-							</div>
+							<CaretUpDown size={20} />
 						</Button>
 					</DropdownMenuTrigger>
 				</div>

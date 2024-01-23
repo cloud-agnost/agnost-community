@@ -80,7 +80,7 @@ export default function VersionEditorLayout({
 	}, [logic]);
 
 	return (
-		<div className={cn('h-full space-y-2 flex flex-col', className)}>
+		<div className={cn('h-full flex flex-col', className)}>
 			<div className='flex items-center justify-between gap-6 py-2 px-4'>
 				{breadCrumbItems && <BreadCrumb items={breadCrumbItems} />}
 				{children}

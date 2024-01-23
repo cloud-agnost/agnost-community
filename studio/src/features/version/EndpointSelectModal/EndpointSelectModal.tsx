@@ -133,13 +133,9 @@ export default function EndpointSelectModal({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='start' className='w-40'>
 							{ALL_HTTP_METHODS.map((method, index) => (
-								<DropdownMenuItem
-									onClick={() => onMethodSelect(method)}
-									key={index}
-									className='flex items-center justify-between p-[6px]'
-								>
+								<DropdownMenuItem onClick={() => onMethodSelect(method)} key={index} className=''>
 									<MethodBadge method={method} />
-									{methods.includes(method) && <Check />}
+									{methods.includes(method) && <Check className='ml-[70px]' />}
 								</DropdownMenuItem>
 							))}
 						</DropdownMenuContent>
@@ -165,56 +161,53 @@ export default function EndpointSelectModal({
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
-				<div className='pt-4'>
-					<div className='space-y-2'>
-						{filtered.length > 0 && (
-							<span className='px-4 text-subtle text-sm leading-6'>Endpoints</span>
+
+				<div className='space-y-2 pt-2'>
+					<div
+						id='endpoint-list-container'
+						className={cn(
+							'h-[245px] overflow-auto',
+							filtered.length === 0 && 'flex items-center justify-center',
 						)}
-						<div
-							id='endpoint-list-container'
-							className={cn(
-								'h-[250px] overflow-auto',
-								filtered.length === 0 && 'flex items-center justify-center',
-							)}
-						>
-							{!loading && filtered.length === 0 ? (
-								<EmptyState title='No endpoints found' type={TabTypes.Endpoint} />
-							) : (
-								<InfiniteScroll
-									scrollableTarget='endpoint-list-container'
-									next={next}
-									hasMore={lastDataCount >= LIMIT}
-									loader={<TableLoading />}
-									dataLength={filtered.length}
-								>
-									{filtered.map((endpoint, index) => {
-										const checked = selected.includes(endpoint.iid);
-										const id = `endpoint-${endpoint._id}`;
-										return (
-											<div
-												className={cn(
-													'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid items-center  grid-cols-[24px_1fr] gap-2',
-													checked && 'bg-wrapper-background-light',
-												)}
-												key={index}
-											>
-												<Checkbox
-													id={id}
-													checked={checked}
-													onCheckedChange={(checked) => addList(endpoint, checked)}
-												/>
-												<label htmlFor={id}>
-													<MethodBadge method={endpoint.method} />
-													<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
-												</label>
-											</div>
-										);
-									})}
-								</InfiniteScroll>
-							)}
-						</div>
+					>
+						{!loading && filtered.length === 0 ? (
+							<EmptyState title='No endpoints found' type={TabTypes.Endpoint} />
+						) : (
+							<InfiniteScroll
+								scrollableTarget='endpoint-list-container'
+								next={next}
+								hasMore={lastDataCount >= LIMIT}
+								loader={<TableLoading />}
+								dataLength={filtered.length}
+							>
+								{filtered.map((endpoint, index) => {
+									const checked = selected.includes(endpoint.iid);
+									const id = `endpoint-${endpoint._id}`;
+									return (
+										<div
+											className={cn(
+												'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid items-center  grid-cols-[24px_1fr] gap-2',
+												checked && 'bg-wrapper-background-light',
+											)}
+											key={index}
+										>
+											<Checkbox
+												id={id}
+												checked={checked}
+												onCheckedChange={(checked) => addList(endpoint, checked)}
+											/>
+											<label htmlFor={id}>
+												<MethodBadge method={endpoint.method} />
+												<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
+											</label>
+										</div>
+									);
+								})}
+							</InfiniteScroll>
+						)}
 					</div>
 				</div>
+
 				<DrawerFooter className='p-4'>
 					<DrawerClose asChild>
 						<Button size='lg'>{t('general.close')}</Button>

@@ -35,7 +35,7 @@ export default function OrganizationSelect() {
 
 	return (
 		<div className='p-6 relative'>
-			<div className='absolute right-6 flex items-center gap-4'>
+			<div className='absolute right-6 flex items-center gap-1'>
 				<ReleaseDropdown />
 				<AuthUserDropdown />
 			</div>

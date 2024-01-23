@@ -38,18 +38,18 @@ export default function SelectModel({
 	const models = getModelsOfSelectedDb(dbId);
 	return (
 		<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4 overflow-auto'>
-			<div className='space-y-4'>
+			<div className='space-y-1'>
 				{models?.map((md) => (
 					<div key={md._id}>
 						<Button
 							className={cn(
-								'text-default text-base p-2 font-normal w-full justify-start rounded-lg hover:bg-wrapper-background-hover',
+								'text-default p-2 font-normal w-full justify-start hover:bg-wrapper-background-hover',
 								model._id === md._id && 'bg-wrapper-background-hover',
 							)}
 							variant='blank'
 							onClick={() => onModelSelect(md)}
 						>
-							<Table className='w-6 h-6 inline-block mr-2' />
+							<Table size={14} className='text-database inline-block mr-1' />
 							{md.name}
 						</Button>
 					</div>

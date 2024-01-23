@@ -1,18 +1,17 @@
 import { DateRangePicker } from '@/components/DateRangePicker';
 import useAuthStore from '@/store/auth/authStore';
 import useThemeStore from '@/store/theme/themeStore';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { DATE_TIME_FORMAT, formatDate, toIsoString } from '@/utils';
-import { endOfDay, startOfDay } from 'date-fns';
+import { differenceInSeconds, endOfDay, startOfDay } from 'date-fns';
 import { t } from 'i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { Range } from 'react-date-range';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
-import { differenceInSeconds } from 'date-fns';
-import useTabStore from '@/store/version/tabStore';
 
 export default function VersionLogCharts() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -89,11 +88,11 @@ export default function VersionLogCharts() {
 		<div className='max-h-[400px] border border-border rounded-lg'>
 			<div className='flex items-center justify-between bg-subtle w-full rounded-t-lg p-4'>
 				<div>
-					<h1 className='font-semibold text-default space-x-2'>
+					<h1 className='text-default space-x-1 text-sm'>
 						<span>{logBuckets?.totalHits}</span>
 						<span>{logBuckets?.totalHits <= 1 ? t('version.hit') : t('version.hits')}</span>
 					</h1>
-					<p className='text-sm text-subtle'>
+					<p className='text-xs text-subtle'>
 						{formatDate(date[0].startDate as Date, DATE_TIME_FORMAT)} to{' '}
 						{formatDate(date[0].endDate as Date, DATE_TIME_FORMAT)}
 					</p>
@@ -112,7 +111,6 @@ export default function VersionLogCharts() {
 						}}
 						onClick={handleClickChart}
 					>
-						<CartesianGrid stroke='#46474E' strokeDasharray='4 4' vertical={false} />
 						<XAxis minTickGap={10} dataKey='name' />
 						<Tooltip
 							content={<CustomTooltip payload={data} />}

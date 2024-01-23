@@ -29,7 +29,7 @@ export default function TabLink({ className, name, path, onClick, type, ...props
 		<Button
 			variant='blank'
 			onClick={handleClickTabLink}
-			className={cn(className, 'link text-left !text-xs')}
+			className={cn(className, 'link text-left !text-xs justify-start')}
 			{...props}
 		>
 			{name}

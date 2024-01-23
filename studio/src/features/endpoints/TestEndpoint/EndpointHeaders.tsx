@@ -39,6 +39,7 @@ export default function EndpointHeaders() {
 											}
 											error={!!errors.headers?.[index]?.key}
 											{...field}
+											variant='sm'
 										/>
 									</FormControl>
 									<FormMessage />
@@ -61,6 +62,7 @@ export default function EndpointHeaders() {
 											}
 											error={!!errors.headers?.[index]?.value}
 											{...field}
+											variant='sm'
 										/>
 									</FormControl>
 									<FormMessage />
@@ -69,7 +71,7 @@ export default function EndpointHeaders() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button variant='secondary' rounded onClick={() => remove(index)}>
+						<Button variant='icon' size='sm' rounded onClick={() => remove(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>

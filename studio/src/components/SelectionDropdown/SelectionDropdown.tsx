@@ -45,14 +45,8 @@ export default function SelectionDropdown({
 			<div className='w-[210px] h-10 relative'>
 				<SelectionLabel onClick={onClick} selectedData={selectedData} />
 				<PopoverTrigger asChild>
-					<Button
-						variant='blank'
-						className='absolute z-50 top-0 -right-1 p-1.5 text-icon-base hover:text-icon-secondary'
-						rounded
-					>
-						<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>
-							<CaretUpDown size={20} />
-						</div>
+					<Button variant='icon' size='sm' className='absolute z-50 top-0 -right-1' rounded>
+						<CaretUpDown size={20} />
 					</Button>
 				</PopoverTrigger>
 			</div>
@@ -103,8 +97,13 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 		}
 	}
 
-	const label = (
-		<>
+	return (
+		<Button
+			variant='blank'
+			size='sm'
+			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-button-secondary-hover'
+			onClick={openAppSettings}
+		>
 			<Avatar className='mr-2' size='xs' square>
 				<AvatarImage src={selectedData?.pictureUrl} alt={selectedData?.name} />
 				<AvatarFallback name={selectedData?.name} color={selectedData?.color as string} />
@@ -115,16 +114,6 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 				</div>
 				<div className='text-xs text-subtle'>{selectedData?.role}</div>
 			</div>
-		</>
-	);
-
-	return (
-		<Button
-			variant='blank'
-			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-button-secondary-hover'
-			onClick={openAppSettings}
-		>
-			{label}
 		</Button>
 	);
 }

@@ -13,6 +13,9 @@ module.exports = {
 			},
 		},
 		extend: {
+			height: {
+				7: 'var(--base-height)',
+			},
 			colors: {
 				brand: {
 					primary: 'rgb(var(--brand-color-primary) / <alpha-value>)',
@@ -47,7 +50,6 @@ module.exports = {
 				border: 'rgb(var(--theme-border) / <alpha-value>)',
 				'border-hover': 'rgb(var(--theme-border-hover) / <alpha-value>)',
 				database: 'rgb(var(--database) / <alpha-value>)',
-				model: 'rgb(var(--model) / <alpha-value>)',
 				cache: 'rgb(var(--cache) / <alpha-value>)',
 				storage: 'rgb(var(--storage) / <alpha-value>)',
 				endpoint: 'rgb(var(--endpoint) / <alpha-value>)',
@@ -55,9 +57,6 @@ module.exports = {
 				function: 'rgb(var(--function) / <alpha-value>)',
 				queue: 'rgb(var(--queue) / <alpha-value>)',
 				task: 'rgb(var(--task) / <alpha-value>)',
-				field: 'rgb(var(--field) / <alpha-value>)',
-				bucket: 'rgb(var(--bucket) / <alpha-value>)',
-				file: 'rgb(var(--file) / <alpha-value>)',
 
 				icon: {
 					secondary: 'rgb(var(--icon-secondary) / <alpha-value>)',
@@ -125,7 +124,6 @@ module.exports = {
 				'subtle-reverse': 'rgb(var(--text-subtle-reverse) / <alpha-value>)',
 				'disabled-reverse': 'rgb(var(--text-disabled-reverse) / <alpha-value>)',
 			},
-
 			borderWidth: {
 				3: '3px',
 			},

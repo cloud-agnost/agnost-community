@@ -45,14 +45,14 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 				</TabsList>
 				{response && (
 					<div className='flex items-center gap-4'>
-						<div className='text-sm text-default'>
+						<div className='text-xs text-default'>
 							{t('endpoint.status')}
 							<span className={cn('ml-2', getStatusClass(response?.status))}>
 								{response?.status}
 							</span>
 						</div>
 						{response?.duration && (
-							<div className='text-sm text-default'>
+							<div className='text-xs text-default'>
 								{t('endpoint.duration')}
 								<span className={cn('ml-2', getStatusClass(response?.status))}>
 									{response?.duration}
