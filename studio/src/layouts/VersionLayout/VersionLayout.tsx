@@ -1,11 +1,11 @@
+import { Resizer } from '@/components/Resizer';
 import { Tabs } from '@/features/version/Tabs';
 import { SideNavigation } from '@/features/version/navigation';
 import useUtilsStore from '@/store/version/utilsStore';
 import { cn } from '@/utils';
 import { ReactNode } from 'react';
+import { Panel, PanelGroup } from 'react-resizable-panels';
 import './versionLayout.scss';
-import { Separator } from '@/components/Separator';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 
 interface VersionLayoutProps {
 	children: ReactNode;
@@ -19,10 +19,7 @@ export default function VersionLayout({ children, className }: VersionLayoutProp
 				<Panel defaultSize={isSidebarOpen ? 15 : 0} minSize={isSidebarOpen ? 12 : 0}>
 					{isSidebarOpen && <SideNavigation />}
 				</Panel>
-				<PanelResizeHandle className=''>
-					{isSidebarOpen && <Separator className='cursor-col-resize w-1' orientation='vertical' />}
-				</PanelResizeHandle>
-
+				<Resizer className='h-full' hide={!isSidebarOpen} orientation='vertical' />
 				<Panel defaultSize={isSidebarOpen ? 85 : 100}>
 					<div className='w-full'>
 						<Tabs />
