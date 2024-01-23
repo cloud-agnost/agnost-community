@@ -208,12 +208,6 @@
 	.main-layout {
 		height: calc(100vh - var(--header-menu-height));
 	}
-	.editor {
-		.overflow-guard,
-		.monaco-editor {
-			border-radius: 8px !important;
-		}
-	}
 	[type='button'] {
 		@apply appearance-none;
 	}
