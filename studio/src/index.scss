@@ -185,10 +185,6 @@
 	}
 }
 
-.flex > * {
-	min-width: 0;
-}
-
 @layer base {
 	* {
 		@apply border-border;
