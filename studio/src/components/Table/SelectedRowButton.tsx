@@ -19,8 +19,8 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 
 	return (
 		<>
-			<div className={cn('flex items-center rounded-sm bg-lighter', className)}>
-				<div className='flex items-center gap-2 border-r border-button-border px-1.5'>
+			<div className={cn('flex items-center rounded-sm bg-lighter p-1', className)}>
+				<div className='flex items-center gap-2 border-r border-button-border pr-2'>
 					{table && (
 						<Button
 							size='sm'
@@ -38,8 +38,8 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 						})}
 					</span>
 				</div>
-
 				<Button
+					className='!p-1 ml-1'
 					variant='icon'
 					size='sm'
 					rounded
