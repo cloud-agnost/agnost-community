@@ -55,7 +55,7 @@ export default function SideBar() {
 		};
 	}, [isSidebarOpen, tabs]);
 	return (
-		<div className='h-full w-full bg-base shadow-xl' id='side-navigation'>
+		<div className='h-full w-full bg-base shadow-xl flex flex-col' id='side-navigation'>
 			<div className='pl-2 py-1 border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
 				<h1 className='text-xs text-white'>{t('version.explorer')}</h1>
 				<TooltipProvider>
@@ -76,12 +76,7 @@ export default function SideBar() {
 				</TooltipProvider>
 			</div>
 			<OpenTabs />
-			<div
-				className={cn(
-					'overflow-y-auto overflow-x-hidden pb-2',
-					sidebar[versionId].openEditor ? 'h-[calc(100%-13rem)]' : 'h-[calc(100%-4rem)]',
-				)}
-			>
+			<div className='overflow-y-auto overflow-x-hidden pb-2 flex-1'>
 				<Workspace />
 				<VersionSettingsExplorer />
 			</div>
