@@ -35,6 +35,7 @@ import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
 import { CopyButton } from '@/components/CopyButton';
+import { Resizer } from '@/components/Resizer';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -279,12 +280,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 								</form>
 							</div>
 						</Panel>
-						<PanelResizeHandle className='my-6'>
-							<Separator
-								className='cursor-row-resize h-1 flex items-center justify-center'
-								ref={resizerRef}
-							/>
-						</PanelResizeHandle>
+						<Resizer className='my-6' orientation='horizontal' />
 						<Panel minSize={30}>
 							<EndpointResponse className='h-full' editorClassName='h-full' />
 						</Panel>
