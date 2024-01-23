@@ -135,14 +135,14 @@ export const AuditModel = mongoose.model(
 		data: {
 			type: mongoose.Schema.Types.Mixed,
 		},
-		// Datetime of the action. Audit logs are kept only for one year and any older logs will be automatically deleted
+		// Datetime of the action. Audit logs are kept only for 3 months and any older logs will be automatically deleted
 		createdAt: {
 			type: Date,
 			default: Date.now,
 			index: true,
 			immutable: true,
 			//expire records after 1 year
-			expires: helper.constants["1year"],
+			expires: helper.constants["3months"],
 		},
 		__v: {
 			type: Number,

@@ -13,6 +13,7 @@ const constants = {
 	"1day": 86400, // in seconds
 	"1week": 604800, // in seconds
 	"1month": 2592000, // in seconds (30 days)
+	"3months": 7776000, // in seconds (90 days)
 	"6months": 15552000, // in seconds (180 days)
 	"1year": 31536000, // in seconds (365 days)
 };
