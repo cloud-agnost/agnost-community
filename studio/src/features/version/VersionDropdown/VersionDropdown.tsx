@@ -83,7 +83,7 @@ export default function VersionDropdown() {
 				closable
 			/>
 			<DropdownMenu>
-				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden'>
+				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden flex items-center'>
 					<Button
 						variant='blank'
 						className='flex items-center px-1.5 h-full w-full hover:bg-button-secondary-hover transition font-normal rounded-sm'
@@ -111,7 +111,7 @@ export default function VersionDropdown() {
 					<DropdownMenuTrigger asChild>
 						<Button
 							variant='blank'
-							className='absolute z-50 top-0 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
+							className='absolute z-50 -top-1 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
 							rounded
 						>
 							<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>

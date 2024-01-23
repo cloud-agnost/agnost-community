@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
+import { DropdownMenuItem } from '@/components/Dropdown';
 
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
@@ -36,17 +37,12 @@ export default function ApplicationSelectDropdown() {
 				onSelect={(app) => onSelect(app as Application)}
 				onClick={() => openEditAppDrawer(application as Application)}
 			>
-				<CommandItem>
-					<Button
-						variant='primary'
-						size='full'
-						onClick={() => setOpenCreateModal(true)}
-						className='font-normal '
-					>
-						<Plus size={16} className='mr-2' />
+				<DropdownMenuItem asChild>
+					<Button variant='primary' onClick={() => setOpenCreateModal(true)}>
+						<Plus size={14} className='mr-2' />
 						{t('application.create')}
 					</Button>
-				</CommandItem>
+				</DropdownMenuItem>
 			</SelectionDropdown>
 
 			<ApplicationCreateModal

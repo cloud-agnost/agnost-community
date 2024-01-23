@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './organization.scss';
+import { DropdownMenuItem } from '@/components/Dropdown';
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const { user } = useAuthStore();
@@ -76,7 +77,7 @@ export function OrganizationDropdown() {
 				onSelect={(org) => onSelect(org as Organization)}
 				onClick={() => navigate(`/organization/${organization?._id}`)}
 			>
-				<CommandItem className='flex !justify-center'>
+				<DropdownMenuItem className='flex !justify-center' asChild>
 					<Button
 						disabled={organization?.ownerUserId === user?._id}
 						className='w-full font-normal'
@@ -85,19 +86,17 @@ export function OrganizationDropdown() {
 					>
 						{t('organization.leave.main')}
 					</Button>
-				</CommandItem>
-				<CommandItem className='hover:bg-[unset]'>
+				</DropdownMenuItem>
+				<DropdownMenuItem className='hover:bg-[unset]' asChild>
 					<Button
-						className='font-normal'
 						disabled={!user?.isClusterOwner}
-						size='full'
 						variant='primary'
 						onClick={() => setOpenCreateModal(true)}
 					>
-						<Plus size={16} className='mr-2' />
+						<Plus size={14} className='mr-2' />
 						{t('organization.create')}
 					</Button>
-				</CommandItem>
+				</DropdownMenuItem>
 			</SelectionDropdown>
 
 			<InfoModal
