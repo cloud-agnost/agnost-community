@@ -64,22 +64,22 @@ export default function ReleaseDropdown() {
 			<DropdownMenuTrigger asChild>
 				<Button variant='icon' size='sm' rounded className='relative'>
 					{getReleaseStatus() !== 'OK' && (
-						<div className='absolute top-1 right-0.5'>
-							<span className='relative flex items-center justify-center h-3 w-3'>
+						<div className='absolute top-1.5 right-1'>
+							<div className='relative flex items-center justify-center h-2.5 w-2.5'>
 								<span
 									className={cn(
-										'animate-ping  absolute inline-flex h-full w-full rounded-full ',
+										'ping absolute inline-flex h-full w-full rounded-full ',
 										classes?.[0],
 									)}
 								/>
 								<span className={cn('relative inline-flex rounded-full h-2 w-2', classes?.[1])} />
-							</span>
+							</div>
 						</div>
 					)}
 					<Package size={18} />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='relative max-w-sm bg-subtle h-full' align='end'>
+			<DropdownMenuContent className='relative max-w-xs bg-subtle h-full' align='end'>
 				<DropdownMenuLabel className='text-default flex items-center justify-between px-4 py-2'>
 					<p>{t('cluster.release_info')}</p>
 					<span className='text-subtle text-sm font-sfCompact inline-block text-right'>
@@ -88,11 +88,7 @@ export default function ReleaseDropdown() {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className='my-0' />
 				<DropdownMenuLabel className='p-0'>
-					<Alert
-						variant={hasUpdate ? 'warning' : 'success'}
-						size='sm'
-						className='!rounded-none !gap-2 !p-2'
-					>
+					<Alert variant={hasUpdate ? 'warning' : 'success'} size='sm'>
 						<AlertTitle className='font-normal'>
 							{hasUpdate ? t('cluster.update_available') : t('cluster.up_to_date')}
 						</AlertTitle>
@@ -122,7 +118,7 @@ function ReleaseInfo({ loading = false }: { loading: boolean }) {
 	) : (
 		<DataTable
 			table={table}
-			containerClassName='!border-none pl-3.5'
+			containerClassName='!border-none pl-3.5 pb-3'
 			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-0.5 [&_th]:p-0.5 [&_th]:h-8'
 		/>
 	);
