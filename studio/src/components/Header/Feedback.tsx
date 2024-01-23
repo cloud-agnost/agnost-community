@@ -58,7 +58,11 @@ export default function Feedback() {
 			}}
 		>
 			<PopoverTrigger asChild>
-				<Button variant='text' className='header-menu-right-nav-item text-subtle'>
+				<Button
+					variant='text'
+					size='sm'
+					className='header-menu-right-nav-item !text-subtle hover:!text-default'
+				>
 					<Lightbulb size={14} className='mr-1' />
 
 					<span className='header-menu-right-nav-item-title font-sfCompact'>Feedback</span>

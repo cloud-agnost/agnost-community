@@ -48,9 +48,10 @@ export function Header() {
 					<Feedback />
 					{MENU_ITEMS.map((item) => (
 						<Button
+							size='sm'
 							key={item.title}
 							variant='text'
-							className='text-subtle'
+							className='!text-subtle hover:!text-default'
 							onClick={() => {
 								window.open(item.url, '_blank', 'noreferrer');
 							}}
@@ -60,7 +61,10 @@ export function Header() {
 						</Button>
 					))}
 				</nav>
-				<div className='header-menu-divider' />
+				<Separator
+					orientation='vertical'
+					className='h-8 transform rotate-12 invisible 2xl:visible'
+				/>
 				<div className='header-menu-right-actions'>
 					<Button variant='icon' size='sm' rounded onClick={toggleSearchCommandMenu}>
 						<MagnifyingGlass size={18} />
@@ -73,7 +77,7 @@ export function Header() {
 						</>
 					)}
 
-					<div className='header-menu-right-actions-user'>
+					<div className='header-menu-right-actions-user ml-2'>
 						<AuthUserDropdown />
 					</div>
 				</div>
