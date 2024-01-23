@@ -195,7 +195,7 @@
 	}
 
 	body {
-		@apply bg-base;
+		@apply bg-base font-sfCompact text-default;
 		font-feature-settings:
 			'rlig' 1,
 			'calt' 1;
@@ -559,4 +559,12 @@ button:focus-visible {
 }
 .animate-ping {
 	animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite !important;
+}
+
+.active-resizer {
+	background: radial-gradient(
+		circle,
+		rgb(var(--brand-color-primary)) calc(100% - 140px),
+		transparent
+	);
 }

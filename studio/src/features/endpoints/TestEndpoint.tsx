@@ -1,10 +1,11 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
+import { CopyButton } from '@/components/CopyButton';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Separator } from '@/components/Separator';
+import { Resizer } from '@/components/Resizer';
 import { BASE_URL, HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
@@ -22,10 +23,10 @@ import {
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
 import { OrganizationMenuItem } from '../organization';
@@ -34,7 +35,6 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
-import { CopyButton } from '@/components/CopyButton';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -85,7 +85,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint } = useEndpointStore();
 	const { endpointRequest } = useUtilsStore();
-	const resizerRef = useRef<HTMLDivElement>(null);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [debugChannel, setDebugChannel] = useState<string | null>('');
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
@@ -279,12 +278,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 								</form>
 							</div>
 						</Panel>
-						<PanelResizeHandle className='my-6'>
-							<Separator
-								className='cursor-row-resize h-1 flex items-center justify-center'
-								ref={resizerRef}
-							/>
-						</PanelResizeHandle>
+						<Resizer className='my-6' orientation='horizontal' />
 						<Panel minSize={30}>
 							<EndpointResponse className='h-full' editorClassName='h-full' />
 						</Panel>

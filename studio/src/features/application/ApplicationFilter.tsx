@@ -25,6 +25,7 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 				<SearchInput placeholder='Search apps' value={searchParams.get('q') as string} />
 				<ButtonGroup>
 					<Button
+						size='sm'
 						iconOnly
 						variant='outline'
 						className={cn(isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
@@ -35,6 +36,7 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 						/>
 					</Button>
 					<Button
+						size='sm'
 						iconOnly
 						variant='outline'
 						className={cn(!isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}

@@ -37,7 +37,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[13px] !w-[13px] !pr-0',
+		className: '!max-w-[18px] !w-[18px] !pr-0',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
