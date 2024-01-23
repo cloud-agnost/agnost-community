@@ -15,19 +15,16 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 				<DrawerHeader>
 					<DrawerTitle>{t('version.log_details')}</DrawerTitle>
 				</DrawerHeader>
-				<div className='p-6 h-full overflow-auto space-y-6'>
-					<div className='space-y-4 h-[85%]'>
-						<p className='text-default font-sfCompact text-sm'>{t('version.details')}</p>
-						<CodeEditor
-							key={log._id}
-							value={JSON.stringify(log, null, 2)}
-							defaultLanguage='json'
-							containerClassName='h-full'
-							className='h-full'
-							readonly
-							name={`versionLogDetails-${log._id}`}
-						/>
-					</div>
+				<div className='p-6 h-full overflow-auto space-y-6 flex flex-col'>
+					<CodeEditor
+						key={log._id}
+						value={JSON.stringify(log, null, 2)}
+						defaultLanguage='json'
+						containerClassName='flex-[0.5]'
+						className='h-full'
+						readonly
+						name={`versionLogDetails-${log._id}`}
+					/>
 				</div>
 			</DrawerContent>
 		</Drawer>

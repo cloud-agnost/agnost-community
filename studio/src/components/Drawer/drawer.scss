@@ -52,7 +52,7 @@
 		@apply flex items-center justify-between text-center sm:text-left border-b border-border p-6;
 	}
 	&-title {
-		@apply text-xl font-semibold text-default;
+		@apply font-semibold text-default;
 	}
 	&-footer {
 		@apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2;

@@ -66,7 +66,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						})}
 					</DrawerTitle>
 				</DrawerHeader>
-				<div className='p-6 space-y-6 h-full'>
+				<div className='p-6 space-y-6 h-full flex flex-col'>
 					{environment?.serverStatus === 'Deploying' && (
 						<div className='px-5'>
 							<Alert variant='warning'>
@@ -75,15 +75,14 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 							</Alert>
 						</div>
 					)}
-					<div className='flex items-center justify-between flex-1'>
-						<span className='text-xl font-semibold text-default'>{task.name}</span>
+					<div className='flex items-center justify-between'>
+						<span className='text-sm font-semibold text-default'>{task.name}</span>
 						<Button variant='primary' onClick={testTaskHandler} loading={isPending}>
 							{t('task.run')}
 						</Button>
 					</div>
 					<Separator />
-					<div className='h-[90%]'>
-						<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
+					<div className='h-[calc(100%-156px)]'>
 						<Logs logs={taskLogs?.[taskId as string] as Log[]} />
 					</div>
 				</div>

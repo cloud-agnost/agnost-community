@@ -6,7 +6,7 @@ function OrganizationCreateButton({ ...props }) {
 	const { t } = useTranslation();
 	return (
 		<div className='create-button-container'>
-			<Button variant='secondary' className='create-button' {...props}>
+			<Button size='sm' variant='secondary' className='create-button' {...props}>
 				<Plus size={64} weight='bold' className='create-button-icon' />
 			</Button>
 			<span className='create-button-label'>{t('organization.create')}</span>

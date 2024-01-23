@@ -99,7 +99,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		}) => {
 			return (
 				<div className='flex items-center gap-2'>
-					<Clock size={24} />
+					<Clock size={18} />
 					<span className='whitespace-nowrap text-default'>{duration}ms</span>
 				</div>
 			);

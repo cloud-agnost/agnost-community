@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
-import { cn, isElementInViewport } from '@/utils';
+import { isElementInViewport } from '@/utils';
 import { MinusSquare } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import VersionSettingsExplorer from './VersionSettingsExplorer';
 import Workspace from './Workspace';
 export default function SideBar() {
 	const { t } = useTranslation();
-	const { toggleSidebar, isSidebarOpen, collapseAll, sidebar } = useUtilsStore();
+	const { toggleSidebar, isSidebarOpen, collapseAll } = useUtilsStore();
 	const { getCurrentTab, tabs } = useTabStore();
 	const { versionId } = useParams() as Record<string, string>;
 

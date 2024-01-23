@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -112,7 +110,7 @@ const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
 	<div className={cn('drawer-header', className)} {...props}>
 		{props.children}
 		<SheetPrimitive.Close className='drawer-close'>
-			<X size={24} />
+			<X size={20} />
 			<span className='sr-only'>Close</span>
 		</SheetPrimitive.Close>
 	</div>

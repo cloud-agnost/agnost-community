@@ -110,13 +110,12 @@ export default function VersionDropdown() {
 					</Button>
 					<DropdownMenuTrigger asChild>
 						<Button
-							variant='blank'
-							className='absolute z-50 -top-1 -right-1  p-1.5 text-icon-base hover:text-icon-secondary'
+							variant='icon'
+							className='absolute z-50 top-1 right-0 text-icon-base p-1.5'
 							rounded
+							size='sm'
 						>
-							<div className='rounded-full hover:bg-button-secondary-hover w-8 h-8 flex items-center justify-center'>
-								<CaretUpDown size={20} />
-							</div>
+							<CaretUpDown size={20} />
 						</Button>
 					</DropdownMenuTrigger>
 				</div>

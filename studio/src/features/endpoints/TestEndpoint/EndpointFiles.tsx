@@ -55,13 +55,16 @@ export default function EndpointFiles() {
 												field.onChange(val);
 											}}
 										>
-											<SelectTrigger defaultValue={field.value} className='w-[120px]'>
+											<SelectTrigger
+												defaultValue={field.value}
+												className='w-[120px] text-xs placeholder:text-xs !h-[30px]'
+											>
 												<SelectValue>{capitalize(field.value)}</SelectValue>
 											</SelectTrigger>
 
 											<SelectContent>
 												{['text', 'file']?.map((role) => (
-													<SelectItem key={role} value={role}>
+													<SelectItem key={role} value={role} className='text-xs'>
 														{role}
 													</SelectItem>
 												))}
@@ -83,6 +86,7 @@ export default function EndpointFiles() {
 									<FormControl>
 										<Input
 											disabled={watch(`formData.${index}.type`) === 'file'}
+											variant='sm'
 											placeholder={
 												t('forms.placeholder', {
 													label: t('resources.database.key'),
@@ -106,6 +110,7 @@ export default function EndpointFiles() {
 									<FormItem className='flex-1'>
 										<FormControl>
 											<Input
+												variant='sm'
 												placeholder={
 													t('forms.placeholder', {
 														label: t('resources.database.value'),
@@ -148,7 +153,7 @@ export default function EndpointFiles() {
 						)}
 					</TableCell>
 					<TableCell>
-						<Button variant='secondary' rounded onClick={() => remove(index)}>
+						<Button variant='icon' size='sm' rounded onClick={() => remove(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>

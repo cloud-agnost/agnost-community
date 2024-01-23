@@ -43,6 +43,7 @@ export default function EndpointParams() {
 												}) ?? ''
 											}
 											error={!!errors.params?.queryParams?.[index]?.key}
+											variant='sm'
 											{...field}
 										/>
 									</FormControl>
@@ -66,6 +67,7 @@ export default function EndpointParams() {
 											}
 											error={!!errors.params?.queryParams?.[index]?.value}
 											{...field}
+											variant='sm'
 										/>
 									</FormControl>
 									<FormMessage />
@@ -74,7 +76,7 @@ export default function EndpointParams() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button variant='secondary' rounded onClick={() => removeQueryParamFields(index)}>
+						<Button variant='icon' size='sm' rounded onClick={() => removeQueryParamFields(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>

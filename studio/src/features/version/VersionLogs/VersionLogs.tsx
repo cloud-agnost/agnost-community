@@ -60,7 +60,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	}, []);
 
 	return (
-		<div className='h-full space-y-6'>
+		<div className='h-full space-y-6 p-4'>
 			<VersionLogCharts />
 			{isFetching ? (
 				<div className='flex items-center justify-center h-full w-full'>
@@ -82,14 +82,14 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 export const CustomTooltip = ({ payload }: any) => {
 	const { t } = useTranslation();
 	return (
-		<div className='bg-subtle p-2 rounded-lg space-y-4 max-w-[13rem]'>
-			<p className='text-subtle text-sm font-sfCompact'>{payload?.[0]?.payload.tooltip}</p>
-			<p className='text-default text-sm font-sfCompact flex items-center gap-1'>
+		<div className='bg-subtle p-2 rounded-lg space-y-2 max-w-[13rem]'>
+			<p className='text-subtle text-xs font-sfCompact'>{payload?.[0]?.payload.tooltip}</p>
+			<p className='text-default text-xs font-sfCompact flex items-center gap-1'>
 				<span className='bg-[#11BB69] w-3 h-3 rounded inline-block mr-1' />
 				{payload?.[0]?.payload?.success}{' '}
 				<span className='text-subtle'>{t('version.success_count')}</span>
 			</p>
-			<p className='text-default text-sm font-sfCompact flex items-center gap-1'>
+			<p className='text-default text-xs font-sfCompact flex items-center gap-1'>
 				<span className='bg-[#EE446D] w-3 h-3 rounded inline-block mr-1' />
 				{payload?.[0]?.payload?.error} <span className='text-subtle'> {t('version.errors')}</span>
 			</p>

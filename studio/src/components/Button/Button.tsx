@@ -87,7 +87,7 @@ const Button = React.forwardRef<
 					ref={ref}
 					{...props}
 				>
-					{loading && <CircleNotch size={16} className='loading' />}
+					{loading && <CircleNotch size={14} className='loading' />}
 					{children}
 				</Link>
 			);
@@ -99,7 +99,7 @@ const Button = React.forwardRef<
 				type={type ?? 'button'}
 				{...props}
 			>
-				{loading && <CircleNotch size={16} className='loading' />}
+				{loading && <CircleNotch size={14} className='loading' />}
 				{children}
 			</Comp>
 		);

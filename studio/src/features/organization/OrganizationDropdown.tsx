@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { CommandItem } from '@/components/Command';
+import { DropdownMenuItem } from '@/components/Dropdown';
 import { InfoModal } from '@/components/InfoModal';
 import { SelectionDropdown } from '@/components/SelectionDropdown';
 import { OrganizationCreateModal } from '@/features/organization';
@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './organization.scss';
-import { DropdownMenuItem } from '@/components/Dropdown';
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const { user } = useAuthStore();
@@ -77,7 +76,7 @@ export function OrganizationDropdown() {
 				onSelect={(org) => onSelect(org as Organization)}
 				onClick={() => navigate(`/organization/${organization?._id}`)}
 			>
-				<DropdownMenuItem className='flex !justify-center' asChild>
+				<DropdownMenuItem className='flex !justify-center'>
 					<Button
 						disabled={organization?.ownerUserId === user?._id}
 						className='w-full font-normal'
@@ -87,8 +86,9 @@ export function OrganizationDropdown() {
 						{t('organization.leave.main')}
 					</Button>
 				</DropdownMenuItem>
-				<DropdownMenuItem className='hover:bg-[unset]' asChild>
+				<DropdownMenuItem className='hover:bg-[unset]'>
 					<Button
+						size='full'
 						disabled={!user?.isClusterOwner}
 						variant='primary'
 						onClick={() => setOpenCreateModal(true)}

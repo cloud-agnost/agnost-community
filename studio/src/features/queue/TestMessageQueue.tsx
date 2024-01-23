@@ -103,7 +103,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 h-full'>
 						<div className='flex items-center justify-between flex-1'>
-							<span className='text-xl font-semibold text-default'>{queue.name}</span>
+							<span className='text-sm font-semibold text-default'>{queue.name}</span>
 							<Button variant='primary' type='submit' loading={isPending}>
 								{t('queue.test.submit')}
 							</Button>
@@ -131,13 +131,13 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 									)}
 								/>
 							</Panel>
-							<PanelResizeHandle className='my-6'>
+							<PanelResizeHandle className='my-2'>
 								<Separator
 									className='cursor-row-resize h-1 flex items-center justify-center'
 									ref={resizerRef}
 								/>
 							</PanelResizeHandle>
-							<Panel minSize={30} className='max-h-full no-scrollbar !overflow-y-auto'>
+							<Panel minSize={30}>
 								<Logs logs={testQueueLogs?.[queue?._id]?.logs as Log[]} />
 							</Panel>
 						</PanelGroup>
