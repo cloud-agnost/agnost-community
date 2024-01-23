@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, AlertDescription } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
@@ -14,10 +14,10 @@ import { APIError, EnvironmentStatus, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
@@ -35,7 +35,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { toast } = useToast();
 	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
-	const resizerRef = useRef<HTMLDivElement>(null);
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
 		appId: string;

@@ -1,7 +1,6 @@
 import useApplicationStore from '@/store/app/applicationStore';
-import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { Eye, EyeSlash, GearSix, GitBranch, GitFork, LockSimple } from '@phosphor-icons/react';
+import { Eye, EyeSlash, GitBranch, GitFork, LockSimple } from '@phosphor-icons/react';
 import { LockSimpleOpen } from '@phosphor-icons/react/dist/ssr';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +12,6 @@ export default function useVersionDropdownItems() {
 	const { appId, orgId } = useParams() as Record<string, string>;
 	const { versions, version, setCreateCopyVersionDrawerIsOpen, getAllVersionsVisibleToUser } =
 		useVersionStore();
-	const { addSettingsTab } = useTabStore();
 
 	const { updateVersion } = useUpdateVersion();
 

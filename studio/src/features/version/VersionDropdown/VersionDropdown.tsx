@@ -1,17 +1,12 @@
 import { Button } from '@/components/Button';
+import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
 import { useToast, useVersionDropdownItems } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
-import {
-	CaretUpDown,
-	GearSix,
-	LockSimple,
-	LockSimpleOpen,
-	SunDim,
-	Trash,
-} from '@phosphor-icons/react';
+import { resetAfterVersionChange } from '@/utils';
+import { CaretUpDown, GearSix, LockSimple, LockSimpleOpen, Trash } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
 	DropdownMenu,
@@ -28,8 +23,6 @@ import {
 import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { cn, resetAfterVersionChange } from '@/utils';
-import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
 
 export default function VersionDropdown() {
 	const { toast } = useToast();
