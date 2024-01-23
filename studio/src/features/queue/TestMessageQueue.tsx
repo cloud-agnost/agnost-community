@@ -4,6 +4,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Logs } from '@/components/Log';
+import { Resizer } from '@/components/Resizer';
 import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -131,12 +132,8 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 									)}
 								/>
 							</Panel>
-							<PanelResizeHandle className='my-2'>
-								<Separator
-									className='cursor-row-resize h-1 flex items-center justify-center'
-									ref={resizerRef}
-								/>
-							</PanelResizeHandle>
+							<Resizer className='my-6' orientation='horizontal' />
+
 							<Panel minSize={30}>
 								<Logs logs={testQueueLogs?.[queue?._id]?.logs as Log[]} />
 							</Panel>
