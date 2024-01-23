@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { DropdownMenuItem } from '@/components/Dropdown';
+import { CommandItem } from '@/components/Command';
 import { SelectionDropdown } from '@/components/SelectionDropdown';
 import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
@@ -36,7 +36,7 @@ export default function ApplicationSelectDropdown() {
 				onSelect={(app) => onSelect(app as Application)}
 				onClick={() => openEditAppDrawer(application as Application)}
 			>
-				<DropdownMenuItem>
+				<CommandItem>
 					<Button
 						variant='primary'
 						size='full'
@@ -46,7 +46,7 @@ export default function ApplicationSelectDropdown() {
 						<Plus size={16} className='mr-2' />
 						{t('application.create')}
 					</Button>
-				</DropdownMenuItem>
+				</CommandItem>
 			</SelectionDropdown>
 
 			<ApplicationCreateModal

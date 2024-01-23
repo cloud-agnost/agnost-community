@@ -1,18 +1,19 @@
 import { Button } from '@/components/Button';
-import { Application, Organization } from '@/types';
-import { cn } from '@/utils';
-import { CaretUpDown, Check } from '@phosphor-icons/react';
-import { MouseEvent, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuItemContainer,
-	DropdownMenuTrigger,
-} from '../Dropdown';
-import { SearchInput } from '../SearchInput';
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandSeparator,
+} from '@/components/Command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
+import { MouseEvent, useMemo, useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
+import { CaretUpDown, Check } from '@phosphor-icons/react';
+import { cn } from '@/utils';
+import { useTranslation } from 'react-i18next';
+import { Application, Organization } from '@/types';
 interface SelectionLabelProps {
 	selectedData: Organization | Application;
 	onClick?: () => void;
@@ -40,51 +41,51 @@ export default function SelectionDropdown({
 		return data.filter((d) => RegExp(new RegExp(search, 'i')).exec(d.name));
 	}, [data, search]);
 	return (
-		<DropdownMenu>
-			<div className='w-[210px] h-10 relative rounded-sm overflow-hidden flex items-center'>
+		<Popover>
+			<div className='w-[210px] h-10 relative'>
 				<SelectionLabel onClick={onClick} selectedData={selectedData} />
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant='icon'
-						className='absolute z-50 top-1 right-0 text-icon-base p-1.5'
-						rounded
-						size='sm'
-					>
+				<PopoverTrigger asChild>
+					<Button variant='icon' size='sm' className='absolute z-50 top-0 -right-1' rounded>
 						<CaretUpDown size={20} />
 					</Button>
-				</DropdownMenuTrigger>
+				</PopoverTrigger>
 			</div>
-
-			<DropdownMenuContent align='end' className='min-w-[210px]'>
-				{data.length > 5 && (
-					<div className='p-2'>
-						<SearchInput
+			<PopoverContent align='end' className='p-0'>
+				<Command shouldFilter={false}>
+					{data.length > 5 && (
+						<CommandInput
 							placeholder={t('organization.select') as string}
 							value={search}
-							canAddParam={false}
-							onClear={() => setSearch('')}
-							onSearch={(value) => setSearch(value)}
+							onValueChange={setSearch}
 						/>
-					</div>
-				)}
-				<DropdownMenuItemContainer>
-					{filteredData.map((d) => (
-						<DropdownMenuItem key={d._id} onClick={() => onSelect(d)}>
-							<SelectionLabel selectedData={d} />
-							<Check
-								size={16}
-								className={cn(
-									'text-icon-base',
-									selectedData?._id === d?._id ? 'opacity-100 ' : 'opacity-0',
-								)}
-								weight='bold'
-							/>
-						</DropdownMenuItem>
-					))}
-					{children}
-				</DropdownMenuItemContainer>
-			</DropdownMenuContent>
-		</DropdownMenu>
+					)}
+					<CommandEmpty>{t('organization.empty')}</CommandEmpty>
+					<CommandGroup className='max-h-[300px] overflow-y-auto'>
+						<div className='space-y-2'>
+							{filteredData.map((d) => (
+								<CommandItem key={d._id} value={d._id} onSelect={() => onSelect(d)}>
+									<SelectionLabel selectedData={d} />
+									<Check
+										size={16}
+										className={cn(
+											'text-icon-base',
+											selectedData?._id === d?._id ? 'opacity-100 ' : 'opacity-0',
+										)}
+										weight='bold'
+									/>
+								</CommandItem>
+							))}
+						</div>
+					</CommandGroup>
+					<CommandSeparator />
+					{children && (
+						<CommandGroup className='[&>.command-item]:rounded-none hover:bg-inherit'>
+							{children}
+						</CommandGroup>
+					)}
+				</Command>
+			</PopoverContent>
+		</Popover>
 	);
 }
 
@@ -99,6 +100,7 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 	return (
 		<Button
 			variant='blank'
+			size='sm'
 			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-button-secondary-hover'
 			onClick={openAppSettings}
 		>

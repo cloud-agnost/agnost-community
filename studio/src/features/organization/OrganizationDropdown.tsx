@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { DropdownMenuItem } from '@/components/Dropdown';
+import { CommandItem } from '@/components/Command';
 import { InfoModal } from '@/components/InfoModal';
 import { SelectionDropdown } from '@/components/SelectionDropdown';
 import { OrganizationCreateModal } from '@/features/organization';
@@ -76,7 +76,7 @@ export function OrganizationDropdown() {
 				onSelect={(org) => onSelect(org as Organization)}
 				onClick={() => navigate(`/organization/${organization?._id}`)}
 			>
-				<DropdownMenuItem className='flex !justify-center'>
+				<CommandItem className='flex !justify-center'>
 					<Button
 						disabled={organization?.ownerUserId === user?._id}
 						className='w-full font-normal'
@@ -85,18 +85,19 @@ export function OrganizationDropdown() {
 					>
 						{t('organization.leave.main')}
 					</Button>
-				</DropdownMenuItem>
-				<DropdownMenuItem className='hover:bg-[unset]'>
+				</CommandItem>
+				<CommandItem className='hover:bg-[unset]'>
 					<Button
-						size='full'
+						className='font-normal'
 						disabled={!user?.isClusterOwner}
+						size='full'
 						variant='primary'
 						onClick={() => setOpenCreateModal(true)}
 					>
-						<Plus size={14} className='mr-2' />
+						<Plus size={16} className='mr-2' />
 						{t('organization.create')}
 					</Button>
-				</DropdownMenuItem>
+				</CommandItem>
 			</SelectionDropdown>
 
 			<InfoModal
