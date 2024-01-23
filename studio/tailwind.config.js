@@ -14,7 +14,7 @@ module.exports = {
 		},
 		extend: {
 			height: {
-				7: 'var(--base-width)',
+				7: 'var(--base-height)',
 			},
 			colors: {
 				brand: {
