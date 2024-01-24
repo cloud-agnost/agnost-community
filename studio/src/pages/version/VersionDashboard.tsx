@@ -8,6 +8,7 @@ import {
 	CardTitle,
 } from '@/components/Card';
 import { CopyInput } from '@/components/CopyInput';
+import { Loading } from '@/components/Loading';
 import { useTabIcon, useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -20,13 +21,12 @@ import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function VersionDashboard() {
 	const { version, dashboard, getVersionDashboardPath, getVersionDashboardInfo } =
 		useVersionStore();
 	const { environment } = useEnvironmentStore();
-	const { addSettingsTab, addTab } = useTabStore();
+	const { addTab } = useTabStore();
 	const { t } = useTranslation();
 	const getIcon = useTabIcon('w-8 h-8');
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
@@ -81,10 +81,19 @@ export default function VersionDashboard() {
 			isActive: true,
 		});
 	}
+
+	function addAPIKeyTab() {
+		addTab(versionId, {
+			title: t('version.settings.api_keys'),
+			id: generateId(),
+			isActive: false,
+			isDashboard: false,
+			path: 'api-keys',
+			type: TabTypes.APIKeys,
+		});
+	}
 	return isFetching ? (
-		<div className='flex items-center justify-center h-full'>
-			<BeatLoader color='#6884FD' size={24} margin={18} />
-		</div>
+		<Loading loading={isFetching} />
 	) : (
 		<div className='space-y-8 max-w-7xl p-4'>
 			<div className='grid grid-cols-4 gap-6'>
@@ -146,7 +155,7 @@ export default function VersionDashboard() {
 					))}
 				</CardContent>
 				<CardFooter className='flex justify-between'>
-					<Button variant='outline' onClick={() => addSettingsTab(version._id, 'api-keys')}>
+					<Button variant='outline' onClick={addAPIKeyTab}>
 						{t('version.settings.manage_api_keys')}
 					</Button>
 				</CardFooter>

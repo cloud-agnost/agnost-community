@@ -13,7 +13,7 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		<PanelResizeHandle
 			{...props}
 			className={cn(
-				'flex items-center justify-center',
+				'flex items-center justify-center w-2 gap-0.5 group !cursor-col-resize',
 				orientation === 'horizontal' && 'flex-col',
 				className,
 			)}
@@ -23,12 +23,14 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		>
 			{!hide && (
 				<>
-					<div
-						className={cn(
-							'rounded h-8 w-0.5 bg-lighter',
-							orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
-						)}
-					/>
+					{!isResizing && (
+						<div
+							className={cn(
+								'rounded h-8 w-0.5 bg-lighter group-hover:bg-white transition-all',
+								orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
+							)}
+						/>
+					)}
 					<Separator
 						className={cn(isResizing ? 'active-resizer' : 'bg-lighter')}
 						orientation={orientation}

@@ -1,5 +1,5 @@
 .drawer {
-	@apply fixed z-50 bg-subtle opacity-100 shadow-lg border outline-none;
+	@apply fixed z-50 bg-subtle opacity-100 shadow-lg border outline-none flex flex-col;
 	&-left {
 		@apply animate-in slide-in-from-left h-full duration-300;
 	}

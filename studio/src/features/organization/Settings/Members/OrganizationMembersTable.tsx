@@ -1,4 +1,5 @@
 import { DataTable } from '@/components/DataTable';
+import { Loading } from '@/components/Loading';
 import {
 	OrganizationMembersColumns,
 	OrganizationMembersTableHeader,
@@ -8,7 +9,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 export default function OrganizationMembersTable() {
 	const { members } = useOrganizationStore();
 	const [searchParams] = useSearchParams();
@@ -35,12 +36,10 @@ export default function OrganizationMembersTable() {
 		if (searchParams.get('tab') === 'member') refetch();
 	}, [searchParams, searchParams.get('tab')]);
 	return (
-		<div className='space-y-4'>
+		<div className='space-y-4 relative'>
 			<OrganizationMembersTableHeader table={table} />
 			{isPending ? (
-				<div className='flex items-center justify-center h-full w-full'>
-					<BeatLoader color='#6884FD' size={16} margin={12} />
-				</div>
+				<Loading loading={isPending} />
 			) : (
 				<DataTable<OrganizationMember> table={table} />
 			)}

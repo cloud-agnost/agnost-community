@@ -8,9 +8,10 @@ import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
+import { Loading } from '@/components/Loading';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
@@ -60,12 +61,10 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	}, []);
 
 	return (
-		<div className='h-full space-y-6 p-4'>
+		<div className='h-full space-y-6 p-4 relative'>
 			<VersionLogCharts />
 			{isFetching ? (
-				<div className='flex items-center justify-center h-full w-full'>
-					<BeatLoader color='#6884FD' size={16} margin={12} />
-				</div>
+				<Loading loading={isFetching} />
 			) : logBuckets.totalHits > 0 ? (
 				<>
 					<VersionLogsTable type={type} />

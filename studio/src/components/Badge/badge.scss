@@ -9,11 +9,17 @@
 		.badge-dot {
 			@apply bg-elements-green;
 		}
+		.badge-clear {
+			@apply hover:bg-elements-green;
+		}
 	}
 	&-blue {
 		@apply bg-elements-subtle-blue dark:bg-elements-strong-blue;
 		.badge-dot {
 			@apply bg-elements-blue;
+		}
+		.badge-clear {
+			@apply hover:bg-elements-blue;
 		}
 	}
 	&-yellow {
@@ -21,11 +27,17 @@
 		.badge-dot {
 			@apply bg-elements-yellow;
 		}
+		.badge-clear {
+			@apply hover:bg-elements-yellow;
+		}
 	}
 	&-purple {
 		@apply bg-elements-subtle-purple dark:bg-elements-strong-purple;
 		.badge-dot {
 			@apply bg-elements-purple;
+		}
+		.badge-clear {
+			@apply hover:bg-elements-purple;
 		}
 	}
 	&-red {
@@ -33,17 +45,26 @@
 		.badge-dot {
 			@apply bg-elements-red;
 		}
+		.badge-clear {
+			@apply hover:bg-elements-red;
+		}
 	}
 	&-orange {
 		@apply bg-elements-subtle-orange dark:bg-elements-strong-orange;
 		.badge-dot {
 			@apply bg-elements-orange;
 		}
+		.badge-clear {
+			@apply hover:bg-elements-orange;
+		}
 	}
 	&-gray {
 		@apply dark:bg-lighter;
 		.badge-dot {
 			@apply bg-lighter;
+		}
+		.badge-clear {
+			@apply hover:bg-base;
 		}
 	}
 	&-rounded {

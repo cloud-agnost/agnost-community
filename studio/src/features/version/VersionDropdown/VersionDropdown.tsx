@@ -1,11 +1,11 @@
 import { Button } from '@/components/Button';
 import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
-import { useToast, useVersionDropdownItems } from '@/hooks';
+import { useTabIcon, useToast, useVersionDropdownItems } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError } from '@/types';
-import { resetAfterVersionChange } from '@/utils';
+import { APIError, TabTypes } from '@/types';
+import { generateId, resetAfterVersionChange } from '@/utils';
 import { CaretUpDown, GearSix, LockSimple, LockSimpleOpen, Trash } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
@@ -32,17 +32,33 @@ export default function VersionDropdown() {
 	const [loading, setLoading] = useState(false);
 	const confirmCode = useVersionStore((state) => state.version?.iid) as string;
 	const deleteVersionDrawerIsOpen = useVersionStore((state) => state.deleteVersionDrawerIsOpen);
-	const deleteVersion = useVersionStore((state) => state.deleteVersion);
+	const { deleteVersion, getVersionDashboardPath } = useVersionStore();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
-	const { addSettingsTab, updateCurrentTab } = useTabStore();
+	const { addTab } = useTabStore();
 	const versionDropdownItems = useVersionDropdownItems();
+	const getIcon = useTabIcon('w-5 h-5');
 
 	function handleAddTab(item: (typeof VERSION_SETTINGS_MENU_ITEMS)[number]) {
-		addSettingsTab(versionId, item.href);
-		updateCurrentTab(versionId, {
+		addTab(versionId, {
 			title: item.title,
+			path: getVersionDashboardPath(`settings/${item.href}`),
+			id: generateId(),
+			isActive: false,
+			isDashboard: false,
+			type: item.type,
+		});
+	}
+
+	function addSettingsTab(versionId: string) {
+		addTab(versionId, {
+			title: t('version.settings.default'),
+			path: '',
+			id: generateId(),
+			isActive: false,
+			isDashboard: false,
+			type: TabTypes.Settings,
 		});
 	}
 
@@ -158,7 +174,7 @@ export default function VersionDropdown() {
 					</DropdownMenuItemContainer>
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger className='dropdown-item flex items-center gap-2'>
-							<GearSix className='w-5 h-5 mr-2' />
+							<GearSix className='w-5 h-5' />
 							{t('version.settings.default')}
 						</DropdownMenuSubTrigger>
 						<DropdownMenuPortal>
@@ -170,7 +186,7 @@ export default function VersionDropdown() {
 								{VERSION_SETTINGS_MENU_ITEMS.map((item) => (
 									<DropdownMenuItem onClick={() => handleAddTab(item)} asChild key={item.id}>
 										<div className='flex items-center gap-2'>
-											<item.icon />
+											{getIcon(item.type)}
 											{item.title}
 										</div>
 									</DropdownMenuItem>

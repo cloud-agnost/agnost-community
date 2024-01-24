@@ -502,48 +502,56 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.general'),
 		href: '',
 		icon: GearSix,
+		type: TabTypes.Settings,
 	},
 	{
 		id: 8,
 		title: translate('version.settings.api_keys'),
 		href: 'api-keys',
 		icon: Key,
+		type: TabTypes.APIKeys,
 	},
 	{
 		id: 7,
 		title: translate('version.settings.authentications'),
 		href: 'authentications?t=general',
 		icon: Authentication,
+		type: TabTypes.Authentication,
 	},
 	{
 		id: 9,
 		title: translate('cluster.custom_domain'),
 		href: 'custom-domain',
 		icon: GlobeSimple,
+		type: TabTypes.CustomDomains,
 	},
 	{
 		id: 2,
 		title: translate('version.settings.environment'),
 		href: 'environment',
 		icon: Environment,
+		type: TabTypes.Environment,
 	},
 	{
 		id: 5,
 		title: translate('version.settings.environment_variables'),
 		href: 'environment-variables',
 		icon: EnvironmentVariable,
+		type: TabTypes.EnvironmentVariables,
 	},
 	{
 		id: 4,
 		title: translate('version.settings.npm_packages'),
 		href: 'npm-packages',
 		icon: NpmPackage,
+		type: TabTypes.NPMPackages,
 	},
 	{
 		id: 6,
 		title: translate('version.settings.rate_limits'),
 		href: 'rate-limits',
 		icon: RateLimit,
+		type: TabTypes.RateLimits,
 	},
 
 	{
@@ -551,6 +559,7 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.real_time'),
 		href: 'real-time',
 		icon: RealTime,
+		type: TabTypes.Realtime,
 	},
 ];
 
@@ -818,6 +827,14 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	[TabTypes.Navigator]: Table,
 	[TabTypes.Bucket]: HardDrives,
 	[TabTypes.File]: FileText,
+	[TabTypes.APIKeys]: Key,
+	[TabTypes.Authentication]: Authentication,
+	[TabTypes.CustomDomains]: GlobeSimple,
+	[TabTypes.Environment]: Environment,
+	[TabTypes.EnvironmentVariables]: EnvironmentVariable,
+	[TabTypes.NPMPackages]: NpmPackage,
+	[TabTypes.RateLimits]: RateLimit,
+	[TabTypes.Realtime]: RealTime,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {

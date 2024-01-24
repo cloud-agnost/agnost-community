@@ -66,7 +66,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						})}
 					</DrawerTitle>
 				</DrawerHeader>
-				<div className='p-6 space-y-6 h-full flex flex-col'>
+				<div className='flex-1 p-6 space-y-6 h-full flex flex-col'>
 					{environment?.serverStatus === 'Deploying' && (
 						<div className='px-5'>
 							<Alert variant='warning'>
@@ -82,7 +82,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						</Button>
 					</div>
 					<Separator />
-					<div className='h-[calc(100%-156px)]'>
+					<div className='flex-1'>
 						<Logs logs={taskLogs?.[taskId as string] as Log[]} />
 					</div>
 				</div>

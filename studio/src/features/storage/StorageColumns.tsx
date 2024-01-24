@@ -14,7 +14,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[40px] !w-[40px]',
+		className: '!max-w-[15px] !w-[15px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

@@ -1,4 +1,5 @@
 import { EmptyState } from '@/components/EmptyState';
+import { Loading } from '@/components/Loading';
 import { TableLoading } from '@/components/Table/Table';
 import { Notification, NotificationFilter } from '@/features/version/Notification';
 import { useInfiniteScroll } from '@/hooks';
@@ -8,7 +9,6 @@ import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function VersionNotifications() {
 	const { t } = useTranslation();
@@ -35,14 +35,12 @@ export default function VersionNotifications() {
 	return (
 		<div className='flex gap-6 h-full'>
 			<NotificationFilter />
-			<div className='border border-border rounded-lg flex-1'>
+			<div className='border border-border rounded-lg flex-1 relative'>
 				<div className='bg-subtle p-6 border-b border-border'>
 					<h1 className='text-default text-xl'>{t('version.notifications')}</h1>
 				</div>
 				{isFetching ? (
-					<div className='flex items-center justify-center h-full w-full'>
-						<BeatLoader color='#6884FD' size={24} margin={18} />
-					</div>
+					<Loading loading={isFetching} />
 				) : (
 					<div className='scroll p-6 divide-y-2' id='scrollableDiv'>
 						{!_.isEmpty(notifications) ? (

@@ -20,6 +20,14 @@ export default function useTabIcon(className: string) {
 		[TabTypes.Storage]: 'text-storage',
 		[TabTypes.Settings]: 'text-settings',
 		[TabTypes.Notifications]: 'text-notification',
+		[TabTypes.APIKeys]: '',
+		[TabTypes.Authentication]: '',
+		[TabTypes.CustomDomains]: '',
+		[TabTypes.Environment]: '',
+		[TabTypes.EnvironmentVariables]: '',
+		[TabTypes.NPMPackages]: '',
+		[TabTypes.RateLimits]: '',
+		[TabTypes.Realtime]: '',
 	};
 	function getTabIcon(type: TabTypes) {
 		const Icon = TAB_ICON_MAP[type];

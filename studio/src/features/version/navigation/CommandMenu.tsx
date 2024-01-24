@@ -7,6 +7,7 @@ import {
 	CommandLoading,
 } from '@/components/Command';
 import { MethodBadge } from '@/components/Endpoint';
+import { Loading } from '@/components/Loading';
 import { useDebounce, useSearchTabClick, useTabIcon, useUpdateEffect } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
@@ -14,7 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 export default function CommandMenu() {
 	const handleClickElement = useSearchTabClick();
 
@@ -45,12 +46,10 @@ export default function CommandMenu() {
 	return (
 		<CommandDialog open={isSearchCommandMenuOpen} onOpenChange={toggleSearchCommandMenu}>
 			<CommandInput value={search} onValueChange={setSearch} />
-			<CommandList>
+			<CommandList className='relative'>
 				{isFetching ? (
 					<CommandLoading>
-						<div className='flex items-center justify-center h-full p-4'>
-							<BeatLoader color='#6884FD' size={16} margin={12} />
-						</div>
+						<Loading loading={isFetching} />
 					</CommandLoading>
 				) : (
 					data?.map((item) => (

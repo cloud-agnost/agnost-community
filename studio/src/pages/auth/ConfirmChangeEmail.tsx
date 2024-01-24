@@ -1,11 +1,12 @@
 import { Feedback } from '@/components/Alert';
+import { Loading } from '@/components/Loading';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 export default function ConfirmChangeEmail() {
 	const { confirmChangeLoginEmail } = useAuthStore();
 	const [searchParams] = useSearchParams();
@@ -28,9 +29,9 @@ export default function ConfirmChangeEmail() {
 	}, []);
 	return (
 		<AuthLayout>
-			<div className='flex flex-col items-center justify-center h-full'>
+			<div className='flex flex-col items-center justify-center h-full relative'>
 				{isPending ? (
-					<BeatLoader color='#6884FD' size={24} margin={18} />
+					<Loading loading={isPending} />
 				) : (
 					<Feedback success={isSuccess} title={title} description={description} />
 				)}

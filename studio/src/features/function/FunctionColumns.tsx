@@ -37,7 +37,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[40px] !w-[40px]',
+		className: '!max-w-[10px] !w-[10px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

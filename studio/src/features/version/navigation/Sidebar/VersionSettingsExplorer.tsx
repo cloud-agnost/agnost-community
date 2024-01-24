@@ -2,21 +2,29 @@ import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
-import { cn } from '@/utils';
+import { cn, generateId } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
 import SideBarButton from './SideBarButton';
+import { useTabIcon } from '@/hooks';
+import useVersionStore from '@/store/version/versionStore';
 export default function VersionSettingsExplorer() {
 	const { sidebar, toggleWorkspaceTab } = useUtilsStore();
-	const { addSettingsTab, updateCurrentTab, getCurrentTab } = useTabStore();
+	const { addTab, getCurrentTab } = useTabStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { versionId } = useParams() as Record<string, string>;
 	const tab = getCurrentTab(versionId);
 	function handleAddTab(item: (typeof VERSION_SETTINGS_MENU_ITEMS)[number]) {
-		addSettingsTab(versionId, item.href);
-		updateCurrentTab(versionId, {
+		addTab(versionId, {
 			title: item.title,
+			path: getVersionDashboardPath(`settings/${item.href}`),
+			id: generateId(),
+			isActive: false,
+			isDashboard: false,
+			type: item.type,
 		});
 	}
+	const getIcon = useTabIcon('w-3.5 h-3.5');
 	return (
 		<ExplorerCollapsible
 			open={sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings) || false}
@@ -37,14 +45,15 @@ export default function VersionSettingsExplorer() {
 					onClick={() => handleAddTab(item)}
 					asChild
 				>
-					<div className='flex-1/2'>
-						<item.icon
-							className={cn(
-								tab.title === item.title
-									? 'text-icon-secondary'
-									: 'text-subtle group-hover:text-default',
-							)}
-						/>
+					<div
+						className={cn(
+							'flex-1/2',
+							tab.title === item.title
+								? 'text-icon-secondary'
+								: 'text-subtle group-hover:text-default',
+						)}
+					>
+						{getIcon(item.type)}
 					</div>
 					<p
 						className={cn(

@@ -1,6 +1,7 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { EmptyState } from '@/components/EmptyState';
 import { InfoModal } from '@/components/InfoModal';
+import { Loading } from '@/components/Loading';
 import {
 	ApplicationCard,
 	ApplicationFilter,
@@ -15,7 +16,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const { toast } = useToast();
@@ -74,7 +75,12 @@ export default function OrganizationApps() {
 	}, []);
 
 	return (
-		<div className={cn('scroll p-8', !applications.length && 'flex items-center justify-center')}>
+		<div
+			className={cn(
+				'scroll p-8',
+				!applications.length && 'flex items-center justify-center relative',
+			)}
+		>
 			{!!applications.length && !!filteredApps.length && !isFetching && (
 				<>
 					<ApplicationFilter isCard={isCard} setIsCard={setIsCard} />
@@ -94,11 +100,7 @@ export default function OrganizationApps() {
 					)}
 				</>
 			)}
-			{isFetching && (
-				<div className='flex items-center justify-center h-full'>
-					<BeatLoader color='#6884FD' size={24} margin={18} />
-				</div>
-			)}
+			<Loading loading={isFetching} />
 			{!!applications.length && !filteredApps.length && !isFetching && (
 				<EmptyState title={t('application.search_empty')} type='app' />
 			)}

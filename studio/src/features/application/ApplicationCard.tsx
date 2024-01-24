@@ -6,10 +6,11 @@ import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application } from '@/types';
 import { cn, getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import ApplicationSettings from './ApplicationSettings';
 import ApplicationTeam from './ApplicationTeam';
 import './application.scss';
+import { Loading } from '@/components/Loading';
 interface ApplicationCardProps {
 	application: Application;
 }
@@ -35,9 +36,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 		>
 			{loading && application._id === selectedApp?._id && (
 				<>
-					<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
-						<BeatLoader color='#6884FD' size={16} margin={12} />
-					</div>
+					<Loading loading={loading} />
 					<div
 						className={cn(
 							'absolute bg-base/50 w-full h-full z-40',

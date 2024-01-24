@@ -10,8 +10,9 @@ import { Organization } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import './organization.scss';
+import { Loading } from '@/components/Loading';
 export default function OrganizationSelect() {
 	const { organizations, selectOrganization, getAllOrganizationByUser } = useOrganizationStore();
 	const { user } = useAuthStore();
@@ -41,9 +42,7 @@ export default function OrganizationSelect() {
 			</div>
 			<div className='select-organization-container'>
 				{isFetching ? (
-					<div className='flex justify-center items-center h-full'>
-						<BeatLoader color='#6884FD' size={24} margin={18} />
-					</div>
+					<Loading loading={isFetching} />
 				) : (
 					<>
 						{!!organizations.length && (
