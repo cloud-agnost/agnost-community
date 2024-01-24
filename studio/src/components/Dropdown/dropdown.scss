@@ -14,7 +14,7 @@
 
 	&-item {
 		@apply relative flex cursor-pointer select-none items-center font-sfCompact text-xs;
-		@apply px-3 py-1 text-default outline-none transition-colors;
+		@apply px-3 py-1.5 text-default outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		&:hover,
 		&:focus-visible,
