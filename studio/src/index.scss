@@ -269,6 +269,17 @@
 	.link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover text-xs font-normal;
 	}
+
+	@keyframes ping {
+		75%,
+		100% {
+			transform: scale(1.5);
+			opacity: 0;
+		}
+	}
+	.ping {
+		animation: 2s ease 0s infinite normal none running ping;
+	}
 }
 
 .Toastify {
@@ -560,14 +571,4 @@ button:focus-visible {
 		rgb(var(--brand-color-primary)) calc(100% - 140px),
 		transparent
 	);
-}
-@keyframes ping {
-	75%,
-	100% {
-		transform: scale(1.5);
-		opacity: 0;
-	}
-}
-.ping {
-	animation: 2s ease 0s infinite normal none running ping;
 }
