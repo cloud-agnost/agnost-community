@@ -82,24 +82,20 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 				onOpenChange={setAddMiddlewareDropDownIsOpen}
 			>
 				<DropdownMenuTrigger asChild>
-					<Button variant='secondary' className='flex items-center gap-[10px]'>
-						<Plus weight='bold' className='text-base' />
+					<Button variant='secondary' className='items-center gap-[10px]' size='sm'>
+						<Plus size={14} />
 						{t('version.middleware.add_middleware')}
-						{addMiddlewareDropDownIsOpen ? (
-							<CaretUp weight='bold' className='text-base' />
-						) : (
-							<CaretDown weight='bold' className='text-base' />
-						)}
+						{addMiddlewareDropDownIsOpen ? <CaretUp size={14} /> : <CaretDown size={14} />}
 					</Button>
 				</DropdownMenuTrigger>
 
-				<DropdownMenuContent align='end' className='version-dropdown-content'>
-					<DropdownMenuItemContainer>
+				<DropdownMenuContent align='end' className='version-dropdown-content bg-input-background'>
+					<DropdownMenuItemContainer className='bg-input-background'>
 						<DropdownMenuItem
 							onClick={toggleCreateModal}
-							className='flex gap-[10px] text-default text-sm font-medium'
+							className='flex gap-[10px] text-default text-xs font-medium hover:bg-[#343B4D]'
 						>
-							<Plus weight='bold' />
+							<Plus size={14} weight='bold' />
 							<span>{t('version.middleware.add_middleware')}</span>
 						</DropdownMenuItem>
 						{middlewares && middlewares.length > 1 && <DropdownMenuSeparator />}
@@ -113,6 +109,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 										else onChange([mw.iid]);
 									}}
 									key={index}
+									className='hover:bg-[#343B4D]'
 								>
 									<div className='flex flex-col'>
 										<span>{mw.name}</span>
