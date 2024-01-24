@@ -269,6 +269,7 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 				key={item.path}
 				className='justify-start w-full text-left font-normal gap-2'
 				variant='blank'
+				size='sm'
 			>
 				<h1
 					title={item.title}

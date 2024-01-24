@@ -56,7 +56,7 @@ export default function SideBar() {
 	}, [isSidebarOpen, tabs]);
 	return (
 		<div className='h-full w-full bg-base shadow-xl flex flex-col' id='side-navigation'>
-			<div className='pl-2 py-1 border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
+			<div className='pl-2 py-[0.22rem] border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
 				<h1 className='text-xs text-white'>{t('version.explorer')}</h1>
 				<TooltipProvider>
 					<Tooltip>
