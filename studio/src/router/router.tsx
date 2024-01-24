@@ -1,3 +1,4 @@
+import { Loading } from '@/components/Loading';
 import { componentLoader } from '@/helpers';
 import ErrorBoundary from '@/pages/errors/ErrorBoundary';
 import { Root } from '@/pages/root';
@@ -6,15 +7,14 @@ import useClusterStore from '@/store/cluster/clusterStore.ts';
 import loadable from '@loadable/component';
 import type { ReactNode } from 'react';
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
 import authLoaders from './loader/AuthLoader';
 import homeLoaders from './loader/HomeLoader';
 import onboardingLoaders from './loader/OnboardingLoader';
 import versionLoaders from './loader/VersionLoader';
 export function Fallback(): JSX.Element {
 	return (
-		<div className='flex items-center justify-center h-screen'>
-			<BeatLoader color='#6884FD' size={24} margin={18} />
+		<div className='relative w-screen h-screen'>
+			<Loading />
 		</div>
 	);
 }

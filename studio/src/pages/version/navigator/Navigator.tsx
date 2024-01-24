@@ -1,6 +1,7 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
+import { Loading } from '@/components/Loading';
 import { TableLoading } from '@/components/Table/Table';
 import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
@@ -19,7 +20,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function Navigator() {
 	const { t } = useTranslation();
@@ -164,8 +164,8 @@ export default function Navigator() {
 				<div className='flex gap-4 justify-center h-[calc(100%-52px)]'>
 					<SelectModel fetchData={fetchData} />
 					{isFetching && !isSorted && !isFetchingNextPage ? (
-						<div className='flex-1 flex items-center justify-center'>
-							<BeatLoader color='#6884FD' size={24} margin={18} />
+						<div className='flex-1 relative'>
+							<Loading />
 						</div>
 					) : data.length > 0 ? (
 						<div className='w-5/6 table-container overflow-auto' id='scroll' ref={scrollContainer}>

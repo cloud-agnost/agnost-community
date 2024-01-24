@@ -24,8 +24,9 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import ReleaseColumns from './ReleaseColumns';
+import { Loading } from '@/components/Loading';
 
 export default function ReleaseDropdown() {
 	const [open, setOpen] = useState(false);
@@ -112,8 +113,8 @@ function ReleaseInfo({ loading = false }: { loading: boolean }) {
 	});
 
 	return loading && _.isEmpty(clusterComponentsReleaseInfo) ? (
-		<div className='h-96 flex items-center justify-center'>
-			<BeatLoader color='#6884FD' size={16} margin={12} />
+		<div className='h-96 relative'>
+			<Loading />
 		</div>
 	) : (
 		<DataTable

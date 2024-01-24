@@ -14,8 +14,8 @@ import { SelectedRowButton } from 'components/Table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
+import { Loading } from '@/components/Loading';
 export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const [searchParams] = useSearchParams();
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
@@ -61,7 +61,7 @@ export default function MainAppMembers({ loading }: { loading: boolean }) {
 		});
 	}
 	return (
-		<div className='space-y-6 p-6'>
+		<div className='space-y-6 p-6 relative'>
 			<div className='flex items-center gap-4'>
 				<SearchInput
 					className='flex-1'
@@ -91,13 +91,7 @@ export default function MainAppMembers({ loading }: { loading: boolean }) {
 					)}
 				</div>
 			</div>
-			{loading ? (
-				<div className='flex items-center justify-center h-full w-full'>
-					<BeatLoader color='#6884FD' size={16} margin={12} />
-				</div>
-			) : (
-				<DataTable<ApplicationMember> table={table} />
-			)}
+			{loading ? <Loading loading={loading} /> : <DataTable<ApplicationMember> table={table} />}
 		</div>
 	);
 }

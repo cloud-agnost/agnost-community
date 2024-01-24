@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button';
 import { EmptyState, Modules } from '@/components/EmptyState';
+import { Loading } from '@/components/Loading';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectedRowButton } from '@/components/Table';
 import { useUpdateEffect } from '@/hooks';
@@ -10,7 +11,7 @@ import { Table } from '@tanstack/react-table';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
@@ -122,13 +123,7 @@ export default function VersionTabLayout<T>({
 				</div>
 			</div>
 			{!loading && content}
-			<BeatLoader
-				color='#6884FD'
-				className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-				size={24}
-				loading={loading}
-				margin={18}
-			/>
+			<Loading loading={loading} />
 		</div>
 	);
 }

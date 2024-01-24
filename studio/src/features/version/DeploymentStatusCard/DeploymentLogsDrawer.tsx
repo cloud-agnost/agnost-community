@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import DeploymentLogColumns from './DeploymentLogColumns';
+import { Loading } from '@/components/Loading';
 interface DeploymentLogsDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -73,14 +74,8 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 					<DrawerHeader>
 						<DrawerTitle>{t('version.logs')}</DrawerTitle>
 					</DrawerHeader>
-					<div className='p-6 scroll'>
-						{isPending ? (
-							<div className='flex justify-center items-center h-[300px]'>
-								<BeatLoader color='#6884FD' size={16} margin={12} />
-							</div>
-						) : (
-							<DataTable table={table} />
-						)}
+					<div className='p-6 scroll relative'>
+						{isPending ? <Loading loading={isPending} /> : <DataTable table={table} />}
 					</div>
 				</DrawerContent>
 			</Drawer>
@@ -107,9 +102,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 						</TabsList>
 
 						{isDetailsFetching ? (
-							<div className='flex justify-center items-center h-[300px]'>
-								<BeatLoader color='#6884FD' size={16} margin={12} />
-							</div>
+							<Loading loading={isDetailsFetching} />
 						) : (
 							<>
 								<TabsContent className='h-[300px] w-full' value='db'>

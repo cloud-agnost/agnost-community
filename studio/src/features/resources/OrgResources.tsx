@@ -9,8 +9,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-import BeatLoader from 'react-spinners/BeatLoader';
+
 import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
+import { Loading } from '@/components/Loading';
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
@@ -99,8 +100,6 @@ export default function OrgResources() {
 			<EditResourceDrawer />
 		</div>
 	) : (
-		<div className='flex items-center justify-center h-full'>
-			<BeatLoader color='#6884FD' size={24} margin={18} />
-		</div>
+		<Loading loading={isPending} />
 	);
 }

@@ -9,7 +9,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { PAGE_SIZE } from '@/constants';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { TableLoading } from '@/components/Table/Table';
-import BeatLoader from 'react-spinners/BeatLoader';
+
+import { Loading } from '@/components/Loading';
 function AppInvitations() {
 	const { invitations, getAppInvitations, lastFetchedInvitationsPage, application } =
 		useApplicationStore();
@@ -49,7 +50,7 @@ function AppInvitations() {
 	}, [searchParams]);
 
 	return (
-		<div className='p-6 max-h-[85%] overflow-auto' id='invitation-infinite-scroll'>
+		<div className='p-6 max-h-[85%] overflow-auto relative' id='invitation-infinite-scroll'>
 			<InfiniteScroll
 				scrollableTarget='invitation-infinite-scroll'
 				next={fetchNextPage}
@@ -60,9 +61,7 @@ function AppInvitations() {
 				<div className='space-y-4'>
 					<AppInvitationFilter table={table} />
 					{isFetching && !isFetchingNextPage ? (
-						<div className='flex items-center justify-center h-full w-full'>
-							<BeatLoader color='#6884FD' size={16} margin={12} />
-						</div>
+						<Loading loading={isFetching} />
 					) : (
 						<DataTable<Invitation> table={table} />
 					)}
