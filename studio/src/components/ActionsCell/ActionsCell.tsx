@@ -32,11 +32,10 @@ function ActionsCell<T>({
 							variant='icon'
 							size='sm'
 							rounded
-							className='text-xl'
 							onClick={() => onEdit?.(original)}
 							disabled={disabled || !canEdit}
 						>
-							<Pencil />
+							<Pencil size={20} />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>{t('general.edit')}</TooltipContent>
