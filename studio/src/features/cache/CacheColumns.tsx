@@ -14,7 +14,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[40px] !w-[40px]',
+		className: '!max-w-[25px] !w-[25px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

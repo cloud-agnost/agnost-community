@@ -43,6 +43,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
+		className: '!max-w-[35px] !w-[35px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

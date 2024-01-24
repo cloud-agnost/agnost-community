@@ -223,8 +223,8 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant='icon' rounded onClick={() => copyFile(original.path)}>
-									<Copy />
+								<Button variant='icon' size='sm' rounded onClick={() => copyFile(original.path)}>
+									<Copy size={20} />
 								</Button>
 							</TooltipTrigger>
 							<TooltipContent>{translate('storage.file.copy')}</TooltipContent>
@@ -233,8 +233,8 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant='icon' rounded onClick={() => replaceFile(original.path)}>
-									<Swap />
+								<Button variant='icon' size='sm' rounded onClick={() => replaceFile(original.path)}>
+									<Swap size={20} />
 								</Button>
 							</TooltipTrigger>
 							<TooltipContent>{translate('storage.file.replace')}</TooltipContent>
