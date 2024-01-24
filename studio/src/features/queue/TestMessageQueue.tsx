@@ -88,7 +88,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	}, [open]);
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
-			<DrawerContent position='right' size='lg' className='h-full flex [&>*]:w-full flex-col'>
+			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.test.title')}</DrawerTitle>
 				</DrawerHeader>
@@ -101,42 +101,43 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 					</div>
 				)}
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 h-full'>
-						<div className='flex items-center justify-between flex-1'>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 flex-1 flex flex-col'>
+						<div className='flex items-center justify-between'>
 							<span className='text-sm font-semibold text-default'>{queue.name}</span>
 							<Button variant='primary' type='submit' loading={isPending}>
 								{t('queue.test.submit')}
 							</Button>
 						</div>
 						<Separator className='my-6' />
-						<PanelGroup direction='vertical' autoSaveId={queue._id}>
-							<Panel defaultSize={32} className='max-h-full !overflow-y-auto' minSize={20}>
-								<FormField
-									control={form.control}
-									name='payload'
-									render={({ field }) => (
-										<FormItem className='h-full'>
-											<FormControl className='h-full'>
-												<CodeEditor
-													className='min-h-[100px] h-full'
-													containerClassName='h-full'
-													value={stringifyIfObject(field.value)}
-													onChange={field.onChange}
-													name={`testQueuePayload-${queue._id}`}
-													defaultLanguage='json'
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</Panel>
-							<Resizer className='my-6' orientation='horizontal' />
-
-							<Panel minSize={30}>
-								<Logs logs={testQueueLogs?.[queue?._id]?.logs as Log[]} />
-							</Panel>
-						</PanelGroup>
+						<div className='flex-1'>
+							<PanelGroup direction='vertical' autoSaveId={queue._id}>
+								<Panel defaultSize={32} className='max-h-full !overflow-y-auto' minSize={20}>
+									<FormField
+										control={form.control}
+										name='payload'
+										render={({ field }) => (
+											<FormItem className='h-full'>
+												<FormControl className='h-full'>
+													<CodeEditor
+														className='min-h-[100px] h-full'
+														containerClassName='h-full'
+														value={stringifyIfObject(field.value)}
+														onChange={field.onChange}
+														name={`testQueuePayload-${queue._id}`}
+														defaultLanguage='json'
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</Panel>
+								<Resizer className='my-6' orientation='horizontal' />
+								<Panel minSize={30}>
+									<Logs logs={testQueueLogs?.[queue?._id]?.logs as Log[]} />
+								</Panel>
+							</PanelGroup>
+						</div>
 					</form>
 				</Form>
 			</DrawerContent>
