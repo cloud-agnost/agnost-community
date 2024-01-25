@@ -36,7 +36,7 @@ export default function OrganizationMenuItem({
 	return (
 		<li className={cn('org-menu-item', active && 'active')}>
 			<Button variant='blank' onClick={clickHandler} className='org-menu-link rounded-none'>
-				{item.icon && <item.icon size={20} className='org-menu-icon' />}
+				{item.icon && <item.icon size={20} className='org-menu-icon w-5 h-5' />}
 				<span className='org-menu-item-name'>{item.name}</span>
 			</Button>
 		</li>
