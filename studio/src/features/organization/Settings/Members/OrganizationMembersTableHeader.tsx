@@ -105,12 +105,12 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 			<DropdownMenu>
 				<RoleDropdown type='org' onChange={setMemberRoleFilter} />
 				<DropdownMenuTrigger asChild>
-					<Button variant='outline'>
+					<Button variant='secondary'>
 						<FunnelSimple size={16} className='members-filter-icon' />
 						{selectedSort?.name}
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='w-56'>
+				<DropdownMenuContent className='w-24'>
 					{sortOptions.map((sort) => (
 						<DropdownMenuCheckboxItem
 							key={sort.name}
