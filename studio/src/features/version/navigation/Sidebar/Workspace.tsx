@@ -160,6 +160,20 @@ export default function Workspace() {
 		return t(`${toDeleteData.type.toLowerCase()}.delete.message`);
 	}
 
+	useEffect(() => {
+		if (sidebar[versionId]?.openedTabs) {
+			sidebar[versionId]?.openedTabs?.forEach(async (item) => {
+				await STORES[item][`get${item}s`]({
+					orgId,
+					appId,
+					versionId,
+					page: 0,
+					size: 250,
+				});
+			});
+		}
+	}, [appId, versionId]);
+
 	return (
 		<>
 			{NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
@@ -243,23 +257,6 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 		toggleWorkspaceTab(item.type);
 	}
 
-	async function getData(type: TabTypes) {
-		const mt = type === TabTypes.MessageQueue ? 'getQueues' : `get${type}s`;
-		await STORES[type][mt]({
-			orgId,
-			appId,
-			versionId,
-			page: 0,
-			size: 100,
-		});
-	}
-
-	useEffect(() => {
-		//TODO? check
-		NEW_TAB_ITEMS.forEach(async (item) => {
-			await getData(item.type);
-		});
-	}, []);
 	return (
 		<ExplorerCollapsibleTrigger
 			active={sidebar[versionId]?.openedTabs?.includes(item.type) as boolean}
