@@ -229,7 +229,7 @@ export default function AddOrEditAPIKeyDrawer({
 							{editMode ? t('version.api_key.edit') : t('version.api_key.add')}
 						</DrawerTitle>
 					</DrawerHeader>
-					<ul className='mx-auto flex border-b'>
+					<ul className='flex border-b'>
 						{ADD_API_KEYS_MENU_ITEMS.map((item) => {
 							return (
 								<OrganizationMenuItem
