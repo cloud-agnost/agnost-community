@@ -5,9 +5,8 @@ import { TableConfirmation } from '@/components/Table';
 import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { Invitation } from '@/types';
+import { ColumnDefWithClassName, Invitation } from '@/types';
 import { getAppPermission, translate } from '@/utils';
-import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
 const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
@@ -83,10 +82,11 @@ async function deleteInvitationHandler(token: string) {
 		},
 	});
 }
-export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
+export const AppInvitationsColumns: ColumnDefWithClassName<Invitation>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
+		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -136,6 +136,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 	},
 	{
 		id: 'actions',
+		className: 'actions',
 		size: 20,
 		cell: ({ row }) => {
 			const { token, email } = row.original;
