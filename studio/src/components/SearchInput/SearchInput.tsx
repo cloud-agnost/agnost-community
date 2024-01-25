@@ -66,6 +66,7 @@ export default function SearchInput({
 		<div className={cn('search-input-wrapper', className)} {...props}>
 			<MagnifyingGlass size={16} className='search-input-icon' />
 			<Input
+				variant='sm'
 				ref={ref}
 				value={inputValue}
 				onChange={(e) => setInputValue(e.target.value)}
