@@ -163,6 +163,7 @@ export default function Workspace() {
 	useEffect(() => {
 		if (sidebar[versionId]?.openedTabs) {
 			sidebar[versionId]?.openedTabs?.forEach(async (item) => {
+				if (item === TabTypes.Settings) return;
 				await STORES[item][`get${item}s`]({
 					orgId,
 					appId,
@@ -245,7 +246,7 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 	const { toggleWorkspaceTab, sidebar } = useUtilsStore();
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const { versionId } = useParams() as Record<string, string>;
 
 	function handleAddTab(item: (typeof NEW_TAB_ITEMS)[number]) {
 		const tab = {
