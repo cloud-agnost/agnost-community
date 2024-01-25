@@ -49,7 +49,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[20px] !w-[20px]',
+		className: '!max-w-[25px] !w-[25px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

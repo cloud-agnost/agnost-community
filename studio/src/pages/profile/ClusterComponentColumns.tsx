@@ -1,6 +1,5 @@
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
-import { SortButton } from '@/components/DataTable';
 import { Pencil } from '@/components/icons';
 import { RESOURCE_ICON_MAP } from '@/constants';
 import useClusterStore from '@/store/cluster/clusterStore';
@@ -12,11 +11,11 @@ const { openEditClusterComponent } = useClusterStore.getState();
 const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	{
 		accessorKey: 'title',
-		header: () => <SortButton text={translate('general.name')} field='title' />,
+		header: translate('general.name'),
 	},
 	{
 		accessorKey: 'type',
-		header: () => <SortButton text={translate('general.type')} field='type' />,
+		header: translate('general.type'),
 		cell: ({ row }) => {
 			const { type } = row.original;
 			const Icon = RESOURCE_ICON_MAP[type];
@@ -30,7 +29,7 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: () => <SortButton text={translate('cluster.k8sType')} field='status' />,
+		header: translate('cluster.k8sType'),
 		cell: ({ row }) => {
 			const { k8sType } = row.original;
 			return <Badge variant={k8sType === 'Deployment' ? 'blue' : 'orange'} text={k8sType} />;
@@ -38,23 +37,21 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	},
 	{
 		accessorKey: 'info.version',
-		header: () => <SortButton text={translate('general.version')} field='info.version' />,
+		header: translate('general.version'),
 		cell: ({ row }) => (
 			<div className='text-sm text-default truncate'>{row.original.info?.version}</div>
 		),
 	},
 	{
 		accessorKey: 'info.runningReplicas',
-		header: () => (
-			<SortButton text={translate('cluster.running_replicas')} field='info.runningReplicas' />
-		),
+		header: translate('cluster.running_replicas'),
 		cell: ({ row }) => (
 			<span className='text-sm text-default'>{row.original.info?.runningReplicas}</span>
 		),
 	},
 	{
 		accessorKey: 'info.size',
-		header: () => <SortButton text={translate('storage.file.size')} field='info.runningReplicas' />,
+		header: translate('storage.file.size'),
 		cell: ({ row }) => <span className='text-sm text-default'>{row.original.info?.size}</span>,
 	},
 	{
