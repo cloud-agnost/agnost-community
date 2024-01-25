@@ -28,6 +28,7 @@ export interface ClusterComponent {
 		runningReplicas: number;
 		minReplicas: number;
 		maxReplicas: number;
+		size: string;
 	};
 }
 
