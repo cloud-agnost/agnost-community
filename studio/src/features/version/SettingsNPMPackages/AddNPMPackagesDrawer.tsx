@@ -26,6 +26,7 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 	const [packages, setPackages] = useState<SearchNPMPackages[] | null>(null);
 	const scrollContainerId = useId();
 	const [lastDataLength, setLastDataLength] = useState(0);
+	const [loading, setLoading] = useState(false);
 	const [searchParams] = useSearchParams();
 	useEffect(() => {
 		if (!open) {
@@ -35,6 +36,7 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 	}, [open]);
 
 	async function onSearch(value: string, init?: boolean, append?: boolean) {
+		setLoading(true);
 		if (!version) return;
 
 		if (value.length === 0) {
@@ -60,6 +62,7 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 		} else {
 			setPackages(packages);
 		}
+		setLoading(false);
 	}
 
 	async function addPackage(data: SearchNPMPackages) {
@@ -104,7 +107,7 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 							scrollableTarget={scrollContainerId}
 							next={next}
 							hasMore={lastDataLength >= SIZE}
-							loader={packages.length > 0 && <TableLoading />}
+							loader={loading && <TableLoading />}
 							dataLength={packages.length}
 						>
 							<Table>
@@ -126,13 +129,13 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 										packages.map((item, index) => {
 											const exist = npmPackages.some((_package) => _package.name === item.package);
 											return (
-												<TableRow key={index} className='font-sfCompact font-normal'>
+												<TableRow key={index} className='font-sfCompact font-normal group'>
 													<TableCell className='max-w-[15ch] whitespace-normal'>
 														{item.package}
 													</TableCell>
 													<TableCell className='w-fit'>{item.version}</TableCell>
-													<TableCell className='w-[140px]'>
-														<div className='flex items-center justify-center w-full'>
+													<TableCell className='w-[140px] '>
+														<div className='flex items-center justify-center w-full invisible group-hover:visible hover:visible'>
 															<Button
 																disabled={exist}
 																onClick={() => addPackage(item)}
