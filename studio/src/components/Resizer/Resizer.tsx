@@ -13,8 +13,8 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		<PanelResizeHandle
 			{...props}
 			className={cn(
-				'flex items-center justify-center w-2 gap-0.5 group !cursor-col-resize',
-				orientation === 'horizontal' && 'flex-col',
+				'flex items-center justify-center gap-0.5 group !cursor-col-resize',
+				orientation === 'horizontal' ? 'flex-col h-2' : 'w-2',
 				className,
 			)}
 			onDragging={(val) => {
