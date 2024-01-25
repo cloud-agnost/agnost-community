@@ -174,6 +174,12 @@ const useVersionStore = create<VersionStore & Actions>()(
 					try {
 						const { version } = await VersionService.createCopyOfVersion(params);
 						set((prev) => ({ versions: [version, ...prev.versions] }));
+						useUtilsStore.setState((prev) => ({
+							sidebar: {
+								...prev.sidebar,
+								[version._id]: prev.sidebar[params.parentVersionId],
+							},
+						}));
 						params.onSuccess?.(version);
 						return version;
 					} catch (e) {
