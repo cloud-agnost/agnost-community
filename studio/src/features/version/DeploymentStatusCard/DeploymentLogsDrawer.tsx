@@ -88,7 +88,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 					<Tabs
 						defaultValue={selectedTab}
 						onValueChange={setSelectedTab}
-						className='max-w-full overflow-auto'
+						className='max-w-full h-full min-h-36 overflow-auto'
 					>
 						<TabsList>
 							<TabsTrigger value='db'>{t('general.dbLogs')}</TabsTrigger>
@@ -100,22 +100,22 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 							</TabsTrigger>
 							<TabsTrigger value='scheduler'>{t('general.schedulerLogs')}</TabsTrigger>
 						</TabsList>
-
-						{isDetailsFetching ? (
+						<div className='relative w-full h-1/2'>
 							<Loading loading={isDetailsFetching} />
-						) : (
-							<>
-								<TabsContent className='h-[300px] w-full' value='db'>
-									<Logs className='h-full' logs={selectedLog.dbLogs} />
-								</TabsContent>
-								<TabsContent className='h-[300px]' value='server'>
-									<Logs className='h-full' logs={selectedLog.serverLogs} />
-								</TabsContent>
-								<TabsContent className='h-[300px]' value='scheduler'>
-									<Logs className='h-full' logs={selectedLog.schedulerLogs} />
-								</TabsContent>
-							</>
-						)}
+							{!isDetailsFetching && (
+								<>
+									<TabsContent className='h-[300px] w-full' value='db'>
+										<Logs className='h-full' logs={selectedLog.dbLogs} />
+									</TabsContent>
+									<TabsContent className='h-[300px]' value='server'>
+										<Logs className='h-full' logs={selectedLog.serverLogs} />
+									</TabsContent>
+									<TabsContent className='h-[300px]' value='scheduler'>
+										<Logs className='h-full' logs={selectedLog.schedulerLogs} />
+									</TabsContent>
+								</>
+							)}
+						</div>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
