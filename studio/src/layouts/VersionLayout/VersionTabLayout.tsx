@@ -102,7 +102,6 @@ export default function VersionTabLayout<T>({
 							<SearchInput
 								value={searchParams.get('q') ?? undefined}
 								className='sm:w-[450px] flex-1'
-								inputClassName='h-[30px] text-xs placeholder:text-xs [&>svg]:text-[16px]'
 							/>
 						)}
 						{table?.getSelectedRowModel()?.rows?.length ? (
