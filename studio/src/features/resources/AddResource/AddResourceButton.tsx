@@ -44,9 +44,9 @@ export default function AddResourceButton() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={!canCreateResource}>
 				<Button className='gap-2 whitespace-nowrap' disabled={!canCreateResource}>
-					<Plus weight='bold' />
+					<Plus size={14} />
 					{t('resources.add')}
-					<CaretDown weight='bold' />
+					<CaretDown size={14} />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='max-h-[650px] overflow-y-auto'>

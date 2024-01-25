@@ -18,7 +18,7 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 
 	return (
 		<div className='flex  items-center justify-between'>
-			<h1 className='text-default text-2xl font-semibold text-center'>
+			<h1 className='text-default text-lg font-semibold text-center'>
 				{applications.length} {t('application.apps')}
 			</h1>
 			<div className='flex items-center justify-center gap-6'>
@@ -32,7 +32,8 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 						onClick={() => setIsCard(true)}
 					>
 						<SquaresFour
-							className={cn('w-5 h-5', isCard ? 'text-icon-secondary' : 'text-icon-base')}
+							size={14}
+							className={cn(isCard ? 'text-icon-secondary' : 'text-icon-base')}
 						/>
 					</Button>
 					<Button
@@ -42,7 +43,7 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 						className={cn(!isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
 						onClick={() => setIsCard(false)}
 					>
-						<List className={cn('w-5 h-5', !isCard ? 'text-icon-secondary' : 'text-icon-base')} />
+						<List size={14} className={cn(!isCard ? 'text-icon-secondary' : 'text-icon-base')} />
 					</Button>
 				</ButtonGroup>
 				<CreateApplicationButton />

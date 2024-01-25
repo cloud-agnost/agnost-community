@@ -12,7 +12,7 @@ export default function CreateApplicationButton() {
 	}>();
 	return (
 		<Button variant='primary' onClick={openAppCreateModal} disabled={!canAppCreate}>
-			<Plus size={16} className='mr-2 text-icon-default' />
+			<Plus size={14} className='mr-1 text-icon-default' />
 			{t('application.create')}
 		</Button>
 	);
