@@ -80,12 +80,12 @@ export default function VersionEditorLayout({
 		setEditedLogic(logic);
 	}, [logic]);
 
-	useEffect(() => {
-		if (window.monaco) {
-			const uri = monaco.Uri.parse(`file:///src/${name}.js`);
-			window.monaco.editor.getModel(uri)?.setValue(logic);
-		}
-	}, [window.monaco]);
+	// useEffect(() => {
+	// 	if (window.monaco) {
+	// 		const uri = monaco.Uri.parse(`file:///src/${name}.js`);
+	// 		window.monaco.editor.getModel(uri)?.setValue(logic);
+	// 	}
+	// }, [window.monaco]);
 
 	return (
 		<div className={cn('h-full flex flex-col', className)}>
