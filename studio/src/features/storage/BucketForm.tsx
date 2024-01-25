@@ -96,7 +96,8 @@ export default function BucketForm({ loading }: { loading: boolean }) {
 						/>
 						<Button
 							iconOnly
-							variant='secondary'
+							variant='icon'
+							size='sm'
 							disabled={fields.length === 1}
 							className={cn(
 								!index && 'self-end',
