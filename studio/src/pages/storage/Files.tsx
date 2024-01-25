@@ -143,7 +143,7 @@ export default function Files() {
 				table={table}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-						{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
+						{!isRefreshing && <Refresh className='mr-1 w-3.5 h-3.5' />}
 						{t('general.refresh')}
 					</Button>
 				}
