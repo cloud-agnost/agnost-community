@@ -4,7 +4,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Logs } from '@/components/Log';
 import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTaskStore from '@/store/task/taskStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, Log } from '@/types';
@@ -22,7 +21,6 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 	const { task, testTask } = useTaskStore();
 	const { taskLogs } = useUtilsStore();
 	const { toast } = useToast();
-	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
 	const { versionId, appId, orgId, taskId } = useParams<{
 		versionId: string;

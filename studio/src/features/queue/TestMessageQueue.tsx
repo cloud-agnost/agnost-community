@@ -7,7 +7,6 @@ import { Logs } from '@/components/Log';
 import { Resizer } from '@/components/Resizer';
 import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, Log } from '@/types';
@@ -33,7 +32,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { queue, testQueue } = useMessageQueueStore();
 	const { testQueueLogs } = useUtilsStore();
 	const { toast } = useToast();
-	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;

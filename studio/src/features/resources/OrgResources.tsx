@@ -6,12 +6,12 @@ import { AddResourceButton, EditResourceDrawer } from '@/features/resources';
 import { useTable } from '@/hooks';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
 import { Loading } from '@/components/Loading';
+import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
+import { useEffect } from 'react';
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
@@ -50,9 +50,9 @@ export default function OrgResources() {
 		mutationKey: ['deleteResource'],
 	});
 
-	// useEffect(() => {
-	// 	refetch();
-	// }, [searchParams.get('q')]);
+	useEffect(() => {
+		refetch();
+	}, [searchParams.get('q')]);
 
 	return (
 		<div className='p-8 scroll space-y-8' id='resource-scroll'>
