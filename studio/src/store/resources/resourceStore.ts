@@ -69,7 +69,7 @@ const initialState: ResourceStore = {
 };
 
 const useResourceStore = create<ResourceStore & Actions>()(
-	devtools((set) => ({
+	devtools((set, get) => ({
 		...initialState,
 		getResources: async (req: GetResourcesRequest) => {
 			try {
@@ -247,6 +247,7 @@ const useResourceStore = create<ResourceStore & Actions>()(
 		},
 		getOrgResources: async (req: GetResourcesRequest) => {
 			try {
+				console.log('req', get().resources.length);
 				const resources = await ResourceService.getOrganizationResources(req);
 				set({
 					resources,
@@ -256,7 +257,10 @@ const useResourceStore = create<ResourceStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-		reset: () => set(initialState),
+		reset: () => {
+			console.log('reset');
+			set(initialState);
+		},
 	})),
 );
 

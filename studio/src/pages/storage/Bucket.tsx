@@ -11,7 +11,7 @@ import useStorageStore from '@/store/storage/storageStore';
 import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
@@ -20,7 +20,7 @@ export default function Buckets() {
 	const { toast } = useToast();
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { t } = useTranslation();
-	const { versionId, orgId, appId } = useParams();
+	const { versionId, orgId, appId, storageId } = useParams();
 	const {
 		getBuckets,
 		closeBucketDeleteDialog,
@@ -100,6 +100,10 @@ export default function Buckets() {
 		await refetch();
 		setIsRefreshing(false);
 	}
+
+	useEffect(() => {
+		refetch();
+	}, [versionId, orgId, appId, storageId]);
 	return (
 		<>
 			<VersionTabLayout

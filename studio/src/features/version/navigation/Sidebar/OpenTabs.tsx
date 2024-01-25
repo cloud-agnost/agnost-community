@@ -80,6 +80,7 @@ function OpenTabsTrigger() {
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
 	const { removeAllTabs } = useTabStore();
 	const { versionId } = useParams() as { versionId: string };
+
 	return (
 		<ExplorerCollapsibleTrigger active={sidebar[versionId]?.openEditor || false}>
 			<Button

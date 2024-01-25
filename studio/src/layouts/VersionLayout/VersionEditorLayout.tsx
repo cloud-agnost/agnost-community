@@ -56,6 +56,7 @@ export default function VersionEditorLayout({
 	const { t } = useTranslation();
 	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
+
 	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
 		useTabStore();
 	const tab = getCurrentTab(versionId as string);
@@ -78,6 +79,13 @@ export default function VersionEditorLayout({
 	useUpdateEffect(() => {
 		setEditedLogic(logic);
 	}, [logic]);
+
+	useEffect(() => {
+		if (window.monaco) {
+			const uri = monaco.Uri.parse(`file:///src/${name}.js`);
+			window.monaco.editor.getModel(uri)?.setValue(logic);
+		}
+	}, [window.monaco]);
 
 	return (
 		<div className={cn('h-full flex flex-col', className)}>
@@ -118,7 +126,7 @@ export default function VersionEditorLayout({
 				onConfirm={() => {
 					removeTab(versionId as string, toDeleteTab.id);
 					closeDeleteTabModal();
-					deleteLogic?.();
+					deleteLogic();
 				}}
 				action={
 					<Button
