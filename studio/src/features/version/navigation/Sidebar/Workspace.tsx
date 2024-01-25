@@ -78,14 +78,14 @@ export default function Workspace() {
 	const { storages } = useStorageStore();
 
 	const data: Record<string, WorkspaceDataType[]> = {
-		[TabTypes.Cache]: caches,
-		[TabTypes.Task]: tasks,
-		[TabTypes.Database]: databases,
-		[TabTypes.Endpoint]: endpoints,
-		[TabTypes.Function]: functions,
-		[TabTypes.MessageQueue]: queues,
-		[TabTypes.Middleware]: middlewares,
-		[TabTypes.Storage]: storages,
+		[TabTypes.Cache]: structuredClone(caches),
+		[TabTypes.Task]: structuredClone(tasks),
+		[TabTypes.Database]: structuredClone(databases),
+		[TabTypes.Endpoint]: structuredClone(endpoints),
+		[TabTypes.Function]: structuredClone(functions),
+		[TabTypes.MessageQueue]: structuredClone(queues),
+		[TabTypes.Middleware]: structuredClone(middlewares),
+		[TabTypes.Storage]: structuredClone(storages),
 	};
 
 	const { mutateAsync: deleteMutation, isPending } = useMutation({
@@ -184,50 +184,52 @@ export default function Workspace() {
 					key={item.type}
 					trigger={<WorkspaceTrigger item={item} />}
 				>
-					{data[item.type]?.map((data) => (
-						<SideBarButton
-							key={data._id}
-							id={data._id}
-							active={window.location.pathname.includes(data._id)}
-							onClick={() => handleDataClick(data, item.type)}
-							title={data.name}
-							type={item.type}
-							actions={
-								<div className='flex items-center justify-end'>
-									<Button
-										variant='icon'
-										size='sm'
-										rounded
-										className={cn(
-											window.location.pathname.includes(data._id) &&
-												'hover:bg-button-primary text-default',
-											'!p-0 !h-5 hidden group-hover:inline-flex',
-										)}
-										onClick={(e) => {
-											e.stopPropagation();
-											openEditDialog(data, item.type);
-										}}
-									>
-										<Pencil size={14} />
-									</Button>
+					{data[item.type]
+						.sort((a, b) => a.name.localeCompare(b.name))
+						?.map((data) => (
+							<SideBarButton
+								key={data._id}
+								id={data._id}
+								active={window.location.pathname.includes(data._id)}
+								onClick={() => handleDataClick(data, item.type)}
+								title={data.name}
+								type={item.type}
+								actions={
+									<div className='flex items-center justify-end'>
+										<Button
+											variant='icon'
+											size='sm'
+											rounded
+											className={cn(
+												window.location.pathname.includes(data._id) &&
+													'hover:bg-button-primary text-default',
+												'!p-0 !h-5 hidden group-hover:inline-flex',
+											)}
+											onClick={(e) => {
+												e.stopPropagation();
+												openEditDialog(data, item.type);
+											}}
+										>
+											<Pencil size={14} />
+										</Button>
 
-									<Button
-										rounded
-										className={cn(
-											window.location.pathname.includes(data._id) &&
-												'hover:bg-button-primary text-default',
-											'p-0 !h-5 hidden group-hover:inline-flex',
-										)}
-										variant='icon'
-										size='sm'
-										onClick={() => deleteHandler(data, item.type)}
-									>
-										<Trash size={14} />
-									</Button>
-								</div>
-							}
-						/>
-					))}
+										<Button
+											rounded
+											className={cn(
+												window.location.pathname.includes(data._id) &&
+													'hover:bg-button-primary text-default',
+												'p-0 !h-5 hidden group-hover:inline-flex',
+											)}
+											variant='icon'
+											size='sm'
+											onClick={() => deleteHandler(data, item.type)}
+										>
+											<Trash size={14} />
+										</Button>
+									</div>
+								}
+							/>
+						))}
 				</ExplorerCollapsible>
 			))}
 			<InfoModal
