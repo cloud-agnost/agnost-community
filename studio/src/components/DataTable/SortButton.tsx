@@ -35,7 +35,12 @@ export function SortButton({ text, className, field }: SortButtonProps) {
 	};
 
 	return (
-		<Button variant='blank' onClick={handleSortClick} className={cn('sort-button', className)}>
+		<Button
+			variant='blank'
+			onClick={handleSortClick}
+			size='sm'
+			className={cn('justify-start w-full h-full text-subtle', className)}
+		>
 			{text}
 			{searchParams.get('f') === field && (
 				<div className='ml-2'>
