@@ -82,23 +82,25 @@ async function resizeMinio(newSize) {
     deploymentList.body.items.forEach(async (depl) => {
       var dname = depl.metadata.name;
       if (dname.includes('minio')) {
-        isDeployment = true;
-        deploymentName = dname;
+        const isDeployment = true;
+        const deploymentName = dname;
+        const replicas = depl.spec.replicas;
       };
     });
 
     if (isDeployment) {
       await scaleDeployment(deploymentName, 0);
       await sleep(5000)
-      await scaleDeployment(deploymentName, 1);
+      await scaleDeployment(deploymentName, replicas);
     } else {
       stsList = await k8sApi.listNamespacedStatefulSet(namespace);
       stsList.body.items.forEach(async (sts) => {
         var stsName = sts.metadata.name;
         if (stsName.includes('minio')) {
+          const replicas = sts.spec.replicas;
           await scaleStatefulSet(stsName, 0);
           await sleep(5000);
-          await scaleStatefulSet(stsName, 4);
+          await scaleStatefulSet(stsName, replicas);
         };
       });
     };
