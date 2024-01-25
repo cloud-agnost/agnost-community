@@ -1,3 +1,4 @@
+import { APIServerAlert } from '@/components/APIServerAlert';
 import { Alert, AlertTitle, AlertDescription } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
@@ -67,14 +68,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 					</DrawerTitle>
 				</DrawerHeader>
 				<div className='flex-1 p-6 space-y-6 h-full flex flex-col'>
-					{environment?.serverStatus === 'Deploying' && (
-						<div className='px-5'>
-							<Alert variant='warning'>
-								<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
-								<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
-							</Alert>
-						</div>
-					)}
+					<APIServerAlert />
 					<div className='flex items-center justify-between'>
 						<span className='text-sm font-semibold text-default'>{task.name}</span>
 						<Button variant='primary' onClick={testTaskHandler} loading={isPending}>
