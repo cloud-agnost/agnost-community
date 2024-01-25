@@ -116,6 +116,15 @@ const useTabStore = create<TabStore & Actions>()(
 					return tabs[currentTabIndex - 1];
 				},
 				removeAllTabs: (versionId) => {
+					set((state) => {
+						const tabs = state.tabs[versionId] ?? [];
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: tabs.filter((tab) => tab.isDashboard),
+							},
+						};
+					});
 					const dashboardTab = get().tabs[versionId]?.find((tab) => tab.isDashboard);
 					get().setCurrentTab(versionId, dashboardTab?.id as string);
 					history.navigate?.(dashboardTab?.path as string);
