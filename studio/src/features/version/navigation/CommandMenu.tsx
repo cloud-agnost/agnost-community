@@ -8,29 +8,34 @@ import {
 } from '@/components/Command';
 import { MethodBadge } from '@/components/Endpoint';
 import { Loading } from '@/components/Loading';
-import { useDebounce, useSearchTabClick, useTabIcon, useUpdateEffect } from '@/hooks';
+import { useDebounce, useTabIcon, useUpdateEffect } from '@/hooks';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { TabTypes } from '@/types';
+import { DesignElement, Tab, TabTypes } from '@/types';
+import { generateId } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export default function CommandMenu() {
-	const handleClickElement = useSearchTabClick();
-
 	const [search, setSearch] = useState('');
 	const searchTerm = useDebounce(search, 500);
-	const { searchDesignElements, isSearchCommandMenuOpen, toggleSearchCommandMenu } =
-		useVersionStore();
+	const {
+		searchDesignElements,
+		isSearchCommandMenuOpen,
+		toggleSearchCommandMenu,
+		getVersionDashboardPath,
+	} = useVersionStore();
+	const { addTab } = useTabStore();
 	const { appId, orgId, versionId } = useParams() as Record<string, string>;
 
 	const getIcon = useTabIcon('w-5 h-5');
 	useUpdateEffect(() => {
-		if (!open) {
+		if (!isSearchCommandMenuOpen) {
 			setSearch('');
 		}
-	}, [open]);
+	}, [isSearchCommandMenuOpen]);
 
 	const { data, isFetching } = useQuery({
 		queryKey: ['version', versionId, orgId, appId, searchTerm],
@@ -43,6 +48,29 @@ export default function CommandMenu() {
 			}),
 		enabled: !!searchTerm,
 	});
+
+	function handleClickElement(item: DesignElement) {
+		let url = `${item.type}/${item._id}`;
+		if (_.capitalize(item.type) === TabTypes.Database) url = `database/${item._id}/models`;
+
+		if (_.capitalize(item.type) === TabTypes.Model)
+			url = `database/${item.meta.dbId}/models/${item._id}/fields`;
+
+		const path = getVersionDashboardPath(url);
+
+		const tab: Tab = {
+			id: generateId(),
+			title:
+				_.capitalize(item.type) === TabTypes.Field ? (item.meta.modelName as string) : item.name,
+			path,
+			isActive: true,
+			isDashboard: false,
+			isDirty: false,
+			type: _.capitalize(item.type) as TabTypes,
+		};
+		addTab(versionId, tab);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+	}
 	return (
 		<CommandDialog open={isSearchCommandMenuOpen} onOpenChange={toggleSearchCommandMenu}>
 			<CommandInput value={search} onValueChange={setSearch} />
