@@ -24,7 +24,7 @@ function ActionsCell<T>({
 	const { t } = useTranslation();
 
 	return (
-		<div className='flex items-center justify-end'>
+		<div className='flex items-center'>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
