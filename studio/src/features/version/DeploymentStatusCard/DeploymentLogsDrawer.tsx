@@ -93,10 +93,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 						<TabsList>
 							<TabsTrigger value='db'>{t('general.dbLogs')}</TabsTrigger>
 							<TabsTrigger value='server'>
-								{t('general.serverLogs')}
-								<span className='text-subtle font-normal ml-2'>
-									({log.serverStatusOK}/{log.serverStatusError})
-								</span>
+								{t('general.serverLogs')} ({log.serverStatusOK}/{log.serverStatusError})
 							</TabsTrigger>
 							<TabsTrigger value='scheduler'>{t('general.schedulerLogs')}</TabsTrigger>
 						</TabsList>
