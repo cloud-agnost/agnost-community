@@ -36,7 +36,6 @@ export default function SideBarButton({
 			)}
 			{...props}
 		>
-			{' '}
 			<Button
 				variant='blank'
 				size='full'

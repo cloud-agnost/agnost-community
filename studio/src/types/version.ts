@@ -516,3 +516,24 @@ export interface CustomDomain {
 	createdAt: string;
 	updatedAt: string;
 }
+
+export interface SearchCodeParams extends BaseGetRequest, BaseParams {
+	find: string;
+	matchCase: boolean;
+	matchWholeWord: boolean;
+}
+
+export interface SearchCodeResult {
+	_id: string;
+	versionId: string;
+	name: string;
+	type: DesignElementTypes;
+	meta: {
+		method?: HttpMethod;
+		path?: string;
+	};
+	matchingLines: {
+		lineNumber: number;
+		lineText: string;
+	}[];
+}

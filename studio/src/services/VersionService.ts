@@ -40,6 +40,8 @@ import {
 	SaveEmailPhoneParams,
 	SaveRedirectURLsParams,
 	SaveUserDataModelInfoParams,
+	SearchCodeParams,
+	SearchCodeResult,
 	SearchDesignElementParams,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
@@ -550,6 +552,19 @@ export default class VersionService {
 					data,
 				},
 			)
+		).data;
+	}
+
+	static async searchCode({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: SearchCodeParams): Promise<SearchCodeResult[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/search-code`, {
+				params,
+			})
 		).data;
 	}
 }

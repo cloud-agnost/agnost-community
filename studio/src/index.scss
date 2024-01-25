@@ -545,7 +545,9 @@ html .light ::-webkit-scrollbar-track {
 .monaco-editor .parameter-hints-widget {
 	transform: translate(1.25rem, 50%) !important;
 }
-
+.monaco-editor [widgetId='editor.contrib.resizableContentHoverWidget'] {
+	@apply sm:transform translate-x-[2.25rem] translate-y-[30%] #{!important};
+}
 .navigator .table-body tr:last-child td {
 	@apply border-b;
 }
@@ -571,4 +573,8 @@ button:focus-visible {
 		rgb(var(--brand-color-primary)) calc(100% - 140px),
 		transparent
 	);
+}
+mark {
+	@apply bg-elements-subtle-blue dark:bg-elements-blue px-1 rounded-sm text-default;
+	@apply border dark:border-elements-blue border-elements-subtle-blue;
 }

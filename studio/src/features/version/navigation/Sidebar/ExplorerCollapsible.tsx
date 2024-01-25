@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/Collapsible';
 import { cn } from '@/utils';
 import { CaretRight } from '@phosphor-icons/react';
+import React from 'react';
 
 interface ExplorerCollapsibleProps {
 	open: boolean;
@@ -36,7 +37,7 @@ export function ExplorerCollapsibleTrigger({
 	active,
 	onClick,
 }: {
-	title?: string;
+	title?: React.ReactNode;
 	children?: React.ReactNode;
 	active: boolean;
 	onClick?: () => void;
@@ -53,16 +54,7 @@ export function ExplorerCollapsibleTrigger({
 								active && 'rotate-90 text-default',
 							)}
 						/>
-						{title && (
-							<h1
-								className={cn(
-									'flex-1 text-left font-normal text-xs',
-									active ? 'text-default' : 'text-subtle group-hover:text-default',
-								)}
-							>
-								{title}
-							</h1>
-						)}
+						{title && title}
 					</Button>
 				</CollapsibleTrigger>
 				<div className='flex-1 flex justify-between items-center'>{children}</div>

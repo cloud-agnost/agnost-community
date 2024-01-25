@@ -12,6 +12,8 @@ import {
 	GetVersionNotificationParams,
 	GetVersionRequest,
 	Notification,
+	SearchCodeParams,
+	SearchCodeResult,
 	SearchDesignElementParams,
 	UpdateVersionPropertiesParams,
 	Version,
@@ -45,6 +47,12 @@ interface VersionStore {
 	packages: Record<string, string>;
 	lastFetchedLogPage: number | undefined;
 	isSearchCommandMenuOpen: boolean;
+	isSearchViewOpen: boolean;
+	searchCodeResult: SearchCodeResult[];
+	openCodeResultIndexes: number[];
+	matchCase: boolean;
+	matchWholeWord: boolean;
+	codeSearchTerm: string;
 }
 
 type Actions = {
@@ -70,6 +78,12 @@ type Actions = {
 	getNpmPackages: (params: BaseParams) => Promise<void>;
 	getTypings: () => Promise<Record<string, string>>;
 	toggleSearchCommandMenu: () => void;
+	searchCode: (params: SearchCodeParams) => Promise<SearchCodeResult[]>;
+	toggleSearchView: () => void;
+	toggleCodeResult: (index: number) => void;
+	setCodeSearchTerm: (input: string) => void;
+	toggleMatchCase: () => void;
+	toggleMatchWholeWord: () => void;
 	reset: () => void;
 };
 
@@ -95,6 +109,12 @@ const initialState: VersionStore = {
 	packages: {},
 	lastFetchedLogPage: undefined,
 	isSearchCommandMenuOpen: false,
+	isSearchViewOpen: false,
+	searchCodeResult: [],
+	openCodeResultIndexes: [],
+	matchCase: false,
+	matchWholeWord: false,
+	codeSearchTerm: '',
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -324,6 +344,27 @@ const useVersionStore = create<VersionStore & Actions>()(
 				toggleSearchCommandMenu: () => {
 					set((prev) => ({ isSearchCommandMenuOpen: !prev.isSearchCommandMenuOpen }));
 				},
+				toggleSearchView: () => set((prev) => ({ isSearchViewOpen: !prev.isSearchViewOpen })),
+				searchCode: async (params) => {
+					const searchCodeResult = await VersionService.searchCode(params);
+					set({ searchCodeResult });
+					return searchCodeResult;
+				},
+				toggleCodeResult: (index) => {
+					set((prev) => {
+						const openCodeResultIndexes = [...prev.openCodeResultIndexes];
+						const indexInOpenCodeResultIndexes = openCodeResultIndexes.indexOf(index);
+						if (indexInOpenCodeResultIndexes === -1) {
+							openCodeResultIndexes.push(index);
+						} else {
+							openCodeResultIndexes.splice(indexInOpenCodeResultIndexes, 1);
+						}
+						return { openCodeResultIndexes };
+					});
+				},
+				setCodeSearchTerm: (input) => set({ codeSearchTerm: input }),
+				toggleMatchCase: () => set((prev) => ({ matchCase: !prev.matchCase })),
+				toggleMatchWholeWord: () => set((prev) => ({ matchWholeWord: !prev.matchWholeWord })),
 				reset: () => set(initialState),
 			}),
 			{

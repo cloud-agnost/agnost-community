@@ -6,9 +6,11 @@ import { cn, generateId } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
 import SideBarButton from './SideBarButton';
-import { useTabIcon } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import useVersionStore from '@/store/version/versionStore';
+import { useTabIcon } from '@/hooks';
 export default function VersionSettingsExplorer() {
+	const { t } = useTranslation();
 	const { sidebar, toggleWorkspaceTab } = useUtilsStore();
 	const { addTab, getCurrentTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
@@ -33,7 +35,18 @@ export default function VersionSettingsExplorer() {
 			trigger={
 				<ExplorerCollapsibleTrigger
 					active={sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings) || false}
-					title='Settings'
+					title={
+						<h1
+							className={cn(
+								'flex-1 text-left font-normal text-sm',
+								sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings)
+									? 'text-default'
+									: 'text-subtle group-hover:text-default',
+							)}
+						>
+							{t('version.settings.default')}
+						</h1>
+					}
 				/>
 			}
 		>
