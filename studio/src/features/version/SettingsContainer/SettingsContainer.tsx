@@ -19,7 +19,9 @@ export default function SettingsContainer({
 }: Props) {
 	return (
 		<div className={cn('flex-1 max-h-full overflow-auto space-y-4', className)}>
-			<Description title={pageTitle}>{description}</Description>
+			<Description className='max-w-2xl' title={pageTitle}>
+				{description}
+			</Description>
 			{action && action}
 			{children}
 		</div>

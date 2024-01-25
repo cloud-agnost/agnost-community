@@ -55,7 +55,7 @@ export default function CustomDomains() {
 
 	return _.isNil(clusterDomainError) ? (
 		<div className='space-y-6 max-w-2xl'>
-			<p className='text-subtle text-sm font-sfCompact'>{t('cluster.custom_domain_description')}</p>
+			<p className='text-subtle text-sm'>{t('cluster.custom_domain_description')}</p>
 			<EnforceSSL />
 			<DnsSettings />
 			<div className='space-y-4'>

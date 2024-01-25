@@ -55,7 +55,7 @@ const initialState: UtilsStore = {
 	typings: {} as Record<string, string>,
 	endpointLogs: {} as EndpointLogs,
 	sidebar: {} as UtilsStore['sidebar'],
-	isSidebarOpen: false,
+	isSidebarOpen: true,
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(

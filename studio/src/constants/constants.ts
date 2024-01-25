@@ -178,17 +178,17 @@ export const MENU_ITEMS = [
 export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 	{
 		title: translate('profileSettings.general_title'),
-		href: '/organization/:id/profile',
+		href: '/organization/:orgId/profile',
 		icon: GearSix,
 	},
 	{
 		title: translate('profileSettings.notifications_title'),
-		href: '/organization/:id/profile/notifications',
+		href: '/organization/:orgId/profile/notifications',
 		icon: BellRing,
 	},
 	{
 		title: translate('profileSettings.clusters_title'),
-		href: '/organization/:id/profile/cluster-management',
+		href: '/organization/:orgId/profile/cluster-management',
 		icon: LineSegments,
 	},
 ];

@@ -129,7 +129,7 @@ export default function CreateApp() {
 									{t('onboarding.next')}
 								</Button>
 							) : (
-								<Button type='submit' loading={finalizing} variant='secondary' size='lg'>
+								<Button type='submit' loading={finalizing} variant='primary' size='lg'>
 									{t('onboarding.finish')}
 								</Button>
 							)}
