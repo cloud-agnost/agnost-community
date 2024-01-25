@@ -1,4 +1,3 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
@@ -11,7 +10,7 @@ import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useUtilsStore from '@/store/version/utilsStore';
-import { APIError, EnvironmentStatus, TestMethods } from '@/types';
+import { APIError, TestMethods } from '@/types';
 import {
 	cn,
 	generateId,
@@ -35,6 +34,7 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
+import { APIServerAlert } from '@/components/APIServerAlert';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -201,15 +201,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<DrawerTitle>{t('endpoint.test.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div>
-					{environment?.serverStatus === EnvironmentStatus.Deploying && (
-						<div className='px-5'>
-							<Alert variant='warning'>
-								<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
-								<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
-							</Alert>
-						</div>
-					)}
-
+					<APIServerAlert />
 					<div className='flex items-center px-5 my-6'>
 						<div className='flex items-center flex-1'>
 							<div className='w-16 !h-[30px]'>

@@ -6,12 +6,12 @@ import { AddResourceButton, EditResourceDrawer } from '@/features/resources';
 import { useTable } from '@/hooks';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
 import { Loading } from '@/components/Loading';
+import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
+import { useEffect } from 'react';
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
@@ -31,8 +31,12 @@ export default function OrgResources() {
 	});
 
 	const { isPending, refetch } = useQuery({
-		queryKey: ['orgResources'],
-		queryFn: getResources,
+		queryKey: ['orgResources', orgId],
+		queryFn: () =>
+			getOrgResources({
+				search: searchParams.get('q') as string,
+				orgId,
+			}),
 		refetchOnWindowFocus: false,
 		enabled: !resources.length,
 	});
@@ -46,30 +50,33 @@ export default function OrgResources() {
 		mutationKey: ['deleteResource'],
 	});
 
-	function getResources() {
-		return getOrgResources({
-			search: searchParams.get('q') as string,
-			orgId,
-		});
-	}
-
 	useEffect(() => {
 		refetch();
 	}, [searchParams.get('q')]);
 
-	return !isPending ? (
+	return (
 		<div className='p-8 scroll space-y-8' id='resource-scroll'>
-			<div className='flex items-center justify-between'>
-				<h1 className='text-default text-2xl font-semibold text-center'>{t('resources.title')}</h1>
-				<div className='flex items-center justify-center gap-6'>
-					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
-					<AddResourceButton />
-				</div>
-			</div>
-			{resources.length ? (
-				<DataTable table={table} />
-			) : (
-				<EmptyState title={t('resources.empty')} type='resource' />
+			<Loading loading={isPending} />
+			{!isPending && (
+				<>
+					<div className='flex items-center justify-between'>
+						<h1 className='text-default text-2xl font-semibold text-center'>
+							{t('resources.title')}
+						</h1>
+						<div className='flex items-center justify-center gap-6'>
+							<SearchInput
+								value={searchParams.get('q') ?? undefined}
+								className='sm:w-[450px] flex-1'
+							/>
+							<AddResourceButton />
+						</div>
+					</div>
+					{resources.length ? (
+						<DataTable table={table} />
+					) : (
+						<EmptyState title={t('resources.empty')} type='resource' />
+					)}
+				</>
 			)}
 			<ConfirmationModal
 				title={t('resources.delete.title')}
@@ -97,9 +104,8 @@ export default function OrgResources() {
 				error={error}
 				closable
 			/>
+
 			<EditResourceDrawer />
 		</div>
-	) : (
-		<Loading loading={isPending} />
 	);
 }

@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { APIServerAlert } from '@/components/APIServerAlert';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
@@ -7,10 +7,9 @@ import { Logs } from '@/components/Log';
 import { Resizer } from '@/components/Resizer';
 import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useUtilsStore from '@/store/version/utilsStore';
-import { APIError, EnvironmentStatus, Log } from '@/types';
+import { APIError, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -33,7 +32,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { queue, testQueue } = useMessageQueueStore();
 	const { testQueueLogs } = useUtilsStore();
 	const { toast } = useToast();
-	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
@@ -92,14 +90,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.test.title')}</DrawerTitle>
 				</DrawerHeader>
-				{environment?.serverStatus === EnvironmentStatus.Deploying && (
-					<div className='px-5'>
-						<Alert variant='warning'>
-							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
-							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
-						</Alert>
-					</div>
-				)}
+				<APIServerAlert />
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 flex-1 flex flex-col'>
 						<div className='flex items-center justify-between'>

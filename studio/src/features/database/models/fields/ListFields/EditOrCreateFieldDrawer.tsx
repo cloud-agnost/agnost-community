@@ -336,6 +336,7 @@ export default function EditOrCreateFieldDrawer({
 
 				if (
 					editMode &&
+					database.type !== DATABASE.MongoDB &&
 					hasMaxLength &&
 					((fieldToEdit.text?.maxLength && Number(arg.maxLength) < fieldToEdit.text.maxLength) ||
 						(fieldToEdit.encryptedText?.maxLength &&
@@ -388,7 +389,7 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (isReference && database.type !== DATABASE.MongoDB && !arg.referenceAction) {
+				if (isReference && !arg.referenceAction) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.required', {

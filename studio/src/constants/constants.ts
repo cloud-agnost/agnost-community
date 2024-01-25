@@ -901,6 +901,7 @@ export const VERSION_CHANGE_EXCEPTIONS = [
 	'cluster',
 	'auth',
 	'onBoarding',
+	'resource',
 ];
 export const ORG_CHANGE_EXCEPTIONS = [
 	'organization',

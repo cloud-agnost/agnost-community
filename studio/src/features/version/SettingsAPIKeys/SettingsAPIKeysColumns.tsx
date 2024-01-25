@@ -79,7 +79,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			},
 		}) => {
 			return (
-				<div className='flex items-center gap-8 group'>
+				<div className='flex items-center gap-2 group'>
 					<div className='truncate'>{key}</div>
 					<CopyButton text={key} className='hidden group-hover:block' />
 				</div>

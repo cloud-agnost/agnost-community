@@ -17,7 +17,7 @@ const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog } = useStorage
 
 const queryClient = new QueryClient();
 async function clearBucket(bucketName: string) {
-	const storage = useStorageStore.getState().storage;
+	const { storage, bucket } = useStorageStore.getState();
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
@@ -32,6 +32,7 @@ async function clearBucket(bucketName: string) {
 		.execute({
 			storageName: storage?.name,
 			bucketName,
+			bckId: bucket.id,
 			onSuccess: () => {
 				toast({
 					title: translate('storage.bucket.empty'),
@@ -51,7 +52,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[20px] !w-[20px]',
+		className: '!max-w-[25px] !w-[25px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

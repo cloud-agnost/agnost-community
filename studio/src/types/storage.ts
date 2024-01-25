@@ -97,6 +97,7 @@ export interface DeleteBucketParams extends BaseRequest {
 	storageName: string;
 	bucketName: string;
 	versionId?: string;
+	bckId?: string;
 }
 export interface DeleteMultipleBucketParams extends BaseRequest {
 	storageName: string;

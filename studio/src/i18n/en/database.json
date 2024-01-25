@@ -98,6 +98,7 @@
 		"reference_action_placeholder": "Select reference action",
 		"reference_model": "Reference Model",
 		"reference_model_placeholder": "Select reference model",
+		"edit_success": "Field updated successfully",
 		"delete": {
 			"title": "Delete Field",
 			"description": "Deleting this field will remove all associated data and cannot be undone."
@@ -123,8 +124,7 @@
 				"title": "Searchable Collation",
 				"field": "Searchable Collation",
 				"placeholder": "Select Searchable Collation"
-			},
-			"edit_success": "Field updated successfully"
+			}
 		}
 	},
 	"navigator": {

@@ -262,6 +262,12 @@ const useStorageStore = create<StorageStore & Actions>()(
 		emptyBucket: async (params: DeleteBucketParams) => {
 			try {
 				await StorageService.emptyBucket(params);
+				if (params.bckId) {
+					set({
+						files: { ...get().files, [params.bckId]: [] },
+						fileCountInfo: { ...get().fileCountInfo, [params.bckId]: undefined },
+					});
+				}
 				params.onSuccess?.();
 			} catch (error) {
 				params.onError?.(error as APIError);

@@ -64,7 +64,7 @@ export default function OrganizationApps() {
 	});
 
 	const { isFetching } = useQuery({
-		queryKey: ['apps'],
+		queryKey: ['apps', orgId],
 		queryFn: () => getAppsByOrgId(orgId),
 		enabled: applications[0]?.orgId !== orgId,
 		refetchOnWindowFocus: false,

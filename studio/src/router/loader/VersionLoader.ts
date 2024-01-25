@@ -132,6 +132,7 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[queueId] ? queue.logic !== logics[queueId] : false,
 		});
+		console.log(logics[queueId], logics);
 		setLogics(queueId, logics[queueId] ?? queue.logic);
 		closeDeleteTabModal();
 		return { queue };
