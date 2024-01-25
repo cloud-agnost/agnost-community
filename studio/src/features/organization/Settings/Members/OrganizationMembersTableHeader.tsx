@@ -40,7 +40,9 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 	}, [searchParams]);
 
 	function setMemberRoleFilter(roles: string[]) {
-		searchParams.set('r', roles.join(','));
+		if (!roles.length) {
+			searchParams.delete('r');
+		} else searchParams.set('r', roles.join(','));
 		setSearchParams(searchParams);
 	}
 
