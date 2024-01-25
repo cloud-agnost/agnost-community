@@ -50,7 +50,7 @@ function AppInvitations() {
 	}, [searchParams]);
 
 	return (
-		<div className='p-6 max-h-[85%] overflow-auto relative' id='invitation-infinite-scroll'>
+		<div className='p-6 max-h-[85%] overflow-auto relative flex-1' id='invitation-infinite-scroll'>
 			<InfiniteScroll
 				scrollableTarget='invitation-infinite-scroll'
 				next={fetchNextPage}
@@ -60,11 +60,8 @@ function AppInvitations() {
 			>
 				<div className='space-y-4'>
 					<AppInvitationFilter table={table} />
-					{isFetching && !isFetchingNextPage ? (
-						<Loading loading={isFetching} />
-					) : (
-						<DataTable<Invitation> table={table} />
-					)}
+					<Loading loading={isFetching && !isFetchingNextPage} />
+					{!(isFetching && !isFetchingNextPage) && <DataTable<Invitation> table={table} />}
 				</div>
 			</InfiniteScroll>
 		</div>

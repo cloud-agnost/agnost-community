@@ -13,7 +13,7 @@ import onboardingLoaders from './loader/OnboardingLoader';
 import versionLoaders from './loader/VersionLoader';
 export function Fallback(): JSX.Element {
 	return (
-		<div className='relative w-screen h-screen'>
+		<div className='relative h-screen'>
 			<Loading />
 		</div>
 	);

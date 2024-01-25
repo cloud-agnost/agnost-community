@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
 import SideBarButton from './SideBarButton';
+import { MouseEvent } from 'react';
 export default function OpenTabs() {
 	const { versionId } = useParams() as { versionId: string };
 	const { getTabsByVersionId, setCurrentTab, openDeleteTabModal, removeTab } = useTabStore();
@@ -16,7 +17,8 @@ export default function OpenTabs() {
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
 	const navigate = useNavigate();
 
-	function tabRemoveHandler(tab: Tab) {
+	function tabRemoveHandler(e: MouseEvent<HTMLButtonElement>, tab: Tab) {
+		e.stopPropagation();
 		if (tab.isDirty) {
 			openDeleteTabModal(tab);
 		} else {
@@ -46,7 +48,7 @@ export default function OpenTabs() {
 						title={tab.title}
 						type={tab.type}
 						actions={
-							<div className='flex items-center mr-2'>
+							<div className='flex items-center'>
 								{tab.isDirty && (
 									<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
 								)}
@@ -59,7 +61,7 @@ export default function OpenTabs() {
 											tab.isActive && 'hover:bg-button-primary',
 											'!p-0 !h-5  hidden group-hover:inline-flex',
 										)}
-										onClick={() => tabRemoveHandler(tab)}
+										onClick={(e) => tabRemoveHandler(e, tab)}
 									>
 										<X size={14} className='text-subtle group-hover:text-default' />
 									</Button>

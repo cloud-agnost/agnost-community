@@ -13,6 +13,7 @@ import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
+import { useEffect } from 'react';
 export default function CreateDatabase() {
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
@@ -64,6 +65,12 @@ export default function CreateDatabase() {
 		toggleCreateModal();
 		form.reset();
 	}
+
+	useEffect(() => {
+		if (isCreateDatabaseDialogOpen) {
+			form.reset();
+		}
+	}, [isCreateDatabaseDialogOpen]);
 
 	async function onSubmit(data: z.infer<typeof CreateDatabaseSchema>) {
 		const resource = resources.find((item) => item._id === data.resourceId);

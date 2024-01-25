@@ -47,7 +47,7 @@ export default function EditApplication() {
 				<DrawerHeader className='border-none'>
 					<DrawerTitle>{t('application.settings.editApp')}</DrawerTitle>
 				</DrawerHeader>
-				<nav className='mx-auto flex border-b'>
+				<nav className='flex border-b'>
 					{EDIT_APPLICATION_MENU_ITEMS.map((item) => {
 						return (
 							<OrganizationMenuItem

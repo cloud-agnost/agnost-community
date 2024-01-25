@@ -40,6 +40,11 @@ export default function SelectionDropdown({
 		if (!search) return data;
 		return data.filter((d) => RegExp(new RegExp(search, 'i')).exec(d.name));
 	}, [data, search]);
+
+	function handleSelect(data: Organization | Application) {
+		onSelect(data);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+	}
 	return (
 		<Popover>
 			<div className='w-[210px] h-10 relative'>
@@ -63,7 +68,7 @@ export default function SelectionDropdown({
 					<CommandGroup className='max-h-[300px] overflow-y-auto'>
 						<div className='space-y-2'>
 							{filteredData.map((d) => (
-								<CommandItem key={d._id} value={d._id} onSelect={() => onSelect(d)}>
+								<CommandItem key={d._id} value={d._id} onSelect={() => handleSelect(d)}>
 									<SelectionLabel selectedData={d} />
 									<Check
 										size={16}

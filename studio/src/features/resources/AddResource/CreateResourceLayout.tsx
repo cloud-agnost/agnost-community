@@ -74,7 +74,7 @@ export default function CreateResourceLayout({ children, loading }: Props) {
 								<FormLabel>{t('resources.table.allowedRoles')}</FormLabel>
 								<div className='flex items-center space-x-6 space-y-0'>
 									{appRoles.map((role) => (
-										<FormItem key={role} className='flex flex-row items-start space-x-4 space-y-0'>
+										<FormItem key={role} className='flex flex-row items-center space-x-4 space-y-0'>
 											<FormControl>
 												<Checkbox
 													disabled={role === 'Admin'}

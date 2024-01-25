@@ -242,7 +242,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							{t('endpoint.test.send')}
 						</Button>
 					</div>
-					<nav className='mx-auto flex border-b'>
+					<nav className='flex border-b'>
 						{TEST_ENDPOINTS_MENU_ITEMS.filter(
 							(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
 						)

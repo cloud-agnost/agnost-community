@@ -53,6 +53,11 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 		),
 	},
 	{
+		accessorKey: 'info.size',
+		header: () => <SortButton text={translate('storage.file.size')} field='info.runningReplicas' />,
+		cell: ({ row }) => <span className='text-sm text-default'>{row.original.info?.size}</span>,
+	},
+	{
 		header: translate('general.actions'),
 		accessorKey: 'actions',
 		className: 'actions',
