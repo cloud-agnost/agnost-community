@@ -56,9 +56,7 @@ export default function VersionEditorLayout({
 	const { t } = useTranslation();
 	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
-	const { STORES } = useStores();
-	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
-		useTabStore();
+	const { getCurrentTab } = useTabStore();
 	const tab = getCurrentTab(versionId as string);
 
 	async function handleSaveLogic() {
@@ -112,34 +110,6 @@ export default function VersionEditorLayout({
 				onSave={(val) => onSaveLogic(val as string)}
 				name={name}
 				readonly={!canEdit}
-			/>
-			<InfoModal
-				isOpen={isDeleteTabModalOpen}
-				closeModal={closeDeleteTabModal}
-				onConfirm={() => {
-					deleteLogic();
-					const uri = monaco.Uri.parse(`file:///src/${name}.js`);
-					window.monaco.editor
-						.getModel(uri)
-						?.setValue(STORES[tab.type][tab.type.toLowerCase()].logic);
-					removeTab(versionId as string, toDeleteTab.id);
-					closeDeleteTabModal();
-				}}
-				action={
-					<Button
-						variant='secondary'
-						size='lg'
-						onClick={() => {
-							removeTab(versionId as string, toDeleteTab.id);
-							handleSaveLogic();
-							deleteLogic?.();
-						}}
-					>
-						{t('general.save_and_close')}
-					</Button>
-				}
-				title={t('general.tab_close_title')}
-				description={t('general.tab_close_description')}
 			/>
 		</div>
 	);
