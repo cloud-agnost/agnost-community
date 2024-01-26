@@ -7,7 +7,6 @@ import { cn, formatCode } from '@/utils';
 import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface VersionEditorLayoutProps {
 	children?: React.ReactNode;

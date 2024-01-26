@@ -1,5 +1,4 @@
-import { Badge } from '@/components/Badge';
-import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { MethodBadge } from '@/components/Endpoint';
 import { useDebounce, useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -11,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from '../ExplorerCollapsible';
 import SideBarButton from '../SideBarButton';
 import CodeSearchInput from './CodeSearchInput';
-import { MethodBadge } from '@/components/Endpoint';
 export default function CodeSearch() {
 	const {
 		isSearchViewOpen,

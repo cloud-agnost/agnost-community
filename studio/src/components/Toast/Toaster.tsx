@@ -1,4 +1,4 @@
-import { Toast, ToastClose, ToastProvider, ToastTitle, ToastViewport } from '@/components/Toast';
+import { Toast, ToastProvider, ToastTitle, ToastViewport } from '@/components/Toast';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/utils';
 import { Check, X } from '@phosphor-icons/react';
