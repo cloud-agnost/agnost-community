@@ -5,7 +5,7 @@ import { cn } from '@/utils';
 import { useTabIcon } from '@/hooks';
 import { TabTypes } from '@/types';
 
-interface SideBarButtonProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SideBarButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 	active: boolean;
 	className?: string;
 	children?: React.ReactNode;
@@ -34,10 +34,9 @@ export default function SideBarButton({
 					? 'bg-button-primary/70 text-default'
 					: 'hover:bg-subtle text-subtle hover:text-default',
 			)}
-			{...props}
 		>
-			{' '}
 			<Button
+				{...props}
 				variant='blank'
 				size='full'
 				className={cn(

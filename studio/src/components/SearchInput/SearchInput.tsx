@@ -28,8 +28,8 @@ export default function SearchInput({
 
 	...props
 }: SearchInputProps) {
-	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 	const searchTerm = useDebounce(inputValue, 500);
 	const { t } = useTranslation();
 	const ref = React.useRef<HTMLInputElement>(null);

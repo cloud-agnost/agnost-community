@@ -55,14 +55,14 @@ import * as iplastic from 'monaco-themes/themes/iPlastic.json';
 import * as idlefingers from 'monaco-themes/themes/idleFingers.json';
 import * as krtheme from 'monaco-themes/themes/krTheme.json';
 import * as monoindustrial from 'monaco-themes/themes/monoindustrial.json';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import config from '../helpers/eslint.json';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
 import { useDebounceFn } from '.';
 import { SURROUND_MENU_ITEMS } from '@/constants';
-
+import { useSearchParams } from 'react-router-dom';
 export const EDITOR_OPTIONS: EditorProps['options'] = {
 	quickSuggestions: {
 		strings: true,
@@ -93,6 +93,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const linter = new Linter();
 	const { updateCurrentTab, getTabById } = useTabStore();
 	const { version } = useVersionStore();
+	const [searchParams] = useSearchParams();
 	const setTabState = useDebounceFn((isDirty) => {
 		if (
 			editor.getModel()?.getLanguageId() === 'javascript' &&
@@ -345,6 +346,15 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	) => {
 		onChange?.(content, ev);
 	};
+
+	useEffect(() => {
+		if (searchParams.get('line') && editorRef.current) {
+			const lineNumber = Number(searchParams.get('line'));
+			const range = new monaco.Range(lineNumber, 1, lineNumber, 1);
+			editorRef.current.revealLineInCenter(lineNumber);
+			editorRef.current.setSelection(range);
+		}
+	}, [searchParams.get('line'), editorRef.current]);
 	return {
 		onBeforeMount,
 		onCodeEditorMount,
