@@ -7,7 +7,6 @@ import { SearchCodeResult, TabTypes } from '@/types';
 import { cn, generateId } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import _, { capitalize } from 'lodash';
-import { MouseEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from '../ExplorerCollapsible';
 import SideBarButton from '../SideBarButton';

@@ -2,7 +2,7 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
-import { useUpdateEffect } from '@/hooks';
+import { useStores, useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn, formatCode } from '@/utils';
 import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
@@ -56,7 +56,7 @@ export default function VersionEditorLayout({
 	const { t } = useTranslation();
 	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
-
+	const { STORES } = useStores();
 	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
 		useTabStore();
 	const tab = getCurrentTab(versionId as string);
@@ -79,13 +79,6 @@ export default function VersionEditorLayout({
 	useUpdateEffect(() => {
 		setEditedLogic(logic);
 	}, [logic]);
-
-	// useEffect(() => {
-	// 	if (window.monaco) {
-	// 		const uri = monaco.Uri.parse(`file:///src/${name}.js`);
-	// 		window.monaco.editor.getModel(uri)?.setValue(logic);
-	// 	}
-	// }, [window.monaco]);
 
 	return (
 		<div className={cn('h-full flex flex-col', className)}>
@@ -124,9 +117,13 @@ export default function VersionEditorLayout({
 				isOpen={isDeleteTabModalOpen}
 				closeModal={closeDeleteTabModal}
 				onConfirm={() => {
+					deleteLogic();
+					const uri = monaco.Uri.parse(`file:///src/${name}.js`);
+					window.monaco.editor
+						.getModel(uri)
+						?.setValue(STORES[tab.type][tab.type.toLowerCase()].logic);
 					removeTab(versionId as string, toDeleteTab.id);
 					closeDeleteTabModal();
-					deleteLogic();
 				}}
 				action={
 					<Button

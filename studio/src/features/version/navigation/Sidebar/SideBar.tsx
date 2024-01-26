@@ -16,7 +16,7 @@ import Workspace from './Workspace';
 export default function SideBar() {
 	const { t } = useTranslation();
 
-	const { toggleSidebar, isSidebarOpen, collapseAll, sidebar } = useUtilsStore();
+	const { toggleSidebar, isSidebarOpen, collapseAll } = useUtilsStore();
 	const { toggleSearchView, isSearchViewOpen } = useVersionStore();
 	const { versionId } = useParams() as Record<string, string>;
 	const { getCurrentTab, tabs } = useTabStore();
