@@ -175,6 +175,7 @@ export default function Tabs() {
 
 	function closeTab() {
 		handleResetEditorState(toDeleteTab);
+		removeTab(versionId as string, toDeleteTab.id);
 		closeDeleteTabModal();
 	}
 
@@ -220,7 +221,7 @@ export default function Tabs() {
 						{t('general.save_and_close')}
 					</Button>
 				}
-				title={t('general.tab_close_title')}
+				title={t('general.multiple_tab_close_title')}
 				description={t('general.tab_close_description_count', {
 					count: toDeleteTabs.filter((tab) => tab.isDirty).length,
 				})}
