@@ -78,8 +78,17 @@ export default function OpenTabs() {
 function OpenTabsTrigger() {
 	const { t } = useTranslation();
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
-	const { removeAllTabs } = useTabStore();
+	const { removeAllTabs, openMultipleDeleteTabModal, getTabsByVersionId } = useTabStore();
 	const { versionId } = useParams() as { versionId: string };
+
+	function removeHandler() {
+		const tabs = getTabsByVersionId(versionId);
+		if (tabs.some((tab) => tab.isDirty)) {
+			openMultipleDeleteTabModal(tabs);
+		} else {
+			removeAllTabs(versionId);
+		}
+	}
 
 	return (
 		<ExplorerCollapsibleTrigger active={sidebar[versionId]?.openEditor || false}>
@@ -109,7 +118,7 @@ function OpenTabsTrigger() {
 							className='h-full !w-6 p-0.5 mr-2 invisible group-hover:visible'
 							variant='icon'
 							size='sm'
-							onClick={() => removeAllTabs(versionId)}
+							onClick={removeHandler}
 						>
 							<XSquare size={14} />
 						</Button>

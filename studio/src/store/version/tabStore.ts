@@ -6,10 +6,14 @@ import useVersionStore from './versionStore';
 interface TabStore {
 	tabs: Record<string, Tab[]>;
 	toDeleteTab: Tab;
+	toDeleteTabs: Tab[];
 	isDeleteTabModalOpen: boolean;
+	isMultipleDeleteTabModalOpen: boolean;
 }
 type Actions = {
 	openDeleteTabModal: (tab: Tab) => void;
+	openMultipleDeleteTabModal: (tabs: Tab[]) => void;
+	closeMultipleDeleteTabModal: () => void;
 	closeDeleteTabModal: () => void;
 	removeAllTabs: (versionId: string) => void;
 	removeAllTabsExcept: (versionId: string) => void;
@@ -28,6 +32,7 @@ type Actions = {
 	removeTabByPath: (versionId: string, path: string) => void;
 	updateTab: (param: UpdateTabParams) => void;
 	closeCurrentTab: () => void;
+	removeMultipleTabs: (versionId: string, tabs: Tab[]) => void;
 	reset: () => void;
 };
 
@@ -35,6 +40,8 @@ const initialState: TabStore = {
 	tabs: {},
 	toDeleteTab: {} as Tab,
 	isDeleteTabModalOpen: false,
+	isMultipleDeleteTabModalOpen: false,
+	toDeleteTabs: [],
 };
 const useTabStore = create<TabStore & Actions>()(
 	devtools(
@@ -235,6 +242,21 @@ const useTabStore = create<TabStore & Actions>()(
 					const currentTab = get().getCurrentTab(useVersionStore.getState().version._id);
 					if (!currentTab) return;
 					get().removeTab(useVersionStore.getState().version._id, currentTab.id);
+				},
+				openMultipleDeleteTabModal: (tabs: Tab[]) => {
+					set({ isMultipleDeleteTabModalOpen: true, toDeleteTabs: tabs });
+				},
+				closeMultipleDeleteTabModal: () => {
+					set({ isMultipleDeleteTabModalOpen: false, toDeleteTabs: [] });
+				},
+				removeMultipleTabs: (versionId, tabs) => {
+					tabs
+						.filter((tab) => !tab.isDashboard)
+						.forEach((tab) => {
+							get().removeTab(versionId, tab.id);
+						});
+					const newTabs = get().tabs[versionId];
+					get().setCurrentTab(versionId, newTabs?.[newTabs.length - 1]?.id ?? '');
 				},
 				reset: () => set(initialState),
 			}),

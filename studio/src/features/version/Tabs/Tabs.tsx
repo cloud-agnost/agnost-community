@@ -1,12 +1,11 @@
 import { Button } from '@/components/Button';
-import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
-import { useUpdateEffect } from '@/hooks';
+import { InfoModal } from '@/components/InfoModal';
+import { TabItem } from '@/features/version/Tabs/index.ts';
+import { useStores, useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
-import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab, TabTypes } from '@/types';
-import { cn, generateId, isElementInViewport, reorder } from '@/utils';
-import { CaretLeft, CaretRight, Sidebar } from '@phosphor-icons/react';
+import { formatCode, generateId, isElementInViewport, reorder } from '@/utils';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -19,25 +18,36 @@ import {
 } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
+import TabControls from './TabControls';
 import './tabs.scss';
-
-const SCROLL_AMOUNT = 200;
 
 export default function Tabs() {
 	const scrollContainer = useRef<HTMLDivElement>(null);
-	const [endOfScroll, setEndOfScroll] = useState(false);
-	const [startOfScroll, setStartOfScroll] = useState(false);
-	const [isScrollable, setIsScrollable] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
-	const { openDeleteTabModal, getTabsByVersionId, removeTab, setCurrentTab, addTab, setTabs } =
-		useTabStore();
+	const {
+		getTabsByVersionId,
+		addTab,
+		setTabs,
+		closeMultipleDeleteTabModal,
+		removeMultipleTabs,
+		closeDeleteTabModal,
+		removeTab,
+		toDeleteTab,
+		toDeleteTabs,
+		isMultipleDeleteTabModalOpen,
+		isDeleteTabModalOpen,
+	} = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { toggleSidebar, isSidebarOpen } = useUtilsStore();
 	const { t } = useTranslation();
 	const matches = useMatches();
 	const { pathname } = useLocation();
-
-	const { versionId } = useParams() as { versionId: string };
+	const { getFunction, STORES } = useStores();
+	const { versionId, orgId, appId } = useParams() as {
+		versionId: string;
+		orgId: string;
+		appId: string;
+	};
 
 	const tabs = getTabsByVersionId(versionId);
 
@@ -77,11 +87,6 @@ export default function Tabs() {
 	}, [versionId]);
 
 	useEffect(() => {
-		const reset = handleScrollEvent();
-		return () => reset?.();
-	}, [scrollContainer, tabs]);
-
-	useEffect(() => {
 		const path = pathname?.split('/')?.slice(-1)[0];
 		const currentTab = tabs.find((tab) => tab.isActive);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
@@ -115,53 +120,6 @@ export default function Tabs() {
 		return `/organization/${orgId}/apps/${appId}/version/${versionId}`;
 	}
 
-	function handleScrollEvent() {
-		const container = scrollContainer.current;
-		if (!container) return;
-
-		const handleScroll = () => {
-			setIsScrollable(container.scrollWidth > container.clientWidth);
-			setEndOfScroll(container.scrollLeft + container.clientWidth >= container.scrollWidth);
-			setStartOfScroll(container.scrollLeft === 0);
-		};
-
-		handleScroll();
-
-		container.addEventListener('scroll', handleScroll);
-
-		const resizeObserver = new ResizeObserver(() => {
-			handleScroll();
-		});
-
-		resizeObserver.observe(container);
-
-		return () => {
-			container.removeEventListener('scroll', handleScroll);
-			resizeObserver.disconnect();
-		};
-	}
-
-	function tabRemoveHandler(tab: Tab) {
-		if (tab.isDirty) {
-			openDeleteTabModal(tab);
-		} else {
-			removeTab(versionId, tab.id);
-		}
-	}
-
-	function move(type: 'next' | 'prev') {
-		const container = scrollContainer.current;
-		if (!container) return;
-
-		const scrollAmount = SCROLL_AMOUNT;
-
-		if (type === 'next') {
-			container.scrollLeft += scrollAmount;
-		} else {
-			container.scrollLeft -= scrollAmount;
-		}
-	}
-
 	function onDragEnd(result: DropResult) {
 		if (!result.destination) return;
 		const tabs = getTabsByVersionId(versionId);
@@ -169,6 +127,62 @@ export default function Tabs() {
 		setTabs(versionId, newTabs);
 	}
 
+	async function handleSaveLogic(tab: Tab) {
+		setLoading(true);
+		const deleteLogic = getFunction(tab.type, 'deleteLogic');
+		const editor = monaco.editor.getEditors()[0];
+		const formattedLogic = await formatCode(editor.getValue());
+		const setLogic = getFunction(tab.type, 'setLogics');
+		const data = STORES[tab.type][tab.type.toLowerCase()];
+		setLogic(formattedLogic);
+		const saveLogic = getFunction(tab.type, `save${tab.type}Logic`);
+		await saveLogic({
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			[`${tab.type.toLowerCase()}Id`]: data._id,
+			logic: formattedLogic,
+		});
+		deleteLogic?.(data._id);
+	}
+
+	function handleResetEditorState(tab: Tab) {
+		const deleteLogic = getFunction(tab.type, 'deleteLogic');
+		const id = tab.path.split('/').slice(-1)[0].split('?')[0];
+		const data = STORES[tab.type][`${tab.type.toLowerCase()}s`].find(
+			(item: any) => item._id === id,
+		);
+		deleteLogic(id);
+		const uri = window.monaco.Uri.parse(`file:///src/${id}.js`);
+		window.monaco.editor.getModel(uri)?.setValue(data.logic);
+	}
+
+	function closeMultipleTab() {
+		const dirtyTabs = toDeleteTabs.filter((tab) => tab.isDirty);
+		dirtyTabs.forEach((tab) => {
+			handleResetEditorState(tab);
+		});
+		removeMultipleTabs(versionId as string, toDeleteTabs);
+		closeMultipleDeleteTabModal();
+	}
+
+	async function closeAndSaveMultipleTab() {
+		const dirtyTabs = toDeleteTabs.filter((tab) => tab.isDirty);
+		await Promise.all(dirtyTabs.map(async (tab) => handleSaveLogic(tab)));
+		removeMultipleTabs(versionId as string, toDeleteTabs);
+		closeMultipleDeleteTabModal();
+	}
+
+	function closeTab() {
+		handleResetEditorState(toDeleteTab);
+		closeDeleteTabModal();
+	}
+
+	async function closeAndSaveTab() {
+		await handleSaveLogic(toDeleteTab);
+		removeTab(versionId as string, toDeleteTab.id);
+		closeDeleteTabModal();
+	}
 	return (
 		<div className='navigation-tab-container'>
 			<div className='max-w-full overflow-auto'>
@@ -185,30 +199,7 @@ export default function Tabs() {
 											isDragDisabled={tab.isDashboard}
 										>
 											{(dragProvided: DraggableProvided) => (
-												<TabItem
-													active={tab.isActive}
-													onClose={() => tabRemoveHandler(tab)}
-													onClick={() => {
-														setCurrentTab(versionId, tab.id);
-														history.pushState(
-															{
-																tabId: tab.id,
-																type: 'tabChanged',
-															},
-															'',
-															tab.path,
-														);
-													}}
-													to={tab.path}
-													closeable={!tab.isDashboard}
-													isDirty={tab.isDirty}
-													provided={dragProvided}
-													title={tab.title}
-													key={tab.id}
-													type={tab.type}
-												>
-													{!tab.isDashboard && <p className='tab-item-link-text'>{tab.title} </p>}
-												</TabItem>
+												<TabItem tab={tab} provided={dragProvided} key={tab.id} />
 											)}
 										</Draggable>
 									))}
@@ -219,49 +210,33 @@ export default function Tabs() {
 					</Droppable>
 				</DragDropContext>
 			</div>
-			<div className='tab-control'>
-				{isScrollable && (
-					<div className='tab-control-item navigation'>
-						<Button
-							rounded
-							variant='icon'
-							size='sm'
-							onClick={() => move('prev')}
-							disabled={startOfScroll}
-						>
-							<CaretLeft size={15} />
-						</Button>
-						<Button
-							rounded
-							variant='icon'
-							size='sm'
-							onClick={() => move('next')}
-							disabled={endOfScroll}
-						>
-							<CaretRight size={15} />
-						</Button>
-					</div>
-				)}
-				<div className='tab-control-item'>
-					<Button
-						rounded
-						variant='icon'
-						size='sm'
-						onClick={toggleSidebar}
-						className={cn(
-							isSidebarOpen && 'bg-button-primary/70 hover:bg-button-primary text-default',
-						)}
-					>
-						<Sidebar size={14} />
+			<TabControls scrollContainer={scrollContainer} />
+			<InfoModal
+				isOpen={isMultipleDeleteTabModalOpen}
+				closeModal={closeMultipleDeleteTabModal}
+				onConfirm={closeMultipleTab}
+				action={
+					<Button variant='secondary' size='lg' onClick={closeAndSaveMultipleTab} loading={loading}>
+						{t('general.save_and_close')}
 					</Button>
-				</div>
-				<div className='tab-control-item'>
-					<NewTabDropdown />
-				</div>
-				<div className='tab-control-item'>
-					<TabOptionsDropdown getDashboardPath={getDashboardPath} />
-				</div>
-			</div>
+				}
+				title={t('general.tab_close_title')}
+				description={t('general.tab_close_description_count', {
+					count: toDeleteTabs.filter((tab) => tab.isDirty).length,
+				})}
+			/>
+			<InfoModal
+				isOpen={isDeleteTabModalOpen}
+				closeModal={closeDeleteTabModal}
+				onConfirm={closeTab}
+				action={
+					<Button variant='secondary' size='lg' onClick={closeAndSaveTab} loading={loading}>
+						{t('general.save_and_close')}
+					</Button>
+				}
+				title={t('general.tab_close_title')}
+				description={t('general.tab_close_description')}
+			/>
 		</div>
 	);
 }
