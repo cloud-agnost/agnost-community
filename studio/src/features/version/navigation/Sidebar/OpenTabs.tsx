@@ -48,9 +48,9 @@ export default function OpenTabs() {
 						title={tab.title}
 						type={tab.type}
 						actions={
-							<div className='flex items-center'>
+							<div className='relative'>
 								{tab.isDirty && (
-									<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
+									<p className='text-default rounded-full bg-base-reverse w-2 h-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover:invisible' />
 								)}
 								{!tab.isDashboard && (
 									<Button
@@ -59,7 +59,7 @@ export default function OpenTabs() {
 										rounded
 										className={cn(
 											tab.isActive && 'hover:bg-button-primary',
-											'!p-0 !h-5  hidden group-hover:inline-flex',
+											'!p-0 !h-5 transform translate-y-[1px] invisible group-hover:visible',
 										)}
 										onClick={(e) => tabRemoveHandler(e, tab)}
 									>
