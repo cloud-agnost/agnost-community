@@ -8,7 +8,7 @@ export default function APIServerAlert() {
 
 	if (environment?.serverStatus === EnvironmentStatus.Deploying) {
 		return (
-			<div className='px-5'>
+			<div className='px-5 mt-4'>
 				<Alert variant='warning'>
 					<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
 					<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
@@ -17,7 +17,7 @@ export default function APIServerAlert() {
 		);
 	} else if (environment?.serverStatus === EnvironmentStatus.Error)
 		return (
-			<div className='px-5'>
+			<div className='px-5 mt-4'>
 				<Alert variant='error'>
 					<AlertTitle>{t('endpoint.test.deploy.error')}</AlertTitle>
 					<AlertDescription>{t('endpoint.test.deploy.error_description')}</AlertDescription>
