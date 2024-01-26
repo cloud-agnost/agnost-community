@@ -70,8 +70,8 @@ export default function ConnectOptions() {
 						)}
 					/>
 					<Button
-						iconOnly
-						variant='secondary'
+						variant='icon'
+						size='sm'
 						rounded
 						className={cn(
 							!index && 'self-end',

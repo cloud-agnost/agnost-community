@@ -24,7 +24,7 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, error, onChange, ...props }, ref) => {
+	({ className, type, error, onChange, variant, ...props }, ref) => {
 		const [value, setValue] = React.useState(props.value || '');
 
 		const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,11 +33,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				onChange(event);
 			}
 		};
-
 		return (
 			<input
 				type={type}
-				className={cn(inputVariants(), error && 'input-error', className)}
+				className={cn(inputVariants({ variant }), error && 'input-error', className)}
 				ref={ref}
 				autoComplete='off'
 				value={value}

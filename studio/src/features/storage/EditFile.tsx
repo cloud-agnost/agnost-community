@@ -172,8 +172,9 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 											)}
 										/>
 										<Button
-											iconOnly
-											variant='secondary'
+											variant='icon'
+											size='sm'
+											rounded
 											disabled={fields.length === 1}
 											className={cn(
 												!index && 'self-end',

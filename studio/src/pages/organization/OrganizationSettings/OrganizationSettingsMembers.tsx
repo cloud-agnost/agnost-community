@@ -111,7 +111,7 @@ export default function OrganizationSettingsMembers() {
 					}}
 					className='relative'
 				>
-					<TabsList containerClassName='absolute -top-6 xs:relative'>
+					<TabsList containerClassName='absolute -top-6 xs:relative z-10'>
 						<TabsTrigger value='member'>{t('organization.settings.members.title')}</TabsTrigger>
 						<TabsTrigger value='invitation'>
 							{t('organization.settings.pending-invitation')}

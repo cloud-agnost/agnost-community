@@ -17,7 +17,6 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 				</DrawerHeader>
 				<div className='p-4 flex flex-col flex-1'>
 					<CodeEditor
-						key={log._id}
 						value={JSON.stringify(log, null, 2)}
 						defaultLanguage='json'
 						containerClassName='flex-1'

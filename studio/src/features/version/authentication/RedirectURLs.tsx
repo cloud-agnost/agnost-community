@@ -129,8 +129,9 @@ export default function RedirectURLs() {
 							/>
 
 							<Button
-								iconOnly
-								variant='secondary'
+								variant='icon'
+								size='sm'
+								rounded
 								disabled={fields.length === 1}
 								className={cn(
 									!index && 'self-end',

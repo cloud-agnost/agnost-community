@@ -55,12 +55,12 @@ export default function OrgResources() {
 	}, [searchParams.get('q')]);
 
 	return (
-		<div className='p-8 scroll space-y-8' id='resource-scroll'>
+		<div className='p-8 scroll' id='resource-scroll'>
 			<Loading loading={isPending} />
 			{!isPending && (
 				<>
-					<div className='flex items-center justify-between'>
-						<h1 className='text-default text-2xl font-semibold text-center'>
+					<div className='flex items-center justify-between mb-4'>
+						<h1 className='text-default text-lg font-semibold text-center'>
 							{t('resources.title')}
 						</h1>
 						<div className='flex items-center justify-center gap-6'>

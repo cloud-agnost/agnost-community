@@ -140,7 +140,8 @@ export default function InviteMemberForm({
 						/>
 						<Button
 							type='button'
-							variant='secondary'
+							variant='icon'
+							size='sm'
 							rounded
 							disabled={fields.length === 1}
 							className={cn(

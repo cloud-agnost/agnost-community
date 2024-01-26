@@ -34,16 +34,18 @@ export function ExplorerCollapsibleTrigger({
 	title,
 	children,
 	active,
+	onClick,
 }: {
 	title?: string;
 	children?: React.ReactNode;
 	active: boolean;
+	onClick?: () => void;
 }) {
 	return (
 		<div className='hover:bg-subtle group h-6 flex items-center justify-center group'>
 			<div className='flex items-center justify-start gap-1 w-full pl-1'>
 				<CollapsibleTrigger asChild>
-					<Button variant='blank' className='gap-1' size='sm'>
+					<Button variant='blank' className='gap-1' size='sm' onClick={onClick}>
 						<CaretRight
 							size={14}
 							className={cn(

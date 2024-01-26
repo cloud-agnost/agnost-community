@@ -1,14 +1,8 @@
 import { Button } from '@/components/Button';
 import { InfoModal } from '@/components/InfoModal';
 import { NEW_TAB_ITEMS } from '@/constants';
+import { useStores, useTabNavigate, useToast } from '@/hooks';
 import useCacheStore from '@/store/cache/cacheStore';
-import useDatabaseStore from '@/store/database/databaseStore';
-import useEndpointStore from '@/store/endpoint/endpointStore';
-import useFunctionStore from '@/store/function/functionStore';
-import useMiddlewareStore from '@/store/middleware/middlewareStore';
-import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import useStorageStore from '@/store/storage/storageStore';
-import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -27,13 +21,12 @@ import {
 import { cn, generateId } from '@/utils';
 import { Pencil, Plus, Trash } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
 import SideBarButton from './SideBarButton';
-import { useToast } from '@/hooks';
-import { useTabNavigate } from '@/hooks';
 
 type WorkspaceDataType =
 	| Endpoint
@@ -44,17 +37,6 @@ type WorkspaceDataType =
 	| MessageQueue
 	| Task
 	| Cache;
-
-const STORES: Record<string, any> = {
-	[TabTypes.Cache]: useCacheStore.getState(),
-	[TabTypes.Task]: useTaskStore.getState(),
-	[TabTypes.Database]: useDatabaseStore.getState(),
-	[TabTypes.Endpoint]: useEndpointStore.getState(),
-	[TabTypes.Function]: useFunctionStore.getState(),
-	[TabTypes.MessageQueue]: useMessageQueueStore.getState(),
-	[TabTypes.Middleware]: useMiddlewareStore.getState(),
-	[TabTypes.Storage]: useStorageStore.getState(),
-};
 
 export default function Workspace() {
 	const navigate = useTabNavigate();
@@ -68,26 +50,8 @@ export default function Workspace() {
 	} | null>(null);
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	const { t } = useTranslation();
-	const { caches, openEditCacheModal } = useCacheStore();
-	const { tasks } = useTaskStore();
-	const { databases } = useDatabaseStore();
-	const { endpoints } = useEndpointStore();
-	const { functions } = useFunctionStore();
-	const { queues } = useMessageQueueStore();
-	const { middlewares } = useMiddlewareStore();
-	const { storages } = useStorageStore();
-
-	const data: Record<string, WorkspaceDataType[]> = {
-		[TabTypes.Cache]: structuredClone(caches),
-		[TabTypes.Task]: structuredClone(tasks),
-		[TabTypes.Database]: structuredClone(databases),
-		[TabTypes.Endpoint]: structuredClone(endpoints),
-		[TabTypes.Function]: structuredClone(functions),
-		[TabTypes.MessageQueue]: structuredClone(queues),
-		[TabTypes.Middleware]: structuredClone(middlewares),
-		[TabTypes.Storage]: structuredClone(storages),
-	};
-
+	const { openEditCacheModal } = useCacheStore();
+	const { getFunction, data } = useStores();
 	const { mutateAsync: deleteMutation, isPending } = useMutation({
 		mutationFn: handleDeleteMutation,
 		onSuccess: () => {
@@ -120,12 +84,9 @@ export default function Workspace() {
 
 	function handleDeleteMutation() {
 		if (!toDeleteData) return;
-		return STORES[toDeleteData?.type][
-			toDeleteData?.type === TabTypes.MessageQueue ? 'deleteQueue' : `delete${toDeleteData?.type}`
-		]({
-			[toDeleteData?.type === TabTypes.MessageQueue
-				? 'queueId'
-				: `${toDeleteData?.type.toLowerCase()}Id`]: toDeleteData?.data._id,
+		const fn = getFunction(toDeleteData.type, `delete${toDeleteData?.type}`);
+		return fn({
+			[`${toDeleteData?.type.toLowerCase()}Id`]: toDeleteData?.data._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -137,13 +98,15 @@ export default function Workspace() {
 			type,
 			data,
 		});
+		const openDeleteModal = getFunction(type, `openDelete${type}Modal`);
 		if ([TabTypes.Cache, TabTypes.Database, TabTypes.Storage].includes(type)) {
-			STORES[type][`openDelete${type}Modal`](data);
+			openDeleteModal(data);
 		} else setOpenInfoModal(true);
 	}
 
 	function openEditDialog(data: WorkspaceDataType, type: TabTypes) {
-		STORES[type][`openEdit${type}Modal`](data);
+		const openEditModal = getFunction(type, `openEdit${type}Modal`);
+		openEditModal(data);
 	}
 
 	function getDeleteTitle(): string {
@@ -164,7 +127,8 @@ export default function Workspace() {
 		if (sidebar[versionId]?.openedTabs) {
 			sidebar[versionId]?.openedTabs?.forEach(async (item) => {
 				if (item === TabTypes.Settings) return;
-				await STORES[item][`get${item}s`]({
+				const getItems = getFunction(item as TabTypes, `get${item}s`);
+				await getItems({
 					orgId,
 					appId,
 					versionId,
@@ -248,8 +212,8 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 	const { toggleWorkspaceTab, sidebar } = useUtilsStore();
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { versionId } = useParams() as Record<string, string>;
-
+	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const { getFunction, data, STORES } = useStores();
 	function handleAddTab(item: (typeof NEW_TAB_ITEMS)[number]) {
 		const tab = {
 			id: generateId(),
@@ -260,9 +224,23 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 		toggleWorkspaceTab(item.type);
 	}
 
+	function loadItems() {
+		if (_.isEmpty(data[item.type]) && !sidebar[versionId]?.openedTabs?.includes(item.type)) {
+			const getItems = getFunction(item.type, `get${item.type}s`);
+			getItems({
+				orgId,
+				appId,
+				versionId,
+				page: 0,
+				size: 250,
+			});
+		}
+	}
+
 	return (
 		<ExplorerCollapsibleTrigger
 			active={sidebar[versionId]?.openedTabs?.includes(item.type) as boolean}
+			onClick={loadItems}
 		>
 			<Button
 				onClick={() => handleAddTab(item)}
