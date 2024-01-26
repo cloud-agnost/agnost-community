@@ -1,5 +1,4 @@
 {
-
    "release": "v1.0.204",
    "modules": {
       "engine-core": "v1.0.68",
@@ -13,4 +12,3 @@
       "studio": "v1.0.92"
    }
 }
-
