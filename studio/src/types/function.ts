@@ -31,7 +31,8 @@ export interface CreateFunctionParams extends BaseParams, BaseRequest {
 	name: string;
 }
 export type UpdateFunctionParams = GetFunctionByIdParams & Partial<HelperFunction> & BaseRequest;
-export interface SaveFunctionCodeParams extends GetFunctionByIdParams, BaseRequest {
+export interface SaveFunctionCodeParams extends BaseParams, BaseRequest {
+	functionId: string;
 	logic: string;
 }
 export const CreateFunctionSchema = z.object({

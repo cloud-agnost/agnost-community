@@ -32,7 +32,14 @@ export default function EditEndpoint() {
 	}>();
 	const onSuccess = useSaveLogicOnSuccess(t('endpoint.editLogicSuccess'));
 	const { mutateAsync: saveEpMutation, isPending } = useMutation({
-		mutationFn: saveEndpointLogic,
+		mutationFn: (logic: string) =>
+			saveEndpointLogic({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				endpointId: useEndpointStore.getState().endpoint._id,
+				logic: logic,
+			}),
 		onSuccess,
 		onError: ({ details }: APIError) => {
 			toast({
@@ -42,21 +49,11 @@ export default function EditEndpoint() {
 		},
 	});
 
-	async function saveLogic(logic: string) {
-		await saveEpMutation({
-			orgId: orgId,
-			appId: appId,
-			versionId: versionId,
-			epId: useEndpointStore.getState().endpoint._id,
-			logic: logic,
-		});
-	}
-
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditEndpointModal(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={saveEpMutation}
 			loading={isPending}
 			name={endpoint?._id}
 			canEdit={canEdit}

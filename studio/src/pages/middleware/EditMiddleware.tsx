@@ -13,7 +13,7 @@ export default function EditMiddleware() {
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const canEdit = useAuthorizeVersion('middleware.update');
 	const {
-		saveMiddlewareCode,
+		saveMiddlewareLogic,
 		openEditMiddlewareModal,
 		middleware,
 		logics,
@@ -24,15 +24,15 @@ export default function EditMiddleware() {
 	const onSuccess = useSaveLogicOnSuccess(t('version.middleware.edit.success'));
 	const { mutate, isPending } = useMutation({
 		mutationKey: ['saveMiddlewareCode'],
-		mutationFn: (logic: string) => {
-			return saveMiddlewareCode({
+		mutationFn: (logic: string) =>
+			saveMiddlewareLogic({
 				orgId,
 				appId,
 				versionId,
-				mwId: useMiddlewareStore.getState().middleware._id,
+				middlewareId: useMiddlewareStore.getState().middleware._id,
 				logic: logic,
-			});
-		},
+			}),
+
 		onSuccess,
 		onError(error: APIError) {
 			toast({

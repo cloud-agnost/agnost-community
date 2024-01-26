@@ -126,7 +126,7 @@ export interface GetEndpointByIdParams extends BaseParams {
 	epId: string;
 }
 export interface SaveEndpointLogicParams extends BaseParams, BaseRequest {
-	epId: string;
+	endpointId: string;
 	logic: string;
 }
 
