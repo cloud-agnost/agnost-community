@@ -47,12 +47,11 @@ export default function CodeSearch() {
 		enabled: !!searchTerm && isSearchViewOpen,
 	});
 
-	function navigate(e: MouseEvent<HTMLButtonElement>, item: SearchCodeResult) {
-		e.stopPropagation();
+	function navigate(item: SearchCodeResult, lineNumber: number) {
 		addTab(versionId, {
 			id: generateId(),
 			title: item.name,
-			path: getVersionDashboardPath(`${item.type}/${item._id}`),
+			path: getVersionDashboardPath(`${item.type}/${item._id}?line=${lineNumber}`),
 			isActive: true,
 			isDashboard: false,
 			isDirty: false,
@@ -74,17 +73,20 @@ export default function CodeSearch() {
 										active={openCodeResultIndexes.includes(index)}
 										title={
 											<div className='w-full flex items-center justify-between'>
-												<div className=' flex items-center'>
+												<div className='flex items-center'>
 													<span className='mr-2' title={item.type}>
 														{getIcon(capitalize(item.type) as TabTypes)}
 													</span>
 													<h1
 														className={cn(
-															'flex-1 text-left font-normal text-sm truncate min-w-0 text-default',
+															'flex-1 text-left font-normal text-xs truncate min-w-0 text-default',
 														)}
 													>
 														{item.name}
 													</h1>
+													<div className='rounded-full bg-subtle ml-1 w-3.5 h-3.5 text-xs flex items-center justify-center'>
+														<span>{item.matchingLines.length}</span>
+													</div>
 												</div>
 												{item.meta?.method && (
 													<Badge
@@ -102,11 +104,10 @@ export default function CodeSearch() {
 									<SideBarButton
 										key={index}
 										active={false}
-										onClick={(e) => navigate(e, item)}
+										onClick={() => navigate(item, line.lineNumber)}
 										asChild
 										className='mt-2 ml-1'
 									>
-										<p>{line.lineNumber}</p>
 										<p
 											className='truncate'
 											dangerouslySetInnerHTML={{
