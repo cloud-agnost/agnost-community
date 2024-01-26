@@ -32,7 +32,7 @@ export default function CodeSearchInput() {
 								variant='blank'
 								className={cn(
 									'hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchCase && 'bg-button-border-hover',
+									matchCase && 'bg-button-primary/70',
 								)}
 								iconOnly
 								size='sm'
@@ -54,7 +54,7 @@ export default function CodeSearchInput() {
 								onClick={toggleMatchWholeWord}
 								className={cn(
 									'hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchWholeWord ? 'bg-button-border-hover' : '',
+									matchWholeWord && 'bg-button-primary/70',
 								)}
 							>
 								<TextAlignJustify size={16} className='text-default' />

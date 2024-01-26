@@ -90,7 +90,7 @@ export default function SideBar() {
 									className={cn(
 										'!p-0 !h-6',
 										isSearchViewOpen
-											? 'bg-wrapper-background-hover text-default visible'
+											? 'bg-button-primary/70 text-default visible'
 											: 'invisible group-hover:visible',
 									)}
 								>
