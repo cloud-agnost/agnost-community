@@ -70,6 +70,12 @@ export default function CreateMiddleware({ onCreate }: CreateMiddlewareProps) {
 			},
 		});
 	}
+
+	useEffect(() => {
+		if (isCreateMiddlewareDrawerOpen) {
+			form.reset();
+		}
+	}, [isCreateMiddlewareDrawerOpen]);
 	return (
 		<Drawer open={isCreateMiddlewareDrawerOpen} onOpenChange={toggleCreateModal}>
 			<DrawerContent position='right'>

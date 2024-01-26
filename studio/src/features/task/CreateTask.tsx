@@ -43,6 +43,7 @@ export default function CreateTask() {
 				orgId: orgId as string,
 				type: 'scheduler',
 			});
+			form.reset();
 		}
 	}, [isCreateTaskModalOpen]);
 

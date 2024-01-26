@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
+import { useEffect } from 'react';
 
 export default function CreateMessageQueue() {
 	const { t } = useTranslation();
@@ -70,12 +71,15 @@ export default function CreateMessageQueue() {
 	}
 
 	function handleClose() {
-		form.setValue('resourceId', '');
-		form.setValue('name', '');
-		form.setValue('delay', undefined);
-		form.setValue('logExecution', true);
+		form.reset();
 		toggleCreateModal();
 	}
+
+	useEffect(() => {
+		if (isCreateQueueModalOpen) {
+			form.reset();
+		}
+	}, [isCreateQueueModalOpen]);
 	return (
 		<Drawer open={isCreateQueueModalOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
