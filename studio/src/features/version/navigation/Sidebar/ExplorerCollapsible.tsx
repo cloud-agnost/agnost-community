@@ -46,7 +46,12 @@ export function ExplorerCollapsibleTrigger({
 		<div className='hover:bg-subtle group h-6 flex items-center justify-center group'>
 			<div className='flex items-center justify-start gap-1 w-full pl-1'>
 				<CollapsibleTrigger asChild>
-					<Button variant='blank' className='gap-1' size='sm' onClick={onClick}>
+					<Button
+						variant='blank'
+						className={cn(!children && 'flex-1', 'gap-1')}
+						size='sm'
+						onClick={onClick}
+					>
 						<CaretRight
 							size={14}
 							className={cn(
@@ -57,7 +62,7 @@ export function ExplorerCollapsibleTrigger({
 						{title && title}
 					</Button>
 				</CollapsibleTrigger>
-				<div className='flex-1 flex justify-between items-center'>{children}</div>
+				{children && <div className='flex-1 flex justify-between items-center'>{children}</div>}
 			</div>
 		</div>
 	);
