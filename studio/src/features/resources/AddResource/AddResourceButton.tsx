@@ -1,8 +1,9 @@
 import { Button } from '@/components/Button';
-import { DEFAULT_RESOURCE_INSTANCES, RESOURCE_ICON_MAP } from '@/constants';
+import { DEFAULT_RESOURCE_INSTANCES, RESOURCE_ICON_MAP, CREATE_RESOURCE_TYPES } from '@/constants';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
+import { ResourceCreateType, ResourceType } from '@/types';
 import { capitalize } from '@/utils';
 import { CaretDown, Plus } from '@phosphor-icons/react';
 import {
@@ -18,13 +19,12 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Fragment, useMemo } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ResourceCreateType, ResourceType } from '@/types';
 export default function AddResourceButton() {
 	const canCreateResource = useAuthorizeOrg('resource.create');
 	const { selectResourceType, toggleCreateResourceModal } = useResourceStore();
-	const { instanceTypes, resourceTypes } = useTypeStore();
+	const { instanceTypes } = useTypeStore();
 	const { t } = useTranslation();
 
 	function getIcon(type: string) {
@@ -37,9 +37,6 @@ export default function AddResourceButton() {
 		toggleCreateResourceModal();
 	};
 
-	const filteredResources = useMemo(() => {
-		return resourceTypes.filter((r) => r !== 'engine' && r !== 'realtime' && r !== 'scheduler');
-	}, [resourceTypes]);
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={!canCreateResource}>
@@ -63,28 +60,34 @@ export default function AddResourceButton() {
 									sideOffset={2}
 									alignOffset={-5}
 								>
-									{filteredResources
-										.filter((r) => type.id !== ResourceCreateType.New || r !== 'storage')
-										.map((resourceType) => (
-											<Fragment key={resourceType}>
-												<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>
-													{capitalize(resourceType)}
-												</DropdownMenuLabel>
-												{instanceTypes[resourceType].map((instance) => (
+									{CREATE_RESOURCE_TYPES.filter(
+										(r) => type.id !== ResourceCreateType.New || r !== 'storage',
+									).map((resourceType) => (
+										<Fragment key={resourceType}>
+											<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>
+												{capitalize(resourceType)}
+											</DropdownMenuLabel>
+											{instanceTypes[resourceType as keyof typeof instanceTypes].map(
+												(
+													instance: string, // Add index signature to instanceTypes
+												) => (
 													<DropdownMenuItem
 														asChild
 														key={instance}
-														onClick={() => selectResource(resourceType, type.id, instance)}
+														onClick={() =>
+															selectResource(resourceType as ResourceType, type.id, instance)
+														}
 													>
 														<div className='space-x-2'>
 															{getIcon(instance)}
 															<span>{instance}</span>
 														</div>
 													</DropdownMenuItem>
-												))}
-												<DropdownMenuSeparator />
-											</Fragment>
-										))}
+												),
+											)}
+											<DropdownMenuSeparator />
+										</Fragment>
+									))}
 								</DropdownMenuSubContent>
 							</DropdownMenuPortal>
 						</DropdownMenuSub>

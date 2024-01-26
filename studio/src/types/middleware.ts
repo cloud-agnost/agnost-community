@@ -21,8 +21,9 @@ export type CreateMiddlewareParams = BaseParams &
 	};
 
 export type UpdateMiddlewareParams = GetMiddlewareByIdParams & Partial<Middleware>;
-export type SaveMiddlewareCodeParams = GetMiddlewareByIdParams &
+export type SaveMiddlewareCodeParams = BaseParams &
 	BaseRequest & {
+		middlewareId: string;
 		logic: string;
 	};
 

@@ -599,6 +599,8 @@ export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
 	},
 ];
 
+export const CREATE_RESOURCE_TYPES = ['database', 'cache', 'storage', 'queue'];
+
 export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	MongoDB: MongoDb,
 	MySQL: MySql,

@@ -106,12 +106,12 @@ export default class EndpointService {
 		orgId,
 		appId,
 		versionId,
-		epId,
+		endpointId,
 		...data
 	}: SaveEndpointLogicParams): Promise<Endpoint> {
 		return (
 			await axios.put(
-				`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/${epId}/logic`,
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/${endpointId}/logic`,
 				data,
 			)
 		).data;

@@ -13,8 +13,7 @@ export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.update');
-	const { updateQueueLogic, queue, openEditQueueModal, setLogics, deleteLogic, logics } =
-		useMessageQueueStore();
+	const { saveQueueLogic, queue, openEditQueueModal, setLogics, logics } = useMessageQueueStore();
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
 	const { versionId, appId, orgId } = useParams<{
@@ -25,7 +24,14 @@ export default function EditMessageQueue() {
 	}>();
 	const onSuccess = useSaveLogicOnSuccess(t('queue.editLogicSuccess'));
 	const { mutateAsync: updateQueueCode, isPending } = useMutation({
-		mutationFn: updateQueueLogic,
+		mutationFn: (logic: string) =>
+			saveQueueLogic({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				queueId: useMessageQueueStore.getState().queue._id as string,
+				logic: logic,
+			}),
 		mutationKey: ['updateQueueLogic'],
 		onSuccess,
 		onError: ({ details }: APIError) => {
@@ -36,26 +42,16 @@ export default function EditMessageQueue() {
 		},
 	});
 
-	function saveLogic(logic: string) {
-		updateQueueCode({
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			queueId: useMessageQueueStore.getState().queue._id as string,
-			logic: logic,
-		});
-	}
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditQueueModal(queue)}
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={updateQueueCode}
 			loading={isPending}
 			name={queue._id}
 			canEdit={canEdit}
 			logic={logics[queue._id]}
 			setLogic={(val) => setLogics(queue._id, val)}
-			deleteLogic={() => deleteLogic(queue._id)}
 			breadCrumbItems={[
 				{
 					name: t('queue.title').toString(),

@@ -4,14 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/Tabs';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { useQuery } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClusterResources from './ClusterComponents';
 import ClusterSmtpForm from './ClusterSmtpForm';
-import TransferClusterOwnership from './TransferClusterOwnership';
 import CustomDomains from './CustomDomains';
-import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
+import TransferClusterOwnership from './TransferClusterOwnership';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();

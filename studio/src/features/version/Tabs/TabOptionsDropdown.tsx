@@ -1,6 +1,7 @@
 import { Button } from '@/components/Button';
 import { useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
+import useVersionStore from '@/store/version/versionStore';
 import { cn } from '@/utils';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import {
@@ -15,10 +16,7 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-interface TabOptionsDropdownProps {
-	getDashboardPath: () => string;
-}
-export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropdownProps) {
+export default function TabOptionsDropdown() {
 	const { t } = useTranslation();
 
 	const {
@@ -30,9 +28,11 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 		getPreviousTab,
 		removeAllAtRight,
 		setCurrentTab,
+		openMultipleDeleteTabModal,
 	} = useTabStore();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { versionId } = useParams() as { versionId: string };
 	const currentTab = getCurrentTab(versionId);
 	const tabs = getTabsByVersionId(versionId);
@@ -48,13 +48,17 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 					if (redirectTab) navigate(redirectTab.path);
 				}, 1);
 			},
-			disabled: pathname.split('?')[0] === getDashboardPath(),
+			disabled: pathname.split('?')[0] === getVersionDashboardPath(),
 		},
 		{
 			title: t('version.close_all_tabs'),
 			action: () => {
-				removeAllTabs(versionId);
-				navigate(getDashboardPath());
+				if (tabs.some((tab) => tab.isDirty)) {
+					openMultipleDeleteTabModal(tabs);
+				} else {
+					removeAllTabs(versionId);
+					navigate(getVersionDashboardPath());
+				}
 			},
 			disabled: tabs.length < 2,
 		},
@@ -69,7 +73,11 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 			title: t('version.close_all_tabs_except_current'),
 			action: () => {
 				if (!currentTab) return;
-				removeAllTabsExcept(versionId);
+				if (tabs.filter((tab) => tab.id !== currentTab.id).some((tab) => tab.isDirty)) {
+					openMultipleDeleteTabModal(tabs.filter((tab) => tab.id !== currentTab.id));
+				} else {
+					removeAllTabsExcept(versionId);
+				}
 			},
 			disabled: tabs.filter((tab) => !tab.isDashboard).length < 2,
 		},

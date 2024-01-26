@@ -15,7 +15,7 @@ export default function EditTask() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('task.update');
-	const { task, saveTaskLogic, openEditTaskModal, logics, setLogics, deleteLogic } = useTaskStore();
+	const { task, saveTaskLogic, openEditTaskModal, logics, setLogics } = useTaskStore();
 	const [isTestTaskOpen, setIsTestTaskOpen] = useState(false);
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -56,7 +56,6 @@ export default function EditTask() {
 			canEdit={canEdit}
 			logic={logics[task._id]}
 			setLogic={(val) => setLogics(task._id, val)}
-			deleteLogic={() => deleteLogic(task._id)}
 			breadCrumbItems={[
 				{
 					name: t('task.title').toString(),

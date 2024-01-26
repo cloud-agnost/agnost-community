@@ -82,12 +82,12 @@ export default class FunctionService {
 		orgId,
 		appId,
 		versionId,
-		funcId,
+		functionId,
 		...data
 	}: funcTypes.SaveFunctionCodeParams) {
 		return (
 			await axios.put(
-				`${this.url}/${orgId}/app/${appId}/version/${versionId}/func/${funcId}/logic`,
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/func/${functionId}/logic`,
 				data,
 			)
 		).data;

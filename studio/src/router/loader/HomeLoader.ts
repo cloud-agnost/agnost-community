@@ -35,8 +35,19 @@ function organizationSelectLoader() {
 	return null;
 }
 
+function clusterManagementLoader() {
+	const user = useAuthStore.getState().user;
+
+	if (!user.isClusterOwner) {
+		return redirect('/401');
+	}
+
+	return null;
+}
+
 export default {
 	homeLoader,
 	redirectHandleLoader,
 	organizationSelectLoader,
+	clusterManagementLoader,
 };

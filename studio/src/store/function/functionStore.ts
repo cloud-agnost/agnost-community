@@ -19,7 +19,9 @@ type Actions = {
 	deleteMultipleFunctions: (params: funcTypes.DeleteMultipleFunctions) => Promise<void>;
 	createFunction: (params: funcTypes.CreateFunctionParams) => Promise<funcTypes.HelperFunction>;
 	updateFunction: (params: funcTypes.UpdateFunctionParams) => Promise<funcTypes.HelperFunction>;
-	saveFunctionCode: (params: funcTypes.SaveFunctionCodeParams) => Promise<funcTypes.HelperFunction>;
+	saveFunctionLogic: (
+		params: funcTypes.SaveFunctionCodeParams,
+	) => Promise<funcTypes.HelperFunction>;
 	closeEditFunctionModal: () => void;
 	openEditFunctionModal: (func: funcTypes.HelperFunction) => void;
 	setLogics: (id: string, logic: string) => void;
@@ -115,7 +117,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				throw err as funcTypes.APIError;
 			}
 		},
-		saveFunctionCode: async (params) => {
+		saveFunctionLogic: async (params) => {
 			try {
 				const func = await FunctionService.saveFunctionCode(params);
 				set((prev) => ({

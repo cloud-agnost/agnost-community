@@ -33,7 +33,7 @@ type Actions = {
 	deleteMultipleQueues: (params: DeleteMultipleQueuesParams) => Promise<void>;
 	createQueue: (params: CreateMessageQueueParams) => Promise<MessageQueue>;
 	updateQueue: (params: UpdateQueueParams) => Promise<MessageQueue>;
-	updateQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
+	saveQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
 	testQueue: (params: TestQueueParams) => Promise<void>;
 	openEditQueueModal: (queue: MessageQueue) => void;
 	closeEditQueueModal: () => void;
@@ -139,7 +139,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-		updateQueueLogic: async (params: UpdateQueueLogicParams) => {
+		saveQueueLogic: async (params: UpdateQueueLogicParams) => {
 			try {
 				const queue = await QueueService.updateQueueLogic(params);
 				set((prev) => ({

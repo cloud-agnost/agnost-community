@@ -31,7 +31,7 @@ type Actions = {
 	deleteMultipleMiddlewares: (params: DeleteMultipleMiddlewares) => Promise<void>;
 	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
 	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
-	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
+	saveMiddlewareLogic: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
 	openEditMiddlewareModal: (middleware: Middleware) => void;
 	closeEditMiddlewareModal: () => void;
 	setLogics: (id: string, logic: string) => void;
@@ -123,11 +123,13 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			}));
 			return middleware;
 		},
-		saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
+		saveMiddlewareLogic: async (params: SaveMiddlewareCodeParams) => {
 			try {
 				const middleware = await MiddlewareService.saveMiddlewareCode(params);
 				set((prev) => ({
-					middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
+					middlewares: prev.middlewares.map((mw) =>
+						mw._id === params.middlewareId ? middleware : mw,
+					),
 					middleware,
 					editedLogic: middleware.logic,
 				}));

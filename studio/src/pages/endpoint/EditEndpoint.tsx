@@ -19,7 +19,7 @@ export default function EditEndpoint() {
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics, deleteLogic } =
+	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics } =
 		useEndpointStore();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -32,7 +32,14 @@ export default function EditEndpoint() {
 	}>();
 	const onSuccess = useSaveLogicOnSuccess(t('endpoint.editLogicSuccess'));
 	const { mutateAsync: saveEpMutation, isPending } = useMutation({
-		mutationFn: saveEndpointLogic,
+		mutationFn: (logic: string) =>
+			saveEndpointLogic({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				endpointId: useEndpointStore.getState().endpoint._id,
+				logic: logic,
+			}),
 		onSuccess,
 		onError: ({ details }: APIError) => {
 			toast({
@@ -42,27 +49,16 @@ export default function EditEndpoint() {
 		},
 	});
 
-	async function saveLogic(logic: string) {
-		await saveEpMutation({
-			orgId: orgId,
-			appId: appId,
-			versionId: versionId,
-			epId: useEndpointStore.getState().endpoint._id,
-			logic: logic,
-		});
-	}
-
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditEndpointModal(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={saveEpMutation}
 			loading={isPending}
 			name={endpoint?._id}
 			canEdit={canEdit}
 			logic={logics[endpoint._id]}
 			setLogic={(val) => setLogics(endpoint._id, val)}
-			deleteLogic={() => deleteLogic(endpoint._id)}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),

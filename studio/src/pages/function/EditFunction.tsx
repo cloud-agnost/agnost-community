@@ -13,11 +13,10 @@ export default function EditFunction() {
 	const canEdit = useAuthorizeVersion('function.update');
 	const {
 		function: helper,
-		saveFunctionCode,
+		saveFunctionLogic,
 		openEditFunctionModal,
 		logics,
 		setLogics,
-		deleteLogic,
 	} = useFunctionStore();
 
 	const { versionId, appId, orgId } = useParams<{
@@ -28,7 +27,14 @@ export default function EditFunction() {
 	}>();
 	const onSuccess = useSaveLogicOnSuccess(t('function.editLogicSuccess'));
 	const { mutate: saveFunctionCodeMutation, isPending } = useMutation({
-		mutationFn: saveFunctionCode,
+		mutationFn: (logic: string) =>
+			saveFunctionLogic({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				functionId: useFunctionStore.getState().function._id as string,
+				logic: logic,
+			}),
 		onSuccess,
 		onError: (error: APIError) => {
 			toast({
@@ -38,24 +44,14 @@ export default function EditFunction() {
 		},
 	});
 
-	function saveLogic(logic: string) {
-		saveFunctionCodeMutation({
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			funcId: useFunctionStore.getState().function._id as string,
-			logic: logic,
-		});
-	}
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditFunctionModal(helper)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={saveFunctionCodeMutation}
 			loading={isPending}
 			name={helper._id}
 			logic={logics[helper._id]}
 			setLogic={(val) => setLogics(helper._id, val)}
-			deleteLogic={() => deleteLogic(helper._id)}
 			breadCrumbItems={[
 				{
 					name: t('function.title').toString(),
