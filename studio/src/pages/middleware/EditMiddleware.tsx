@@ -12,14 +12,8 @@ export default function EditMiddleware() {
 	const { toast } = useToast();
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const canEdit = useAuthorizeVersion('middleware.update');
-	const {
-		saveMiddlewareLogic,
-		openEditMiddlewareModal,
-		middleware,
-		logics,
-		setLogics,
-		deleteLogic,
-	} = useMiddlewareStore();
+	const { saveMiddlewareLogic, openEditMiddlewareModal, middleware, logics, setLogics } =
+		useMiddlewareStore();
 	const { t } = useTranslation();
 	const onSuccess = useSaveLogicOnSuccess(t('version.middleware.edit.success'));
 	const { mutate, isPending } = useMutation({
@@ -71,7 +65,6 @@ export default function EditMiddleware() {
 			canEdit={canEdit}
 			logic={logics[middlewareId]}
 			setLogic={(val) => setLogics(middlewareId, val)}
-			deleteLogic={() => deleteLogic(middlewareId)}
 		/>
 	);
 }

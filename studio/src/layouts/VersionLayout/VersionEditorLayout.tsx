@@ -1,8 +1,7 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
-import { InfoModal } from '@/components/InfoModal';
-import { useStores, useUpdateEffect } from '@/hooks';
+import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn, formatCode } from '@/utils';
 import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
@@ -22,7 +21,6 @@ interface VersionEditorLayoutProps {
 	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
 	setLogic: (logic: string) => void;
-	deleteLogic: () => void;
 }
 
 const initBeforeUnLoad = (showExitPrompt: boolean) => {
@@ -51,7 +49,6 @@ export default function VersionEditorLayout({
 	className,
 	name,
 	canEdit,
-	deleteLogic,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { versionId } = useParams<{ versionId: string }>();

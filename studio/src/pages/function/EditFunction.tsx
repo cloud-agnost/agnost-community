@@ -17,7 +17,6 @@ export default function EditFunction() {
 		openEditFunctionModal,
 		logics,
 		setLogics,
-		deleteLogic,
 	} = useFunctionStore();
 
 	const { versionId, appId, orgId } = useParams<{
@@ -53,7 +52,6 @@ export default function EditFunction() {
 			name={helper._id}
 			logic={logics[helper._id]}
 			setLogic={(val) => setLogics(helper._id, val)}
-			deleteLogic={() => deleteLogic(helper._id)}
 			breadCrumbItems={[
 				{
 					name: t('function.title').toString(),

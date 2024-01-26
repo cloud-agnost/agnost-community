@@ -13,8 +13,7 @@ export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.update');
-	const { saveQueueLogic, queue, openEditQueueModal, setLogics, deleteLogic, logics } =
-		useMessageQueueStore();
+	const { saveQueueLogic, queue, openEditQueueModal, setLogics, logics } = useMessageQueueStore();
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
 	const { versionId, appId, orgId } = useParams<{
@@ -53,7 +52,6 @@ export default function EditMessageQueue() {
 			canEdit={canEdit}
 			logic={logics[queue._id]}
 			setLogic={(val) => setLogics(queue._id, val)}
-			deleteLogic={() => deleteLogic(queue._id)}
 			breadCrumbItems={[
 				{
 					name: t('queue.title').toString(),

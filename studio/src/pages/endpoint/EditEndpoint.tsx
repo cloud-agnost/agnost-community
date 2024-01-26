@@ -19,7 +19,7 @@ export default function EditEndpoint() {
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics, deleteLogic } =
+	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics } =
 		useEndpointStore();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -59,7 +59,6 @@ export default function EditEndpoint() {
 			canEdit={canEdit}
 			logic={logics[endpoint._id]}
 			setLogic={(val) => setLogics(endpoint._id, val)}
-			deleteLogic={() => deleteLogic(endpoint._id)}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),
