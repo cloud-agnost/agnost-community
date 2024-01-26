@@ -847,6 +847,7 @@ const router = createBrowserRouter([
 									{
 										path: 'cluster-management',
 										element: <ClusterManagement />,
+										loader: homeLoaders.clusterManagementLoader,
 									},
 									{
 										path: 'notifications',
