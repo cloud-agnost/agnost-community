@@ -23,14 +23,12 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		>
 			{!hide && (
 				<>
-					{orientation === 'horizontal' && (
-						<Separator className='bg-lighter' orientation={orientation} />
-					)}
+					<Separator className='bg-lighter' orientation={orientation} />
 					<div
 						className={cn(
-							'rounded group-hover:bg-white',
+							'rounded',
 							orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
-							isResizing ? 'active-resizer' : 'bg-lighter',
+							isResizing ? 'active-resizer' : 'bg-lighter group-hover:bg-white',
 							isResizing && orientation === 'horizontal' && 'w-full',
 							isResizing && orientation === 'vertical' && 'h-full',
 						)}
