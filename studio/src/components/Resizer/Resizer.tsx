@@ -13,8 +13,8 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		<PanelResizeHandle
 			{...props}
 			className={cn(
-				'flex items-center justify-center gap-0.5 group !cursor-col-resize',
-				orientation === 'horizontal' ? 'flex-col h-2' : 'w-2',
+				'flex items-center justify-center group gap-0.5 ',
+				orientation === 'horizontal' ? 'flex-col h-2 !cursor-row-resize' : 'w-2 !cursor-col-resize',
 				className,
 			)}
 			onDragging={(val) => {
@@ -23,18 +23,19 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		>
 			{!hide && (
 				<>
-					{!isResizing && (
-						<div
-							className={cn(
-								'rounded h-8 w-0.5 bg-lighter group-hover:bg-white transition-all',
-								orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
-							)}
-						/>
+					{orientation === 'horizontal' && (
+						<Separator className='bg-lighter' orientation={orientation} />
 					)}
-					<Separator
-						className={cn(isResizing ? 'active-resizer' : 'bg-lighter')}
-						orientation={orientation}
+					<div
+						className={cn(
+							'rounded group-hover:bg-white',
+							orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
+							isResizing ? 'active-resizer' : 'bg-lighter',
+							isResizing && orientation === 'horizontal' && 'w-full',
+							isResizing && orientation === 'vertical' && 'h-full',
+						)}
 					/>
+					<Separator className='bg-lighter' orientation={orientation} />
 				</>
 			)}
 		</PanelResizeHandle>
