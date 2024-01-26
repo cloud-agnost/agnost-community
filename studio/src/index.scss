@@ -574,7 +574,3 @@ button:focus-visible {
 		transparent
 	);
 }
-mark {
-	@apply bg-elements-subtle-blue dark:bg-elements-blue px-1 rounded-sm text-default;
-	@apply border dark:border-elements-blue border-elements-subtle-blue;
-}
