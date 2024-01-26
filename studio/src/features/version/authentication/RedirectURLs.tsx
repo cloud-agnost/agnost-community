@@ -131,9 +131,9 @@ export default function RedirectURLs() {
 							<Button
 								variant='icon'
 								size='sm'
-								rounded
 								disabled={fields.length === 1}
 								className={cn(
+									'rounded-full',
 									!index && 'self-end',
 									!isEmpty(form.formState.errors) && !index && 'self-center mt-2',
 									!isEmpty(form.formState.errors) &&

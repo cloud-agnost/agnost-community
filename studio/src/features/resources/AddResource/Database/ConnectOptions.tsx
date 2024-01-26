@@ -72,8 +72,8 @@ export default function ConnectOptions() {
 					<Button
 						variant='icon'
 						size='sm'
-						rounded
 						className={cn(
+							'rounded-full',
 							!index && 'self-end',
 							!isEmpty(errors) && !index && 'self-center mt-2',
 							!isEmpty(errors) && isEmpty(errors.access?.options?.[0]) && !index && 'self-end',
