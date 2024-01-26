@@ -60,10 +60,10 @@ export default function SideBar() {
 
 	return (
 		<div
-			className='h-full w-full bg-base shadow-xl flex flex-col border-r border'
+			className='h-full w-full bg-base shadow-xl flex flex-col border-r border-border'
 			id='side-navigation'
 		>
-			<div className='pl-2 py-[0.22rem] border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
+			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
 				<h1 className='text-xs text-white'>{t('version.explorer')}</h1>
 				<div className='flex items-center'>
 					<TooltipProvider>
@@ -110,12 +110,7 @@ export default function SideBar() {
 			) : (
 				<>
 					<OpenTabs />
-					<div
-						className={cn(
-							'overflow-y-auto overflow-x-hidden pb-2',
-							sidebar[versionId].openEditor ? 'h-[calc(100%-13rem)]' : 'h-[calc(100%-4rem)]',
-						)}
-					>
+					<div className='overflow-y-auto overflow-x-hidden pb-2 flex-1'>
 						<Workspace />
 						<VersionSettingsExplorer />
 					</div>
