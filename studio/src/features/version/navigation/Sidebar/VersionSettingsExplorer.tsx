@@ -38,7 +38,7 @@ export default function VersionSettingsExplorer() {
 					title={
 						<h1
 							className={cn(
-								'flex-1 text-left font-normal text-sm',
+								'flex-1 text-left',
 								sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings)
 									? 'text-default'
 									: 'text-subtle group-hover:text-default',
