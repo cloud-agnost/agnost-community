@@ -11,6 +11,7 @@ import * as z from 'zod';
 import useCacheStore from '@/store/cache/cacheStore';
 import { useMutation } from '@tanstack/react-query';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { useEffect } from 'react';
 
 export default function CreateCache() {
 	const { t } = useTranslation();
@@ -57,6 +58,12 @@ export default function CreateCache() {
 			...data,
 		});
 	}
+
+	useEffect(() => {
+		if (isCreateCacheModalOpen) {
+			form.reset();
+		}
+	}, [isCreateCacheModalOpen]);
 
 	return (
 		<Drawer open={isCreateCacheModalOpen} onOpenChange={resetAndClose}>

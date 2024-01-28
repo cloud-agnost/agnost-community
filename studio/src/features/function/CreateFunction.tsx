@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import FunctionForm from './FunctionForm';
+import { useEffect } from 'react';
 
 export default function CreateFunction() {
 	const { t } = useTranslation();
@@ -58,11 +59,15 @@ export default function CreateFunction() {
 	}
 
 	function handleClose() {
-		form.reset({
-			name: '',
-		});
+		form.reset();
 		toggleCreateModal();
 	}
+
+	useEffect(() => {
+		if (isCreateFunctionDrawerOpen) {
+			form.reset();
+		}
+	}, [isCreateFunctionDrawerOpen]);
 
 	return (
 		<Drawer open={isCreateFunctionDrawerOpen} onOpenChange={handleClose}>

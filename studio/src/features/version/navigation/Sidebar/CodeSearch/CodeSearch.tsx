@@ -1,5 +1,4 @@
-import { Badge } from '@/components/Badge';
-import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { MethodBadge } from '@/components/Endpoint';
 import { useDebounce, useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -88,11 +87,7 @@ export default function CodeSearch() {
 													</div>
 												</div>
 												{item.meta?.method && (
-													<Badge
-														variant={HTTP_METHOD_BADGE_MAP[item.meta.method]}
-														text={item.meta.method}
-														className='p-0.5 font-normal mr-2'
-													/>
+													<MethodBadge method={item.meta.method} className='p-0 mr-2' />
 												)}
 											</div>
 										}
@@ -105,7 +100,6 @@ export default function CodeSearch() {
 										active={false}
 										onClick={() => navigate(item, line.lineNumber)}
 										asChild
-										className='mt-2 ml-1'
 									>
 										<p
 											className='truncate'

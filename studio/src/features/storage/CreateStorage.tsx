@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import StorageForm from './StorageForm';
 import useVersionStore from '@/store/version/versionStore';
+import { useEffect } from 'react';
 
 export default function CreateStorage() {
 	const { t } = useTranslation();
@@ -61,10 +62,15 @@ export default function CreateStorage() {
 	}
 
 	function onCloseHandler() {
-		form.setValue('name', '');
-		form.setValue('resourceId', '');
+		form.reset();
 		toggleCreateModal();
 	}
+
+	useEffect(() => {
+		if (isCreateStorageModalOpen) {
+			form.reset();
+		}
+	}, [isCreateStorageModalOpen]);
 	return (
 		<Drawer open={isCreateStorageModalOpen} onOpenChange={onCloseHandler}>
 			<DrawerContent position='right' size='lg' className='h-full'>

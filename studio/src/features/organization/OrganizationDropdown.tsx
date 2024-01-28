@@ -76,7 +76,10 @@ export function OrganizationDropdown() {
 				onSelect={(org) => onSelect(org as Organization)}
 				onClick={() => navigate(`/organization/${organization?._id}`)}
 			>
-				<CommandItem className='flex !justify-center'>
+				<CommandItem
+					className='flex !justify-center'
+					disabled={organization?.ownerUserId === user?._id}
+				>
 					<Button
 						disabled={organization?.ownerUserId === user?._id}
 						className='w-full font-normal'
@@ -86,7 +89,7 @@ export function OrganizationDropdown() {
 						{t('organization.leave.main')}
 					</Button>
 				</CommandItem>
-				<CommandItem className='hover:bg-[unset]'>
+				<CommandItem className='hover:bg-[unset]' disabled={!user?.isClusterOwner}>
 					<Button
 						className='font-normal'
 						disabled={!user?.isClusterOwner}

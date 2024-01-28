@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
+import { useEffect } from 'react';
 
 export default function CreateEndpoint() {
 	const { createEndpoint, isCreateEndpointDialogOpen, toggleCreateModal } = useEndpointStore();
@@ -64,18 +65,14 @@ export default function CreateEndpoint() {
 
 	function closeDrawer() {
 		toggleCreateModal();
-		form.reset({
-			method: 'GET',
-			path: '',
-			name: '',
-			middlewares: [],
-			apiKeyRequired: false,
-			sessionRequired: false,
-			timeout: null,
-			logExecution: false,
-			rateLimits: [],
-		});
+		form.reset();
 	}
+
+	useEffect(() => {
+		if (isCreateEndpointDialogOpen) {
+			form.reset();
+		}
+	}, [isCreateEndpointDialogOpen]);
 
 	return (
 		<Drawer open={isCreateEndpointDialogOpen} onOpenChange={closeDrawer}>

@@ -7,7 +7,6 @@ import { cn, formatCode } from '@/utils';
 import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface VersionEditorLayoutProps {
 	children?: React.ReactNode;
@@ -23,10 +22,12 @@ interface VersionEditorLayoutProps {
 	setLogic: (logic: string) => void;
 }
 
-const initBeforeUnLoad = (showExitPrompt: boolean) => {
+const initBeforeUnLoad = () => {
+	const getCurrentTab = useTabStore.getState().getCurrentTab;
 	window.onbeforeunload = (event) => {
-		// Show prompt based on state
-		if (showExitPrompt) {
+		const versionId = new URLSearchParams(window.location.search).get('versionId') as string;
+		const tab = getCurrentTab(versionId);
+		if (tab.isDirty) {
 			const e = event || window.event;
 			e.preventDefault();
 			if (e) {
@@ -51,10 +52,7 @@ export default function VersionEditorLayout({
 	canEdit,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
-	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
-	const { getCurrentTab } = useTabStore();
-	const tab = getCurrentTab(versionId as string);
 
 	async function handleSaveLogic() {
 		const editor = monaco.editor.getEditors()[0];
@@ -64,12 +62,12 @@ export default function VersionEditorLayout({
 	}
 
 	window.onload = function () {
-		initBeforeUnLoad(tab.isDirty as boolean);
+		initBeforeUnLoad();
 	};
 
 	useEffect(() => {
-		initBeforeUnLoad(tab.isDirty as boolean);
-	}, [tab.isDirty]);
+		initBeforeUnLoad();
+	}, []);
 
 	useUpdateEffect(() => {
 		setEditedLogic(logic);

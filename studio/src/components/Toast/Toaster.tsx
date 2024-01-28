@@ -1,11 +1,12 @@
-import { Toast, ToastClose, ToastProvider, ToastTitle, ToastViewport } from '@/components/Toast';
+import { Toast, ToastProvider, ToastTitle, ToastViewport } from '@/components/Toast';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/utils';
 import { Check, X } from '@phosphor-icons/react';
+import { Button } from '../Button';
 
 export function Toaster() {
 	const { toasts } = useToast();
-
+	const { dismiss } = useToast();
 	return (
 		<ToastProvider duration={2500}>
 			{toasts.map(function ({ id, title, action, ...props }) {
@@ -25,7 +26,15 @@ export function Toaster() {
 							{action === 'error' && <X size={14} color='white' />}
 						</div>
 						{title && <ToastTitle className='flex-1'>{title}</ToastTitle>}
-						<ToastClose />
+						<Button
+							rounded
+							variant='icon'
+							size='sm'
+							onClick={() => dismiss(id)}
+							className='!h-[unset] !p-1 opacity-0 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-hover:bg-transparent group-hover:ring-transparent'
+						>
+							<X size={12} />
+						</Button>
 					</Toast>
 				);
 			})}
