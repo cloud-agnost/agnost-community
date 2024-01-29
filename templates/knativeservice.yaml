@@ -1,0 +1,28 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/initial-scale: "1"
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/max-scale: "10"
+        autoscaling.knative.dev/target-utilization-percentage: "80"
+        autoscaling.knative.dev/scale-down-delay: "5m00s"
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "10m00s"
+    spec:
+      containerConcurrency: 50
+      containers:
+        - image: nginx:1.23.0
+          ports:
+          - containerPort: 80
+          resources:
+            requests:
+              cpu: "125m"
+              memory: "100M"
+            limits:
+              cpu: "250m"
+              memory: "512M"
