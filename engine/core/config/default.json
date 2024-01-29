@@ -57,6 +57,6 @@
      "session": {
       "accessTokenExpiry": 300,
       "refreshTokenExpiry": 31536000,
-      "refreshTokenDelete": 5
+      "refreshTokenDelete": 60
     }
 }

@@ -29,6 +29,7 @@ export const redeployVersionHandler = (connection, queue) => {
                 let msgObj = JSON.parse(msg.content.toString());
 
                 // Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
+                await setKey(`${msgObj.env.iid}.status`, "OK");
                 let envStatus = await getKey(`${msgObj.env.iid}.status`);
                 if (["Deploying", "Redeploying"].includes(envStatus)) {
                     // Check timestamp of the message
@@ -134,7 +135,7 @@ export const redeployVersionHandler = (connection, queue) => {
                 }
             },
             {
-                noAck: false,
+                noAck: true,
             }
         );
     });

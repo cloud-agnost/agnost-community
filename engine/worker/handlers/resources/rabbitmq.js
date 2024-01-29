@@ -85,7 +85,15 @@ export async function updateRabbitmqCluster(clusterName, rmqVersion, size, repli
         rmq.body.spec.image = "docker.io/bitnami/rabbitmq:" + rmqVersion;
         rmq.body.spec.replicas = replicaCount;
         rmq.body.spec.persistence.storage = size;
-        rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env[0].value = rmqVersion;
+        if (
+            rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env &&
+            rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env[0]
+        )
+            rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env[0].value = rmqVersion;
+        else
+            rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env = [
+                { name: "RMQ_VERSION", value: rmqVersion },
+            ];
 
         await k8sCustomApi.replaceNamespacedCustomObject(
             group,
@@ -97,6 +105,7 @@ export async function updateRabbitmqCluster(clusterName, rmqVersion, size, repli
         );
         // console.log("RabbitMQ " + clusterName + " updated...");
     } catch (error) {
+        console.log("****here", error);
         // console.error("Error updating RabbitMQ " + clusterName + " resources...", error);
         throw new AgnostError(error.body?.message);
     }

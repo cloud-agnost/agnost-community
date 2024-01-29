@@ -56,7 +56,7 @@ export class PostgresDBManager extends SQLBaseManager {
      * @param databaseName
      * @return {Promise<void>}
      */
-    async useDatabase(databaseName) {
+    async useDatabase(databaseName, forceNewConnection = false) {
         const config = this.getResourceAccessSettings();
 
         this.setDatabaseName(databaseName);
@@ -64,7 +64,12 @@ export class PostgresDBManager extends SQLBaseManager {
 
         // In the case of postgres, we need to create a new connection with the new database name,
         // so we need to set true as the 4th parameter of getConn
-        this.conn = await connManager.getConn(`${this.getDbId()}_${config.database}`, this.getDbType(), config);
+        this.conn = await connManager.getConn(
+            `${this.getDbId()}_${config.database}`,
+            this.getDbType(),
+            config,
+            forceNewConnection
+        );
     }
 
     /**
@@ -73,8 +78,13 @@ export class PostgresDBManager extends SQLBaseManager {
      * @return {Promise<void>}
      */
     async dropDatabase(dbName) {
-        await this.useDatabase("postgres");
-        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()} WITH (FORCE);`);
+        try {
+            await connManager.removeConnection(this.getDbId(), this.getDbType());
+            await connManager.removeConnection(`${this.getDbId()}_${this.getDatabaseNameToUse()}`, this.getDbType());
+
+            await this.useDatabase("postgres", true);
+            return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()} WITH (FORCE);`);
+        } catch (err) {}
     }
 
     dropForeignKey(model, foreignKeyName, returnQuery = false) {

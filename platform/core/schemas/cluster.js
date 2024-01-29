@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
 import {
+	clusterOtherResourceTypes,
+	clusterResouceInstanceTypes,
 	clusterComponents,
 	clusterComponentsAll,
 	clusterComponentStatus,
 } from "../config/constants.js";
+import configDatabaseRules from "./config/database.js";
+import configCacheRules from "./config/cache.js";
+import configQueueRules from "./config/queue.js";
+import configStorageRules from "./config/storage.js";
+
 /**
  * Account is the top level model which will hold the list of organizations, under organization there will be users and apps etc.
  * Whenever a new users signs up a personal account with 'Admin' role will be creted. When a user joins to an organization, a new account entry
@@ -218,6 +225,44 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+			];
+		case "update-config":
+			return [
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(clusterOtherResourceTypes)
+					.withMessage(t("Unsupported cluster component type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = clusterResouceInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided cluster component"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for cluster component type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				...configDatabaseRules(type),
+				...configCacheRules(type),
+				...configQueueRules(type),
+				...configStorageRules(type),
 			];
 		case "update-version":
 			return [

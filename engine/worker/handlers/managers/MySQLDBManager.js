@@ -420,7 +420,9 @@ DROP PROCEDURE IF EXISTS ${name};`;
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()};`);
+        try {
+            return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()};`);
+        } catch (err) {}
     }
 
     setNullability(modelName, field, returnQuery = false) {

@@ -5,6 +5,7 @@ import { createRabbitmqCluster, updateRabbitmqCluster, deleteRabbitmqCluster } f
 import { createMongoDBResource, updateMongoDBResource, deleteMongoDBResource } from "./mongodb.js";
 import { createPostgresql, updatePostgresql, deletePostgresql, waitForSecret } from "./postgres.js";
 import { createMySQLResource, updateMySQLResource, deleteMySQLResource } from "./mysql.js";
+import { updateMinioStorageSize } from "./minio.js";
 import { getDBClient } from "../../init/db.js";
 
 export class ResourceManager {
@@ -611,8 +612,6 @@ export class ResourceManager {
                 deploymentName
             );
 
-            //console.log("***here", JSON.stringify(existingService.body, null, 2));
-
             // Update annotations
             existingService.body.spec.template.metadata.annotations = {
                 ...existingService.body.spec.template.metadata.annotations,
@@ -995,19 +994,23 @@ export class ResourceManager {
         kubeconfig.loadFromDefault();
         const k8sApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
         const k8sAutoscalingApi = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
+        const k8sCoreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
 
         try {
             let deployments = await k8sApi.listNamespacedDeployment(process.env.NAMESPACE);
             let statefulSets = await k8sApi.listNamespacedStatefulSet(process.env.NAMESPACE);
             let hpas = await k8sAutoscalingApi.listNamespacedHorizontalPodAutoscaler(process.env.NAMESPACE);
+            const pvcs = await k8sCoreApi.listNamespacedPersistentVolumeClaim(process.env.NAMESPACE);
 
             for (const comp of clusterComponents) {
                 if (comp.k8sType === "Deployment") {
-                    const info = this.getDeploymentInfo(comp, deployments.body.items, hpas.body.items);
+                    const info = this.getDeploymentInfo(comp, deployments.body.items, hpas.body.items, pvcs.body.items);
                     if (info) clusterInfo.push(info);
                 } else if (comp.k8sType === "StatefulSet") {
-                    const info = this.getStatefulSetInfo(comp, statefulSets.body.items);
-                    if (info) clusterInfo.push(info);
+                    const info = this.getStatefulSetInfo(comp, statefulSets.body.items, pvcs.body.items);
+                    if (info) {
+                        clusterInfo.push(info);
+                    }
                 }
             }
 
@@ -1020,7 +1023,7 @@ export class ResourceManager {
     /**
      * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
      */
-    getDeploymentInfo(component, deployments, hpas) {
+    getDeploymentInfo(component, deployments, hpas, pvcs) {
         const deployment = deployments.find((entry) => entry.metadata.name === component.deploymentName);
         if (!deployment) return null;
         const hpa = component.hasHpa ? hpas.find((entry) => entry.metadata.name === component.hpaName) : null;
@@ -1030,6 +1033,7 @@ export class ResourceManager {
             version: container.image.split(":")[1],
             configuredReplicas: deployment.spec.replicas,
             runningReplicas: deployment.status.availableReplicas,
+            resources: container.resources,
         };
 
         if (hpa) {
@@ -1038,14 +1042,21 @@ export class ResourceManager {
             info.hpaCurrentReplicas = hpa.status.currentReplicas;
         }
 
+        if (component.hasPVC) {
+            const pvc = pvcs.find((entry) => entry.metadata.name === component.PVCName);
+            if (pvc) {
+                info.pvcSize = pvc.spec.resources.requests.storage;
+            }
+        }
+
         const comp = { ...component, info };
         return comp;
     }
 
     /**
-     * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
+     * Returns information about the Agnost cluster default stateful sets
      */
-    getStatefulSetInfo(component, statefulSets) {
+    getStatefulSetInfo(component, statefulSets, pvcs) {
         const statefulSet = statefulSets.find((entry) => entry.metadata.name === component.statefulSetName);
         if (!statefulSet) return null;
         let container = statefulSet.spec.template.spec.containers[0];
@@ -1054,7 +1065,15 @@ export class ResourceManager {
             version: container.image.split(":")[1],
             configuredReplicas: statefulSet.spec.replicas,
             runningReplicas: statefulSet.status.availableReplicas,
+            resources: container.resources,
         };
+
+        if (component.hasPVC) {
+            const pvc = pvcs.find((entry) => entry.metadata.name === component.PVCName);
+            if (pvc) {
+                info.pvcSize = pvc.spec.resources.requests.storage;
+            }
+        }
 
         const comp = { ...component, info };
         return comp;
@@ -1121,6 +1140,36 @@ export class ResourceManager {
             await k8sApi.replaceNamespacedHorizontalPodAutoscaler(hpaName, process.env.NAMESPACE, response.body);
         } catch (err) {
             logger.error(`Cannot update HPA '${hpaName}'`, { details: err });
+        }
+    }
+
+    /**
+     * Updates a cluster's other resource.
+     * @param {string} name - The name of the resource.
+     * @param {string} instance - The instance of the resource.
+     * @param {object} config - The configuration object.
+     * @returns {Promise<void>} - A promise that resolves when the update is complete.
+     */
+    async updateClusterOtherResource(name, instance, config) {
+        try {
+            switch (instance) {
+                case "Redis":
+                    await updateRedis(name, config.version, config.size, false);
+                    break;
+                case "RabbitMQ":
+                    await updateRabbitmqCluster(name, config.version, config.size, config.replicas);
+                    break;
+                case "MongoDB":
+                    await updateMongoDBResource(name, config.version, config.size, config.replicas);
+                    break;
+                case "Minio":
+                    await updateMinioStorageSize(name, config.size);
+                    break;
+                default:
+                    break;
+            }
+        } catch (err) {
+            logger.error(`Cannot update cluster resource '${name}'.${err.message}`, { details: err });
         }
     }
 
@@ -1874,6 +1923,94 @@ export class ResourceManager {
             );
         } catch (err) {
             logger.error(`Cannot restart the mysql-operator.${err.message}`, { details: err });
+        }
+    }
+
+    /**
+     * Creates a custom domain ingress.
+     *
+     * @param {string} ingressName - The name of the ingress.
+     * @param {string} domainName - The domain name.
+     * @param {string} serviceName - The name of the service.
+     * @param {number} port - The port number.
+     * @returns {Promise<void>} - A promise that resolves when the custom domain ingress is created.
+     */
+    async createCustomDomainIngress(ingressName, domainName, serviceName, port) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+        try {
+            const ingress = {
+                apiVersion: "networking.k8s.io/v1",
+                kind: "Ingress",
+                metadata: {
+                    name: `${ingressName}-ingress`,
+                    annotations: {
+                        "nginx.ingress.kubernetes.io/proxy-body-size": "500m",
+                        "nginx.ingress.kubernetes.io/proxy-connect-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-send-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/ssl-redirect": "true",
+                        "nginx.ingress.kubernetes.io/force-ssl-redirect": "true",
+                        "cert-manager.io/issuer": "letsencrypt-issuer-cluster",
+                    },
+                },
+                spec: {
+                    ingressClassName: "nginx",
+                    tls: [
+                        {
+                            hosts: [domainName],
+                            secretName: `${ingressName}-tls`,
+                        },
+                    ],
+                    rules: [
+                        {
+                            http: {
+                                paths: [
+                                    {
+                                        path: `/`,
+                                        pathType: "Prefix",
+                                        backend: {
+                                            service: {
+                                                name: `${serviceName}`,
+                                                port: { number: port },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            };
+
+            // Create the ingress with the provided spec
+            await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Deletes the custom domain ingress.
+     *
+     * @param {string} ingressName - The name of the ingress.
+     * @returns {Promise<void>} - A promise that resolves when the custom domain ingress is deleted.
+     */
+    async deleteCustomDomainIngress(ingressName) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+        try {
+            // Delete the ingress resource
+            await networkingApi.deleteNamespacedIngress(`${ingressName}-ingress`, process.env.NAMESPACE);
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
         }
     }
 }

@@ -11,6 +11,7 @@ import { applyRules } from "../schemas/cluster.js";
 import { validate } from "../middlewares/validate.js";
 import { validateCluster } from "../middlewares/validateCluster.js";
 import { validateClusterIPs } from "../middlewares/validateClusterIPs.js";
+import { validateClusterResource } from "../middlewares/validateClusterResource.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { clusterComponents } from "../config/constants.js";
 import { sendMessage } from "../init/sync.js";
@@ -329,6 +330,72 @@ router.put(
 
 			res.json();
 		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/:componentName/update
+@method     PUT
+@desc       Updates a specific cluster component namely mongodb, rabbitmq-server, redis-master and minio-storage
+@access     public
+*/
+router.put(
+	"/:componentName/update",
+	checkContentType,
+	authSession,
+	validateClusterResource,
+	applyRules("update-config"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user, resource } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to manage cluster components. Only the cluster owner can manage cluster core components."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			// In case of database resource the size and other parameters (replicas/instances and version) need to be upated separately
+			if (resource.type === "database") {
+				if (req.body.updateType === "size") {
+					req.body.config = { ...resource.config, size: req.body.config.size };
+				} else {
+					req.body.config = {
+						...req.body.config.config,
+						size: resource.config.size,
+					};
+				}
+			}
+
+			if (resource.instance === "Redis") {
+				// Cluster redis does not have a read replica
+				req.body.config.readReplica = false;
+			}
+
+			try {
+				// Update cluster configuration. We are running this in catch since if engine-worker is upated the called worker can be terminated
+				// resulting in socket hang up kind of errors
+				await axios.post(
+					helper.getWorkerUrl() + "/v1/resource/cluster-info-other",
+					req.body,
+					{
+						headers: {
+							Authorization: process.env.ACCESS_TOKEN,
+							"Content-Type": "application/json",
+						},
+					}
+				);
+			} catch (err) {}
+
+			res.json({ body: req.body, resouce: req.resource });
+		} catch (error) {
+			console.log(error);
 			handleError(req, res, error);
 		}
 	}

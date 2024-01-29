@@ -617,6 +617,12 @@ export const resourceTypes = [
 
 export const addResourceTypes = ["database", "cache", "storage", "queue"];
 export const createResourceTypes = ["database", "cache", "queue"];
+export const clusterOtherResourceTypes = [
+	"database",
+	"cache",
+	"storage",
+	"queue",
+];
 
 export const designElementTypes = [
 	"engine",
@@ -644,6 +650,13 @@ export const addInstanceTypes = {
 	cache: ["Redis"],
 	storage: ["AWS S3", "GCP Cloud Storage", "Azure Blob Storage"],
 	queue: ["RabbitMQ", "Kafka"],
+};
+
+export const clusterResouceInstanceTypes = {
+	database: ["MongoDB"],
+	cache: ["Redis"],
+	storage: ["Minio"],
+	queue: ["RabbitMQ"],
 };
 
 export const createInstanceTypes = {
@@ -1036,6 +1049,39 @@ export const clusterComponents = [
 	{
 		deploymentName: "studio-deployment",
 		hpaName: "studio-hpa",
+	},
+];
+
+export const clusterOtherComponents = [
+	{
+		name: "mongodb",
+		type: "database",
+		instance: "MongoDB",
+		k8sName: "mongodb",
+	},
+	{
+		name: "redis-master",
+		type: "cache",
+		instance: "Redis",
+		k8sName: "redis",
+	},
+	{
+		name: "rabbitmq-server",
+		type: "queue",
+		instance: "RabbitMQ",
+		k8sName: "rabbitmq",
+	},
+	{
+		name: "minio",
+		type: "storage",
+		instance: "Minio",
+		k8sName: "minio",
+	},
+	{
+		name: "minio-storage",
+		type: "storage",
+		instance: "Minio",
+		k8sName: "minio-storage",
 	},
 ];
 

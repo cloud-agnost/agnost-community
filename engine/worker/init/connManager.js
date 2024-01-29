@@ -12,7 +12,11 @@ class ConnectionManager {
         this.connections = new Map();
     }
 
-    async getConn(id, type, connSettings) {
+    async getConn(id, type, connSettings, forceNew = false) {
+        if (forceNew) {
+            return await this.setUpConnection(id, type, connSettings);
+        }
+
         let conn = this.getConnection(id);
 
         if (conn) return conn;
@@ -43,6 +47,7 @@ class ConnectionManager {
     async removeConnection(id, type) {
         let conn = this.getConnection(id);
         if (conn) {
+            console.log("**************removing connection", id);
             try {
                 switch (type) {
                     case DATABASE.PostgreSQL:
@@ -66,7 +71,9 @@ class ConnectionManager {
                         } catch (err) {}
                         break;
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.log("****errror", err);
+            }
         }
 
         this.connections.delete(id);
@@ -86,9 +93,7 @@ class ConnectionManager {
                         max: config.get("general.maxPoolSize"),
                     });
 
-                    await client.connect();
                     client.on("error", (err, errClient) => {});
-
                     this.addConnection(id, client);
 
                     return client;

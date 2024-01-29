@@ -126,7 +126,9 @@ export async function updateRedis(clusterName, version, size, readReplicaEnabled
     try {
         const sts = await k8sApi.readNamespacedStatefulSet(clusterName + "-master", namespace);
         sts.body.spec.template.spec.containers[0].image = "docker.io/bitnami/redis:" + version;
-        sts.body.spec.template.spec.containers[0].resources.limits.memory = size;
+        if (!sts.body.spec.template.spec.containers[0].resources?.limits)
+            sts.body.spec.template.spec.containers[0].resources = { limits: { memory: size } };
+        else sts.body.spec.template.spec.containers[0].resources.limits.memory = size;
 
         var pvcName = "redis-data-" + clusterName + "-master-0";
         const pvcPatch = {

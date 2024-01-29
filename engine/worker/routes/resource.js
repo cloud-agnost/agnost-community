@@ -63,6 +63,24 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
 });
 
 /*
+@route      /resource/cluster-info-other
+@method     POST
+@desc       Updates the other cluster component settings (mpongodb, redis, minio, rabbitmq)
+@access     public
+*/
+router.post("/cluster-info-other", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const { name, instance, config } = req.body;
+        let manager = new ResourceManager(null);
+        await manager.updateClusterOtherResource(name, instance, config);
+
+        res.json();
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
 @route      /resource/cluster-versions
 @method     POST
 @desc       Updates the version of cluster's default deployments and if specified the API server versions

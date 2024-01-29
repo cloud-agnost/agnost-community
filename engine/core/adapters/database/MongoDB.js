@@ -874,7 +874,11 @@ export class MongoDB extends DatabaseBase {
 
 			const findResult = await dataCursor.toArray();
 			await dataCursor.close();
-			return findResult;
+
+			if (options.returnCount) {
+				const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+				return { info: countInfo, data: findResult };
+			} else return findResult;
 		} else {
 			// No joins then just fetch the records
 			const filter = {};
@@ -890,7 +894,11 @@ export class MongoDB extends DatabaseBase {
 
 			const findResult = await dataCursor.toArray();
 			await dataCursor.close();
-			return findResult;
+
+			if (options.returnCount) {
+				const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+				return { info: countInfo, data: findResult };
+			} else return findResult;
 		}
 	}
 
@@ -1175,6 +1183,93 @@ export class MongoDB extends DatabaseBase {
 
 		const findResult = await dataCursor.toArray();
 		await dataCursor.close();
-		return findResult;
+
+		if (options.returnCount) {
+			const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+			return { info: countInfo, data: findResult };
+		} else return findResult;
+	}
+
+	/**
+	 * Returns the count and pagination information for the records matching the query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async getCountInfo(dbMeta, modelMeta, options) {
+		const dbName = this.getAppliedDbName(dbMeta);
+		const modelName = this.getModelName(modelMeta);
+
+		const db = this.driver.db(dbName);
+		const collection = db.collection(modelName);
+		const readPreference = this.session
+			? "primary"
+			: options.useReadReplica
+			? "secondaryPreferred"
+			: "primary";
+
+		let docCount = 0;
+		// Check if we need to use the aggregation pipeline
+		if (
+			options.join?.length > 0 ||
+			options.lookup?.length > 0 ||
+			options.searchText
+		) {
+			const pipeline = [];
+			if (options.searchText)
+				this.createTextSearchStage(options.searchText, pipeline);
+
+			if (options.where && options.where.hasJoinFieldValues()) {
+				this.createJoinStage(options.join, pipeline);
+				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
+			} else {
+				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
+				this.createJoinStage(options.join, pipeline);
+			}
+
+			// Add the final count staget to the pipeline
+			pipeline.push({ $count: "_count" });
+
+			const countCursor = await collection.aggregate(pipeline, {
+				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
+				session: this.session,
+				readPreference: readPreference,
+			});
+
+			//Get the first item of the cursor to get the total object count if there are any results
+			let result = null;
+			try {
+				result = await countCursor.next();
+				await countCursor.close();
+			} catch (err) {
+				await countCursor.close();
+				throw err;
+			}
+
+			docCount = result ? result._count : 0;
+		} else {
+			if (!options.where) {
+				docCount = await collection.estimatedDocumentCount({
+					session: this.session,
+					readPreference: readPreference,
+				});
+			} else {
+				// No joins then just fetch the records
+				const filter = {};
+				filter.$expr = options.where.getQuery("MongoDB");
+
+				docCount = await collection.countDocuments(filter, {
+					session: this.session,
+					readPreference: readPreference,
+				});
+			}
+		}
+
+		return {
+			count: docCount,
+		};
 	}
 }

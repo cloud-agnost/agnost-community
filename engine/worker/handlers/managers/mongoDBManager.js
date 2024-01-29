@@ -28,8 +28,11 @@ export class MongoDBManager extends DBManager {
      * Deletes an existing MongoDB database
      */
     async dropDatabase() {
-        const conn = await this.getConn();
-        await conn.db(this.getAppliedDbName()).dropDatabase();
+        try {
+            // Sometime the database server can be deleted before the database, so we need to check whether the database exists or not
+            const conn = await this.getConn();
+            await conn.db(this.getAppliedDbName()).dropDatabase();
+        } catch (err) {}
     }
 
     /**

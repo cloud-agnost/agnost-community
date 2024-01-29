@@ -95,6 +95,8 @@ export const clusterComponents = [
         editable: false,
         type: "MongoDB",
         k8sType: "StatefulSet",
+        hasPVC: true,
+        PVCName: "data-volume-mongodb-0",
         description: t(
             "Store all data about application versions, design specifications, endpoint code, etc., and used as the single source of truth."
         ),
@@ -107,6 +109,8 @@ export const clusterComponents = [
         editable: false,
         type: "RabbitMQ",
         k8sType: "StatefulSet",
+        hasPVC: true,
+        PVCName: "persistence-rabbitmq-server-0",
         description: t(
             "Manages the asynchronous task queues to perform data model deployments and application code push to API servers."
         ),
@@ -119,15 +123,48 @@ export const clusterComponents = [
         editable: false,
         type: "Redis",
         k8sType: "StatefulSet",
+        hasPVC: true,
+        PVCName: "redis-data-redis-master-0",
         description: t("Caches a subset of MongoDB data to speed up application design data retrieval."),
     },
     {
+        statefulSetName: "minio-storage",
+        name: "minio-storage",
+        title: "Platform Storage",
+        hasHpa: false,
+        editable: false,
+        type: "MinIO",
+        k8sType: "StatefulSet",
+        hasPVC: true,
+        PVCName: "minio-storage",
+        description: t(
+            "Handles the document storage needs of the Agnost platform itself and the storage needs of the developed applications."
+        ),
+    },
+    {
         deploymentName: "minio-storage",
+        name: "minio-storage",
         title: "Platform Storage",
         hasHpa: false,
         editable: false,
         type: "MinIO",
         k8sType: "Deployment",
+        hasPVC: true,
+        PVCName: "minio-storage",
+        description: t(
+            "Handles the document storage needs of the Agnost platform itself and the storage needs of the developed applications."
+        ),
+    },
+    {
+        deploymentName: "minio",
+        name: "minio",
+        title: "Platform Storage",
+        hasHpa: false,
+        editable: false,
+        type: "MinIO",
+        k8sType: "Deployment",
+        hasPVC: true,
+        PVCName: "minio",
         description: t(
             "Handles the document storage needs of the Agnost platform itself and the storage needs of the developed applications."
         ),

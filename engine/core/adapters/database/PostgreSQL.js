@@ -667,6 +667,8 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  The full-text search query string
 	 */
 	getTextSearchDefinition(modelMeta, searchField, searchText) {
+		if (!searchText || !searchField) return null;
+
 		const language = searchField.field.getLanguage();
 		const fieldName = `${modelMeta.name}.${searchField.field.getName()}`;
 		return `to_tsvector('${language}', ${fieldName}) @@ to_tsquery('${language}', '${searchText}')`;
@@ -843,8 +845,8 @@ export class PostgreSQL extends SQLDatabase {
 
 		if (joins) selectQuery = `${selectQuery}\n${joins}`;
 		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
 
+		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
@@ -853,7 +855,13 @@ export class PostgreSQL extends SQLDatabase {
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows : [];
+		if (options.returnCount) {
+			const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+			return {
+				info: countInfo,
+				data: result.rows && result.rows.length > 0 ? result.rows : [],
+			};
+		} else return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
 
 	/**
@@ -1206,7 +1214,13 @@ export class PostgreSQL extends SQLDatabase {
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows : [];
+		if (options.returnCount) {
+			const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+			return {
+				info: countInfo,
+				data: result.rows && result.rows.length > 0 ? result.rows : [],
+			};
+		} else return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
 
 	/**
@@ -1299,5 +1313,48 @@ export class PostgreSQL extends SQLDatabase {
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
 		return selectQuery;
+	}
+
+	/**
+	 * Returns the count and pagination information for the records matching the query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async getCountInfo(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const textSearch = this.getTextSearchDefinition(
+			modelMeta,
+			options.searchField,
+			options.searchText
+		);
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+
+		console.log("textSearch", textSearch);
+		console.log("where", where);
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT COUNT(*) AS count`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (textSearch && where)
+			selectQuery = `${selectQuery}\nWHERE ${textSearch} AND ${where}`;
+		else if (textSearch && !where)
+			selectQuery = `${selectQuery}\nWHERE ${textSearch}`;
+		else if (!textSearch && where)
+			selectQuery = selectQuery = `${selectQuery}\nWHERE ${where}`;
+
+		// console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.getDriver().query(selectQuery);
+
+		return {
+			count: result.rows && result.rows.length === 1 ? result.rows[0].count : 0,
+		};
 	}
 }

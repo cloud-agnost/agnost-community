@@ -137,14 +137,16 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        const db = dbName ?? this.getDatabaseNameToUse();
-        await this.useDatabase("master");
+        try {
+            const db = dbName ?? this.getDatabaseNameToUse();
+            await this.useDatabase("master");
 
-        const condition = `EXISTS(SELECT name FROM master.sys.databases WHERE name = '${db}')`;
-        const query = `ALTER DATABASE ${db} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;\nDROP DATABASE IF EXISTS ${db};\n`;
+            const condition = `EXISTS(SELECT name FROM master.sys.databases WHERE name = '${db}')`;
+            const query = `ALTER DATABASE ${db} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;\nDROP DATABASE IF EXISTS ${db};\n`;
 
-        const SQL = this.ifWrapper(condition, query);
-        return this.runQuery(SQL);
+            const SQL = this.ifWrapper(condition, query);
+            return this.runQuery(SQL);
+        } catch (err) {}
     }
 
     /**

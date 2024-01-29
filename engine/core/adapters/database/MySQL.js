@@ -680,6 +680,8 @@ export class MySQL extends SQLDatabase {
 	 * @returns  The full-text search query string
 	 */
 	getTextSearchDefinition(modelMeta, searchField, searchText) {
+		if (!searchText || !searchField) return null;
+
 		const fieldName = `${modelMeta.name}.${searchField.field.getName()}`;
 		return `MATCH(${fieldName}) AGAINST('${searchText}' IN BOOLEAN MODE)`;
 	}
@@ -870,7 +872,13 @@ export class MySQL extends SQLDatabase {
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
 
-		return rows && rows.length > 0 ? rows : [];
+		if (options.returnCount) {
+			const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+			return {
+				info: countInfo,
+				data: rows && rows.length > 0 ? rows : [],
+			};
+		} else return rows && rows.length > 0 ? rows : [];
 	}
 
 	/**
@@ -1217,7 +1225,13 @@ export class MySQL extends SQLDatabase {
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
 
-		return rows && rows.length > 0 ? rows : [];
+		if (options.returnCount) {
+			const countInfo = await this.getCountInfo(dbMeta, modelMeta, options);
+			return {
+				info: countInfo,
+				data: rows && rows.length > 0 ? rows : [],
+			};
+		} else return rows && rows.length > 0 ? rows : [];
 	}
 
 	/**
@@ -1303,5 +1317,48 @@ export class MySQL extends SQLDatabase {
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
 		return selectQuery;
+	}
+
+	/**
+	 * Returns the count and pagination information for the records matching the query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async getCountInfo(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const textSearch = this.getTextSearchDefinition(
+			modelMeta,
+			options.searchField,
+			options.searchText
+		);
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+
+		console.log("textSearch", textSearch);
+		console.log("where", where);
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT COUNT(*) AS count`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (textSearch && where)
+			selectQuery = `${selectQuery}\nWHERE ${textSearch} AND ${where}`;
+		else if (textSearch && !where)
+			selectQuery = `${selectQuery}\nWHERE ${textSearch}`;
+		else if (!textSearch && where)
+			selectQuery = selectQuery = `${selectQuery}\nWHERE ${where}`;
+
+		// console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const [rows] = await this.getDriver().query(selectQuery);
+
+		return {
+			count: rows && rows.length === 1 ? rows[0].count : 0,
+		};
 	}
 }
