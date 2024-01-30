@@ -31,7 +31,7 @@ router.post("/", checkContentType, authAccessToken, applyRules("create"), valida
 @desc       Deletes the ingress for the custom domain
 @access     public
 */
-router.posdeletet("/", checkContentType, authAccessToken, applyRules("delete"), validate, async (req, res) => {
+router.delete("/", checkContentType, authAccessToken, applyRules("delete"), validate, async (req, res) => {
     try {
         const { name } = req.body;
         let manager = new ResourceManager(null);
