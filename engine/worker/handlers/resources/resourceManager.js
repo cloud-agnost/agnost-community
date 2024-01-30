@@ -1968,6 +1968,7 @@ export class ResourceManager {
                     ],
                     rules: [
                         {
+                            host: domainName,
                             http: {
                                 paths: [
                                     {
