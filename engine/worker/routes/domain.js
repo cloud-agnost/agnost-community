@@ -42,3 +42,5 @@ router.delete("/", checkContentType, authAccessToken, applyRules("delete"), vali
         helper.handleError(req, res, error);
     }
 });
+
+export default router;
