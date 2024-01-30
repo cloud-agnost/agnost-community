@@ -88,7 +88,7 @@ export default function VersionDashboard() {
 			id: generateId(),
 			isActive: false,
 			isDashboard: false,
-			path: 'api-keys',
+			path: 'settings/api-keys',
 			type: TabTypes.APIKeys,
 		});
 	}
