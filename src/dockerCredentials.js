@@ -59,8 +59,8 @@ async function createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion,
   }
 }
 
-async function createDockerCredetials(repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName) {
-  const secretName = 'regcred-' + repository;
+async function createDockerCredetials(repoId, repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, genericRepoUrl) {
+  const secretName = 'regcred-' + repository + '-' + repoId;
 
   switch(repository) {
     case "docker":
@@ -93,8 +93,8 @@ async function createDockerCredetials(repository, username, password, email, gcp
       dockerServer = awsAccount + ".dkr.ecr." + awsRegion + ".amazonaws.com";
       await createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, secretName);
       break;
-    case "generic": // For other possible server, serverName needs to be provided
-      dockerServer = serverName;
+    case "generic": // For other possible server, genericRepoUrl needs to be provided
+      dockerServer = genericRepoUrl;
       break;
   }
 
@@ -126,11 +126,11 @@ async function createDockerCredetials(repository, username, password, email, gcp
 
 // Create a Docker Credentials for imagePullSecrets
 router.post('/dockercredentials', async (req, res) => {
-  const { repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName} = req.body;
+  const { repoId, repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, genericRepoUrl} = req.body;
 
   try {
-    await createDockerCredetials(repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName);
-    res.json({ 'secretName': 'regcred-' + repository });
+    await createDockerCredetials(repoId, repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, genericRepoUrl);
+    res.json({ 'secretName': 'regcred-' + repository + '-' + repoId });
   } catch (err) {
     console.error(err);
     res.status(500).json(JSON.parse(err.message));
