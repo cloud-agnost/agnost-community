@@ -8,11 +8,9 @@ import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from './components/Toast';
 import useThemeStore from './store/theme/themeStore';
-
 const queryClient = new QueryClient();
 function App() {
 	useRealtime();
-
 	const { getAllTypes } = useTypeStore();
 	const { accessToken, user } = useAuthStore();
 	const { getTheme } = useThemeStore();
@@ -20,6 +18,9 @@ function App() {
 	useEffect(() => {
 		if (!_.isEmpty(accessToken)) {
 			getAllTypes();
+		}
+		if (!window.location.pathname.includes('studio')) {
+			window.location.pathname = `/studio${window.location.pathname}`;
 		}
 	}, []);
 
