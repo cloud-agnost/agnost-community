@@ -267,8 +267,8 @@ curl -XPOST http://localhost:3000/dockercredentials -d '{
     "repository": "ecr",
     "username": "AWS",
     "password": "eyJwYX…",
-    "awsAccessKeyId": "AKIAZRRZZAMDUKJKFUOI",
-    "awsSecretAccessKey": "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",
+    "awsAccessKeyId": "AKIAZRRZZAMxxx",
+    "awsSecretAccessKey": "IXGHxeYg3oLiSxxxxxxxxxxx",
     "awsRegion": "eu-central-1",
     "awsAccount": "656177431303",
     "email": "koray.oksay@gmail.com"
