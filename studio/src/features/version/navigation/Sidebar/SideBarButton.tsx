@@ -4,6 +4,8 @@ import React from 'react';
 import { cn } from '@/utils';
 import { useTabIcon } from '@/hooks';
 import { TabTypes } from '@/types';
+import useThemeStore from '@/store/theme/themeStore';
+import useAuthStore from '@/store/auth/authStore';
 
 interface SideBarButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 	active: boolean;
@@ -26,12 +28,14 @@ export default function SideBarButton({
 	...props
 }: SideBarButtonProps) {
 	const getIcon = useTabIcon('w-3.5 h-3.5');
+	const { getTheme } = useThemeStore();
+	const user = useAuthStore((state) => state.user);
 	return (
 		<div
 			className={cn(
 				'flex items-center [&>*]:min-w-0 justify-between gap-1 group',
 				active
-					? 'bg-button-primary/70 text-default'
+					? 'bg-button-primary/90 dark:bg-button-primary/70 text-default'
 					: 'hover:bg-subtle text-subtle hover:text-default',
 			)}
 		>
@@ -46,12 +50,19 @@ export default function SideBarButton({
 			>
 				{!asChild ? (
 					<>
-						<div className='flex-1/2'>{getIcon(type as TabTypes)}</div>
+						<div
+							className={cn(
+								'flex-1/2',
+								active && getTheme(user._id) === 'light' && '[&>svg]:text-white',
+							)}
+						>
+							{getIcon(type as TabTypes)}
+						</div>
 						<h1
 							title={title}
 							className={cn(
 								'truncate font-sfCompact text-subtle',
-								active ? 'text-default' : 'text-subtle group-hover:text-default',
+								active ? 'text-white dark:text-default' : 'text-subtle group-hover:text-default',
 							)}
 						>
 							{title}

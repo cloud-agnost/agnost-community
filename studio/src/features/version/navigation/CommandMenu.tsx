@@ -84,7 +84,7 @@ export default function CommandMenu() {
 						<Button
 							key={item._id}
 							variant='blank'
-							className='justify-between py-6 px-4 hover:bg-wrapper-background-hover rounded-none'
+							className='justify-between py-6 px-4 hover:bg-lighter dark:hover:bg-wrapper-background-hover rounded-none'
 							size='full'
 							onClick={() => handleClickElement(item)}
 						>

@@ -9,7 +9,6 @@ import Serverless from '@/assets/images/serverless_functions.webp';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 import {
-	ApiKeys,
 	Apple,
 	Authentication,
 	Awss3,
@@ -19,7 +18,6 @@ import {
 	Calendar,
 	ChangeLog,
 	Connect,
-	Database as DatabaseIcon,
 	Decimal,
 	Decision,
 	Discord,
@@ -85,12 +83,17 @@ import {
 import { getAppPermission, translate } from '@/utils';
 import {
 	AppWindow,
+	ArchiveBox,
+	Bell,
 	BracketsCurly,
 	Clock,
+	ComputerTower,
 	CurrencyDollarSimple,
+	Database as DatabaseIcon,
 	Envelope,
 	FileText,
 	Function,
+	Gauge,
 	GearSix,
 	GitBranch,
 	GlobeSimple,
@@ -108,13 +111,17 @@ import {
 	Plus,
 	PresentationChart,
 	Share,
+	ShareNetwork,
+	Signpost,
 	SkipForward,
 	Table,
 	TextAa,
 	Textbox,
 	Timer,
+	Toolbox,
 	Trash,
 	UserPlus,
+	Vault,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
@@ -813,30 +820,30 @@ export const DATABASE = {
 };
 
 export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
-	[TabTypes.Storage]: Storage,
+	[TabTypes.Storage]: HardDrives,
 	[TabTypes.Database]: DatabaseIcon,
 	[TabTypes.Cache]: Lightning,
-	[TabTypes.Endpoint]: ApiKeys,
-	[TabTypes.MessageQueue]: MessageQueue,
+	[TabTypes.Endpoint]: Signpost,
+	[TabTypes.MessageQueue]: Envelope,
 	[TabTypes.Task]: Timer,
 	[TabTypes.Middleware]: SkipForward,
 	[TabTypes.Settings]: GearSix,
 	[TabTypes.Dashboard]: PresentationChart,
-	[TabTypes.Notifications]: BellRing,
+	[TabTypes.Notifications]: Bell,
 	[TabTypes.Function]: Function,
 	[TabTypes.Field]: Textbox,
 	[TabTypes.Model]: Table,
 	[TabTypes.Navigator]: Table,
-	[TabTypes.Bucket]: HardDrives,
+	[TabTypes.Bucket]: Toolbox,
 	[TabTypes.File]: FileText,
 	[TabTypes.APIKeys]: Key,
-	[TabTypes.Authentication]: Authentication,
+	[TabTypes.Authentication]: IdentificationBadge,
 	[TabTypes.CustomDomains]: GlobeSimple,
-	[TabTypes.Environment]: Environment,
-	[TabTypes.EnvironmentVariables]: EnvironmentVariable,
-	[TabTypes.NPMPackages]: NpmPackage,
-	[TabTypes.RateLimits]: RateLimit,
-	[TabTypes.Realtime]: RealTime,
+	[TabTypes.Environment]: ComputerTower,
+	[TabTypes.EnvironmentVariables]: Vault,
+	[TabTypes.NPMPackages]: ArchiveBox,
+	[TabTypes.RateLimits]: Gauge,
+	[TabTypes.Realtime]: ShareNetwork,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {

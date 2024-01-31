@@ -114,17 +114,14 @@ export default function VersionDropdown() {
 				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden flex items-center'>
 					<Button
 						variant='blank'
-						className='flex items-center px-1.5 h-full w-full hover:bg-button-secondary-hover transition font-normal rounded-sm'
+						className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover transition font-normal rounded-sm'
 						onClick={() => addSettingsTab(version._id)}
 					>
-						<div className='w-7 h-7 bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
+						<div className='w-7 h-7 bg-white dark:bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
 							{version?.readOnly ? (
-								<LockSimple size={20} className='text-elements-subtle-red dark:text-elements-red' />
+								<LockSimple size={20} className='text-elements-red' />
 							) : (
-								<LockSimpleOpen
-									size={20}
-									className='text-elements-subtle-green dark:text-elements-green'
-								/>
+								<LockSimpleOpen size={20} className='text-elements-green' />
 							)}
 						</div>
 						<div className='text-left flex-1 font-sfCompact h-full flex flex-col justify-center'>

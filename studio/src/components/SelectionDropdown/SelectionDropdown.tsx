@@ -106,7 +106,7 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 		<Button
 			variant='blank'
 			size='sm'
-			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-button-secondary-hover'
+			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover'
 			onClick={openAppSettings}
 		>
 			<Avatar className='mr-2' size='xs' square>

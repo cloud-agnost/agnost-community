@@ -4,6 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from '@phosphor-icons/react';
 import { cn } from '@/utils';
 import './drawer.scss';
+import { Button } from '../Button';
 
 const Drawer = ({ children, onOpenChange, ...props }: SheetPrimitive.DialogProps) => (
 	<SheetPrimitive.Root
@@ -109,9 +110,10 @@ DrawerContent.displayName = SheetPrimitive.Content.displayName;
 const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div className={cn('drawer-header', className)} {...props}>
 		{props.children}
-		<SheetPrimitive.Close className='drawer-close'>
-			<X size={20} />
-			<span className='sr-only'>Close</span>
+		<SheetPrimitive.Close asChild>
+			<Button rounded variant='icon' size='sm' className='!h-[unset] !p-1'>
+				<X size={24} />
+			</Button>
 		</SheetPrimitive.Close>
 	</div>
 );

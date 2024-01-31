@@ -22,11 +22,6 @@ const useThemeStore = create<ThemeStore>()(
 					});
 				},
 				getTheme: (userId) => get().theme[userId] ?? 'dark',
-				reset: () => {
-					set({
-						theme: {},
-					});
-				},
 			}),
 
 			{

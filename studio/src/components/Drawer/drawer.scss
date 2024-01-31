@@ -1,5 +1,5 @@
 .drawer {
-	@apply fixed z-50 bg-subtle opacity-100 shadow-lg border outline-none flex flex-col;
+	@apply fixed z-50 bg-base dark:bg-subtle  opacity-100 shadow-lg border outline-none flex flex-col;
 	&-left {
 		@apply animate-in slide-in-from-left h-full duration-300;
 	}
@@ -45,7 +45,7 @@
 		width: 750px;
 	}
 	&-close {
-		@apply rounded-full w-8 h-8 flex justify-center items-center hover:bg-button-secondary-hover;
+		@apply rounded-full w-8 h-8 flex justify-center items-center hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover;
 		@apply text-icon-base hover:text-icon-secondary;
 	}
 	&-header {

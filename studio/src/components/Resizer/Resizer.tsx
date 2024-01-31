@@ -13,7 +13,8 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 		<PanelResizeHandle
 			{...props}
 			className={cn(
-				'flex items-center justify-center group gap-0.5 ',
+				//Todo add css variables
+				'flex items-center justify-center group gap-0.5 bg-[#f5f6f6] dark:bg-[#171d2d]',
 				orientation === 'horizontal' ? 'flex-col h-2 !cursor-row-resize' : 'w-2 !cursor-col-resize',
 				className,
 			)}
@@ -28,7 +29,9 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 						className={cn(
 							'rounded',
 							orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
-							isResizing ? 'active-resizer' : 'bg-lighter group-hover:bg-white',
+							isResizing
+								? 'active-resizer'
+								: 'bg-lighter group-hover:bg-wrapper-background-hover dark:group-hover:bg-white',
 							isResizing && orientation === 'horizontal' && 'w-full',
 							isResizing && orientation === 'vertical' && 'h-full',
 						)}

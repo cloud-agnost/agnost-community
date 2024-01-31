@@ -95,7 +95,8 @@ export default function TabControls({
 					size='sm'
 					onClick={toggleSidebar}
 					className={cn(
-						isSidebarOpen && 'bg-button-primary/70 hover:bg-button-primary text-default',
+						isSidebarOpen &&
+							'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
 					)}
 				>
 					<Sidebar size={14} />

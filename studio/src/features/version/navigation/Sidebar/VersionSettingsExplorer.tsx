@@ -36,16 +36,7 @@ export default function VersionSettingsExplorer() {
 				<ExplorerCollapsibleTrigger
 					active={sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings) || false}
 					title={
-						<h1
-							className={cn(
-								'flex-1 text-left',
-								sidebar[versionId]?.openedTabs?.includes(TabTypes.Settings)
-									? 'text-default'
-									: 'text-subtle group-hover:text-default',
-							)}
-						>
-							{t('version.settings.default')}
-						</h1>
+						<h1 className={cn('flex-1 text-left text-subtle')}>{t('version.settings.default')}</h1>
 					}
 				/>
 			}
@@ -62,7 +53,7 @@ export default function VersionSettingsExplorer() {
 						className={cn(
 							'flex-1/2',
 							tab.title === item.title
-								? 'text-icon-secondary'
+								? 'text-white dark:text-default'
 								: 'text-subtle group-hover:text-default',
 						)}
 					>
@@ -71,7 +62,9 @@ export default function VersionSettingsExplorer() {
 					<p
 						className={cn(
 							'truncate',
-							tab.title === item.title ? 'text-default' : 'text-subtle group-hover:text-default',
+							tab.title === item.title
+								? 'text-white dark:text-default'
+								: 'text-subtle group-hover:text-default',
 						)}
 					>
 						{item.title}

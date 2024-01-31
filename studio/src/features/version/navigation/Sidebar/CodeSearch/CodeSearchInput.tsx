@@ -31,14 +31,15 @@ export default function CodeSearchInput() {
 							<Button
 								variant='blank'
 								className={cn(
-									'hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchCase && 'bg-button-primary/70',
+									'hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
+									matchCase &&
+										'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
 								)}
 								iconOnly
 								size='sm'
 								onClick={toggleMatchCase}
 							>
-								<TextAa size={16} className='text-default' />
+								<TextAa size={16} />
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent>{t('version.match_case')}</TooltipContent>
@@ -53,11 +54,12 @@ export default function CodeSearchInput() {
 								size='sm'
 								onClick={toggleMatchWholeWord}
 								className={cn(
-									'hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchWholeWord && 'bg-button-primary/70',
+									'hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
+									matchWholeWord &&
+										'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
 								)}
 							>
-								<TextAlignJustify size={16} className='text-default' />
+								<TextAlignJustify size={16} />
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent>{t('version.match_whole_word')}</TooltipContent>

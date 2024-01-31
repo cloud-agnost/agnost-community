@@ -59,9 +59,12 @@ export default function SideBar() {
 	}, [isSidebarOpen, tabs]);
 
 	return (
-		<div className='h-full w-full bg-base shadow-xl flex flex-col' id='side-navigation'>
-			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between bg-[#f5f6f6] dark:bg-[#171d2d]'>
-				<h1 className='text-xs text-white'>{t('version.explorer')}</h1>
+		<div
+			className='h-full w-full shadow-xl flex flex-col bg-[#f5f6f6] dark:bg-[#171d2d]'
+			id='side-navigation'
+		>
+			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between'>
+				<h1 className='text-xs text-default'>{t('version.explorer')}</h1>
 				<div className='flex items-center'>
 					<TooltipProvider>
 						<Tooltip>
@@ -90,7 +93,7 @@ export default function SideBar() {
 									className={cn(
 										'!p-0 !h-6',
 										isSearchViewOpen
-											? 'bg-button-primary/70 text-default visible'
+											? 'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default visible'
 											: 'invisible group-hover:visible',
 									)}
 								>

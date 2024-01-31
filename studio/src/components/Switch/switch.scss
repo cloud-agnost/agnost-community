@@ -7,7 +7,7 @@
 	}
 
 	.switch-thumb {
-		@apply pointer-events-none bg-white block h-4 w-4 rounded-full shadow-lg transition-transform;
+		@apply pointer-events-none bg-lighter dark:bg-white block h-4 w-4 rounded-full shadow-lg transition-transform;
 	}
 
 	&[data-state='checked'] {
@@ -19,7 +19,7 @@
 	}
 
 	&[data-state='unchecked'] {
-		@apply dark:bg-lighter bg-button-secondary;
+		@apply dark:bg-lighter bg-input-background;
 
 		.switch-thumb {
 			@apply translate-x-0;

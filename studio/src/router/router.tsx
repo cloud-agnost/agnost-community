@@ -548,372 +548,377 @@ const Unauthorized = loadable(() => componentLoader(() => import('../pages/error
 	resolveComponent: (mod: any) => mod.default,
 });
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+	[
+		{
+			path: '/',
+			element: <Root />,
+			children: [
+				{
+					index: true,
+					element: <HomeLoadable />,
+					loader: homeLoaders.homeLoader,
+				},
+				{
+					path: '/login',
+					element: <Login />,
+				},
+				{
+					path: '/forgot-password',
+					element: <ForgotPassword />,
+				},
+				{
+					path: '/confirm-change-email',
+					element: <ConfirmChangeEmailLoadable />,
+					loader: authLoaders.confirmChangeEmailLoader,
+				},
+				{
+					path: '/change-password',
+					element: <ChangePasswordWithTokenLoadable />,
+					loader: authLoaders.changePasswordWithTokenLoader,
+				},
+				{
+					path: '/verify-email',
+					element: <VerifyEmail />,
+				},
+				{
+					path: '/complete-account-setup',
+					element: <CompleteAccountSetup />,
+				},
+				{
+					path: '/complete-account-setup/verify-email',
+					element: <CompleteAccountSetupVerifyEmailLoadable />,
+				},
+				{
+					path: '/organization',
+					element: <Organization />,
+					children: [
+						{
+							path: '',
+							element: <OrganizationSelect />,
+							loader: homeLoaders.organizationSelectLoader,
+						},
+						{
+							path: ':orgId',
+							element: <OrganizationDetailsLoadable />,
+							children: [
+								{
+									path: 'apps',
+									children: [
+										{
+											index: true,
+											element: <OrganizationApps />,
+										},
+										{
+											path: ':appId/version/:versionId',
+											element: <Version />,
+											children: [
+												{
+													path: '',
+													element: <Dashboard />,
+												},
+												{
+													path: 'error',
+													element: <VersionError />,
+												},
+												{
+													path: 'notFound',
+													element: <VersionNotFound />,
+												},
+												{
+													path: 'database',
+													children: [
+														{
+															index: true,
+															element: <VersionDatabase />,
+														},
+														{
+															path: ':dbId/navigator/:modelId',
+															element: <NavigatorLoadable />,
+															loader: versionLoaders.navigatorLoader,
+														},
+														{
+															path: ':dbId/models',
+															element: <ModelsOutletLoadable />,
+															loader: versionLoaders.modelsOutletLoader,
+															children: [
+																{
+																	index: true,
+																	element: <Models />,
+																},
+																{
+																	path: ':modelId/fields',
+																	element: <FieldsLoadable />,
+																	loader: versionLoaders.fieldsLoader,
+																},
+															],
+														},
+													],
+												},
+												{
+													path: 'endpoint',
+													element: <VersionEndpoint />,
+													children: [
+														{
+															index: true,
+															element: <Endpoint />,
+														},
+														{
+															path: ':endpointId',
+															element: <EditEndpointLoadable />,
+															loader: versionLoaders.editEndpointLoader,
+														},
+														{
+															path: 'logs',
+															element: <EndpointLogs />,
+														},
+													],
+												},
+												{
+													path: 'function',
+													element: <VersionFunction />,
+													children: [
+														{
+															index: true,
+															element: <Function />,
+														},
+														{
+															path: ':funcId',
+															element: <EditFunctionLoadable />,
+															loader: versionLoaders.editFunctionLoader,
+														},
+													],
+												},
+												{
+													path: 'storage',
+													element: <VersionStorage />,
+													children: [
+														{
+															index: true,
+															element: <Storage />,
+														},
+														{
+															path: ':storageId',
+															element: <BucketLoadable />,
+															loader: versionLoaders.bucketLoader,
+														},
+														{
+															path: ':storageId/bucket/:bucketName',
+															element: <FilesLoadable />,
+															loader: versionLoaders.fileLoader,
+														},
+													],
+												},
+												{
+													path: 'middleware',
+													element: <VersionMiddlewares />,
+													children: [
+														{
+															index: true,
+															element: <Middleware />,
+														},
+														{
+															path: ':middlewareId',
+															element: <EditMiddlewareLoadable />,
+															loader: versionLoaders.editMiddlewareLoader,
+														},
+													],
+												},
+												{
+													path: 'cache',
+													element: <VersionCache />,
+												},
+												{
+													path: 'queue',
+													element: <VersionMessageQueue />,
+													children: [
+														{
+															index: true,
+															element: <MessageQueue />,
+														},
+														{
+															path: ':queueId',
+															element: <EditMessageQueueLoadable />,
+															loader: versionLoaders.editMessageQueueLoader,
+														},
+														{
+															path: 'logs',
+															element: <MessageQueueLogs />,
+														},
+													],
+												},
+												{
+													path: 'task',
+													element: <VersionTask />,
+													children: [
+														{
+															index: true,
+															element: <Task />,
+														},
+														{
+															path: ':taskId',
+															element: <EditTaskLoadable />,
+															loader: versionLoaders.editTaskLoader,
+														},
+														{
+															path: 'logs',
+															element: <TaskLogs />,
+														},
+													],
+												},
+												{
+													path: 'notifications',
+													element: <VersionNotifications />,
+												},
+												{
+													path: 'settings',
+													element: <VersionSettings />,
+													children: [
+														{
+															index: true,
+															element: <VersionSettingsGeneral />,
+														},
+														{
+															path: 'environment',
+															element: <VersionSettingsEnvironment />,
+														},
+														{
+															path: 'npm-packages',
+															element: <VersionSettingsNPMPackages />,
+														},
+														{
+															path: 'environment-variables',
+															element: <VersionSettingsEnvironmentVariables />,
+														},
+														{
+															path: 'rate-limits',
+															element: <VersionSettingsRateLimits />,
+														},
+														{
+															path: 'authentications',
+															element: <VersionSettingsAuthentications />,
+														},
+														{
+															path: 'api-keys',
+															element: <VersionSettingsAPIKeys />,
+														},
+														{
+															path: 'real-time',
+															element: <VersionSettingsRealTime />,
+														},
+														{
+															path: 'custom-domain',
+															element: <VersionSettingsCustomDomain />,
+														},
+													],
+												},
+											],
+											errorElement: <VersionError />,
+										},
+									],
+								},
+								{
+									path: 'resources',
+									element: <OrganizationResources />,
+								},
+								{
+									path: 'settings',
+									element: <OrganizationSettings />,
+									children: [
+										{
+											index: true,
+											path: '',
+											element: <OrganizationSettingsGeneral />,
+										},
+										{
+											path: 'members',
+											element: <OrganizationSettingsMembers />,
+										},
+									],
+								},
+								{
+									path: 'profile',
+									element: <ProfileSettings />,
+									children: [
+										{
+											index: true,
+											path: '',
+											element: <ProfileSettingsGeneral />,
+										},
+										{
+											path: 'cluster-management',
+											element: <ClusterManagement />,
+											loader: homeLoaders.clusterManagementLoader,
+										},
+										{
+											path: 'notifications',
+											element: <ProfileSettingsNotifications />,
+										},
+										{
+											path: 'cluster-management',
+											element: <ClusterManagement />,
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+			errorElement: <ErrorBoundary />,
+		},
+		{
+			path: '/onboarding',
+			element: <OnboardingLoadable />,
+			loader: onboardingLoaders.onboardingLoader,
+			errorElement: <ErrorBoundary />,
+			children: [
+				{
+					path: '',
+					element: <AccountInformationLoadable />,
+					loader: onboardingLoaders.accountInformationLoader,
+				},
+				{
+					path: 'create-organization',
+					element: <CreateOrganization />,
+				},
+				{
+					path: 'create-app',
+					loader: onboardingLoaders.createAppLoader,
+					element: <CreateApp />,
+				},
+				{
+					path: 'smtp-configuration',
+					element: <SMTPConfiguration />,
+				},
+				{
+					path: 'invite-team-members',
+					element: <InviteTeamMembersLoadable />,
+					loader: onboardingLoaders.inviteTeamMembersLoader,
+				},
+			],
+		},
+		{
+			path: '/redirect-handle',
+			element: <RedirectHandleLoadable />,
+			loader: homeLoaders.redirectHandleLoader,
+			errorElement: <ErrorBoundary />,
+		},
+		{
+			path: '/*',
+			element: <NotFound />,
+			errorElement: <ErrorBoundary />,
+		},
+		{
+			path: '/401',
+			element: <Unauthorized />,
+			errorElement: <ErrorBoundary />,
+		},
+	],
 	{
-		path: '/',
-		element: <Root />,
-		children: [
-			{
-				index: true,
-				element: <HomeLoadable />,
-				loader: homeLoaders.homeLoader,
-			},
-			{
-				path: '/login',
-				element: <Login />,
-			},
-			{
-				path: '/forgot-password',
-				element: <ForgotPassword />,
-			},
-			{
-				path: '/confirm-change-email',
-				element: <ConfirmChangeEmailLoadable />,
-				loader: authLoaders.confirmChangeEmailLoader,
-			},
-			{
-				path: '/change-password',
-				element: <ChangePasswordWithTokenLoadable />,
-				loader: authLoaders.changePasswordWithTokenLoader,
-			},
-			{
-				path: '/verify-email',
-				element: <VerifyEmail />,
-			},
-			{
-				path: '/complete-account-setup',
-				element: <CompleteAccountSetup />,
-			},
-			{
-				path: '/complete-account-setup/verify-email',
-				element: <CompleteAccountSetupVerifyEmailLoadable />,
-			},
-			{
-				path: '/organization',
-				element: <Organization />,
-				children: [
-					{
-						path: '',
-						element: <OrganizationSelect />,
-						loader: homeLoaders.organizationSelectLoader,
-					},
-					{
-						path: ':orgId',
-						element: <OrganizationDetailsLoadable />,
-						children: [
-							{
-								path: 'apps',
-								children: [
-									{
-										index: true,
-										element: <OrganizationApps />,
-									},
-									{
-										path: ':appId/version/:versionId',
-										element: <Version />,
-										children: [
-											{
-												path: '',
-												element: <Dashboard />,
-											},
-											{
-												path: 'error',
-												element: <VersionError />,
-											},
-											{
-												path: 'notFound',
-												element: <VersionNotFound />,
-											},
-											{
-												path: 'database',
-												children: [
-													{
-														index: true,
-														element: <VersionDatabase />,
-													},
-													{
-														path: ':dbId/navigator/:modelId',
-														element: <NavigatorLoadable />,
-														loader: versionLoaders.navigatorLoader,
-													},
-													{
-														path: ':dbId/models',
-														element: <ModelsOutletLoadable />,
-														loader: versionLoaders.modelsOutletLoader,
-														children: [
-															{
-																index: true,
-																element: <Models />,
-															},
-															{
-																path: ':modelId/fields',
-																element: <FieldsLoadable />,
-																loader: versionLoaders.fieldsLoader,
-															},
-														],
-													},
-												],
-											},
-											{
-												path: 'endpoint',
-												element: <VersionEndpoint />,
-												children: [
-													{
-														index: true,
-														element: <Endpoint />,
-													},
-													{
-														path: ':endpointId',
-														element: <EditEndpointLoadable />,
-														loader: versionLoaders.editEndpointLoader,
-													},
-													{
-														path: 'logs',
-														element: <EndpointLogs />,
-													},
-												],
-											},
-											{
-												path: 'function',
-												element: <VersionFunction />,
-												children: [
-													{
-														index: true,
-														element: <Function />,
-													},
-													{
-														path: ':funcId',
-														element: <EditFunctionLoadable />,
-														loader: versionLoaders.editFunctionLoader,
-													},
-												],
-											},
-											{
-												path: 'storage',
-												element: <VersionStorage />,
-												children: [
-													{
-														index: true,
-														element: <Storage />,
-													},
-													{
-														path: ':storageId',
-														element: <BucketLoadable />,
-														loader: versionLoaders.bucketLoader,
-													},
-													{
-														path: ':storageId/bucket/:bucketName',
-														element: <FilesLoadable />,
-														loader: versionLoaders.fileLoader,
-													},
-												],
-											},
-											{
-												path: 'middleware',
-												element: <VersionMiddlewares />,
-												children: [
-													{
-														index: true,
-														element: <Middleware />,
-													},
-													{
-														path: ':middlewareId',
-														element: <EditMiddlewareLoadable />,
-														loader: versionLoaders.editMiddlewareLoader,
-													},
-												],
-											},
-											{
-												path: 'cache',
-												element: <VersionCache />,
-											},
-											{
-												path: 'queue',
-												element: <VersionMessageQueue />,
-												children: [
-													{
-														index: true,
-														element: <MessageQueue />,
-													},
-													{
-														path: ':queueId',
-														element: <EditMessageQueueLoadable />,
-														loader: versionLoaders.editMessageQueueLoader,
-													},
-													{
-														path: 'logs',
-														element: <MessageQueueLogs />,
-													},
-												],
-											},
-											{
-												path: 'task',
-												element: <VersionTask />,
-												children: [
-													{
-														index: true,
-														element: <Task />,
-													},
-													{
-														path: ':taskId',
-														element: <EditTaskLoadable />,
-														loader: versionLoaders.editTaskLoader,
-													},
-													{
-														path: 'logs',
-														element: <TaskLogs />,
-													},
-												],
-											},
-											{
-												path: 'notifications',
-												element: <VersionNotifications />,
-											},
-											{
-												path: 'settings',
-												element: <VersionSettings />,
-												children: [
-													{
-														index: true,
-														element: <VersionSettingsGeneral />,
-													},
-													{
-														path: 'environment',
-														element: <VersionSettingsEnvironment />,
-													},
-													{
-														path: 'npm-packages',
-														element: <VersionSettingsNPMPackages />,
-													},
-													{
-														path: 'environment-variables',
-														element: <VersionSettingsEnvironmentVariables />,
-													},
-													{
-														path: 'rate-limits',
-														element: <VersionSettingsRateLimits />,
-													},
-													{
-														path: 'authentications',
-														element: <VersionSettingsAuthentications />,
-													},
-													{
-														path: 'api-keys',
-														element: <VersionSettingsAPIKeys />,
-													},
-													{
-														path: 'real-time',
-														element: <VersionSettingsRealTime />,
-													},
-													{
-														path: 'custom-domain',
-														element: <VersionSettingsCustomDomain />,
-													},
-												],
-											},
-										],
-										errorElement: <VersionError />,
-									},
-								],
-							},
-							{
-								path: 'resources',
-								element: <OrganizationResources />,
-							},
-							{
-								path: 'settings',
-								element: <OrganizationSettings />,
-								children: [
-									{
-										index: true,
-										path: '',
-										element: <OrganizationSettingsGeneral />,
-									},
-									{
-										path: 'members',
-										element: <OrganizationSettingsMembers />,
-									},
-								],
-							},
-							{
-								path: 'profile',
-								element: <ProfileSettings />,
-								children: [
-									{
-										index: true,
-										path: '',
-										element: <ProfileSettingsGeneral />,
-									},
-									{
-										path: 'cluster-management',
-										element: <ClusterManagement />,
-										loader: homeLoaders.clusterManagementLoader,
-									},
-									{
-										path: 'notifications',
-										element: <ProfileSettingsNotifications />,
-									},
-									{
-										path: 'cluster-management',
-										element: <ClusterManagement />,
-									},
-								],
-							},
-						],
-					},
-				],
-			},
-		],
-		errorElement: <ErrorBoundary />,
+		basename: '/studio',
 	},
-	{
-		path: '/onboarding',
-		element: <OnboardingLoadable />,
-		loader: onboardingLoaders.onboardingLoader,
-		errorElement: <ErrorBoundary />,
-		children: [
-			{
-				path: '',
-				element: <AccountInformationLoadable />,
-				loader: onboardingLoaders.accountInformationLoader,
-			},
-			{
-				path: 'create-organization',
-				element: <CreateOrganization />,
-			},
-			{
-				path: 'create-app',
-				loader: onboardingLoaders.createAppLoader,
-				element: <CreateApp />,
-			},
-			{
-				path: 'smtp-configuration',
-				element: <SMTPConfiguration />,
-			},
-			{
-				path: 'invite-team-members',
-				element: <InviteTeamMembersLoadable />,
-				loader: onboardingLoaders.inviteTeamMembersLoader,
-			},
-		],
-	},
-	{
-		path: '/redirect-handle',
-		element: <RedirectHandleLoadable />,
-		loader: homeLoaders.redirectHandleLoader,
-		errorElement: <ErrorBoundary />,
-	},
-	{
-		path: '/*',
-		element: <NotFound />,
-		errorElement: <ErrorBoundary />,
-	},
-	{
-		path: '/401',
-		element: <Unauthorized />,
-		errorElement: <ErrorBoundary />,
-	},
-]);
+);
 
 export function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();

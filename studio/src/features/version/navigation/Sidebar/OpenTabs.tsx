@@ -100,12 +100,7 @@ function OpenTabsTrigger() {
 			>
 				<h1
 					title='Open Tabs'
-					className={cn(
-						'truncate max-w-[15ch] text-xs text-default font-sfCompact',
-						sidebar[versionId]?.openEditor
-							? 'text-default'
-							: 'text-subtle group-hover:text-default',
-					)}
+					className={cn('truncate max-w-[15ch] text-xs text-subtle font-sfCompact')}
 				>
 					Open Tabs
 				</h1>
