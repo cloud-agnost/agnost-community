@@ -5,7 +5,7 @@
    "type": "module",
    "scripts": {
       "dev": "vite",
-      "build": "tsc && vite build --base=/",
+      "build": "tsc && vite build --base=/studio",
       "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
       "preview": "vite preview",
       "icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#929AB5=currentColor\" --replace-attr-values \"#fff=currentColor\" "

@@ -742,8 +742,8 @@ export class MySQL extends SQLDatabase {
 
 			const values = data.flatMap((entry) => Object.values(entry));
 
-			// // console.log("***sql", insertQuery);
-			// // console.log("***values", values);
+			// console.log("***sql", insertQuery);
+			// console.log("***values", values);
 
 			// Execute the INSERT query
 			const [insertResult] = await this.getDriver().query(insertQuery, values);
@@ -781,7 +781,7 @@ export class MySQL extends SQLDatabase {
 					WHERE ${modelMeta.name}.${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
-		// // console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -824,7 +824,7 @@ export class MySQL extends SQLDatabase {
 		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		// // console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -867,7 +867,7 @@ export class MySQL extends SQLDatabase {
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		// // console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);

@@ -105,7 +105,6 @@ export async function updateRabbitmqCluster(clusterName, rmqVersion, size, repli
         );
         // console.log("RabbitMQ " + clusterName + " updated...");
     } catch (error) {
-        console.log("****here", error);
         // console.error("Error updating RabbitMQ " + clusterName + " resources...", error);
         throw new AgnostError(error.body?.message);
     }

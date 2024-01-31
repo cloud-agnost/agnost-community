@@ -47,7 +47,6 @@ class ConnectionManager {
     async removeConnection(id, type) {
         let conn = this.getConnection(id);
         if (conn) {
-            console.log("**************removing connection", id);
             try {
                 switch (type) {
                     case DATABASE.PostgreSQL:
@@ -71,9 +70,7 @@ class ConnectionManager {
                         } catch (err) {}
                         break;
                 }
-            } catch (err) {
-                console.log("****errror", err);
-            }
+            } catch (err) {}
         }
 
         this.connections.delete(id);
