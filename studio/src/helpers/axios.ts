@@ -33,7 +33,7 @@ instance.interceptors.request.use((config) => {
 		config.headers['Authorization'] = refreshToken;
 	} else if (accessToken) {
 		config.headers['Authorization'] = accessToken;
-		config.headers['Refresh-token'] = refreshToken;
+		config.headers['Refresh-Token'] = refreshToken;
 	}
 	return config;
 });
@@ -79,7 +79,7 @@ envInstance.interceptors.request.use((config) => {
 		config.headers['Authorization'] = refreshToken;
 	} else if (accessToken) {
 		config.headers['Authorization'] = accessToken;
-		config.headers['Refresh-token'] = refreshToken;
+		config.headers['Refresh-Token'] = refreshToken;
 	}
 	return config;
 });

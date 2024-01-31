@@ -20,7 +20,7 @@ export const authSession = async (req, res, next) => {
 	let session = await getKey(token);
 	if (!session || !session.rt) {
 		// Check if there is refresh token in header, the session token might be expired but if we have a refresh token in header we can use it to renew the access token
-		let refreshToken = req.header("Refresh-token");
+		let refreshToken = req.header("Refresh-Token");
 		if (refreshToken) {
 			// Check if token is still valid or not
 			let refreshTokenObj = await getKey(refreshToken);
@@ -44,8 +44,8 @@ export const authSession = async (req, res, next) => {
 						code: ERROR_CODES.invalidSession,
 					});
 				} else {
-					res.setHeader("Access-token", tokens.at);
-					res.setHeader("Refresh-token", tokens.rt);
+					res.setHeader("Access-Token", tokens.at);
+					res.setHeader("Refresh-Token", tokens.rt);
 				}
 			} else {
 				return res.status(401).json({
