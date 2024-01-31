@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from '@phosphor-icons/react';
 import { cn } from '@/utils';
 import './dialog.scss';
+import { Button } from '../Button';
 const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -24,19 +25,26 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+	hideCloseButton?: boolean;
+};
 const DialogContent = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+	DialogContentProps
+>(({ className, children, hideCloseButton, ...props }, ref) => {
 	return (
 		<DialogPortal>
 			<DialogOverlay />
 			<DialogPrimitive.Content ref={ref} className={cn('dialog-content', className)} {...props}>
 				{children}
-				<DialogPrimitive.Close className='dialog-close'>
-					<X size={24} />
-					<span className='sr-only'>Close</span>
-				</DialogPrimitive.Close>
+				{!hideCloseButton && (
+					<DialogPrimitive.Close className='dialog-close' asChild>
+						<Button rounded variant='icon' size='sm' className='!h-[unset] !p-1'>
+							<X size={24} />
+							<span className='sr-only'>Close</span>
+						</Button>
+					</DialogPrimitive.Close>
+				)}
 			</DialogPrimitive.Content>
 		</DialogPortal>
 	);

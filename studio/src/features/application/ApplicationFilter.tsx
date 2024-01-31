@@ -28,7 +28,10 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 						size='sm'
 						iconOnly
 						variant='outline'
-						className={cn(isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
+						className={cn(
+							isCard ? 'bg-wrapper-background-base dark:bg-lighter' : 'bg-base',
+							'transition-all',
+						)}
 						onClick={() => setIsCard(true)}
 					>
 						<SquaresFour
@@ -40,7 +43,10 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 						size='sm'
 						iconOnly
 						variant='outline'
-						className={cn(!isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
+						className={cn(
+							!isCard ? 'bg-wrapper-background-base dark:bg-lighter' : 'bg-base',
+							'transition-all',
+						)}
 						onClick={() => setIsCard(false)}
 					>
 						<List size={14} className={cn(!isCard ? 'text-icon-secondary' : 'text-icon-base')} />

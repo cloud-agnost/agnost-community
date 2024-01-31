@@ -166,7 +166,7 @@ export default function Workspace() {
 											rounded
 											className={cn(
 												window.location.pathname.includes(data._id) &&
-													'hover:bg-button-primary text-default',
+													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
 												'!p-0 !h-5 hidden group-hover:inline-flex',
 											)}
 											onClick={(e) => {
@@ -181,7 +181,7 @@ export default function Workspace() {
 											rounded
 											className={cn(
 												window.location.pathname.includes(data._id) &&
-													'hover:bg-button-primary text-default',
+													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
 												'p-0 !h-5 hidden group-hover:inline-flex',
 											)}
 											variant='icon'
@@ -249,15 +249,7 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 				variant='blank'
 				size='sm'
 			>
-				<h1
-					title={item.title}
-					className={cn(
-						'truncate max-w-[15ch] text-xs text-default font-sfCompact',
-						sidebar[versionId]?.openedTabs?.includes(item.type)
-							? 'text-default'
-							: 'text-subtle group-hover:text-default',
-					)}
-				>
+				<h1 title={item.title} className={cn('truncate max-w-[15ch] text-xs text-subtle')}>
 					{item.title}
 				</h1>
 			</Button>
