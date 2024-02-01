@@ -16,6 +16,24 @@ const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 const namespace = process.env.NAMESPACE;
 
+// Function to simulate sleep
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function scaleStatefulSet(statefulSetName, replicas) {
+  try {
+    res = await k8sAppsApi.readNamespacedStatefulSet(statefulSetName, namespace);
+    let sts = res.body;
+    sts.spec.replicas = replicas;
+    await k8sAppsApi.replaceNamespacedStatefulSet(statefulSetName, namespace, sts);
+  } catch (error) {
+    throw new Error(JSON.stringify(error.body));
+  }
+}
+
 async function getImagePullSecrets() {
   const secretList = [];
   try {
@@ -34,7 +52,7 @@ async function getImagePullSecrets() {
   return secretList;
 }
 
-async function createKnativeService(name, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, initialScale, maxScale, targetUtilizationPercentage) {
+async function createKnativeService(name, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage) {
   const group = 'serving.knative.dev';
   const version = 'v1';
   const plural = 'services';
@@ -55,13 +73,31 @@ async function createKnativeService(name, image, portNumber, containerConcurrenc
   resource.spec.template.metadata.annotations['autoscaling.knative.dev/max-scale'] = maxScale;
   resource.spec.template.metadata.annotations['autoscaling.knative.dev/target-utilization-percentage'] = targetUtilizationPercentage;
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -79,7 +115,7 @@ async function createKnativeService(name, image, portNumber, containerConcurrenc
   return "success";
 }
 
-async function updateKnativeService(name, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, initialScale, maxScale, targetUtilizationPercentage) {
+async function updateKnativeService(name, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage) {
   const group = 'serving.knative.dev';
   const version = 'v1';
   const plural = 'services';
@@ -98,13 +134,31 @@ async function updateKnativeService(name, image, portNumber, containerConcurrenc
   resource.spec.template.metadata.annotations['autoscaling.knative.dev/max-scale'] = maxScale;
   resource.spec.template.metadata.annotations['autoscaling.knative.dev/target-utilization-percentage'] = targetUtilizationPercentage;
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -137,7 +191,7 @@ async function deleteKnativeService(name) {
   return "success";
 }
 
-async function createDeployment(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env) {
+async function createDeployment(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom) {
   const template = fs.readFileSync('../templates/deployment.yaml', 'utf8');
   const resource = k8s.loadYaml(template);
   
@@ -154,13 +208,31 @@ async function createDeployment(name, image, replicaCount, portNumber, memoryReq
   resource.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
   resource.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -177,7 +249,7 @@ async function createDeployment(name, image, replicaCount, portNumber, memoryReq
   return "success";
 }
 
-async function updateDeployment(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env) {
+async function updateDeployment(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom) {
   const dply = await k8sAppsApi.readNamespacedDeployment(name, namespace);
   const resource = dply.body;
   
@@ -189,13 +261,31 @@ async function updateDeployment(name, image, replicaCount, portNumber, memoryReq
   resource.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
   resource.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -223,7 +313,7 @@ async function deleteDeployment(name) {
   return "success";
 }
 
-async function createStatefulSet(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, storageSize, storageClass, mountPath) {
+async function createStatefulSet(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, storageSize, storageClass, mountPath) {
   const template = fs.readFileSync('../templates/statefulset.yaml', 'utf8');
   const resource = k8s.loadYaml(template);
   
@@ -243,13 +333,31 @@ async function createStatefulSet(name, image, replicaCount, portNumber, memoryRe
   resource.spec.volumeClaimTemplates[0].spec.storageClassName = storageClass;
   resource.spec.volumeClaimTemplates[0].spec.resources.requests.storage = storageSize;
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -266,7 +374,128 @@ async function createStatefulSet(name, image, replicaCount, portNumber, memoryRe
   return "success";
 }
 
-async function createCronJob(name, image, schedule, command, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env) {
+async function updateStatefulSet(name, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, storageSize, storageClass, mountPath) {
+  const sts = await k8sAppsApi.readNamespacedStatefulSet(name, namespace);
+  var resource = sts.body;
+  
+  const currentStorageClass = resource.spec.volumeClaimTemplates[0].spec.storageClassName;
+  if (storageClass != currentStorageClass) {
+    console.error('[ERROR] StorageClass cannot be changed!...');
+  }
+
+  // storageSize might be the initial one, or it would have been already updated.
+  // Checks an annotation if it's already updated.
+  storageArray = [];
+  storageArray.push(resource.spec.volumeClaimTemplates[0].spec.resources.requests.storage);
+  try {
+    annotationValue = resource.metadata.annotations["agnost.dev/resizedStorage"];
+    if (annotationValue) {
+      storageArray.push(annotationValue);
+    }
+  } catch (err) {
+    // it's fine if does not exist.
+  }
+  if (!storageArray.includes(storageSize)) {
+    const pvcPatch = {
+      spec: {
+        resources: {
+          requests: {
+            storage: storageSize
+          }
+        }
+      }
+    };
+    const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
+  
+    try {
+      const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+      pvcList.body.items.forEach(async (pvc) => {
+        var pvcName = pvc.metadata.name;
+        if (pvcName.includes("data-" + name + '-')) {
+          await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+          console.log('PersistentVolumeClaim ' + pvcName + ' updated...');
+        }
+      });
+      console.log('Scaling Down StatefulSet...');
+      await scaleStatefulSet(name, 0);
+      await sleep(5000);
+      console.log('Scaling Up StatefulSet...');
+      await scaleStatefulSet(name, resource.spec.replicas);
+      await sleep(3000);
+      const stsLatest = await k8sAppsApi.readNamespacedStatefulSet(name, namespace);
+      var resource = stsLatest.body;
+      if (!resource.metadata.annotations) {
+        resource.metadata.annotations = {};
+      }
+      resource.metadata.annotations["agnost.dev/resizedStorage"] = storageSize;
+    } catch (error){
+      console.error('Error updating pvc:', error.body);
+      throw new Error(JSON.stringify(error.body));
+    }
+  }
+
+  resource.spec.replicas = replicaCount;
+  resource.spec.template.spec.containers[0].image = image;
+  resource.spec.template.spec.containers[0].ports[0].containerPort = portNumber;
+  resource.spec.template.spec.containers[0].resources.requests.cpu = cpuRequest;
+  resource.spec.template.spec.containers[0].resources.requests.memory = memoryRequest;
+  resource.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
+  resource.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
+  resource.spec.template.spec.containers[0].volumeMounts[0].mountPath = mountPath;
+
+  const envList = [];
+  if (env) {
+    const envVariables = JSON.parse(JSON.stringify(env));
+    for (const key in envVariables) {
+      envList.push({"name": key, "value": envVariables[key]});
+    };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
+    resource.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.template.spec.containers[0].envFrom = envFromList;
+  }
+
+  const imagePullSecrets = await getImagePullSecrets();
+  if (imagePullSecrets) {
+    resource.spec.template.spec.imagePullSecrets = imagePullSecrets;
+  }
+
+  try {
+    await k8sAppsApi.replaceNamespacedStatefulSet(name, namespace, resource);
+  } catch (err) {
+    console.error('Error updating statefulset:', err.body);
+    throw new Error(JSON.stringify(err.body));
+  }
+  return "success";
+}
+
+async function deleteStatefulSet(name) {
+  try {
+    await k8sAppsApi.deleteNamespacedStatefulSet(name, namespace);
+  } catch (err) {
+    console.error('Error deleting statefulset:', err.body);
+    throw new Error(JSON.stringify(err.body));
+  }
+
+  return "success";
+}
+
+async function createCronJob(name, image, schedule, command, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom) {
   const template = fs.readFileSync('../templates/cronjob.yaml', 'utf8');
   const resource = k8s.loadYaml(template);
   
@@ -285,13 +514,31 @@ async function createCronJob(name, image, schedule, command, memoryRequest, memo
     delete resource.spec.jobTemplate.spec.template.spec.containers[0].command;
   }
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.jobTemplate.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.jobTemplate.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -308,7 +555,7 @@ async function createCronJob(name, image, schedule, command, memoryRequest, memo
   return "success";
 }
 
-async function updateCronJob(name, image, schedule, command, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env) {
+async function updateCronJob(name, image, schedule, command, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, envRef) {
   const cj = await k8sBatchApi.readNamespacedCronJob(name, namespace);
   const resource = cj.body;
   
@@ -325,13 +572,31 @@ async function updateCronJob(name, image, schedule, command, memoryRequest, memo
     delete resource.spec.jobTemplate.spec.template.spec.containers[0].command;
   }
 
+  const envList = [];
   if (env) {
-    const envList = [];
     const envVariables = JSON.parse(JSON.stringify(env));
     for (const key in envVariables) {
       envList.push({"name": key, "value": envVariables[key]});
     };
+  }
+
+  if (envRef) {
+    envRef.forEach(async (environment) => {
+      envList.push({"name": environment["envName"], "valueFrom": {[environment["refType"]]: {"name": environment["refName"], "key": environment["refKey"]}}});
+    });
+  }
+
+  if (envList) {
     resource.spec.jobTemplate.spec.template.spec.containers[0].env = envList;
+  }
+
+  if (envFrom) {
+    const envFromList = [];
+    const envFromVariables = JSON.parse(JSON.stringify(envFrom));
+    for (var key in envFromVariables) {
+      envFromList.push({[key]: {"name": envFromVariables[key]}});
+    };
+    resource.spec.jobTemplate.spec.template.spec.containers[0].envFrom = envFromList;
   }
 
   const imagePullSecrets = await getImagePullSecrets();
@@ -459,7 +724,7 @@ async function deleteHpa(name) {
   return "success";
 }
 
-async function createIngress(name, portNumber, path) {
+async function createIngress(name, portNumber, path, serviceType='k8s') {
   const template = fs.readFileSync('../templates/ingress.yaml', 'utf8');
   const resource = k8s.loadYaml(template);
 
@@ -467,6 +732,10 @@ async function createIngress(name, portNumber, path) {
   resource.spec.rules[0].http.paths[0].path = path + '(/|$)(.*)'
   resource.spec.rules[0].http.paths[0].backend.service.name = name;
   resource.spec.rules[0].http.paths[0].backend.service.port.number = portNumber;
+
+  if (serviceType == "knative") {
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/upstream-vhost"] = name + '.' + namespace + '.svc.cluster.local'
+  }
 
   try {
     await k8sNetworkingApi.createNamespacedIngress(namespace, resource);
@@ -486,7 +755,7 @@ async function updateIngress(name, portNumber, path) {
   resource.spec.rules[0].http.paths[0].backend.service.port.number = portNumber;
 
   try {
-    await k8sNetworkingApi.replaceNamespacedIngress(nname, amespace, resource);
+    await k8sNetworkingApi.replaceNamespacedIngress(name, namespace, resource);
   } catch (err) {
     console.error('Error updating ingress:', err.body);
     throw new Error(JSON.stringify(err.body));
@@ -542,14 +811,14 @@ async function hpaExists(name) {
 // Create a Kubernetes deployment|statefulset|cronjob|kservice
 router.post('/deployapp', async (req, res) => {
   const { kind, identifier, image, replicaCount, portNumber, minReplicas, maxReplicas, memoryRequest, memoryLimit, memoryTarget, 
-          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
+          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
           containerConcurrency, initialScale, maxScale, targetUtilizationPercentage } = req.body;
 
   try {
     switch(kind) {
       case "Deployment":
         var resourceName = identifier + '-dply';
-        await createDeployment(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env);
+        await createDeployment(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom);
         console.log("Deployment " + resourceName + " created.");
         await createService(resourceName, portNumber, false);
         console.log("Service " + resourceName + " created.");
@@ -564,7 +833,7 @@ router.post('/deployapp', async (req, res) => {
         break;
       case "StatefulSet":
         var resourceName = identifier + '-sts';
-        await createStatefulSet(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, storageSize, storageClass, mountPath);
+        await createStatefulSet(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, storageSize, storageClass, mountPath);
         console.log("StatefulSet " + resourceName + " created.");
         await createService(resourceName, portNumber, true);
         console.log("Service " + resourceName + " created.");
@@ -575,15 +844,15 @@ router.post('/deployapp', async (req, res) => {
         break;
       case "CronJob":
         var resourceName = identifier + '-cj'
-        await createCronJob(resourceName, image, cronSchedule, cronCommand, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env);
+        await createCronJob(resourceName, image, cronSchedule, cronCommand, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom);
         console.log("Cron Job " + resourceName + " created.");
         break;
       case "KnativeService":
         var resourceName = identifier + '-ksvc'
-        await createKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, initialScale, maxScale, targetUtilizationPercentage);
+        await createKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage);
         console.log("Knative service " + resourceName + " created.");
         if (ingressPath) {
-          await createIngress(resourceName, portNumber, ingressPath);
+          await createIngress(resourceName, portNumber, ingressPath, 'knative');
           console.log("Ingress " + resourceName + " created.");
         }
         break;
@@ -598,14 +867,14 @@ router.post('/deployapp', async (req, res) => {
 // Update a Kubernetes deployment|statefulset|cronjob|kservice
 router.put('/deployapp', async (req, res) => {
   const { kind, identifier, image, replicaCount, portNumber, minReplicas, maxReplicas, memoryRequest, memoryLimit, memoryTarget, 
-          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
+          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
           containerConcurrency, initialScale, maxScale, targetUtilizationPercentage } = req.body;
 
   try {
     switch(kind) {
       case "Deployment":
         var resourceName = identifier + '-dply';
-        await updateDeployment(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env);
+        await updateDeployment(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom);
         console.log("Deployment " + resourceName + " updated.");
         await updateService(resourceName, portNumber, false);
         console.log("Service " + resourceName + " updated.");
@@ -620,7 +889,7 @@ router.put('/deployapp', async (req, res) => {
         break;
       case "StatefulSet":
         var resourceName = identifier + '-sts';
-        await updateStatefulSet(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, storageSize, storageClass, mountPath);
+        await updateStatefulSet(resourceName, image, replicaCount, portNumber, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, storageSize, storageClass, mountPath);
         console.log("StatefulSet " + resourceName + " updated.");
         await updateService(resourceName, portNumber, true);
         console.log("Service " + resourceName + " updated.");
@@ -631,12 +900,12 @@ router.put('/deployapp', async (req, res) => {
         break;
       case "CronJob":
         var resourceName = identifier + '-cj';
-        await updateCronJob(resourceName, image, cronSchedule, cronCommand, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env);
+        await updateCronJob(resourceName, image, cronSchedule, cronCommand, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom);
         console.log("Cron Job " + resourceName + " updated.");
         break;
       case "KnativeService":
         var resourceName = identifier + '-ksvc';
-        await updateKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, initialScale, maxScale, targetUtilizationPercentage);
+        await updateKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage);
         console.log("Knative service " + resourceName + " updated.");
         if (ingressPath) {
           await updateIngress(resourceName, portNumber, ingressPath);
@@ -674,26 +943,26 @@ router.delete('/deployapp', async (req, res) => {
         break;
       case "StatefulSet":
         var resourceName = identifier + '-sts';
-        await updateStatefulSet(resourceName);
+        await deleteStatefulSet(resourceName);
         console.log("StatefulSet " + resourceName + " deleted.");
-        await updateService(resourceName, portNumber, true);
+        await deleteService(resourceName);
         console.log("Service " + resourceName + " deleted.");
         if (ingressExists(resourceName)) {
-          await updateIngress(resourceName);
+          await deleteIngress(resourceName);
           console.log("Ingress " + resourceName + " deleted.");
         }
         break;
       case "CronJob":
         var resourceName = identifier + '-cj';
-        await updateCronJob(resourceName);
+        await deleteCronJob(resourceName);
         console.log("Cron Job " + resourceName + " deleted.");
         break;
       case "KnativeService":
         var resourceName = identifier + '-ksvc';
-        await updateKnativeService(resourceName);
+        await deleteKnativeService(resourceName);
         console.log("Knative service " + resourceName + " deleted.");
         if (ingressExists(resourceName)) {
-          await updateIngress(resourceName);
+          await deleteIngress(resourceName);
           console.log("Ingress " + resourceName + " deleted.");
         }
         break;

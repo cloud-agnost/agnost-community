@@ -378,3 +378,402 @@ curl -XPOST http://localhost:3000/dockercredentials -d '{
     "email": "email@domain.com"
 }' -H "Content-type: application/json"
 ```
+
+---
+
+## Deploy Applications
+
+### Deployments
+
+#### Create Deployment
+
+> `env`, `envRef`, `envFrom` are not mandatory
+>
+> `ingressPath` is not mandatory, only needed if you want to expose the service to external clients
+>
+> `minReplicas`, `maxReplicas`, `cpuTarget`, `memoryTarget` are not mandatory, only needed to create a HPA
+
+```bash
+curl -XPOST http://localhost:3000/deployapp -d '{
+    "kind": "Deployment",
+    "identifier": "my-app",
+    "replicaCount": 3,
+    "minReplicas": 1,
+    "maxReplicas": 5,
+    "cpuTarget": 80,
+    "memoryTarget": 80,
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "200m",
+    "cpuLimit": "300m",
+    "portNumber": 80,
+    "image": "nginx:1.23.0",
+    "ingressPath": "/api",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ]
+}' -H "Content-type: application/json"
+```
+
+#### Update Deployment
+
+```bash
+curl -XPUT http://localhost:3000/deployapp -d '{
+    "kind": "Deployment",
+    "identifier": "my-app",
+    "replicaCount": 2,
+    "minReplicas": 1,
+    "maxReplicas": 10,
+    "cpuTarget": 80,
+    "memoryTarget": 80,
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "500m",
+    "cpuLimit": "500m",
+    "portNumber": 80,
+    "image": "nginx:1.25.0",
+    "ingressPath": "/ping",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging",
+      "TEAM": "agnost"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "AWS_SECRET",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_SECRET_ACCESS_KEY"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ]
+}' -H "Content-type: application/json"
+```
+
+#### Delete Deployment
+
+```bash
+curl -XDELETE http://localhost:3000/deployapp -d '{
+    "kind": "Deployment",
+    "identifier": "my-app"
+}' -H "Content-type: application/json"
+```
+
+---
+
+### Stateful Set
+
+#### Create STS
+
+```bash
+curl -XPOST http://localhost:3000/deployapp -d '{
+    "kind": "StatefulSet",
+    "identifier": "my-app",
+    "replicaCount": 3,
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "200m",
+    "cpuLimit": "300m",
+    "portNumber": 80,
+    "image": "nginx:1.23.0",
+    "ingressPath": "/api",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ],
+    "mountPath": "/data",
+    "storageSize": "10Gi",
+    "storageClass": "csi-hostpath-sc"
+}' -H "Content-type: application/json"
+```
+
+#### Update STS
+
+```bash
+curl -XPUT http://localhost:3000/deployapp -d '{
+    "kind": "StatefulSet",
+    "identifier": "my-app",
+    "replicaCount": 5,
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "200m",
+    "cpuLimit": "300m",
+    "portNumber": 80,
+    "image": "nginx:1.23.0",
+    "ingressPath": "/api",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ],
+    "mountPath": "/data",
+    "storageSize": "15Gi",
+    "storageClass": "csi-hostpath"
+}' -H "Content-type: application/json"
+```
+
+#### Delete STS
+
+```bash
+curl -XDELETE http://localhost:3000/deployapp -d '{
+    "kind": "StatefulSet",
+    "identifier": "my-app"
+}' -H "Content-type: application/json"
+```
+
+---
+
+### Cron Job
+
+#### Create CronJob
+
+```bash
+curl -XPOST http://localhost:3000/deployapp -d '{
+    "kind": "CronJob",
+    "identifier": "my-app",
+    "cronSchedule": "15 * * * *",
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "200m",
+    "cpuLimit": "300m",
+    "cronCommand": "echo hello world; echo Welcome to the machine",
+    "image": "busybox:1.28",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ]
+}' -H "Content-type: application/json"
+```
+
+#### Update CronJob
+
+```bash
+curl -XPUT http://localhost:3000/deployapp -d '{
+    "kind": "CronJob",
+    "identifier": "my-app",
+    "cronSchedule": "30 * * * *",
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "100m",
+    "cpuLimit": "100m",
+    "cronCommand": "echo command is updated",
+    "image": "busybox:1.28",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging",
+      "TEAM": "agnost"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ]
+}' -H "Content-type: application/json"
+```
+
+#### Delete CronJob
+
+```bash
+curl -XDELETE http://localhost:3000/deployapp -d '{
+    "kind": "CronJob",
+    "identifier": "my-app"
+}' -H "Content-type: application/json"
+```
+
+---
+
+### Knative (Serverless) Application
+
+#### Create Knative Service
+
+```bash
+curl -XPOST http://localhost:3000/deployapp -d '{
+    "kind": "KnativeService",
+    "identifier": "my-app",
+    "containerConcurrency": 20,
+    "memoryRequest": "512Mi",
+    "memoryLimit": "512Mi",
+    "cpuRequest": "200m",
+    "cpuLimit": "300m",
+    "portNumber": 80,
+    "image": "nginx:1.23.0",
+    "ingressPath": "/api",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ],
+    "initialScale": "2",
+    "maxScale": "10",
+    "targetUtilizationPercentage": "90"
+}' -H "Content-type: application/json"
+```
+
+#### Update Knative Service
+
+```bash
+curl -XPUT http://localhost:3000/deployapp -d '{
+    "kind": "KnativeService",
+    "identifier": "my-app",
+    "containerConcurrency": 10,
+    "memoryRequest": "250Mi",
+    "memoryLimit": "250Mi",
+    "cpuRequest": "100m",
+    "cpuLimit": "100m",
+    "portNumber": 80,
+    "image": "nginx:1.23.0",
+    "ingressPath": "/ping",
+    "env": {
+      "APP_NAME": "my-app",
+      "ENVIRONMENT": "staging",
+      "TEAM": "agnost"
+    },
+    "envFrom": {
+      "secretRef": "aws-secrets",
+      "configMapRef": "kube-root-ca.crt"
+    },
+    "envRef": [
+      {
+        "envName": "AWS_KEY",
+        "refType": "secretKeyRef",
+        "refName": "aws-secrets",
+        "refKey": "AWS_ACCESS_KEY_ID"
+      },
+      {
+        "envName": "ROOT_CERT",
+        "refType": "configMapKeyRef",
+        "refName": "kube-root-ca.crt",
+        "refKey": "ca.crt"
+      }
+    ],
+    "initialScale": "1",
+    "maxScale": "5",
+    "targetUtilizationPercentage": "70"
+}' -H "Content-type: application/json"
+```
+
+#### Delete Knative Service
+
+```bash
+curl -XDELETE http://localhost:3000/deployapp -d '{
+    "kind": "KnativeService",
+    "identifier": "my-app"
+}' -H "Content-type: application/json"
+```
