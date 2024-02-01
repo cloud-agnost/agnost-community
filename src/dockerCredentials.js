@@ -44,6 +44,7 @@ async function createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion,
           console.log('AWS CronJob Service Account is created');
           break;
         case 'Role':
+          resource.rules[0].resourceNames = [ regcredSecretName ];
           await rbacApi.createNamespacedRole(namespace, resource);
           console.log('AWS CronJob Role is created');
           break;
