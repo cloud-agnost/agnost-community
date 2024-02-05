@@ -114,7 +114,6 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	},
 	deleteEndpoint: async (params) => {
 		try {
-			console.log(params);
 			await EndpointService.deleteEndpoint(params);
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => e._id !== params.endpointId),

@@ -69,7 +69,7 @@ const initialState: ResourceStore = {
 };
 
 const useResourceStore = create<ResourceStore & Actions>()(
-	devtools((set, get) => ({
+	devtools((set) => ({
 		...initialState,
 		getResources: async (req: GetResourcesRequest) => {
 			try {
@@ -247,7 +247,6 @@ const useResourceStore = create<ResourceStore & Actions>()(
 		},
 		getOrgResources: async (req: GetResourcesRequest) => {
 			try {
-				console.log('req', get().resources.length);
 				const resources = await ResourceService.getOrganizationResources(req);
 				set({
 					resources,
@@ -258,7 +257,6 @@ const useResourceStore = create<ResourceStore & Actions>()(
 			}
 		},
 		reset: () => {
-			console.log('reset');
 			set(initialState);
 		},
 	})),

@@ -85,7 +85,6 @@ const useTabStore = create<TabStore & Actions>()(
 					const existingTab = get().tabs[versionId]?.find(
 						(t) => getUrlWithoutQuery(t.path) === getUrlWithoutQuery(tab.path),
 					);
-					console.log('existingTab', existingTab);
 					const url = useVersionStore.getState().getVersionDashboardPath(tab.path);
 					if (!existingTab) {
 						set((state) => {

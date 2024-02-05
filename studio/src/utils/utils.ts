@@ -359,7 +359,6 @@ export function getTabIdFromUrl() {
 }
 
 export function resetAfterVersionChange() {
-	console.log('resetAfterVersionChange');
 	Object.entries(STATE_LIST).forEach(([name, store]) => {
 		if (!VERSION_CHANGE_EXCEPTIONS.includes(name)) {
 			store.getState()?.reset();
@@ -368,7 +367,6 @@ export function resetAfterVersionChange() {
 }
 
 export function resetAfterOrgChange() {
-	console.log('resetAfterOrgChange');
 	Object.entries(STATE_LIST).forEach(([name, store]) => {
 		if (!ORG_CHANGE_EXCEPTIONS.includes(name)) {
 			store.getState()?.reset();
