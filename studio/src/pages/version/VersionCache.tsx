@@ -66,9 +66,8 @@ export default function VersionCache() {
 			title={t('cache.title') as string}
 			type={TabTypes.Cache}
 			openCreateModal={toggleCreateModal}
-			createButtonTitle={t('cache.create')}
-			emptyStateTitle={t('cache.empty_text')}
-			table={table}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 			onMultipleDelete={deleteMultipleCachesHandler}
 			disabled={!canCreateCache}
 			loading={isFetching && !caches.length}

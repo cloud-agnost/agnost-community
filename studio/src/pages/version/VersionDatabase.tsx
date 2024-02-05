@@ -47,15 +47,14 @@ export default function VersionDatabase() {
 	}, [orgId, appId, versionId]);
 
 	return (
-		<VersionTabLayout<Database>
+		<VersionTabLayout
 			searchable
 			isEmpty={databases.length === 0}
 			title={t('database.page_title') as string}
 			type={TabTypes.Database}
 			openCreateModal={toggleCreateModal}
-			createButtonTitle={t('database.add.title')}
-			emptyStateTitle={t('database.empty_text')}
-			table={table}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 			disabled={!canEdit}
 			loading={isFetching && !databases.length}
 		>

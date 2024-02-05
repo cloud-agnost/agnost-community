@@ -16,9 +16,17 @@ export const DATETIME_MED_WITH_SECONDS = 'MMM d, yyyy, hh:mm:ss a';
 export const DATETIME_MED = 'MMM d, yyyy, hh:mm a';
 
 export function formatDate(date: string | Date, formatString: string) {
-	return format(new Date(date), formatString, {
-		locale: enUS,
-	});
+	try {
+		const dateWithTimezone = new Date(date);
+		const timezoneOffsetMs = dateWithTimezone.getTimezoneOffset() * 60 * 1000;
+		const dateWithoutTimezone = new Date(dateWithTimezone.getTime() + timezoneOffsetMs);
+		return format(new Date(dateWithoutTimezone), formatString, {
+			locale: enUS,
+		});
+	} catch (error) {
+		console.error('Error in formatDate', date);
+	}
+	return '';
 }
 
 export function getRelativeTime(date: string) {

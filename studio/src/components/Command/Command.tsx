@@ -19,7 +19,7 @@ type CommandDialogProps = DialogProps;
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 	return (
 		<Dialog {...props}>
-			<DialogContent className='overflow-hidden p-0 shadow-2xl' hideCloseButton>
+			<DialogContent className='overflow-hidden p-0 shadow-2xl'>
 				<Command className='command-dialog'>{children}</Command>
 			</DialogContent>
 		</Dialog>

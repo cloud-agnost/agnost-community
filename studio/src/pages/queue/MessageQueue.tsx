@@ -9,7 +9,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, MessageQueue, TabTypes } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -73,15 +73,14 @@ export default function MainMessageQueue() {
 		});
 	}
 	return (
-		<VersionTabLayout<MessageQueue>
+		<VersionTabLayout
 			searchable
 			isEmpty={queues.length === 0}
 			title={t('queue.title') as string}
 			type={TabTypes.MessageQueue}
 			openCreateModal={toggleCreateModal}
-			createButtonTitle={t('queue.create.title')}
-			emptyStateTitle={t('queue.empty_text')}
-			table={table}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
 			loading={isFetching && !queues.length}

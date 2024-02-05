@@ -1,86 +1,80 @@
-import { SortButton } from '@/components/DataTable';
-import {
-	BasicValueList,
-	BooleanField,
-	DateTime,
-	Enum,
-	GeoPoint,
-	Link,
-	NavigatorColumns,
-	Number,
-	Reference,
-	SubObject,
-	Text,
-	Time,
-} from '@/features/database/models/Navigator';
-import Json from '@/features/database/models/Navigator/Json';
+import { CellMaskMap, CellRendererMap, CellTypeMap, NavigatorCellEditorMap } from '@/constants';
+import { NavigatorColumns } from '@/features/database/models/Navigator';
+import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
-import useNavigatorStore from '@/store/database/navigatorStore';
-import { ColumnDefWithClassName, Field, FieldTypes } from '@/types';
-import { cn, getValueFromData } from '@/utils';
-import { ElementType, useMemo } from 'react';
+import { Field, FieldTypes } from '@/types';
+import { DATE_FORMAT, DATE_TIME_FORMAT, formatDate, getValueFromData } from '@/utils';
+import { ColDef, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
+import _ from 'lodash';
+import { useMemo } from 'react';
 
-const NavigatorComponentMap: Record<string, ElementType> = {
-	text: Text,
-	enum: Enum,
-	integer: Number,
-	decimal: Number,
-	reference: Reference,
-	boolean: BooleanField,
-	createdat: DateTime,
-	updatedat: DateTime,
-	datetime: DateTime,
-	link: Link,
-	'basic-values-list': BasicValueList,
-	'geo-point': GeoPoint,
-	'object-list': SubObject,
-	object: SubObject,
-	json: Json,
-	id: Text,
-	'rich-text': Text,
-	'encrypted-text': Text,
-	email: Text,
-	phone: Text,
-	date: DateTime,
-	time: Time,
-	binary: Text,
-};
-export default function useNavigatorColumns(fields: Field[]) {
-	const model = useModelStore((state) => state.model);
-	const { getDataOfSelectedModel, data: stateData } = useNavigatorStore();
-	const data = useMemo(() => getDataOfSelectedModel(model?._id) ?? [], [model, stateData]);
+export default function useNavigatorColumns() {
+	const database = useDatabaseStore((state) => state.database);
+	const { model, subModel } = useModelStore();
+	const hasSubModel = !_.isEmpty(subModel);
+	const fields = hasSubModel ? subModel?.fields : model?.fields;
+	function valueFormatter({ value }: ValueFormatterParams, field: Field) {
+		if (field.type === FieldTypes.DECIMAL) {
+			return Number(value);
+		}
+
+		if (field.type === FieldTypes.JSON) {
+			return JSON.stringify(value, null, 2);
+		}
+
+		if ([FieldTypes.DATETIME, FieldTypes.CREATED_AT, FieldTypes.UPDATED_AT].includes(field.type)) {
+			return formatDate(value, DATE_TIME_FORMAT);
+		}
+		if (field.type === FieldTypes.DATE) return formatDate(value, DATE_FORMAT);
+
+		if (FieldTypes.GEO_POINT === field.type) {
+			return `${database.type === 'MongoDB' ? value?.coordinates?.[0] : value?.x} - ${
+				database.type === 'MongoDB' ? value?.coordinates?.[1] : value?.y
+			}`;
+		}
+
+		if (field.type === FieldTypes.ENCRYPTED_TEXT) {
+			return value?.split('').fill('*').join('');
+		}
+
+		return value;
+	}
+
 	return useMemo(() => {
 		if (!fields) return NavigatorColumns;
-		const newNavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = fields?.map(
-			(field) => ({
-				id: field._id,
-				header: () => <SortButton text={field.name} field={field.name} />,
-				accessorKey: field.type === FieldTypes.ID ? 'id' : field.name,
-				size: field.type === FieldTypes.ID ? 50 : 200,
-				className: cn(field.type === FieldTypes.ID && 'sticky left-0 z-40'),
-				meta: {
-					type: field.type,
-				},
+		const newNavigatorColumns: ColDef[] = fields?.map((field) => ({
+			field: field.type === FieldTypes.ID ? 'id' : field.name,
+			pinned: field.name === 'id' ? 'left' : undefined,
+			valueGetter: (params: ValueGetterParams) => {
+				return getValueFromData(params.data, field.type === FieldTypes.ID ? 'id' : field.name);
+			},
+			editable:
+				field.creator !== 'system' &&
+				field.type !== FieldTypes.BINARY &&
+				field.type !== FieldTypes.OBJECT &&
+				field.type !== FieldTypes.OBJECT_LIST &&
+				!field.immutable,
+			filter: true,
+			headerComponentParams: { text: field.name, field: field.name },
+			maxWidth: field.type === FieldTypes.ID ? 75 : undefined,
+			cellEditor: NavigatorCellEditorMap[field.type],
+			cellRenderer: CellRendererMap[field.type],
+			cellEditorPopup:
+				field.type === FieldTypes.RICH_TEXT ||
+				field.type === FieldTypes.JSON ||
+				field.type === FieldTypes.GEO_POINT,
 
-				cell: ({ row, cell }) => {
-					const NavigatorComponent = NavigatorComponentMap[field.type];
-					return (
-						<NavigatorComponent
-							cell={cell}
-							row={row}
-							id={row.original.id}
-							index={row.index}
-							field={field}
-							value={getValueFromData(
-								row.original,
-								field.type === FieldTypes.ID ? 'id' : field.name,
-							)}
-							parentId={data?.[cell.row.index]?.id}
-						/>
-					);
-				},
-			}),
-		);
+			cellEditorParams: {
+				mask: CellMaskMap[field.type]?.mask,
+				replacement: CellMaskMap[field.type]?.replacement,
+				type: field.type,
+				decimalPlaces: field.decimal?.decimalDigits,
+				values: field.enum?.selectList,
+			},
+			cellRendererParams: { type: field.type, referenceModelIid: field.reference?.iid },
+			cellDataType: CellTypeMap[field.type],
+			valueFormatter: (params) => valueFormatter(params, field),
+		}));
 		return [NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]];
 	}, [fields]);
 }

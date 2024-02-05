@@ -45,12 +45,11 @@ export default function VersionSettingsNPMPackages() {
 				className='p-0'
 				type={TabTypes.NPMPackages}
 				title={t('version.settings.npm_packages') as string}
-				createButtonTitle={t('version.npm.install')}
-				emptyStateTitle={t('version.npm.no_package_found')}
 				isEmpty={!sortedPackages.length}
 				openCreateModal={() => setOpen(true)}
 				onMultipleDelete={deleteHandler}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
 			>

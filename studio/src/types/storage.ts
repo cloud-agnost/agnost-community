@@ -55,6 +55,7 @@ export interface BucketCountInfo {
 	currentPage: number;
 	pageSize: number;
 	totalPages: number;
+	totalCount?: number;
 }
 export interface CreateStorageParams extends BaseParams, BaseRequest {
 	name: string;

@@ -153,7 +153,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},
@@ -166,7 +166,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},
@@ -179,7 +179,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},
@@ -192,7 +192,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},
@@ -243,7 +243,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},
@@ -256,7 +256,7 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
-							[params.dbId]: state.models[params.dbId].map((m) =>
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
 						},

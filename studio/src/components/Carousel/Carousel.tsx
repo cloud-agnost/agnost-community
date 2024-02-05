@@ -15,7 +15,13 @@ interface CarouselProps {
 
 export default function MainCarousel({ items, showArrows }: CarouselProps) {
 	return (
-		<Carousel showThumbs={false} showStatus={false} showArrows={showArrows} autoPlay>
+		<Carousel
+			showThumbs={false}
+			showStatus={false}
+			showArrows={showArrows}
+			autoPlay
+			interval={5000}
+		>
 			{items.map(({ element, key }) => (
 				<div key={key}>
 					<div className='carousel-item-cover'>{element}</div>

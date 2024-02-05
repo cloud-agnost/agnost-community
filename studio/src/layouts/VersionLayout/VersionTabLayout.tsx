@@ -7,18 +7,14 @@ import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
-import { Table } from '@tanstack/react-table';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 
-interface Props<T> {
-	isEmpty: boolean;
-	table?: Table<T>;
-	type: Modules;
+interface Props {
 	title?: string;
-	emptyStateTitle: string;
-	createButtonTitle?: string | null;
+	isEmpty: boolean;
+	type: Modules;
 	children: ReactNode;
 	disabled?: boolean;
 	className?: string;
@@ -26,27 +22,28 @@ interface Props<T> {
 	handlerButton?: ReactNode;
 	loading: boolean;
 	searchable?: boolean;
+	selectedRowCount?: number;
+	onClearSelected?: () => void;
 	onMultipleDelete?: () => void;
 	openCreateModal?: () => void;
 }
 
-export default function VersionTabLayout<T>({
+export default function VersionTabLayout({
 	isEmpty,
 	children,
 	type,
 	breadCrumb,
-	table,
-	title,
-	emptyStateTitle,
-	createButtonTitle,
 	disabled,
 	className,
 	handlerButton,
 	loading,
 	searchable,
+	title,
+	selectedRowCount,
 	onMultipleDelete,
 	openCreateModal,
-}: Props<T>) {
+	onClearSelected,
+}: Props) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { versionId } = useParams<{ versionId: string }>();
 	const { pathname, search } = useLocation();
@@ -71,11 +68,21 @@ export default function VersionTabLayout<T>({
 			);
 		} else {
 			content = (
-				<EmptyState type={type} className='flex-1' title={emptyStateTitle}>
-					{!!createButtonTitle && !!openCreateModal ? (
+				<EmptyState
+					type={type}
+					className='flex-1'
+					title={t('general.module_empty', {
+						module: type,
+					})}
+				>
+					{openCreateModal ? (
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
-							<span className='ml-2'>{createButtonTitle}</span>
+							<span className='ml-2'>
+								{t('general.module_create', {
+									module: type,
+								})}
+							</span>
 						</Button>
 					) : (
 						handlerButton
@@ -92,7 +99,7 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4 p-4', className)}>
+		<div className={cn('h-full space-y-4 p-4 flex flex-col', className)}>
 			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
 				{breadCrumb}
 				<div className='flex items-center justify-between flex-1'>
@@ -104,24 +111,29 @@ export default function VersionTabLayout<T>({
 								className='sm:w-[450px] flex-1'
 							/>
 						)}
-						{table?.getSelectedRowModel()?.rows?.length ? (
+						{selectedRowCount ? (
 							<SelectedRowButton
-								table={table}
+								count={selectedRowCount}
+								onReset={onClearSelected as () => void}
 								onDelete={() => onMultipleDelete?.()}
 								disabled={disabled}
 							/>
 						) : null}
 						{handlerButton}
-						{!!createButtonTitle && !!openCreateModal && (
+						{!!openCreateModal && (
 							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 								<Plus size={14} />
-								<span className='ml-1'>{createButtonTitle}</span>
+								<span className='ml-1'>
+									{t('general.module_create', {
+										module: type,
+									})}
+								</span>
 							</Button>
 						)}
 					</div>
 				</div>
 			</div>
-			{!loading && content}
+			<div className='flex-1'>{!loading && content}</div>
 			<Loading loading={loading} />
 		</div>
 	);

@@ -136,11 +136,10 @@ export default function Files() {
 				isEmpty={files?.length === 0}
 				type={TabTypes.File}
 				openCreateModal={uploadFileHandler}
-				createButtonTitle={t('storage.file.upload')}
-				emptyStateTitle={t('storage.file.empty_text')}
 				onMultipleDelete={deleteMultipleFileMutation}
 				loading={isFetching && (!files?.length || files[0].bucketId !== bucket.id)}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
 						{!isRefreshing && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}

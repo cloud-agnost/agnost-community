@@ -8,7 +8,7 @@ class Field implements RealtimeActions<Model> {
 		useModelStore.setState?.((state) => ({
 			models: {
 				...state.models,
-				[data.dbId]: state.models[data.dbId].map((model) =>
+				[data.dbId]: state.models[data.dbId]?.map((model) =>
 					model._id === identifiers.modelId ? data : model,
 				),
 			},
@@ -39,7 +39,7 @@ class Field implements RealtimeActions<Model> {
 		useModelStore.setState?.((state) => ({
 			models: {
 				...state.models,
-				[data.dbId]: state.models[data.dbId].map((model) =>
+				[data.dbId]: state.models[data.dbId]?.map((model) =>
 					model._id === identifiers.modelId ? data : model,
 				),
 			},

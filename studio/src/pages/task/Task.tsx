@@ -80,12 +80,11 @@ export default function MainTask() {
 			<VersionTabLayout
 				type={TabTypes.Task}
 				title={t('task.title') as string}
-				createButtonTitle={t('task.add')}
-				emptyStateTitle={t('task.empty_text')}
 				isEmpty={!tasks.length}
 				openCreateModal={toggleCreateModal}
 				onMultipleDelete={deleteMultipleTasksHandler}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canEdit}
 				loading={isFetching && !tasks.length}
 				searchable
