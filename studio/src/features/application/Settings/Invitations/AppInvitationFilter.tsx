@@ -106,10 +106,11 @@ function AppInvitationFilter({ table }: Props) {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{!!table.getSelectedRowModel().rows?.length && (
-				<SelectedRowButton<Invitation>
+				<SelectedRowButton
 					onDelete={deleteInvitations}
-					table={table}
 					disabled={!canMultiDeleteInvite}
+					count={table.getSelectedRowModel().rows.length}
+					onReset={() => table.toggleAllRowsSelected(false)}
 				/>
 			)}
 		</div>

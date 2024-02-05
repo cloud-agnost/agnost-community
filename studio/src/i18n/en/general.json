@@ -136,5 +136,7 @@
 	"refresh": "Refresh",
 	"invitation_accepted": "Invitation accepted successfully",
 	"hour": "Hour",
-	"no_member_found": "No eligible member found"
+	"no_member_found": "No eligible member found",
+	"module_empty": "You do not have any {{module}}s for this app version",
+	"module_create": "Create {{module}}"
 }

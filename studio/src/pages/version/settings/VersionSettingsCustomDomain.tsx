@@ -90,12 +90,11 @@ export default function VersionSettingsCustomDomain() {
 					className='p-0'
 					type='custom-domain'
 					title={t('cluster.custom_domain') as string}
-					createButtonTitle={t('cluster.add_domain')}
-					emptyStateTitle={t('cluster.empty_domain')}
 					isEmpty={!versionDomains.length}
 					openCreateModal={() => setIsCreateModalOpen(true)}
 					onMultipleDelete={deleteMultipleDomainsHandler}
-					table={table}
+					selectedRowCount={table.getSelectedRowModel().rows.length}
+					onClearSelected={() => table.toggleAllRowsSelected(false)}
 					disabled={!canCreate}
 					loading={false}
 				>

@@ -56,14 +56,13 @@ export default function MainFunction() {
 			searchable
 			type={TabTypes.Function}
 			title={t('function.title') as string}
-			createButtonTitle={t('function.add')}
-			emptyStateTitle={t('function.empty_text')}
 			isEmpty={!functions.length}
 			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleFunctionsHandler}
-			table={table}
 			disabled={!canCreate}
 			loading={isFetching && !functions.length}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

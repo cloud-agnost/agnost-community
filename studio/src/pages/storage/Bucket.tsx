@@ -111,12 +111,11 @@ export default function Buckets() {
 				isEmpty={buckets.length === 0}
 				type={TabTypes.Bucket}
 				openCreateModal={() => setIsBucketCreateOpen(true)}
-				createButtonTitle={t('storage.bucket.create')}
-				emptyStateTitle={t('storage.bucket.empty_text')}
 				onMultipleDelete={deleteMultipleBucketsMutation}
 				loading={isFetching && !buckets.length}
 				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
 						{!isRefreshing && <Refresh className='mr-1 w-3.5 h-3.5' />}

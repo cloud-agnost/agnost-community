@@ -58,16 +58,15 @@ export default function MainMiddleware() {
 		});
 	}
 	return (
-		<VersionTabLayout<Middleware>
+		<VersionTabLayout
 			searchable
 			type={TabTypes.Middleware}
 			title={t('version.settings.middlewares') as string}
-			emptyStateTitle={t('version.middleware.no_middleware_found')}
-			createButtonTitle={t('version.middleware.add_middleware')}
 			isEmpty={!middlewares.length}
 			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleMiddlewaresHandler}
-			table={table}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 			disabled={!canCreate}
 			loading={isFetching && !middlewares.length}
 		>

@@ -8,7 +8,7 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, Endpoint, TabTypes } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -67,16 +67,13 @@ export default function MainEndpoint() {
 	}
 
 	return (
-		<VersionTabLayout<Endpoint>
+		<VersionTabLayout
 			searchable
 			type={TabTypes.Endpoint}
 			title={t('endpoint.title') as string}
-			createButtonTitle={t('endpoint.add')}
-			emptyStateTitle={t('endpoint.empty')}
 			isEmpty={!endpoints.length}
 			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
-			table={table}
 			disabled={!canCreate}
 			loading={isFetching && !endpoints.length}
 			handlerButton={
@@ -84,6 +81,8 @@ export default function MainEndpoint() {
 					{t('queue.view_logs')}
 				</Button>
 			}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

@@ -64,12 +64,11 @@ export default function MainStorage() {
 			title={t('storage.title') as string}
 			type={TabTypes.Storage}
 			openCreateModal={toggleCreateModal}
-			createButtonTitle={t('storage.create')}
-			emptyStateTitle={t('storage.empty_text')}
 			onMultipleDelete={deleteMultipleStoragesHandler}
 			disabled={!canCreateStorages}
 			loading={isFetching && !storages.length}
-			table={table}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

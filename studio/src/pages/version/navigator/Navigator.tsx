@@ -3,29 +3,29 @@ import { Button } from '@/components/Button';
 import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
+import { TableHeader } from '@/features/database/models/Navigator';
 import { useNavigatorColumns, useToast, useUpdateData, useUpdateEffect } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { APIError, FieldTypes, TabTypes } from '@/types';
+import { APIError, FieldTypes, ResourceInstances, TabTypes } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { CellEditRequestEvent } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Theme
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from './Pagination';
-import { TableHeader } from '@/features/database/models/Navigator';
 
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
-
+	const [selectedRowCount, setSelectedRowCount] = useState(0);
 	const {
 		getDataFromModel,
 		deleteMultipleDataFromModel,
@@ -48,7 +48,7 @@ export default function Navigator() {
 	const { mutateAsync: deleteMultipleMutate } = useMutation({
 		mutationFn: deleteMultipleDataFromModel,
 		mutationKey: ['deleteMultipleDataFromModel'],
-		// onSuccess: () => table.resetRowSelection(),
+		onSuccess: () => gridRef.current?.api.deselectAll(),
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
 		},
@@ -61,7 +61,8 @@ export default function Navigator() {
 		});
 	}
 	function handleExportClick() {
-		gridRef.current!.api.exportDataAsCsv();
+		console.log(gridRef.current?.api.getSelectedNodes().length);
+		// gridRef.current!.api.exportDataAsCsv();
 	}
 
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -102,9 +103,10 @@ export default function Navigator() {
 	function onCellEditRequest(event: CellEditRequestEvent) {
 		const oldData = event.data;
 		const field = event.colDef.field;
+		if (!field) return;
 		let newValue = event.newValue;
 		const newData = { ...oldData };
-		newData[field!] = event.newValue;
+		newData[field] = event.newValue;
 
 		const tx = {
 			update: [newData],
@@ -116,11 +118,11 @@ export default function Navigator() {
 		if (event.colDef.cellEditorParams.type === FieldTypes.GEO_POINT) {
 			const coords = {
 				lat:
-					database.type.toString() === 'MongoDB'
+					database.type === ResourceInstances.MongoDB
 						? event.newValue?.coordinates?.[0]
 						: event.newValue?.x,
 				lng:
-					database.type.toString() === 'MongoDB'
+					database.type === ResourceInstances.MongoDB
 						? event.newValue?.coordinates?.[1]
 						: event.newValue?.y,
 			};
@@ -131,19 +133,21 @@ export default function Navigator() {
 
 		updateData(
 			{
-				[field!]: newValue,
+				[field]: newValue,
 			},
 			oldData.id,
 			event.node.rowIndex as number,
-			field!,
+			field,
 		);
 	}
 
 	useUpdateEffect(() => {
-		if (isFetching) {
-			gridRef.current!.api.showLoadingOverlay();
-		} else {
-			gridRef.current!.api.hideOverlay();
+		if (gridRef.current) {
+			if (isFetching) {
+				gridRef.current.api.showLoadingOverlay();
+			} else {
+				gridRef.current.api.hideOverlay();
+			}
 		}
 	}, [isFetching]);
 
@@ -151,12 +155,13 @@ export default function Navigator() {
 		<VersionTabLayout
 			isEmpty={false}
 			type={TabTypes.Field}
-			emptyStateTitle={t('database.fields.no_fields')}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
 			loading={false}
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb items={breadcrumbItems} />}
+			selectedRowCount={selectedRowCount}
+			onClearSelected={() => gridRef.current?.api.deselectAll()}
 			handlerButton={
 				<>
 					<Button variant='outline' onClick={handleExportClick} disabled={!canMultiDelete}>
@@ -183,9 +188,14 @@ export default function Navigator() {
 					}}
 					readOnlyEdit={true}
 					onCellEditRequest={onCellEditRequest}
+					ensureDomOrder
+					enableCellTextSelection
 					reactiveCustomComponents
 					overlayLoadingTemplate={
 						'<div aria-live="polite" aria-atomic="true" style="position:absolute;top:0;left:0;right:0; bottom:0; background: url(https://ag-grid.com/images/ag-grid-loading-spinner.svg) center no-repeat" aria-label="loading"></div>'
+					}
+					onRowSelected={() =>
+						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
 				/>
 				<Pagination />

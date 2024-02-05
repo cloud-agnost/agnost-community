@@ -2,17 +2,17 @@ import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { Minus, Trash } from '@phosphor-icons/react';
 import { useIsMutating } from '@tanstack/react-query';
-import { Table } from '@tanstack/react-table';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';
-interface Props<T> {
+interface Props {
 	onDelete: () => void;
-	table: Table<T>;
+	count: number;
 	className?: string;
 	disabled?: boolean;
+	onReset: () => void;
 }
-function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>) {
+function SelectedRowButton({ onDelete, count, className, disabled, onReset }: Props) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	const isMutating = useIsMutating();
@@ -21,12 +21,12 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 		<>
 			<div className={cn('flex items-center rounded-sm bg-lighter p-1', className)}>
 				<div className='flex items-center gap-2 border-r border-button-border pr-2'>
-					{table && (
+					{count > 0 && (
 						<Button
 							size='sm'
 							variant='primary'
 							className='bg-button-primary h-1/2 p-1'
-							onClick={() => table?.resetRowSelection()}
+							onClick={onReset}
 						>
 							<Minus size={14} weight='bold' className='text-icon-default' />
 						</Button>
@@ -34,7 +34,7 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 
 					<span className='font-sfCompact link text-xs'>
 						{t('general.selected', {
-							count: table.getSelectedRowModel().rows.length,
+							count,
 						})}
 					</span>
 				</div>

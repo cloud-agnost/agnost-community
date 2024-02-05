@@ -47,12 +47,11 @@ export default function VersionSettingsRateLimits() {
 				className='p-0'
 				type='rate-limit'
 				title={t('version.settings.rate_limits') as string}
-				createButtonTitle={t('version.add_new_limiter')}
-				emptyStateTitle={t('version.no_rate_limiters')}
 				isEmpty={!sortedLimits.length}
 				openCreateModal={() => setOpenCreateModal(true)}
 				onMultipleDelete={deleteHandler}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
 			>

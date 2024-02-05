@@ -67,14 +67,14 @@ export default function Fields() {
 
 	return (
 		<>
-			<VersionTabLayout<Field>
+			<VersionTabLayout
 				searchable
 				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
 				type={TabTypes.Field}
 				handlerButton={<CreateFieldButton />}
-				emptyStateTitle={t('database.fields.no_fields')}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canMultiDelete}
 				onMultipleDelete={deleteHandler}
 				loading={!model}

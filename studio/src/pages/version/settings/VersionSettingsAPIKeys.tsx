@@ -53,12 +53,11 @@ export default function VersionSettingsAPIKeys() {
 				className='p-0'
 				type='apiKey'
 				title={t('version.settings.api_keys') as string}
-				createButtonTitle={t('version.api_key.add')}
-				emptyStateTitle={t('version.api_key.no_api_key_found')}
 				isEmpty={!sortedApiKeys.length}
 				openCreateModal={() => setOpenCreateModal(true)}
 				onMultipleDelete={deleteMultipleApiKeys}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
 			>

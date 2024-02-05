@@ -115,14 +115,13 @@ export default function Models() {
 	}, [dbId, orgId, appId, versionId]);
 	return (
 		<>
-			<VersionTabLayout<Model>
+			<VersionTabLayout
 				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 				isEmpty={!filteredModels.length}
 				type={TabTypes.Model}
 				openCreateModal={() => setIsCreateModelOpen(true)}
-				createButtonTitle={t('database.models.create')}
-				emptyStateTitle={t('database.models.no_models')}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteMultipleModelHandler}
 				loading={isFetching}

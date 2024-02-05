@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
+import { Loading } from '@/components/Loading';
 import { SearchInput } from '@/components/SearchInput';
 import { useTable } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
@@ -8,14 +9,12 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { Application, ApplicationMember } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { Table } from '@tanstack/react-table';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
-import { Loading } from '@/components/Loading';
 export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const [searchParams] = useSearchParams();
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
@@ -71,9 +70,10 @@ export default function MainAppMembers({ loading }: { loading: boolean }) {
 				/>
 				<div className='flex items-center gap-4'>
 					{!!table.getSelectedRowModel().rows?.length && (
-						<SelectedRowButton<ApplicationMember>
+						<SelectedRowButton
 							onDelete={removeMultipleMembers}
-							table={table as Table<ApplicationMember>}
+							count={table.getSelectedRowModel().rows.length}
+							onReset={() => table.toggleAllRowsSelected(false)}
 							disabled={!canMultiDelete}
 						/>
 					)}

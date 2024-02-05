@@ -45,12 +45,11 @@ export default function VersionSettingsEnvironmentVariables() {
 				className='p-0'
 				type='variable'
 				title={t('version.settings.environment_variables') as string}
-				createButtonTitle={t('version.variable.add')}
-				emptyStateTitle={t('version.variable.no_variable_found')}
 				isEmpty={!sortedVariables.length}
 				openCreateModal={() => setOpenCreateModal(true)}
 				onMultipleDelete={deleteMultipleParamsHandler}
-				table={table}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
 			>
