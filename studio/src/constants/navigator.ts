@@ -8,7 +8,7 @@ import {
 } from '@/features/database/models/Navigator';
 
 import { FieldTypes } from '@/types';
-import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from '@/utils';
+import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT_WITH_SECONDS } from '@/utils';
 import { Replacement } from '@react-input/mask';
 import { ElementType } from 'react';
 
@@ -75,15 +75,15 @@ export const CellMaskMap: Record<string, { mask: string; replacement: Replacemen
 		replacement: { _: /\d/ },
 	},
 	[FieldTypes.TIME]: {
-		mask: TIME_FORMAT,
-		replacement: { H: /\d/, m: /\d/, s: /\d/ },
+		mask: TIME_FORMAT_WITH_SECONDS,
+		replacement: { h: /\d/, m: /\d/, s: /\d/ },
 	},
 	[FieldTypes.DATE]: {
 		mask: DATE_FORMAT,
-		replacement: { d: /\d/, m: /\d/, y: /\d/ },
+		replacement: { y: /\d/, M: /\d/, d: /\d/ },
 	},
 	[FieldTypes.DATETIME]: {
 		mask: DATE_TIME_FORMAT,
-		replacement: { d: /\d/, M: /\d/, y: /\d/, h: /\d/, m: /\d/, s: /\d/ },
+		replacement: { y: /\d/, M: /\d/, d: /\d/, h: /\d/, m: /\d/, s: /\d/ },
 	},
 };
