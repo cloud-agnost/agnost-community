@@ -32,7 +32,6 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 				versionId,
 				modelIid: referenceModelIid,
 			}));
-		console.log('referenceModel', referenceModel, referenceModelIid);
 		if (referenceModel) {
 			resetNestedModels();
 			searchParams.delete('f');

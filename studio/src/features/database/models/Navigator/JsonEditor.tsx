@@ -10,10 +10,8 @@ export default function JsonEditor({
 	eventKey,
 	node,
 	column,
-	cellStartedEdit,
 }: CustomCellEditorProps) {
 	const updateValue = (value: string | undefined) => {
-		console.log('value', value);
 		onValueChange(value === '' ? null : value);
 	};
 
@@ -37,7 +35,6 @@ export default function JsonEditor({
 	useEffect(() => {
 		onValueChange(JSON.stringify(value, null, 2));
 	}, []);
-	console.log('value', cellStartedEdit);
 	return (
 		<div className='w-[500px] h-[210px] bg-subtle p-1 rounded'>
 			<CodeEditor
