@@ -112,6 +112,7 @@ export const authManageStorage = async (req, res, next) => {
 		});
 	}
 
+	req.user = user;
 	next();
 };
 
