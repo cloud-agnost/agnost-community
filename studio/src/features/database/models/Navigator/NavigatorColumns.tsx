@@ -1,14 +1,21 @@
 import { TableConfirmation } from '@/components/Table';
 import { toast } from '@/hooks/useToast';
+import useDatabaseStore from '@/store/database/databaseStore';
+import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { ColDef } from 'ag-grid-community';
+import { CustomCellRendererProps } from 'ag-grid-react';
 
 const { deleteDataFromModel } = useNavigatorStore.getState();
 const queryClient = new QueryClient();
 async function deleteHandler(id: string) {
+	const { model } = useModelStore.getState();
+	const { database } = useDatabaseStore.getState();
+	const { dataCountInfo, getDataFromModel } = useNavigatorStore.getState();
+	const countInfo = dataCountInfo?.[model._id];
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
@@ -17,6 +24,12 @@ async function deleteHandler(id: string) {
 				toast({
 					title: error.details,
 					action: 'error',
+				});
+
+				getDataFromModel({
+					page: countInfo?.currentPage ?? 0,
+					size: countInfo?.pageSize ?? 0,
+					dbType: database.type,
 				});
 			},
 		})
@@ -39,14 +52,14 @@ export const NavigatorColumns: ColDef[] = [
 		field: 'actions',
 		width: 120,
 		pinned: 'right',
-		cellRenderer: (params: any) => {
+		cellRenderer: (params: CustomCellRendererProps) => {
 			const canDeleteModel = getVersionPermission('model.delete');
 			return (
 				<TableConfirmation
 					align='end'
 					title={translate('database.navigator.delete.title')}
 					description={translate('database.navigator.delete.message')}
-					onConfirm={() => deleteHandler(params.value.id)}
+					onConfirm={() => deleteHandler(params.data.id)}
 					contentClassName='m-0'
 					hasPermission={canDeleteModel}
 				/>
