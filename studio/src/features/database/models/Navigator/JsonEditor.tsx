@@ -44,6 +44,9 @@ export default function JsonEditor({
 				name={`navigator-${column.getId()}-${node.rowIndex}`}
 				className='w-full h-full'
 				containerClassName='w-full h-full'
+				options={{
+					fontSize: 12,
+				}}
 			/>
 		</div>
 	);
