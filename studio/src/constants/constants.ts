@@ -69,6 +69,7 @@ import useAuthStore from '@/store/auth/authStore';
 import {
 	AppRoles,
 	Application,
+	DatabaseTypes,
 	EnvironmentStatus,
 	HttpMethod,
 	Instance,
@@ -608,12 +609,12 @@ export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
 
 export const CREATE_RESOURCE_TYPES = ['database', 'cache', 'storage', 'queue'];
 
-export const DATABASE_ICON_MAP: Record<string, ElementType> = {
+export const DATABASE_ICON_MAP: Record<DatabaseTypes, ElementType> = {
 	MongoDB: MongoDb,
 	MySQL: MySql,
 	PostgreSQL: PostgreSql,
-	Oracle: Oracle,
-	'SQL Server': SqlServer,
+	// Oracle: Oracle,
+	// 'SQL Server': SqlServer,
 };
 export const QUEUE_ICON_MAP: Record<string, ElementType> = {
 	RabbitMQ: RabbitMq,
