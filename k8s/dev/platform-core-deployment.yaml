@@ -67,7 +67,7 @@ spec:
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
-                         key: clusterAcessToken
+                         key: clusterAccessToken
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:

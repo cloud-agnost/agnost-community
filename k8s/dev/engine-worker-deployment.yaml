@@ -83,6 +83,6 @@ spec:
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
-                         key: clusterAcessToken
+                         key: clusterAccessToken
                  - name: NAMESPACE
                    value: default

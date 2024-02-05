@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: studio-clusterip-service
+  namespace: default
+spec:
+  ports:
+  - port: 4000
+    protocol: TCP
+    targetPort: 4000
+  selector:
+    app: studio
+  sessionAffinity: None
+  type: ClusterIP
