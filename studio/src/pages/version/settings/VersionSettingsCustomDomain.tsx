@@ -6,6 +6,7 @@ import { useAuthorizeVersion, useInfiniteScroll, useTable, useToast } from '@/ho
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useSettingsStore from '@/store/version/settingsStore';
+import { TabTypes } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useState } from 'react';
@@ -88,7 +89,7 @@ export default function VersionSettingsCustomDomain() {
 			) : (
 				<VersionTabLayout
 					className='p-0'
-					type='custom-domain'
+					type={TabTypes.CustomDomains}
 					title={t('cluster.custom_domain') as string}
 					createButtonTitle={t('cluster.add_domain')}
 					emptyStateTitle={t('cluster.empty_domain')}

@@ -3,7 +3,6 @@ import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Loading } from '@/components/Loading';
 import { TableLoading } from '@/components/Table/Table';
-import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
 import { useNavigatorColumns, useTable, useToast, useUpdateEffect } from '@/hooks';
@@ -13,6 +12,7 @@ import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError, TabTypes } from '@/types';
 import { isEmpty } from '@/utils';
+import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
 import _ from 'lodash';
@@ -155,7 +155,7 @@ export default function Navigator() {
 			breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 			handlerButton={
 				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-					{!isRefreshing && <Refresh className='mr-1 text-sm' />}
+					{!isRefreshing && <ArrowClockwise className='mr-1 text-sm' />}
 					{t('general.refresh')}
 				</Button>
 			}
