@@ -54,7 +54,7 @@
 			}
 
 			&:first-child {
-				@apply sticky left-0 z-10;
+				@apply sticky left-0 z-10 bg-base dark:bg-[#171d2d];
 			}
 
 			&.icon {
