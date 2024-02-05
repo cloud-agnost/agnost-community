@@ -48,7 +48,11 @@ export default function Navigator() {
 	const { mutateAsync: deleteMultipleMutate } = useMutation({
 		mutationFn: deleteMultipleDataFromModel,
 		mutationKey: ['deleteMultipleDataFromModel'],
-		onSuccess: () => gridRef.current?.api.deselectAll(),
+		onSuccess: () => {
+			setSelectedRowCount(0);
+			gridRef.current?.api.deselectAll();
+			refetch();
+		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
 		},
@@ -61,8 +65,7 @@ export default function Navigator() {
 		});
 	}
 	function handleExportClick() {
-		console.log(gridRef.current?.api.getSelectedNodes().length);
-		// gridRef.current!.api.exportDataAsCsv();
+		gridRef.current!.api.exportDataAsCsv();
 	}
 
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -189,6 +192,7 @@ export default function Navigator() {
 					readOnlyEdit={true}
 					onCellEditRequest={onCellEditRequest}
 					ensureDomOrder
+					suppressRowClickSelection
 					enableCellTextSelection
 					reactiveCustomComponents
 					overlayLoadingTemplate={

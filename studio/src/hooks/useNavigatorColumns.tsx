@@ -1,4 +1,4 @@
-import { NavigatorCellEditorMap, CellRendererMap, CellMaskMap, CellTypeMap } from '@/constants';
+import { CellMaskMap, CellRendererMap, CellTypeMap, NavigatorCellEditorMap } from '@/constants';
 import { NavigatorColumns } from '@/features/database/models/Navigator';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
@@ -34,7 +34,7 @@ export default function useNavigatorColumns() {
 		}
 
 		if (field.type === FieldTypes.ENCRYPTED_TEXT) {
-			return value.split('').fill('*').join('');
+			return value?.split('').fill('*').join('');
 		}
 
 		return value;
@@ -50,7 +50,6 @@ export default function useNavigatorColumns() {
 			},
 			editable:
 				field.creator !== 'system' &&
-				field.type !== FieldTypes.ENCRYPTED_TEXT &&
 				field.type !== FieldTypes.BINARY &&
 				field.type !== FieldTypes.OBJECT &&
 				field.type !== FieldTypes.OBJECT_LIST &&
@@ -60,7 +59,10 @@ export default function useNavigatorColumns() {
 			maxWidth: field.type === FieldTypes.ID ? 75 : undefined,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
-			cellEditorPopup: field.type === FieldTypes.RICH_TEXT || field.type === FieldTypes.JSON,
+			cellEditorPopup:
+				field.type === FieldTypes.RICH_TEXT ||
+				field.type === FieldTypes.JSON ||
+				field.type === FieldTypes.GEO_POINT,
 
 			cellEditorParams: {
 				mask: CellMaskMap[field.type]?.mask,
