@@ -201,7 +201,7 @@ export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.resources'),
 		href: 'resources',
-		icon: Storage,
+		icon: Resource,
 	},
 	{
 		name: translate('organization.menu.settings'),
