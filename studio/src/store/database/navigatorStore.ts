@@ -14,9 +14,7 @@ interface NavigatorStore {
 	data: {
 		[modelId: string]: Record<string, any>[];
 	};
-	subModelData: {
-		[modelId: string]: Record<string, any>[];
-	};
+	subModelData: Record<string, any>[];
 	selectedSubModelId: string;
 	dataCountInfo:
 		| {
@@ -36,7 +34,7 @@ type Actions = {
 
 const initialState: NavigatorStore = {
 	data: {},
-	subModelData: {},
+	subModelData: [],
 	selectedSubModelId: '',
 	dataCountInfo: undefined,
 };
@@ -101,6 +99,15 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 			try {
 				const data = await NavigatorService.updateDataFromModel(param);
 				const modelId = useModelStore.getState().model._id;
+				const subModel = useModelStore.getState().subModel;
+
+				if (param.isSubObjectUpdate) {
+					const subModelData = data[subModel.name];
+					set({
+						subModelData: Array.isArray(subModelData) ? subModelData : [subModelData],
+					});
+				}
+
 				set((state) => ({
 					data: {
 						...state.data,
