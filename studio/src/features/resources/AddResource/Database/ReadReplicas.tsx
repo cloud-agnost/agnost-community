@@ -9,12 +9,11 @@ import {
 } from '@/components/Dialog';
 import { Form } from '@/components/Form';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
-import { Pencil } from '@/components/icons';
 import { INSTANCE_PORT_MAP } from '@/constants';
 import { DatabaseInfo, MongoConnectionFormat, TestConnectionButton } from '@/features/resources';
 import { AccessDbSchema, ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -90,7 +89,7 @@ export default function ReadReplicas() {
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<Button variant='icon' size='sm' rounded>
-											<Pencil
+											<PencilSimple
 												className='w-5 h-5 text-icon-base'
 												onClick={() => editReplica(index)}
 											/>

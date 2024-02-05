@@ -5,9 +5,9 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog } from '@/types';
 import { translate } from '@/utils';
+import { PencilSimple } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
-import { Document } from 'components/icons';
 
 const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 	{
@@ -90,7 +90,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 			const { openLogDetails } = useEnvironmentStore.getState();
 			return (
 				<Button variant='blank' onClick={() => openLogDetails(row.original)}>
-					<Document className='w-6 h-6' />
+					<PencilSimple className='w-6 h-6' />
 				</Button>
 			);
 		},

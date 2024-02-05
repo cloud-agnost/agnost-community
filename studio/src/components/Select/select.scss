@@ -6,6 +6,7 @@
 	@apply focus:border-input-focus focus:outline-none focus:ring-0;
 	@apply truncate max-w-[calc(100%)];
 	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed disabled:opacity-50;
+	@apply border border-input-border hover:border-input-hover dark:border-none;
 	&[data-placeholder] span {
 		@apply text-subtle focus:outline-none;
 	}

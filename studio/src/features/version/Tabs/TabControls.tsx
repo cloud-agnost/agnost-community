@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { NewTabDropdown, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
-import { cn } from '@/utils';
 import { CaretLeft, CaretRight, Sidebar } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -90,14 +89,12 @@ export default function TabControls({
 			)}
 			<div className='tab-control-item'>
 				<Button
+					variant={isSidebarOpen ? 'primary' : 'icon'}
 					rounded
-					variant='icon'
+					iconOnly
 					size='sm'
+					className='aspect-square'
 					onClick={toggleSidebar}
-					className={cn(
-						isSidebarOpen &&
-							'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
-					)}
 				>
 					<Sidebar size={14} />
 				</Button>

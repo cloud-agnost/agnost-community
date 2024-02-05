@@ -10,10 +10,10 @@ import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Calendar } from 'components/icons';
 import { TabLink } from '../version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { toast } from '@/hooks/useToast';
+import { Calendar } from '@phosphor-icons/react';
 
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();

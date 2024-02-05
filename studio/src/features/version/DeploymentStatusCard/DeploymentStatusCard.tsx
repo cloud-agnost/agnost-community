@@ -1,5 +1,4 @@
 import { Button } from '@/components/Button';
-import { Refresh } from '@/components/icons';
 import { ENV_STATUS_CLASS_MAP } from '@/constants';
 import {
 	DeploymentLogsDrawer,
@@ -10,7 +9,7 @@ import { useAuthorizeVersion, useEnvironmentStatus, useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError, EnvironmentStatus } from '@/types';
 import { cn } from '@/utils';
-import { Cloud } from '@phosphor-icons/react';
+import { ArrowClockwise, Cloud } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import {
 	DropdownMenu,
@@ -99,7 +98,7 @@ export default function DeploymentStatusCard() {
 										rounded
 										disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
 									>
-										<Refresh
+										<ArrowClockwise
 											className={cn(
 												'w-5 h-5 text-icon-secondary',
 												(isPending || envStatus === EnvironmentStatus.Deploying) && 'animate-spin',

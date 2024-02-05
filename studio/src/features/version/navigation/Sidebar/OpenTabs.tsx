@@ -58,12 +58,12 @@ export default function OpenTabs() {
 										size='sm'
 										rounded
 										className={cn(
-											tab.isActive && 'hover:bg-button-primary',
-											'!p-0 !h-5 transform translate-y-[1px] invisible group-hover:visible',
+											tab.isActive && 'hover:bg-brand-darker dark:text-subtle !text-white',
+											'!p-0 !h-5 transform translate-y-[1px] invisible group-hover:visible group-hover:dark:text-default',
 										)}
 										onClick={(e) => tabRemoveHandler(e, tab)}
 									>
-										<X size={14} className='text-subtle group-hover:text-default' />
+										<X size={14} />
 									</Button>
 								)}
 							</div>

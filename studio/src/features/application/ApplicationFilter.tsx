@@ -27,9 +27,9 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 					<Button
 						size='sm'
 						iconOnly
-						variant='outline'
+						variant='blank'
 						className={cn(
-							isCard ? 'bg-wrapper-background-base dark:bg-lighter' : 'bg-base',
+							isCard ? 'border border-border shadow-md' : 'bg-subtle',
 							'transition-all',
 						)}
 						onClick={() => setIsCard(true)}
@@ -42,9 +42,9 @@ export default function ApplicationFilter({ isCard, setIsCard }: ApplicationFilt
 					<Button
 						size='sm'
 						iconOnly
-						variant='outline'
+						variant='blank'
 						className={cn(
-							!isCard ? 'bg-wrapper-background-base dark:bg-lighter' : 'bg-base',
+							!isCard ? 'border border-border shadow-md' : 'bg-subtle',
 							'transition-all',
 						)}
 						onClick={() => setIsCard(false)}

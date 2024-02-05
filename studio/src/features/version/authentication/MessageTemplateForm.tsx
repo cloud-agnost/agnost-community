@@ -3,14 +3,13 @@ import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Document } from '@/components/icons';
 import { useAuthorizeVersion, useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, TemplateTypes, VersionMessageTemplate } from '@/types';
 import { capitalize, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CaretDown, FloppyDisk } from '@phosphor-icons/react';
+import { CaretDown, FileText, FloppyDisk } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import {
 	DropdownMenu,
@@ -263,7 +262,7 @@ export default function MessageTemplateForm({
 											<DropdownMenu modal={false}>
 												<DropdownMenuTrigger asChild>
 													<Button variant='secondary' iconOnly>
-														<Document className='w-4 h-4' />
+														<FileText className='w-4 h-4' />
 													</Button>
 												</DropdownMenuTrigger>
 												<DropdownMenuContent

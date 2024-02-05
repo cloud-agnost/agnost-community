@@ -29,11 +29,9 @@ export default function CodeSearchInput() {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								variant='blank'
+								variant={matchCase ? 'primary' : 'blank'}
 								className={cn(
 									'hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchCase &&
-										'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
 								)}
 								iconOnly
 								size='sm'
@@ -49,15 +47,11 @@ export default function CodeSearchInput() {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								variant='blank'
+								variant={matchWholeWord ? 'primary' : 'blank'}
 								iconOnly
 								size='sm'
 								onClick={toggleMatchWholeWord}
-								className={cn(
-									'hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
-									matchWholeWord &&
-										'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default',
-								)}
+								className='hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6'
 							>
 								<TextAlignJustify size={16} />
 							</Button>

@@ -53,10 +53,10 @@
 		--success: 14 156 88;
 		--error: 198 57 91;
 
-		--theme-base-background: 235 236 237;
-		--theme-subtle-background: 252 252 252;
+		--theme-base-background: 255 255 255;
+		--theme-subtle-background: 244 245 248;
 		--theme-lighter-background: 237 238 243;
-		--theme-border: 210 212 214;
+		--theme-border: 239 241 244;
 		--theme-border-hover: 175 177 179;
 
 		--theme-base-reverse-background: 25 28 41;
@@ -66,35 +66,35 @@
 
 		--text-base: 25 28 41;
 		// Todo find a better color for text-subtle
-		--text-subtle: 107, 111, 118;
+		--text-subtle: 107 111 118;
 		--text-disabled: 219 221 230;
 
 		--icon-secondary: 33 37 48;
-		--icon-base: 107, 111, 118;
+		--icon-base: 107 111 118;
 		--icon-disabled: 219 221 230;
 
 		--text-base-reverse: 255 255 255;
-		--text-subtle-reverse: 107, 111, 118;
+		--text-subtle-reverse: 107 111 118;
 		--text-disabled-reverse: 99 113 142;
 
 		--icon-secondary-reverse: 255 255 255;
-		--icon-base-reverse: 107, 111, 118;
+		--icon-base-reverse: 107 111 118;
 		--icon-disabled-reverse: 99 113 142;
 
 		--form-input-base-background: 255 255 255;
 		--form-input-base-border: 219 221 230;
-		--form-input-hover: 107, 111, 118;
+		--form-input-hover: 107 111 118;
 		--form-input-focus: 134 157 254;
 		--form-input-disabled-background: 249 249 251;
 		--form-input-disabled-border: 237 238 243;
 
 		--button-background-base-primary: 15 135 255;
 		--button-background-hover-primary: 107 181 255;
-		--button-background-base-secondary: 252 252 252;
-		--button-background-hover-secondary: 240 241 242;
+		--button-background-base-secondary: 244 245 248;
+		--button-background-hover-secondary: 237 238 243;
 		--button-background-disabled: 249 249 251;
 
-		--button-border-hover: 107, 111, 118;
+		--button-border-hover: 107 111 118;
 		--button-border-disabled: 249 249 251;
 		--button-border-base: 219 221 230;
 
@@ -103,7 +103,7 @@
 		--surface-red: 252 218 226;
 
 		--wrapper-background-base: 249 249 251;
-		--wrapper-background-hover: 203 204 208;
+		--wrapper-background-hover: 240 243 249;
 		--wrapper-background-light: 247 248 250;
 
 		--database: 0 77 13;
@@ -530,7 +530,7 @@ html .light ::-webkit-scrollbar-track {
 	&__multi-value__remove {
 		@apply text-icon-base #{!important};
 		&:hover {
-			@apply hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover #{!important};
+			@apply hover:bg-subtle #{!important};
 		}
 	}
 	&__clear-indicator {
