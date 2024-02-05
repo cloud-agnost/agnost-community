@@ -1329,7 +1329,6 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
 			const templateLiteralBlock = `\`${selectedText}\``;
-			console.log(templateLiteralBlock);
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
