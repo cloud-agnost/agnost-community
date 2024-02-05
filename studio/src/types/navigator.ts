@@ -1,9 +1,10 @@
 import { Cell } from '@tanstack/react-table';
 import { Field } from './model';
-import { BaseGetRequest, BaseRequest } from './type';
+import { BaseGetRequest, BaseRequest, DatabaseType } from './type';
 
 export type GetDataFromModelParams = BaseGetRequest & {
 	id?: string;
+	dbType: DatabaseType;
 };
 
 export interface DeleteDataFromModelParams extends BaseRequest {

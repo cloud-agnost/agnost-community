@@ -1,68 +1,14 @@
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
-import { Input } from '@/components/Input';
-import { useEditedField, useUpdateData } from '@/hooks';
-import useNavigatorStore from '@/store/database/navigatorStore';
-import { NavigatorComponentProps } from '@/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { CustomCellRendererProps } from 'ag-grid-react';
 import { Link } from 'react-router-dom';
-import * as z from 'zod';
-export default function LinkField({ cell, value, id, index, field }: NavigatorComponentProps) {
-	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field.name);
-	const isEditable = useEditedField(field, cell);
-	const LinkSchema = z.object({
-		[field.name]: z.string().optional(),
-	});
-	const form = useForm<z.infer<typeof LinkSchema>>({
-		resolver: zodResolver(LinkSchema),
-		defaultValues: {
-			[field.name]: value,
-		},
-	});
 
-	function onSubmit(d: z.infer<typeof LinkSchema>) {
-		updateData(
-			{
-				[field.name]: d[field.name],
-			},
-			id,
-			index,
-		);
-	}
-
-	useEffect(() => {
-		if (isEditable) {
-			form.setValue(field.name, value);
-		}
-	}, [isEditable]);
-	return isEditable ? (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<FormField
-					control={form.control}
-					name={field.name}
-					render={({ field }) => (
-						<FormItem>
-							<FormControl>
-								<Input
-									{...field}
-									error={!!form.formState.errors?.[field.name]}
-									onBlur={() => {
-										form.handleSubmit(onSubmit)();
-										if (form.formState.errors?.[field.name]) setEditedField('');
-									}}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			</form>
-		</Form>
-	) : (
-		<Link to={value} className='link truncate block' target='_blank' rel='noopener noreferrer'>
+export default function LinkField({ value }: CustomCellRendererProps<any, string>) {
+	return (
+		<Link
+			to={value as string}
+			className='link truncate block'
+			target='_blank'
+			rel='noopener noreferrer'
+		>
 			{value}
 		</Link>
 	);

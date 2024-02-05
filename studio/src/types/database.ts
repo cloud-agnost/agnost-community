@@ -1,4 +1,5 @@
 import { VersionParams } from '@/types/version.ts';
+import { DatabaseType } from '.';
 
 export interface Database {
 	orgId: string;
@@ -8,7 +9,7 @@ export interface Database {
 	versionId: string;
 	iid: string;
 	name: string;
-	type: string;
+	type: DatabaseType;
 	managed: boolean;
 	createdBy: string;
 	updatedBy: string;

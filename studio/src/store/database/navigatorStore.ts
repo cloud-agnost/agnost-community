@@ -1,17 +1,16 @@
 import { NavigatorService } from '@/services';
 import {
 	APIError,
+	BucketCountInfo,
 	DeleteDataFromModelParams,
 	DeleteMultipleDataFromModelParams,
 	GetDataFromModelParams,
 	UpdateDataFromModelParams,
 } from '@/types';
-import _ from 'lodash';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useModelStore from './modelStore';
 interface NavigatorStore {
-	editedField: string;
 	data: {
 		[modelId: string]: Record<string, any>[];
 	};
@@ -19,18 +18,14 @@ interface NavigatorStore {
 		[modelId: string]: Record<string, any>[];
 	};
 	selectedSubModelId: string;
-	lastFetchedPage:
+	dataCountInfo:
 		| {
-				[modelId: string]: number | undefined;
+				[id: string]: BucketCountInfo | undefined;
 		  }
 		| undefined;
-	lastFetchedCount: {
-		[modelId: string]: number | undefined;
-	};
 }
 
 type Actions = {
-	setEditedField: (field: string) => void;
 	getDataFromModel: (params: GetDataFromModelParams) => Promise<any[]>;
 	deleteDataFromModel: (param: DeleteDataFromModelParams) => Promise<void>;
 	deleteMultipleDataFromModel: (param: DeleteMultipleDataFromModelParams) => Promise<void>;
@@ -40,59 +35,28 @@ type Actions = {
 };
 
 const initialState: NavigatorStore = {
-	editedField: '',
 	data: {},
 	subModelData: {},
 	selectedSubModelId: '',
-	lastFetchedPage: undefined,
-	lastFetchedCount: {},
+	dataCountInfo: undefined,
 };
 
 const useNavigatorStore = create<NavigatorStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
-		setEditedField: (field) => set({ editedField: field }),
 		getDataFromModel: async (params) => {
 			try {
-				const data = await NavigatorService.getDataFromModel(params);
+				const { data, countInfo } = await NavigatorService.getDataFromModel(params);
 				const modelId = useModelStore.getState().model._id;
 
-				if (params.page === 0) {
-					set((state) => ({
-						data: {
-							...state.data,
-							[modelId]: data,
-						},
-						lastFetchedPage: {
-							...state.lastFetchedPage,
-							[modelId]:
-								!_.isNil(get().lastFetchedPage?.[modelId]) &&
-								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-								//@ts-ignore
-								get().lastFetchedPage?.[modelId] >= params.page &&
-								params.sortBy &&
-								params.sortDir
-									? get().lastFetchedPage?.[modelId]
-									: params.page,
-						},
-					}));
-				} else {
-					set((state) => ({
-						data: {
-							...state.data,
-							[modelId]: [...state.data[modelId], ...data],
-						},
-						lastFetchedPage: {
-							...state.lastFetchedPage,
-							[modelId]: params.page,
-						},
-					}));
-				}
-
 				set((state) => ({
-					lastFetchedCount: {
-						...state.lastFetchedCount,
-						[modelId]: data.length,
+					data: {
+						...state.data,
+						[modelId]: data,
+					},
+					dataCountInfo: {
+						...state.dataCountInfo,
+						[modelId]: countInfo,
 					},
 				}));
 

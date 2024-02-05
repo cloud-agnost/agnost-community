@@ -29,7 +29,7 @@ class Model implements RealtimeActions<ModelType> {
 		useModelStore.setState?.((state) => ({
 			models: {
 				...state.models,
-				[data.dbId]: state.models[data.dbId].map((model) =>
+				[data.dbId]: state.models[data.dbId]?.map((model) =>
 					model._id === data._id ? data : model,
 				),
 			},

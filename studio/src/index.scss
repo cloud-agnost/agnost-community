@@ -185,6 +185,17 @@
 		--task: 255 102 102;
 		--storage: 54 183 168;
 	}
+
+	.ag-theme-quartz-dark {
+		--ag-foreground-color: rgb(var(--text-base));
+		--ag-background-color: rgb(var(--theme-base-background));
+		--ag-header-foreground-color: rgb(var(--text-base));
+		--ag-header-background-color: rgb(var(--theme-subtle-background));
+		--ag-odd-row-background-color: rgb(var(--theme-base-background));
+		--ag-header-column-resize-handle-color: rgb(var(--theme-lighter-background));
+		--ag-font-size: var(--font-size-xs);
+		--ag-font-family: var(--font-sf);
+	}
 }
 
 @layer base {

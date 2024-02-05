@@ -1,7 +1,6 @@
 export { default as useAuthorizeVersion } from './useAuthorizeVersion.tsx';
 export { default as useDebounce } from './useDebounce.tsx';
 export { default as useDebounceFn } from './useDebounceFn.tsx';
-export { default as useEditedField } from './useEditedField.tsx';
 export { default as useEditor } from './useEditor.tsx';
 export { default as useEnvironmentStatus } from './useEnvironmentStatus.tsx';
 export { default as useInfiniteScroll } from './useInfiniteScroll.tsx';

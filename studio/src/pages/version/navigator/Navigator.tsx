@@ -1,86 +1,68 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { EmptyState } from '@/components/EmptyState';
-import { Loading } from '@/components/Loading';
-import { TableLoading } from '@/components/Table/Table';
 import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
-import { useNavigatorColumns, useTable, useToast, useUpdateEffect } from '@/hooks';
+import { useNavigatorColumns, useToast, useUpdateData, useUpdateEffect } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { APIError, TabTypes } from '@/types';
-import { isEmpty } from '@/utils';
-import { useMutation } from '@tanstack/react-query';
-import { DataTable } from 'components/DataTable';
+import { APIError, FieldTypes, TabTypes } from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { CellEditRequestEvent } from 'ag-grid-community';
+import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
+import 'ag-grid-community/styles/ag-theme-quartz.css'; // Theme
+import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { Pagination } from './Pagination';
+import { TableHeader } from '@/features/database/models/Navigator';
 
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
+
 	const {
-		setEditedField,
 		getDataFromModel,
 		deleteMultipleDataFromModel,
 		getDataOfSelectedModel,
-		lastFetchedCount,
 		data: stateData,
-		editedField,
 		subModelData,
-		lastFetchedPage,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
-	const [isFetching, setIsFetching] = useState(false);
-	const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
+
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
-	const hasSubModel = !isEmpty(subModel);
-	const columns = useNavigatorColumns(hasSubModel ? subModel?.fields : model?.fields);
-	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
-	const isSorted = searchParams.get('f') && searchParams.get('d');
-	const scrollContainer = useRef<HTMLDivElement>(null);
-	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
-	const table = useTable({
-		columns,
-		data: hasSubModel ? subModelData?.[modelId] : data,
-	});
 
+	const columns = useNavigatorColumns();
+	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
+	const gridRef = useRef<AgGridReact<any>>(null);
+	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
+	const updateData = useUpdateData();
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
-	const [isRefreshing, setIsRefreshing] = useState(false);
+
 	const { mutateAsync: deleteMultipleMutate } = useMutation({
 		mutationFn: deleteMultipleDataFromModel,
 		mutationKey: ['deleteMultipleDataFromModel'],
-		onSuccess: () => table.resetRowSelection(),
+		// onSuccess: () => table.resetRowSelection(),
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
 		},
 	});
 
 	async function deleteHandler() {
-		const ids = table?.getSelectedRowModel().rows.map((row) => row.original.id);
+		const ids = gridRef.current?.api.getSelectedNodes().map((node) => node.data.id);
 		deleteMultipleMutate({
 			ids,
 		});
 	}
-
-	useEffect(() => {
-		setEditedField('');
-		document.body.addEventListener('click', () => {
-			setEditedField('');
-		});
-		return () => {
-			document.body.removeEventListener('click', () => {
-				setEditedField('');
-			});
-		};
-	}, []);
+	function handleExportClick() {
+		gridRef.current!.api.exportDataAsCsv();
+	}
 
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -96,49 +78,72 @@ export default function Navigator() {
 		},
 	];
 
-	async function onRefresh() {
-		setIsRefreshing(true);
-		await fetchData(0, MODULE_PAGE_SIZE);
-		setIsRefreshing(false);
-	}
+	const { refetch, isFetching } = useQuery({
+		queryKey: [
+			'getDataFromModel',
+			modelId,
+			searchParams.get('f'),
+			searchParams.get('d'),
+			searchParams.get('ref'),
+			searchParams.get('page'),
+			searchParams.get('size'),
+			database.type,
+		],
+		queryFn: () =>
+			getDataFromModel({
+				sortBy: searchParams.get('f') as string,
+				sortDir: searchParams.get('d') as string,
+				page: searchParams.get('page') ? Number(searchParams.get('page')) : 0,
+				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
+				id: searchParams.get('ref') as string,
+				dbType: database.type,
+			}),
+	});
+	function onCellEditRequest(event: CellEditRequestEvent) {
+		const oldData = event.data;
+		const field = event.colDef.field;
+		let newValue = event.newValue;
+		const newData = { ...oldData };
+		newData[field!] = event.newValue;
 
-	async function fetchData(page: number, size: number = MODULE_PAGE_SIZE) {
-		setIsFetching(true);
-		await getDataFromModel({
-			page,
-			size,
-			sortBy: searchParams.get('f') as string,
-			sortDir: searchParams.get('d') as string,
-			id: searchParams.get('ref') as string,
-		});
-		setIsFetching(false);
-	}
+		const tx = {
+			update: [newData],
+		};
+		if (event.colDef.cellEditorParams.type === FieldTypes.JSON) {
+			newValue = JSON.parse(event.newValue.toString() ?? '');
+		}
 
-	async function fetchNextPage() {
-		setIsFetchingNextPage(true);
-		const page = _.isNil(lastFetchedPage?.[modelId]) ? 0 : (lastFetchedPage[modelId] ?? 0) + 1;
-		await fetchData(page);
-		setIsFetchingNextPage(false);
+		if (event.colDef.cellEditorParams.type === FieldTypes.GEO_POINT) {
+			const coords = {
+				lat:
+					database.type.toString() === 'MongoDB'
+						? event.newValue?.coordinates?.[0]
+						: event.newValue?.x,
+				lng:
+					database.type.toString() === 'MongoDB'
+						? event.newValue?.coordinates?.[1]
+						: event.newValue?.y,
+			};
+			newValue = [coords.lat, coords.lng];
+		}
+
+		event.api.applyTransaction(tx);
+
+		updateData(
+			{
+				[field!]: newValue,
+			},
+			oldData.id,
+			event.node.rowIndex as number,
+			field!,
+		);
 	}
 
 	useUpdateEffect(() => {
-		if (searchParams.get('f') || searchParams.get('d') || searchParams.get('ref')) {
-			const page = lastFetchedPage?.[modelId] ?? 0;
-			const size = lastFetchedPage?.[modelId] ? MODULE_PAGE_SIZE * page : MODULE_PAGE_SIZE;
-			fetchData(0, size);
-		}
-	}, [searchParams.get('f'), searchParams.get('d'), searchParams.get('ref')]);
-
-	useEffect(() => {
-		if (_.isEmpty(data)) {
-			fetchData(0);
-		}
-	}, []);
-
-	useUpdateEffect(() => {
-		if (scrollContainer?.current) {
-			scrollContainer.current.style.overflow =
-				isFetching && !isFetchingNextPage ? 'hidden' : 'auto';
+		if (isFetching) {
+			gridRef.current!.api.showLoadingOverlay();
+		} else {
+			gridRef.current!.api.hideOverlay();
 		}
 	}, [isFetching]);
 
@@ -147,58 +152,44 @@ export default function Navigator() {
 			isEmpty={false}
 			type={TabTypes.Field}
 			emptyStateTitle={t('database.fields.no_fields')}
-			table={table}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
 			loading={false}
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb items={breadcrumbItems} />}
 			handlerButton={
-				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-					{!isRefreshing && <Refresh className='mr-1 text-sm' />}
-					{t('general.refresh')}
-				</Button>
+				<>
+					<Button variant='outline' onClick={handleExportClick} disabled={!canMultiDelete}>
+						Export as CSV
+					</Button>
+					<Button variant='secondary' onClick={() => refetch()} iconOnly>
+						<Refresh className='mr-1 text-sm' />
+						{t('general.refresh')}
+					</Button>
+					<SelectModel />
+				</>
 			}
 		>
-			{!_.isEmpty(model) ? (
-				<div className='flex gap-4 justify-center h-[calc(100%-52px)]'>
-					<SelectModel fetchData={fetchData} />
-					{isFetching && !isSorted && !isFetchingNextPage ? (
-						<div className='flex-1 relative'>
-							<Loading />
-						</div>
-					) : data.length > 0 ? (
-						<div className='w-5/6 table-container overflow-auto' id='scroll' ref={scrollContainer}>
-							<InfiniteScroll
-								hasMore={(lastFetchedCount?.[modelId] ?? 0) >= MODULE_PAGE_SIZE}
-								next={fetchNextPage}
-								loader={isFetchingNextPage && <TableLoading />}
-								dataLength={data.length}
-								scrollableTarget='scroll'
-								className='!overflow-visible h-full'
-							>
-								<DataTable<any>
-									table={table}
-									className='navigator table-fixed w-full h-full relative'
-									headerClassName='sticky top-0 z-50'
-									containerClassName='!border-none h-full'
-									onCellClick={(cell) => {
-										if (editedField !== cell.id) setEditedField(cell.id);
-									}}
-								/>
-							</InfiniteScroll>
-						</div>
-					) : (
-						<div className='flex-1 '>
-							<EmptyState title={t('database.models.no_data')} type={TabTypes.Database} />
-						</div>
-					)}
-				</div>
-			) : (
-				<div className='flex-1 flex flex-col justify-center items-center h-full w-full'>
-					<EmptyState title={t('database.models.no_models')} type={TabTypes.Model} />
-				</div>
-			)}
+			<div className='ag-theme-quartz-dark h-full flex flex-col'>
+				<AgGridReact
+					className='flex-1'
+					ref={gridRef}
+					rowData={!_.isEmpty(subModel) ? subModelData?.[modelId] : data}
+					columnDefs={columns}
+					autoSizeStrategy={{ type: 'fitGridWidth' }}
+					rowSelection='multiple'
+					components={{
+						agColumnHeader: TableHeader,
+					}}
+					readOnlyEdit={true}
+					onCellEditRequest={onCellEditRequest}
+					reactiveCustomComponents
+					overlayLoadingTemplate={
+						'<div aria-live="polite" aria-atomic="true" style="position:absolute;top:0;left:0;right:0; bottom:0; background: url(https://ag-grid.com/images/ag-grid-loading-spinner.svg) center no-repeat" aria-label="loading"></div>'
+					}
+				/>
+				<Pagination />
+			</div>
 		</VersionTabLayout>
 	);
 }
