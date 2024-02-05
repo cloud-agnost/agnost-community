@@ -1,13 +1,14 @@
 import { useTabIcon } from '@/hooks';
 import { TabTypes } from '@/types';
 import { cn } from '@/utils';
-import { AppWindow, Bell, Envelope, GlobeSimple, Key, Users } from '@phosphor-icons/react';
+import { AppWindow, Bell, Envelope, HardDrive, Key, Users } from '@phosphor-icons/react';
 import React, { ElementType } from 'react';
-import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
 
 export type Modules =
 	| 'org'
 	| 'app'
+	| 'invitation'
+	| 'resource'
 	| TabTypes.Endpoint
 	| TabTypes.MessageQueue
 	| TabTypes.File
@@ -21,13 +22,15 @@ export type Modules =
 	| TabTypes.Function
 	| TabTypes.Cache
 	| TabTypes.Notifications
-	| 'invitation'
-	| 'resource'
-	| 'apiKey'
-	| 'variable'
-	| 'package'
-	| 'rate-limit'
-	| 'custom-domain';
+	| TabTypes.CustomDomains
+	| TabTypes.APIKeys
+	| TabTypes.Settings
+	| TabTypes.Authentication
+	| TabTypes.Environment
+	| TabTypes.EnvironmentVariables
+	| TabTypes.NPMPackages
+	| TabTypes.Realtime
+	| TabTypes.RateLimits;
 
 interface EmptyStateProps {
 	title: string;
@@ -39,15 +42,11 @@ interface EmptyStateProps {
 export default function EmptyState({ type, title, className, children }: EmptyStateProps) {
 	const ICON_MAP: Record<string, ElementType> = {
 		apiKey: Key,
-		variable: EnvironmentVariable,
-		package: NpmPackage,
-		'rate-limit': RateLimit,
 		invitation: Envelope,
 		app: AppWindow,
-		resource: Storage,
+		resource: HardDrive,
 		org: Users,
 		notification: Bell,
-		'custom-domain': GlobeSimple,
 	};
 	const getTabIcon = useTabIcon('w-16 h-16');
 	const Icon = ICON_MAP[type];

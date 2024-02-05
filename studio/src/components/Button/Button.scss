@@ -7,7 +7,7 @@
 		@apply hover:bg-button-primary-hover text-white bg-button-primary #{!important};
 	}
 	&-secondary {
-		@apply bg-button-secondary hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover text-default #{!important};
+		@apply bg-button-secondary hover:bg-button-secondary-hover border border-border dark:border-none text-default #{!important};
 	}
 	&-text {
 		@apply text-default hover:bg-wrapper-background-hover #{!important};
@@ -20,7 +20,7 @@
 	}
 
 	&-outline {
-		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover #{!important};
+		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-button-secondary-hover #{!important};
 	}
 
 	&-xs {
@@ -56,7 +56,7 @@
 		border-radius: calc(var(--radius) - 3px);
 
 		.btn {
-			@apply border-none rounded-sm;
+			@apply rounded-sm;
 		}
 	}
 	&-blank {
