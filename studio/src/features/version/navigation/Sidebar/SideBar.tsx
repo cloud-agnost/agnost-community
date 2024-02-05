@@ -33,7 +33,7 @@ export default function SideBar() {
 	}, []);
 
 	useLayoutEffect(() => {
-		let timeout: number;
+		let timeout: any;
 		const scrollToElement = async () => {
 			const currentTab = getCurrentTab(versionId);
 			const dataId =

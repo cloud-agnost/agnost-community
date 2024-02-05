@@ -19,7 +19,9 @@ export default function VersionLayout({ children, className }: VersionLayoutProp
 				<Panel defaultSize={isSidebarOpen ? 15 : 0} minSize={isSidebarOpen ? 12 : 0}>
 					{isSidebarOpen && <SideNavigation />}
 				</Panel>
-				<Resizer className='h-full' hide={!isSidebarOpen} orientation='vertical' />
+				{isSidebarOpen && (
+					<Resizer className='h-full' hide={!isSidebarOpen} orientation='vertical' />
+				)}
 				<Panel defaultSize={isSidebarOpen ? 85 : 100}>
 					<div className='w-full'>
 						<Tabs />
