@@ -15,6 +15,41 @@ const version = 'v1';
 const namespace = process.env.NAMESPACE;
 const plural = 'mongodbcommunity';
 
+async function calculateLogStorageSize(storageSize) {
+  // Parse the storage size and unit
+  const [, size, unit] = storageSize.match(/(\d+)([A-Za-z]+)/);
+
+  // Convert the size to bytes
+  let bytes = parseInt(size);
+  switch (unit.toLowerCase()) {
+    case 'ki':
+      bytes *= 1024;
+      break;
+    case 'mi':
+      bytes *= Math.pow(1024, 2);
+      break;
+    case 'gi':
+      bytes *= Math.pow(1024, 3);
+      break;
+    // Default to bytes if the unit is not recognized
+    default:
+      break;
+  }
+
+  const twentyPercent = 0.2 * bytes;
+
+  // Format the result back to the original unit
+  if (bytes >= Math.pow(1024, 3)) {
+    return `${(twentyPercent / Math.pow(1024, 3)).toFixed()}Gi`;
+  } else if (bytes >= Math.pow(1024, 2)) {
+    return `${(twentyPercent / Math.pow(1024, 2)).toFixed()}Mi`;
+  } else if (bytes >= 1024) {
+    return `${(twentyPercent / 1024).toFixed()}Ki`;
+  } else {
+    return `${twentyPercent}`;
+  }
+}
+
 async function createMongoDBResource(mongoName, mongoVersion, size, userName, passwd, replicaCount) {
   const manifest = fs.readFileSync('/manifests/mongodbcommunity.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
@@ -39,6 +74,8 @@ async function createMongoDBResource(mongoName, mongoVersion, size, userName, pa
           resource.spec.statefulSet.spec.selector.matchLabels.app = mongoName + '-svc';
           resource.spec.statefulSet.spec.template.metadata.labels.app = mongoName + '-svc';
           resource.spec.statefulSet.spec.volumeClaimTemplates[0].spec.resources.requests.storage = size;
+          const logStorageSize = await calculateLogStorageSize(size);
+          resource.spec.statefulSet.spec.volumeClaimTemplates[1].spec.resources.requests.storage = logStorageSize;
           await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
           break;
         default:
@@ -60,15 +97,10 @@ async function updateMongoDBResource(mongoName, mongoVersion, size, replicaCount
       members: replicaCount,
     }
   };
-  const pvcPatch = {
-    spec: {
-      resources: {
-        requests: {
-          storage: size
-        }
-      }
-    }
-  };
+
+  const dataPvcPatch = { spec: { resources: { requests: { storage: size } } } };
+  const logStorageSize = await calculateLogStorageSize(size);
+  const logPvcPatch = { spec: { resources: { requests: { storage: logStorageSize } } } };
   const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
 
   try {
@@ -79,7 +111,10 @@ async function updateMongoDBResource(mongoName, mongoVersion, size, replicaCount
     pvcList.body.items.forEach(async (pvc) => {
       var pvcName = pvc.metadata.name;
       if (pvcName.includes("data-volume-" + mongoName + '-')) {
-        await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+        await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, dataPvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+        console.log('PersistentVolumeClaim ' + pvcName + ' updated...');
+      } else if (pvcName.includes("logs-volume-" + mongoName + '-')) {
+        await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, logPvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
         console.log('PersistentVolumeClaim ' + pvcName + ' updated...');
       }
     });
