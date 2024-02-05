@@ -56,13 +56,12 @@ router.get(
           }
         );
 
-      const totalPages = Math.floor(info.count / Number(size)) - 1;
-
       const countInfo = {
-        count: info.count,
-        totalPages: totalPages,
+        totalCount: Number(info.count),
+        totalPages: Math.floor(info.count / Number(size)),
         currentPage: Number(page),
         pageSize: Number(size),
+        count: data.length,
       };
 
       const updatedData = data.map((d) => {
