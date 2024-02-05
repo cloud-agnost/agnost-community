@@ -1,9 +1,8 @@
 import { APIError } from '@/types';
-import { CircleNotch, Trash } from '@phosphor-icons/react';
+import { CircleNotch, Trash, PencilSimple } from '@phosphor-icons/react';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Button } from '@/components/Button';
-import { Pencil } from 'components/icons';
 import { ChangeEvent, useId, useRef } from 'react';
 import './changeAvatar.scss';
 import { cn } from '@/utils';
@@ -99,7 +98,7 @@ export default function ChangeAvatar({
 							)}
 							<Button rounded variant='icon' size='sm' disabled={disabled || loading}>
 								<label htmlFor={filePickerId} className='cursor-pointer'>
-									<Pencil className='avatar-actions-icon' />
+									<PencilSimple className='avatar-actions-icon' />
 								</label>
 							</Button>
 						</div>

@@ -3,13 +3,13 @@ import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { TableLoading } from '@/components/Table/Table';
-import { Refresh } from '@/components/icons';
 import { EditFile, FileColumns } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, TabTypes } from '@/types';
+import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
@@ -142,7 +142,7 @@ export default function Files() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-						{!isRefreshing && <Refresh className='mr-1 w-3.5 h-3.5' />}
+						{!isRefreshing && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}
 						{t('general.refresh')}
 					</Button>
 				}

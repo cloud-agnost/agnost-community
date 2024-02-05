@@ -1,4 +1,3 @@
-import { LineSegments } from '@/components/icons';
 import { resetAllStores } from '@/helpers';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -8,7 +7,7 @@ import useResourceStore from '@/store/resources/resourceStore';
 import useThemeStore from '@/store/theme/themeStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { cn, leaveChannel } from '@/utils';
-import { CodeBlock, GearSix, Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
+import { CodeBlock, GearSix, Laptop, LineSegments, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
 	DropdownMenu,

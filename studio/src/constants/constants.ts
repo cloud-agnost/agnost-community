@@ -10,49 +10,33 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 import {
 	Apple,
-	Authentication,
 	Awss3,
 	AzureBlobStorage,
-	BellRing,
 	Binary,
-	Calendar,
-	ChangeLog,
-	Connect,
 	Decimal,
 	Decision,
 	Discord,
-	Environment,
-	EnvironmentVariable,
 	Facebook,
 	GcpStorage,
 	Github,
 	Google,
 	Integer,
 	Kafka,
-	Leave,
-	LineSegments,
-	MessageQueue,
 	MinIo,
 	MongoDb,
 	MySql,
 	Nodejs,
-	NpmPackage,
 	Object as ObjectIcon,
 	ObjectList,
 	Oracle,
-	Pencil,
 	PostgreSql,
 	RabbitMq,
-	RateLimit,
 	React,
-	RealTime,
 	Redis,
 	Resource,
 	RichText,
 	SocketIo,
 	SqlServer,
-	Storage,
-	Team,
 	Timestamp,
 	Twitter,
 } from '@/components/icons';
@@ -87,10 +71,13 @@ import {
 	ArchiveBox,
 	Bell,
 	BracketsCurly,
+	Calendar,
 	Clock,
+	ClockCounterClockwise,
 	ComputerTower,
 	CurrencyDollarSimple,
 	Database as DatabaseIcon,
+	EjectSimple,
 	Envelope,
 	FileText,
 	Function,
@@ -103,16 +90,19 @@ import {
 	IdentificationBadge,
 	Key,
 	Lightning,
+	LineSegments,
 	LinkSimple,
 	ListChecks,
 	ListNumbers,
 	LockSimple,
 	MapPin,
+	PencilSimple,
 	Phone,
 	Plus,
 	PresentationChart,
 	Share,
 	ShareNetwork,
+	SignOut,
 	Signpost,
 	SkipForward,
 	Table,
@@ -122,6 +112,7 @@ import {
 	Toolbox,
 	Trash,
 	UserPlus,
+	Users,
 	Vault,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
@@ -174,7 +165,7 @@ export const MENU_ITEMS = [
 	{
 		title: 'Change Log',
 		url: 'https://github.com/cloud-agnost/agnost-community/releases',
-		icon: ChangeLog,
+		icon: ClockCounterClockwise,
 	},
 	{
 		title: 'Docs',
@@ -192,7 +183,7 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 	{
 		title: translate('profileSettings.notifications_title'),
 		href: '/organization/:orgId/profile/notifications',
-		icon: BellRing,
+		icon: Bell,
 	},
 	{
 		title: translate('profileSettings.clusters_title'),
@@ -245,7 +236,7 @@ export const APPLICATION_SETTINGS = [
 			}
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('update', role),
-		icon: Pencil,
+		icon: PencilSimple,
 	},
 	{
 		id: 'invite',
@@ -265,7 +256,7 @@ export const APPLICATION_SETTINGS = [
 		isDisabled: (_role: AppRoles, application: Application) => {
 			return useAuthStore.getState().user?._id === application.ownerUserId;
 		},
-		icon: Leave,
+		icon: SignOut,
 	},
 	{
 		id: 'delete-app',
@@ -287,7 +278,7 @@ export const ORGANIZATION_SETTINGS = [
 	{
 		title: translate('organization.settings.members.title'),
 		href: '/organization/:id/settings/members',
-		icon: Team,
+		icon: Users,
 	},
 ];
 
@@ -509,65 +500,65 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		id: 1,
 		title: translate('version.settings.general'),
 		href: '',
-		icon: GearSix,
 		type: TabTypes.Settings,
+		icon: GearSix,
 	},
 	{
 		id: 8,
 		title: translate('version.settings.api_keys'),
 		href: 'api-keys',
-		icon: Key,
 		type: TabTypes.APIKeys,
+		icon: Key,
 	},
 	{
 		id: 7,
 		title: translate('version.settings.authentications'),
 		href: 'authentications?t=general',
-		icon: Authentication,
 		type: TabTypes.Authentication,
+		icon: IdentificationBadge,
 	},
 	{
 		id: 9,
 		title: translate('cluster.custom_domain'),
 		href: 'custom-domain',
-		icon: GlobeSimple,
 		type: TabTypes.CustomDomains,
+		icon: GlobeSimple,
 	},
 	{
 		id: 2,
 		title: translate('version.settings.environment'),
 		href: 'environment',
-		icon: Environment,
 		type: TabTypes.Environment,
+		icon: ComputerTower,
 	},
 	{
 		id: 5,
 		title: translate('version.settings.environment_variables'),
 		href: 'environment-variables',
-		icon: EnvironmentVariable,
 		type: TabTypes.EnvironmentVariables,
+		icon: Vault,
 	},
 	{
 		id: 4,
 		title: translate('version.settings.npm_packages'),
 		href: 'npm-packages',
-		icon: NpmPackage,
 		type: TabTypes.NPMPackages,
+		icon: ArchiveBox,
 	},
 	{
 		id: 6,
 		title: translate('version.settings.rate_limits'),
 		href: 'rate-limits',
-		icon: RateLimit,
 		type: TabTypes.RateLimits,
+		icon: Gauge,
 	},
 
 	{
 		id: 10,
 		title: translate('version.settings.real_time'),
 		href: 'real-time',
-		icon: RealTime,
 		type: TabTypes.Realtime,
+		icon: ShareNetwork,
 	},
 ];
 
@@ -590,7 +581,7 @@ export const RESOURCE_TYPES = [
 	{
 		id: 'message-queue',
 		name: translate('version.message_queues'),
-		icon: MessageQueue,
+		icon: Envelope,
 	},
 ];
 
@@ -603,7 +594,7 @@ export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
 	{
 		id: ResourceCreateType.Existing,
 		name: translate('resources.connect_existing'),
-		icon: Connect,
+		icon: EjectSimple,
 	},
 ];
 

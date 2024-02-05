@@ -101,13 +101,11 @@ export default function VersionDashboard() {
 					<Button
 						variant='blank'
 						key={key}
-						className='bg-subtle p-6 rounded-md shadow-sm h-auto block text-left font-normal border border-border hover:border-border-hover'
+						className='p-6 rounded-md shadow-sm h-auto block text-left font-normal border border-border hover:border-border-hover'
 						onClick={() => clickDashboardItem(capitalize(key), t(`version.dashboard.${key}`))}
 					>
 						<div className='flex items-center gap-4'>
-							<div className='p-3 rounded-lg bg-lighter'>
-								{getIcon(capitalize(key) as TabTypes)}
-							</div>
+							<div className='p-3 rounded-lg bg-subtle'>{getIcon(capitalize(key) as TabTypes)}</div>
 							<div>
 								<h1 className='text-default text-2xl'>{value}</h1>
 								<h2 className='text-subtle'>
@@ -119,49 +117,41 @@ export default function VersionDashboard() {
 					</Button>
 				))}
 			</div>
-			<Card className='w-full'>
-				<CardHeader>
-					<CardTitle>{t('version.settings.version_id')}</CardTitle>
-					<CardDescription>{t('version.settings.version_id_desc')}</CardDescription>
-				</CardHeader>
-				<CardContent className='space-y-6'>
-					<div className='flex items-center gap-4 max-w-4xl'>
-						<div className='flex items-center gap-2 '>
-							<Key className='w-4 h-4 text-default' />
-							<h1 className='text-sm'>{environment.name}</h1>
-						</div>
-						<CopyInput
-							readOnly
-							value={`${window.location.origin}/${environment.iid}`}
-							className='flex-1'
-						/>
-					</div>
-				</CardContent>
-			</Card>
-			<Card className='w-full'>
-				<CardHeader>
-					<CardTitle>{t('version.settings.api_keys')}</CardTitle>
-					<CardDescription>{t('version.settings.api_keys_desc')}</CardDescription>
-				</CardHeader>
-				<CardContent className='space-y-6'>
-					{version.apiKeys?.map((key) => (
-						<div key={key._id} className='flex items-center gap-4 max-w-4xl'>
-							<div className='flex items-center gap-2 flex-[0.2]'>
-								<Key className='w-4 h-4 text-default' />
-								<h1 className='text-sm'>{key.name}</h1>
+			<div className='grid grid-cols-2 gap-4'>
+				<Card>
+					<CardHeader>
+						<CardTitle>{t('version.settings.version_id')}</CardTitle>
+						<CardDescription>{t('version.settings.version_id_desc')}</CardDescription>
+					</CardHeader>
+					<CardContent className='space-y-6'>
+						<CopyInput readOnly value={`${window.location.origin}/${environment.iid}`} />
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle>{t('version.settings.api_keys')}</CardTitle>
+						<CardDescription>{t('version.settings.api_keys_desc')}</CardDescription>
+					</CardHeader>
+					<CardContent className='space-y-6'>
+						{version.apiKeys?.map((key) => (
+							<div key={key._id} className='flex items-center gap-4 max-w-4xl'>
+								<div className='flex items-center gap-2 flex-[0.2]'>
+									<Key className='w-4 h-4 text-default' />
+									<h1 className='text-sm'>{key.name}</h1>
+								</div>
+								<CopyInput value={key.key} readOnly className='flex-[0.8]' />
 							</div>
-							<CopyInput value={key.key} readOnly className='flex-[0.8]' />
-						</div>
-					))}
-				</CardContent>
-				<CardFooter className='flex justify-between'>
-					<Button variant='outline' onClick={addAPIKeyTab}>
-						{t('version.settings.manage_api_keys')}
-					</Button>
-				</CardFooter>
-			</Card>
+						))}
+					</CardContent>
+					<CardFooter className='flex justify-between'>
+						<Button variant='outline' onClick={addAPIKeyTab}>
+							{t('version.settings.manage_api_keys')}
+						</Button>
+					</CardFooter>
+				</Card>
+			</div>
 
-			<Card className='w-full'>
+			<Card className='w-full block'>
 				<CardHeader>
 					<CardTitle>{t('version.documentation')}</CardTitle>
 				</CardHeader>
@@ -175,7 +165,7 @@ export default function VersionDashboard() {
 							rel='noopener noreferrer'
 						>
 							<div className='flex items-center gap-4 max-w-xl p-4'>
-								<div className='p-4 bg-lighter '>
+								<div className='p-4 bg-subtle '>
 									<guide.icon className='w-6 h-6 text-default' />
 								</div>
 								<div className='flex-1'>

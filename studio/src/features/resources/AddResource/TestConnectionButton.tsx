@@ -1,8 +1,8 @@
 import { Button } from '@/components/Button';
-import { TestConnection } from '@/components/icons';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import { APIError } from '@/types';
+import { ShareNetwork } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 			className='self-start'
 			type='button'
 		>
-			{!isPending && <TestConnection className='w-4 h-4 text-icon-default mr-2' />}
+			{!isPending && <ShareNetwork className='w-4 h-4 text-icon-default mr-2' />}
 			{t('resources.database.test')}
 		</Button>
 	);

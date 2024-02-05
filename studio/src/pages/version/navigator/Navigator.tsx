@@ -1,6 +1,5 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
 import { TableHeader } from '@/features/database/models/Navigator';
@@ -10,6 +9,7 @@ import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError, FieldTypes, ResourceInstances, TabTypes } from '@/types';
+import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { CellEditRequestEvent } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
@@ -168,7 +168,7 @@ export default function Navigator() {
 						Export as CSV
 					</Button>
 					<Button variant='secondary' onClick={() => refetch()} iconOnly>
-						<Refresh className='mr-1 text-sm' />
+						<ArrowClockwise className='mr-1 text-sm' />
 						{t('general.refresh')}
 					</Button>
 					<SelectModel />

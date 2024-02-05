@@ -1,12 +1,12 @@
 import { Button } from '@/components/Button';
 import { DateText } from '@/components/DateText';
-import { Version as VersionIcon } from '@/components/icons';
+
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Version } from '@/types';
 import { cn, getAppPermission, translate } from '@/utils';
-import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { GitBranch, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 const { selectVersion } = useVersionStore.getState();
@@ -22,7 +22,7 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 			const { name, master } = row.original;
 			return (
 				<div className='flex items-center gap-1'>
-					<VersionIcon className='w-5 h-5 text-subtle mr-2 shrink-0' />
+					<GitBranch className='w-5 h-5 text-subtle mr-2 shrink-0' />
 					<span className={cn(master && 'text-elements-green')}>{name}</span>
 				</div>
 			);

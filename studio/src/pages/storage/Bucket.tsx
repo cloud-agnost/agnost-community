@@ -3,12 +3,12 @@ import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { Refresh } from '@/components/icons';
 import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, TabTypes } from '@/types';
+import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -118,7 +118,7 @@ export default function Buckets() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				handlerButton={
 					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-						{!isRefreshing && <Refresh className='mr-1 w-3.5 h-3.5' />}
+						{!isRefreshing && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}
 						{t('general.refresh')}
 					</Button>
 				}
