@@ -5,7 +5,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog } from '@/types';
 import { translate } from '@/utils';
-import { PencilSimple } from '@phosphor-icons/react';
+import { FileText, PencilSimple } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 
@@ -89,8 +89,8 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 		cell: ({ row }) => {
 			const { openLogDetails } = useEnvironmentStore.getState();
 			return (
-				<Button variant='blank' onClick={() => openLogDetails(row.original)}>
-					<PencilSimple className='w-6 h-6' />
+				<Button variant='icon' size='sm' rounded onClick={() => openLogDetails(row.original)}>
+					<FileText size={20} />
 				</Button>
 			);
 		},
