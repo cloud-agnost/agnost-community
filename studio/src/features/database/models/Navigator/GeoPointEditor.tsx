@@ -1,4 +1,5 @@
 import { Input } from '@/components/Input';
+import { Label } from '@/components/Label';
 import useDatabaseStore from '@/store/database/databaseStore';
 import { CustomCellEditorProps } from 'ag-grid-react';
 import { useEffect, useRef, useState } from 'react';
@@ -52,24 +53,27 @@ export default function GeoPointEditor({ value, onValueChange, eventKey }: Custo
 		onChange(startValue.x, startValue.y);
 	}, []);
 	return (
-		<div className='flex gap-4'>
-			<Input
-				ref={ltdRef}
-				className='bg-subtle'
-				type='number'
-				id='latitude'
-				value={coords.lat}
-				onChange={(e) => onChange(e.target.value, lngRef?.current?.value as string)}
-			/>
-			{'-'}
-			<Input
-				ref={lngRef}
-				className='bg-subtle'
-				type='number'
-				id='longitude'
-				value={coords.lng}
-				onChange={(e) => onChange(ltdRef?.current?.value as string, e.target.value)}
-			/>
+		<div className='flex gap-2 items-center w-full bg-subtle p-2'>
+			<div className='space-y-1'>
+				<Label htmlFor='latitude'>Latitude</Label>
+				<Input
+					ref={ltdRef}
+					type='number'
+					id='latitude'
+					value={coords.lat}
+					onChange={(e) => onChange(e.target.value, lngRef?.current?.value as string)}
+				/>
+			</div>
+			<div className='space-y-1'>
+				<Label htmlFor='longitude'>Longitude</Label>
+				<Input
+					ref={lngRef}
+					type='number'
+					id='longitude'
+					value={coords.lng}
+					onChange={(e) => onChange(ltdRef?.current?.value as string, e.target.value)}
+				/>
+			</div>
 		</div>
 	);
 }
