@@ -87,6 +87,7 @@ build:
       #         - '**/*.svg'
       #         - '**/*.ico'
       #         - '**/*.md'
+      #         - '**/*.conf'
       #   docker:
       #      dockerfile: Dockerfile
 deploy:
