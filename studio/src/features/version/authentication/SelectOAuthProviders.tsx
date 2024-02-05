@@ -1,7 +1,6 @@
 import { Button } from '@/components/Button';
 import { InfoModal } from '@/components/InfoModal';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { Pencil } from '@/components/icons';
 import { OAUTH_ICON_MAP } from '@/constants';
 import { useAuthorizeVersion, useUpdateEffect } from '@/hooks';
 import useTypeStore from '@/store/types/typeStore';
@@ -9,7 +8,7 @@ import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
 import { capitalize } from '@/utils';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -114,7 +113,7 @@ export default function SelectOAuthProviders() {
 							</div>
 							<div className='invisible group-hover:visible'>
 								<Button variant='icon' onClick={() => setEditedProvider(p)} disabled={!canEdit}>
-									<Pencil className='text-subtle w-5 h-5' />
+									<PencilSimple className='text-subtle w-5 h-5' />
 								</Button>
 								<Button variant='icon' onClick={() => setToDeleteProvider(p)} disabled={!canEdit}>
 									<Trash size={20} className='text-subtle' />

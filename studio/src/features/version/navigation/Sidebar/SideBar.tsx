@@ -4,7 +4,7 @@ import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
-import { cn, isElementInViewport } from '@/utils';
+import { isElementInViewport } from '@/utils';
 import { MagnifyingGlass, MinusSquare } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ export default function SideBar() {
 
 	return (
 		<div
-			className='h-full w-full shadow-xl flex flex-col bg-[#f5f6f6] dark:bg-[#171d2d]'
+			className='h-full w-full shadow-xl flex flex-col bg-subtle/50 dark:bg-[#171d2d]'
 			id='side-navigation'
 		>
 			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between'>
@@ -86,16 +86,12 @@ export default function SideBar() {
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button
-									variant='icon'
+									variant={isSearchViewOpen ? 'primary' : 'icon'}
 									rounded
+									iconOnly
 									size='sm'
 									onClick={toggleSearchView}
-									className={cn(
-										'!p-0 !h-6',
-										isSearchViewOpen
-											? 'bg-button-primary/90 dark:bg-button-primary/70 text-white dark:text-default visible'
-											: 'invisible group-hover:visible',
-									)}
+									className='!p-0 !h-6 invisible group-hover:visible aspect-square'
 								>
 									<MagnifyingGlass size={16} />
 								</Button>

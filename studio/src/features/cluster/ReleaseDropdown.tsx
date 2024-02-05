@@ -11,14 +11,18 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/Dropdown';
 import { Separator } from '@/components/Separator';
-import { Document, Refresh } from '@/components/icons';
 import { CLUSTER_RELEASE_CLASS_MAP } from '@/constants';
 import { useTable, useToast } from '@/hooks';
 import useAuthStore from '@/store/auth/authStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { APIError } from '@/types';
 import { cn } from '@/utils';
-import { ClockCounterClockwise, Package } from '@phosphor-icons/react';
+import {
+	ArrowCounterClockwise,
+	ClockCounterClockwise,
+	FileText,
+	Package,
+} from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -80,7 +84,7 @@ export default function ReleaseDropdown() {
 					<Package size={18} />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='relative max-w-xs bg-subtle h-full' align='end'>
+			<DropdownMenuContent className='relative max-w-xs h-full' align='end'>
 				<DropdownMenuLabel className='text-default flex items-center justify-between px-4 py-2'>
 					<p>{t('cluster.release_info')}</p>
 					<span className='text-subtle text-sm font-sfCompact inline-block text-right'>
@@ -120,7 +124,7 @@ function ReleaseInfo({ loading = false }: { loading: boolean }) {
 		<DataTable
 			table={table}
 			containerClassName='!border-none pl-3.5 pb-3'
-			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-0.5 [&_th]:p-0.5 [&_th]:h-8'
+			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:!border-none [&_td]:p-0.5 [&_th]:p-0.5 [&_th]:h-8 [&_th]:!bg-transparent'
 		/>
 	);
 }
@@ -152,7 +156,7 @@ function ReleaseSettings() {
 			{hasUpdate && (
 				<>
 					<DropdownMenuItem onClick={mutateAsync} disabled={!user?.isClusterOwner}>
-						<Refresh className={cn('mr-2', isPending && 'animate-spin')} />
+						<ArrowCounterClockwise className={cn('mr-2', isPending && 'animate-spin')} />
 						{t('cluster.update', {
 							release: clusterReleaseInfo?.latest?.release,
 						})}
@@ -172,7 +176,7 @@ function ReleaseSettings() {
 					rel='noopener noreferrer'
 					target='_blank'
 				>
-					<Document className='mr-2' />
+					<FileText className='mr-2' />
 					{t('cluster.view_notes')}
 				</Link>
 			</DropdownMenuItem>

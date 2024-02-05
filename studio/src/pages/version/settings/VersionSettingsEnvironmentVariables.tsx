@@ -5,6 +5,7 @@ import { useAuthorizeVersion, useSearch, useTable } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
+import { TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +44,7 @@ export default function VersionSettingsEnvironmentVariables() {
 		<>
 			<VersionTabLayout
 				className='p-0'
-				type='variable'
+				type={TabTypes.EnvironmentVariables}
 				title={t('version.settings.environment_variables') as string}
 				createButtonTitle={t('version.variable.add')}
 				emptyStateTitle={t('version.variable.no_variable_found')}

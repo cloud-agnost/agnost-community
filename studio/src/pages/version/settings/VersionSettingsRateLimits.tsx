@@ -5,7 +5,7 @@ import { useAuthorizeVersion, useSearch, useTable } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { RateLimit } from '@/types';
+import { RateLimit, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +45,7 @@ export default function VersionSettingsRateLimits() {
 		<>
 			<VersionTabLayout
 				className='p-0'
-				type='rate-limit'
+				type={TabTypes.RateLimits}
 				title={t('version.settings.rate_limits') as string}
 				createButtonTitle={t('version.add_new_limiter')}
 				emptyStateTitle={t('version.no_rate_limiters')}

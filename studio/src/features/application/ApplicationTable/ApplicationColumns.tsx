@@ -2,13 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { SortButton } from '@/components/DataTable';
-import { Refresh } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
 import { getRelativeTime, translate } from '@/utils';
+import { ArrowClockwise } from '@phosphor-icons/react';
 const user = useAuthStore.getState().user;
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
@@ -60,7 +60,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 			const { createdAt } = row.original;
 			return (
 				<div className='flex gap-1 items-center'>
-					<Refresh className='w-4 h-4 text-subtle mr-2' />
+					<ArrowClockwise className='w-4 h-4 text-subtle mr-2' />
 					{getRelativeTime(createdAt)}
 				</div>
 			);
