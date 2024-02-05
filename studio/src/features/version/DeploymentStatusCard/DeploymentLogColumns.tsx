@@ -5,7 +5,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog } from '@/types';
 import { translate } from '@/utils';
-import { FileText, PencilSimple } from '@phosphor-icons/react';
+import { FileText } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 
