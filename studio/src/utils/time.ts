@@ -16,6 +16,12 @@ export const DATETIME_MED_WITH_SECONDS = 'MMM d, yyyy, hh:mm:ss a';
 export const DATETIME_MED = 'MMM d, yyyy, hh:mm a';
 
 export function formatDate(date: string | Date, formatString: string) {
+	return format(new Date(date), formatString, {
+		locale: enUS,
+	});
+}
+
+export function convertUTC(date: string | Date, formatString: string) {
 	try {
 		const dateWithTimezone = new Date(date);
 		const timezoneOffsetMs = dateWithTimezone.getTimezoneOffset() * 60 * 1000;

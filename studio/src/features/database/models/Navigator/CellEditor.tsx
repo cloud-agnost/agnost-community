@@ -1,5 +1,5 @@
 import { FieldTypes } from '@/types';
-import { DATE_FORMAT, DATE_TIME_FORMAT, formatDate } from '@/utils';
+import { DATE_FORMAT, DATE_TIME_FORMAT, convertUTC } from '@/utils';
 import { InputMask, Replacement } from '@react-input/mask';
 import { CustomCellEditorProps } from 'ag-grid-react';
 import { useEffect, useRef } from 'react';
@@ -47,8 +47,8 @@ export default function CellEditor({
 
 	function convertValue(value: string) {
 		if (!value) return '';
-		if (type === FieldTypes.DATETIME) return formatDate(value, DATE_TIME_FORMAT);
-		if (type === FieldTypes.DATE) return formatDate(value, DATE_FORMAT);
+		if (type === FieldTypes.DATETIME) return convertUTC(value, DATE_TIME_FORMAT);
+		if (type === FieldTypes.DATE) return convertUTC(value, DATE_FORMAT);
 		return value;
 	}
 
