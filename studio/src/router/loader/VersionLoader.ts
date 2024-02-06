@@ -276,7 +276,7 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
 
 	const { getModelsOfDatabase, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();
-	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
+	const { database, getDatabaseOfAppById, databases } = useDatabaseStore.getState();
 
 	const apiParams = params as {
 		orgId: string;
@@ -286,10 +286,14 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 		modelId: string;
 	};
 	if (database._id !== apiParams.dbId) {
-		await getDatabaseOfAppById(apiParams);
+		const listDb = databases.find((db) => db._id === apiParams.dbId);
+		if (!_.isEmpty(listDb)) {
+			useDatabaseStore.setState({ database: listDb });
+		} else await getDatabaseOfAppById(apiParams);
 	}
 
 	const models = getModelsOfSelectedDb(apiParams.dbId);
+	console.log(models);
 	if (_.isEmpty(models)) {
 		const models = await getModelsOfDatabase(apiParams);
 		setModel(models.find((m) => m._id === apiParams.modelId) ?? models[0]);
