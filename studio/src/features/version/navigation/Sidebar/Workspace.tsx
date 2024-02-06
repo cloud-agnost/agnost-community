@@ -19,7 +19,7 @@ import {
 	Task,
 } from '@/types';
 import { cn, generateId } from '@/utils';
-import { Pencil, Plus, Trash } from '@phosphor-icons/react';
+import { PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -174,7 +174,7 @@ export default function Workspace() {
 												openEditDialog(data, item.type);
 											}}
 										>
-											<Pencil size={14} />
+											<PencilSimple size={14} />
 										</Button>
 
 										<Button
