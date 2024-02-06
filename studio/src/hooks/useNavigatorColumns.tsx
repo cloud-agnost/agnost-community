@@ -2,7 +2,7 @@ import { CellMaskMap, CellRendererMap, CellTypeMap, NavigatorCellEditorMap } fro
 import { NavigatorColumns } from '@/features/database/models/Navigator';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
-import { Field, FieldTypes } from '@/types';
+import { Field, FieldTypes, ResourceInstances } from '@/types';
 import { DATE_FORMAT, DATE_TIME_FORMAT, formatDate, getValueFromData } from '@/utils';
 import { ColDef, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import _ from 'lodash';
@@ -44,7 +44,7 @@ export default function useNavigatorColumns() {
 		if (!fields) return NavigatorColumns;
 		const newNavigatorColumns: ColDef[] = fields?.map((field) => ({
 			field: field.type === FieldTypes.ID ? 'id' : field.name,
-			pinned: field.name === 'id' ? 'left' : undefined,
+			pinned: field.type === FieldTypes.ID ? 'left' : undefined,
 			valueGetter: (params: ValueGetterParams) => {
 				return getValueFromData(params.data, field.type === FieldTypes.ID ? 'id' : field.name);
 			},
@@ -56,7 +56,10 @@ export default function useNavigatorColumns() {
 				!field.immutable,
 			filter: true,
 			headerComponentParams: { text: field.name, field: field.name },
-			maxWidth: field.type === FieldTypes.ID ? 75 : undefined,
+			maxWidth:
+				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB
+					? 75
+					: undefined,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:
@@ -71,7 +74,11 @@ export default function useNavigatorColumns() {
 				decimalPlaces: field.decimal?.decimalDigits,
 				values: field.enum?.selectList,
 			},
-			cellRendererParams: { type: field.type, referenceModelIid: field.reference?.iid },
+			cellRendererParams: {
+				type: field.type,
+				referenceModelIid: field.reference?.iid,
+				subId: field.type === FieldTypes.OBJECT_LIST ? field.objectList?.iid : field.object?.iid,
+			},
 			cellDataType: CellTypeMap[field.type],
 			valueFormatter: (params) => valueFormatter(params, field),
 		}));

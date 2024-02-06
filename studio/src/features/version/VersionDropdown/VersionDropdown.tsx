@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { VERSION_SETTINGS_MENU_ITEMS } from '@/constants';
-import { useTabIcon, useToast, useVersionDropdownItems } from '@/hooks';
+import { useTabIcon, useTabNavigate, useToast, useVersionDropdownItems } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
@@ -35,6 +35,7 @@ export default function VersionDropdown() {
 	const { deleteVersion, getVersionDashboardPath } = useVersionStore();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
+	const tabNavigate = useTabNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
 	const { addTab } = useTabStore();
 	const versionDropdownItems = useVersionDropdownItems();
@@ -51,14 +52,13 @@ export default function VersionDropdown() {
 		});
 	}
 
-	function addSettingsTab(versionId: string) {
-		addTab(versionId, {
-			title: t('version.settings.default'),
-			path: '',
-			id: generateId(),
-			isActive: false,
-			isDashboard: false,
-			type: TabTypes.Settings,
+	function navigateToDashboard() {
+		tabNavigate({
+			path: getVersionDashboardPath(),
+			title: t('version.dashboard'),
+			type: TabTypes.Dashboard,
+			isDashboard: true,
+			isActive: true,
 		});
 	}
 
@@ -114,10 +114,10 @@ export default function VersionDropdown() {
 				<div className='w-[210px] h-10 relative rounded-sm overflow-hidden flex items-center'>
 					<Button
 						variant='blank'
-						className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover transition font-normal rounded-sm'
-						onClick={() => addSettingsTab(version._id)}
+						className='flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm'
+						onClick={navigateToDashboard}
 					>
-						<div className='w-7 h-7 bg-white dark:bg-lighter flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
+						<div className='w-7 h-7 bg-subtle flex items-center justify-center rounded p-[6px] text-icon-base mr-2'>
 							{version?.readOnly ? (
 								<LockSimple size={20} className='text-elements-red' />
 							) : (

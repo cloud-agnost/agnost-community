@@ -109,7 +109,7 @@ function SelectionLabel({ selectedData, onClick }: SelectionLabelProps) {
 			className='flex items-center px-1.5 h-full w-full transition font-normal rounded-sm hover:bg-wrapper-background-hover dark:hover:bg-button-secondary-hover'
 			onClick={openAppSettings}
 		>
-			<Avatar className='mr-2' size='xs' square>
+			<Avatar className='mr-2' size='sm' square>
 				<AvatarImage src={selectedData?.pictureUrl} alt={selectedData?.name} />
 				<AvatarFallback name={selectedData?.name} color={selectedData?.color as string} />
 			</Avatar>

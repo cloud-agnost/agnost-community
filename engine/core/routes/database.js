@@ -30,7 +30,7 @@ router.get(
       const { page, size, sortBy, sortDir, id, dbType } = req.query;
 
       const query =
-        dbType === "mongodb"
+        dbType === "MongoDB"
           ? {
               $eq: [
                 "_id",
@@ -40,7 +40,8 @@ router.get(
               ],
             }
           : { id: id };
-
+      const field = sortBy ?? dbType === "MongoDB" ? "_id" : "id";
+      const direction = sortDir ?? "asc";
       const { data, info } = await agnost
         .db(dbName)
         .model(modelName)
@@ -50,8 +51,8 @@ router.get(
           },
           {
             ...(size && { limit: Number(size) }),
-            ...(sortBy && sortDir && { sort: { [sortBy]: sortDir } }),
             ...(size && page && { skip: Number(page) * Number(size) }),
+            sort: { [field]: direction },
             returnCount: true,
           }
         );
@@ -125,7 +126,7 @@ router.put(
       const actualDbName = agnost.db(dbName).getActualDbName();
 
       if (isSubObjectUpdate) {
-        const { value } = await mongoClient
+        const value = await mongoClient
           .db(actualDbName)
           .collection(modelName)
           .findOneAndUpdate(
@@ -137,6 +138,7 @@ router.put(
               returnDocument: "after",
             }
           );
+
         value.id = value?._id ?? value.id;
         delete value._id;
         res.json(value);

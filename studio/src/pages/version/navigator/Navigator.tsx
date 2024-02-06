@@ -51,7 +51,7 @@ export default function Navigator() {
 		onSuccess: () => {
 			setSelectedRowCount(0);
 			gridRef.current?.api.deselectAll();
-			refetch();
+			refetch;
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
@@ -153,7 +153,6 @@ export default function Navigator() {
 			}
 		}
 	}, [isFetching]);
-
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -182,7 +181,7 @@ export default function Navigator() {
 				<AgGridReact
 					className='flex-1'
 					ref={gridRef}
-					rowData={!_.isEmpty(subModel) ? subModelData?.[modelId] : data}
+					rowData={!_.isEmpty(subModel) ? subModelData : data}
 					columnDefs={columns}
 					autoSizeStrategy={{ type: 'fitGridWidth' }}
 					rowSelection='multiple'

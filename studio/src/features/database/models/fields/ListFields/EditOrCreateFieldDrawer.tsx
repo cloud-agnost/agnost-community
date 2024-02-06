@@ -389,7 +389,7 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (isReference && !arg.referenceAction) {
+				if (isReference && !arg.referenceAction && database.type !== DATABASE.MongoDB) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.required', {
