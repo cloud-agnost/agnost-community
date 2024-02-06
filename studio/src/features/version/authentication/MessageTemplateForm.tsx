@@ -261,7 +261,7 @@ export default function MessageTemplateForm({
 											<FormLabel>{t('version.authentication.body')}</FormLabel>
 											<DropdownMenu modal={false}>
 												<DropdownMenuTrigger asChild>
-													<Button variant='secondary' iconOnly>
+													<Button variant='icon' rounded size='sm'>
 														<FileText className='w-4 h-4' />
 													</Button>
 												</DropdownMenuTrigger>

@@ -18,7 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams, useRouteError } from 'react-router-dom';
+import { useRouteError } from 'react-router-dom';
 import * as z from 'zod';
 const ErrorScheme = z.object({
 	description: z.string({

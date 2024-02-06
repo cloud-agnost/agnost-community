@@ -32,7 +32,6 @@ export default function Navigator() {
 		getDataOfSelectedModel,
 		data: stateData,
 		subModelData,
-		dataCountInfo,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
 	const [isGridReady, setIsGridReady] = useState(false);

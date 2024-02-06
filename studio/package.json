@@ -59,7 +59,6 @@
       "react-responsive-carousel": "^3.2.23",
       "react-router-dom": "^6.11.2",
       "react-select": "^5.7.4",
-      "react-spinners": "^0.13.8",
       "react-verification-input": "^3.3.0",
       "recharts": "^2.7.2",
       "socket.io-client": "^4.6.2",
