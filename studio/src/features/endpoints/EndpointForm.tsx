@@ -100,7 +100,7 @@ export default function EndpointForm({ loading }: { loading: boolean }) {
 									<FormControl>
 										<SelectTrigger
 											className={cn(
-												'w-[100px] rounded-none rounded-l ',
+												'w-[100px] rounded-none rounded-l',
 												ENDPOINT_METHOD_BG_COLOR[field.value],
 											)}
 											error={Boolean(form.formState.errors.method)}
@@ -110,7 +110,7 @@ export default function EndpointForm({ loading }: { loading: boolean }) {
 											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
-									<SelectContent>
+									<SelectContent className='w-4'>
 										{ALL_HTTP_METHODS.map((role) => (
 											<SelectItem key={role} value={role}>
 												{role}
