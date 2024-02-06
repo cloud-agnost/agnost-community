@@ -19,7 +19,7 @@
 		&:hover,
 		&:focus-visible,
 		&.active {
-			@apply bg-subtle text-default;
+			@apply bg-lighter text-default;
 		}
 	}
 
