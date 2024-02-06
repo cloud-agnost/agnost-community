@@ -32,12 +32,12 @@ export default function Navigator() {
 		getDataOfSelectedModel,
 		data: stateData,
 		subModelData,
+		dataCountInfo,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
-
+	const [isGridReady, setIsGridReady] = useState(false);
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
-
 	const columns = useNavigatorColumns();
 	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
 	const gridRef = useRef<AgGridReact<any>>(null);
@@ -102,7 +102,13 @@ export default function Navigator() {
 				id: searchParams.get('ref') as string,
 				dbType: database.type,
 			}),
+		refetchOnWindowFocus: false,
+		enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
+		// &&
+		// (dataCountInfo?.[modelId]?.currentPage === undefined ||
+		// 	Math.ceil(data.length / MODULE_PAGE_SIZE) < (dataCountInfo?.[modelId]?.currentPage ?? 0)),
 	});
+
 	function onCellEditRequest(event: CellEditRequestEvent) {
 		const oldData = event.data;
 		const field = event.colDef.field;
@@ -153,6 +159,7 @@ export default function Navigator() {
 			}
 		}
 	}, [isFetching]);
+
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -179,6 +186,7 @@ export default function Navigator() {
 		>
 			<div className='ag-theme-quartz-dark h-full flex flex-col'>
 				<AgGridReact
+					key={model._id}
 					className='flex-1'
 					ref={gridRef}
 					rowData={!_.isEmpty(subModel) ? subModelData : data}
@@ -195,11 +203,12 @@ export default function Navigator() {
 					enableCellTextSelection
 					reactiveCustomComponents
 					overlayLoadingTemplate={
-						'<div aria-live="polite" aria-atomic="true" style="position:absolute;top:0;left:0;right:0; bottom:0; background: url(https://ag-grid.com/images/ag-grid-loading-spinner.svg) center no-repeat" aria-label="loading"></div>'
+						'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 					}
 					onRowSelected={() =>
 						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
+					onGridReady={() => setIsGridReady(true)}
 				/>
 				<Pagination />
 			</div>
