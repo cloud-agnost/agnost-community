@@ -81,6 +81,11 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	renderLineHighlight: 'all', //Enable rendering of current line highlight
 	folding: true, //Enable code folding
 	codeLens: true,
+	unicodeHighlight: {
+		allowedLocales: {
+			tr: true,
+		},
+	},
 };
 
 export type CodeEditorProps = {
