@@ -38,7 +38,7 @@
 		},
 		"id": {
 			"title": "Organization ID",
-			"desc": "This is your organization's id within your Agnost Enterprise Cluster."
+			"desc": "This is your organization's id within your Agnost Cluster."
 		},
 		"name": {
 			"title": "Organization Name",
