@@ -90,6 +90,12 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => queue._id !== params.queueId),
 				}));
+
+				useUtilsStore.setState?.((prev) => {
+					const { [params.queueId]: _, ...rest } = prev.testQueueLogs;
+					return { testQueueLogs: rest };
+				});
+
 				if (params.onSuccess) params.onSuccess();
 			} catch (error) {
 				if (params.onError) params.onError(error as APIError);
@@ -102,6 +108,13 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => !params.queueIds.includes(queue._id)),
 				}));
+				useUtilsStore.setState?.((prev) => {
+					const testQueueLogs = prev.testQueueLogs;
+					params.queueIds.forEach((id) => {
+						delete testQueueLogs[id];
+					});
+					return { testQueueLogs: testQueueLogs };
+				});
 				if (params.onSuccess) params.onSuccess(queue);
 			} catch (error) {
 				if (params.onError) params.onError(error as APIError);

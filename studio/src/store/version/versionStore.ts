@@ -24,6 +24,7 @@ import { history, joinChannel, resetAfterVersionChange } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
+import useTabStore from './tabStore';
 import useUtilsStore from './utilsStore';
 interface VersionStore {
 	loading: boolean;
@@ -252,6 +253,18 @@ const useVersionStore = create<VersionStore & Actions>()(
 						set((prev) => ({
 							versions: prev.versions.filter((v) => v._id !== params.versionId),
 						}));
+						useUtilsStore.setState((prev) => {
+							const sidebar = { ...prev.sidebar };
+							delete sidebar[params.versionId];
+							return { sidebar, typings: {} };
+						});
+
+						useTabStore.setState((prev) => {
+							const tabs = { ...prev.tabs };
+							delete tabs[params.versionId];
+							return { tabs };
+						});
+
 						params.onSuccess?.();
 					} catch (e) {
 						const error = e as APIError;
