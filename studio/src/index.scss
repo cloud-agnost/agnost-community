@@ -26,6 +26,7 @@
 
 		--brand-color-primary: 15 135 255;
 		--brand-color-primary--darker: 11 97 182;
+
 		--elements-strong--blue: 49 72 169;
 		--elements-blue: 15 135 255;
 		--elements-subtle-blue: 195 206 254;
@@ -125,6 +126,8 @@
 			--ag-header-background-color: rgb(var(--theme-subtle-background));
 			--ag-odd-row-background-color: rgb(var(--theme-base-background));
 			--ag-header-column-resize-handle-color: rgb(var(--theme-lighter-background));
+			--ag-border-color: rgb(var(--theme-border));
+
 			--ag-font-size: var(--font-size-xs);
 			--ag-font-family: var(--font-sf);
 		}
@@ -554,12 +557,12 @@ html .light ::-webkit-scrollbar-track {
 		@apply hidden #{!important};
 	}
 }
-.monaco-editor .parameter-hints-widget {
-	transform: translate(1.25rem, 50%) !important;
-}
-.monaco-editor [widgetId='editor.contrib.resizableContentHoverWidget'] {
-	@apply sm:transform translate-x-[2.25rem] translate-y-[30%] #{!important};
-}
+// .monaco-editor .parameter-hints-widget {
+// 	transform: translate(1.25rem, 50%) !important;
+// }
+// .monaco-editor [widgetId='editor.contrib.resizableContentHoverWidget'] {
+// 	@apply sm:transform translate-x-[2.25rem] translate-y-[30%] #{!important};
+// }
 .navigator .table-body tr:last-child td {
 	@apply border-b;
 }
@@ -585,4 +588,9 @@ button:focus-visible {
 		rgb(var(--brand-color-primary)) calc(100% - 140px),
 		transparent
 	);
+}
+
+.monaco-editor {
+	position: fixed !important;
+	z-index: 50 !important;
 }
