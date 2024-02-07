@@ -592,5 +592,8 @@ button:focus-visible {
 
 .monaco-editor {
 	position: fixed !important;
-	z-index: 50 !important;
+	z-index: 11 !important;
+}
+.deploy-resources {
+	scrollbar-gutter: stable both-edges;
 }
