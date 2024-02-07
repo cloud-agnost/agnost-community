@@ -4,7 +4,7 @@ import { RESOURCE_ICON_MAP } from '@/constants';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { ClusterComponent, ColumnDefWithClassName } from '@/types';
 import { translate } from '@/utils';
-import { ArrowClockwise } from '@phosphor-icons/react';
+import { ArrowClockwise, PencilSimple } from '@phosphor-icons/react';
 
 const { openEditClusterComponent } = useClusterStore.getState();
 
@@ -66,7 +66,7 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 					rounded
 					onClick={() => openEditClusterComponent(row.original)}
 				>
-					<ArrowClockwise className='w-4 h-4' />
+					<PencilSimple className='w-4 h-4' />
 				</Button>
 			) : null;
 		},
