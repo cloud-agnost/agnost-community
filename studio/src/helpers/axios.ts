@@ -29,10 +29,10 @@ export const testEndpointInstance = axios.create({
 instance.interceptors.request.use((config) => {
 	const accessToken = useAuthStore.getState().accessToken;
 	const refreshToken = useAuthStore.getState().refreshToken;
-	if (config.url === '/v1/auth/renew') {
-		config.headers['Authorization'] = refreshToken;
-	} else if (accessToken) {
+	if (accessToken) {
 		config.headers['Authorization'] = accessToken;
+	}
+	if (refreshToken) {
 		config.headers['Refresh-Token'] = refreshToken;
 	}
 	return config;
@@ -75,10 +75,10 @@ instance.interceptors.response.use(
 envInstance.interceptors.request.use((config) => {
 	const accessToken = useAuthStore.getState().accessToken;
 	const refreshToken = useAuthStore.getState().refreshToken;
-	if (config.url === '/v1/auth/renew') {
-		config.headers['Authorization'] = refreshToken;
-	} else if (accessToken) {
+	if (accessToken) {
 		config.headers['Authorization'] = accessToken;
+	}
+	if (refreshToken) {
 		config.headers['Refresh-Token'] = refreshToken;
 	}
 	return config;
@@ -86,6 +86,12 @@ envInstance.interceptors.request.use((config) => {
 
 envInstance.interceptors.response.use(
 	(response) => {
+		const at = response.headers['access-token'];
+		const rt = response.headers['refresh-token'];
+		if (at && rt) {
+			useAuthStore.getState().setRefreshToken(rt);
+			useAuthStore.getState().setToken(at);
+		}
 		return response;
 	},
 	({ response: { data } }) => {

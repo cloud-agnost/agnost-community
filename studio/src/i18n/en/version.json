@@ -346,7 +346,7 @@
 	"view_all_notifications": "View All Notifications",
 	"mark_all_as_read": "Mark All as Read",
 	"function": "Functions",
-	"update_engine_desc": "Agnost Enterprise clusters, creates a deployment for each app engine of the version which manages a set of replicas of a specific pod template. The replica count specifies the number of replicas (identical copies) of the specified pod template that should be running at any given time.",
+	"update_engine_desc": "Agnost clusters create a deployment for each app engine of the version which manages a set of replicas of a specific pod template. The replica count specifies the number of replicas (identical copies) of the specified pod template that should be running at any given time.",
 	"replicas": "Replicas",
 	"maxReplicas": "Max Replicas",
 	"minReplicas": "Min Replicas",

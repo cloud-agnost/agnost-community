@@ -3,7 +3,7 @@ import { NavigatorColumns } from '@/features/database/models/Navigator';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import { Field, FieldTypes, ResourceInstances } from '@/types';
-import { DATE_FORMAT, DATE_TIME_FORMAT, formatDate, getValueFromData } from '@/utils';
+import { DATE_FORMAT, DATE_TIME_FORMAT, convertUTC, getValueFromData } from '@/utils';
 import { ColDef, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import _ from 'lodash';
 import { useMemo } from 'react';
@@ -23,9 +23,9 @@ export default function useNavigatorColumns() {
 		}
 
 		if ([FieldTypes.DATETIME, FieldTypes.CREATED_AT, FieldTypes.UPDATED_AT].includes(field.type)) {
-			return formatDate(value, DATE_TIME_FORMAT);
+			return convertUTC(value, DATE_TIME_FORMAT);
 		}
-		if (field.type === FieldTypes.DATE) return formatDate(value, DATE_FORMAT);
+		if (field.type === FieldTypes.DATE) return convertUTC(value, DATE_FORMAT);
 
 		if (FieldTypes.GEO_POINT === field.type) {
 			return `${database.type === 'MongoDB' ? value?.coordinates?.[0] : value?.x} - ${

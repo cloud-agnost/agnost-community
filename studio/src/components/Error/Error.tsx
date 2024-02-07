@@ -12,11 +12,13 @@ import {
 import { Textarea } from '@/components/Input';
 import { ErrorPage } from '@/components/icons';
 import { toast } from '@/hooks/useToast';
+import useAuthStore from '@/store/auth/authStore';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams, useRouteError } from 'react-router-dom';
+import { useRouteError } from 'react-router-dom';
 import * as z from 'zod';
 const ErrorScheme = z.object({
 	description: z.string({
@@ -28,42 +30,39 @@ export default function Error({ children }: { children: React.ReactNode }) {
 	const { t } = useTranslation();
 	const error = useRouteError() as Error;
 	const [isOpen, setIsOpen] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const form = useForm<z.infer<typeof ErrorScheme>>({
 		resolver: zodResolver(ErrorScheme),
 	});
-	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const user = useAuthStore((state) => state.user);
 	console.error(error);
-	function onSubmit(data: z.infer<typeof ErrorScheme>) {
-		setLoading(true);
-		const myHeaders = new Headers();
-		myHeaders.append('Content-Type', 'application/json');
-		const raw = JSON.stringify({
-			...data,
-			orgId,
-			appId,
-			versionId,
-			baseUrl: window.location.origin,
-			error: error?.stack,
-		});
-		const requestOptions = {
-			method: 'POST',
-			headers: myHeaders,
-			body: raw,
-		};
-		fetch('https://agnost.c1-europe.altogic.com/error', requestOptions)
-			.then((response) => response.text())
-			.then(() => {
-				setLoading(false);
-				toast({
-					title: 'Feedback sent',
-					action: 'success',
-				});
-				closeModal();
-			})
-			.catch(() => setLoading(false));
-	}
+	const { isPending, mutate } = useMutation({
+		mutationFn: (data: z.infer<typeof ErrorScheme>) => {
+			const myHeaders = new Headers();
+			myHeaders.append('Content-Type', 'application/json');
 
+			return fetch('https://cloudflex.app/env-ikqshrg70v97/bug', {
+				method: 'POST',
+				headers: myHeaders,
+				body: JSON.stringify({
+					...data,
+					username: user.name,
+					email: user.contactEmail,
+					stack: error?.stack,
+				}),
+			});
+		},
+		onSuccess: () => {
+			toast({
+				title: 'Feedback sent',
+				action: 'success',
+			});
+			form.reset();
+			document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+		},
+	});
+	function onSubmit(data: z.infer<typeof ErrorScheme>) {
+		mutate(data);
+	}
 	function closeModal() {
 		setIsOpen(false);
 		form.reset();
@@ -88,7 +87,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 			</div>
 			<Dialog open={isOpen} onOpenChange={() => setIsOpen(false)}>
 				<DialogContent>
-					<DialogTitle>{t('organization.create-new')}</DialogTitle>
+					<DialogTitle>Report a bug</DialogTitle>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='organization-form'>
 							<FormField
@@ -115,7 +114,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 								<Button variant='text' onClick={closeModal}>
 									{t('general.cancel')}
 								</Button>
-								<Button variant='primary' loading={loading} type='submit'>
+								<Button variant='primary' loading={isPending} type='submit'>
 									{t('general.ok')}
 								</Button>
 							</div>

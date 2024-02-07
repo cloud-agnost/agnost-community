@@ -11,7 +11,7 @@
 	"maxReplicasDescription": "Specifies the maximum number of replicas that should be maintained by the Kubernetes deployment controller.",
 	"smtpDescription": "In order to send invitation emails or be notified about your cluster status through email, you need to provide SMTP (email) server connection parameters",
 	"yourClusterId": "Your Cluster ID",
-	"yourClusterIdDescription": "This is your Agnost Enterprise Cluster id.",
+	"yourClusterIdDescription": "This is your Agnost Cluster id.",
 	"clusterVersion": "Cluster Version",
 	"transferClusterOwnership": "Transfer Cluster Ownership",
 	"transferClusterOwnershipDescription": "Select the cluster member that you would like to transfer the ownership of the cluster.",

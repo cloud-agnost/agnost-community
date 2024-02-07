@@ -80,7 +80,7 @@ export function Pagination() {
 				</Select>
 			</div>
 			<div className='flex w-[100px] items-center justify-center text-xs '>
-				{paginationInfo.pageIndex} of {paginationInfo.dataCount}
+				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of {countInfo.totalCount}
 			</div>
 			<div className='flex items-center space-x-2'>
 				<Button

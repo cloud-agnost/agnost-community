@@ -118,7 +118,7 @@ function ReleaseInfo({ loading = false }: { loading: boolean }) {
 
 	return loading && _.isEmpty(clusterComponentsReleaseInfo) ? (
 		<div className='h-96 relative'>
-			<Loading />
+			<Loading loading={loading && _.isEmpty(clusterComponentsReleaseInfo)} />
 		</div>
 	) : (
 		<DataTable

@@ -17,7 +17,7 @@
 	"your_user_id": "Your User ID",
 	"your_name": "Your Name",
 	"delete_account": "Delete Account",
-	"your_user_id_description": "This is your user id within your Agnost Enterprise Cluster.",
+	"your_user_id_description": "This is your user id within your Agnost Cluster.",
 	"your_name_description": "Please enter your full name, or a display name you are comfortable with.",
 	"your_email_description": "This is your visible email within the platform. You can also use your email when signing in to the platform.",
 	"your_password_description": "You use your email and password to login to Agnost cluster.",

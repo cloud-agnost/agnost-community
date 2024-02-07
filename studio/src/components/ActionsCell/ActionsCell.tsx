@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { Trash, Pencil } from '@phosphor-icons/react';
+import { Trash, PencilSimple } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface ActionCellProps<T> {
@@ -35,7 +35,7 @@ function ActionsCell<T>({
 							onClick={() => onEdit?.(original)}
 							disabled={disabled || !canEdit}
 						>
-							<Pencil size={20} />
+							<PencilSimple size={20} />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>{t('general.edit')}</TooltipContent>

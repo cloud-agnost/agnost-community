@@ -4,7 +4,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn, formatCode } from '@/utils';
-import { FloppyDisk, Pencil, TestTube } from '@phosphor-icons/react';
+import { FloppyDisk, PencilSimple, TestTube } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -80,7 +80,7 @@ export default function VersionEditorLayout({
 				{children}
 				<div className='flex items-center gap-2'>
 					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit}>
-						<Pencil size={14} className='text-icon-default mr-1' />
+						<PencilSimple size={14} className='text-icon-default mr-1' />
 						{t('general.edit')}
 					</Button>
 

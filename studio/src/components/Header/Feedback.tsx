@@ -1,11 +1,12 @@
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { toast } from '@/hooks/useToast';
+import useAuthStore from '@/store/auth/authStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lightbulb } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import { Form, FormControl, FormField, FormItem, FormMessage } from 'components/Form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import { Button } from '../Button';
 import { Textarea } from '../Input';
@@ -16,39 +17,36 @@ const FeedbackScheme = z.object({
 });
 export default function Feedback() {
 	const { t } = useTranslation();
+	const user = useAuthStore((state) => state.user);
 	const form = useForm<z.infer<typeof FeedbackScheme>>({
 		resolver: zodResolver(FeedbackScheme),
 	});
-	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const { isPending, mutate } = useMutation({
+		mutationFn: (data: z.infer<typeof FeedbackScheme>) => {
+			const myHeaders = new Headers();
+			myHeaders.append('Content-Type', 'application/json');
 
+			return fetch('https://cloudflex.app/env-ikqshrg70v97/feedback', {
+				method: 'POST',
+				headers: myHeaders,
+				body: JSON.stringify({
+					...data,
+					username: user.name,
+					email: user.contactEmail,
+				}),
+			});
+		},
+		onSuccess: () => {
+			toast({
+				title: 'Feedback sent',
+				action: 'success',
+			});
+			form.reset();
+			document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+		},
+	});
 	function onSubmit(data: z.infer<typeof FeedbackScheme>) {
-		const myHeaders = new Headers();
-		myHeaders.append('Content-Type', 'application/json');
-
-		const raw = JSON.stringify({
-			...data,
-			orgId,
-			appId,
-			versionId,
-			baseUrl: window.location.origin,
-		});
-
-		const requestOptions = {
-			method: 'POST',
-			headers: myHeaders,
-			body: raw,
-		};
-
-		fetch('https://agnost.c1-europe.altogic.com/feedback', requestOptions)
-			.then((response) => response.text())
-			.then(() => {
-				toast({
-					title: 'Feedback sent',
-					action: 'success',
-				});
-				form.reset();
-			})
-			.catch((error) => console.log('error', error));
+		mutate(data);
 	}
 
 	return (
@@ -64,7 +62,6 @@ export default function Feedback() {
 					className='header-menu-right-nav-item !text-subtle hover:!text-default'
 				>
 					<Lightbulb size={14} className='mr-1' />
-
 					<span className='header-menu-right-nav-item-title font-sfCompact'>Feedback</span>
 				</Button>
 			</PopoverTrigger>
@@ -101,7 +98,7 @@ export default function Feedback() {
 								</Button>
 							</PopoverClose>
 
-							<Button type='submit' size='lg'>
+							<Button type='submit' size='lg' loading={isPending}>
 								{t('general.ok')}
 							</Button>
 						</div>
