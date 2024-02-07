@@ -590,7 +590,7 @@ button:focus-visible {
 	);
 }
 
-.monaco-editor {
+.code-editor-container .monaco-editor {
 	position: fixed !important;
 	z-index: 11 !important;
 }

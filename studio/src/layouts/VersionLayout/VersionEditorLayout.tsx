@@ -99,7 +99,7 @@ export default function VersionEditorLayout({
 
 			<CodeEditor
 				className='h-full'
-				containerClassName='flex-1'
+				containerClassName='flex-1 code-editor-container'
 				value={editedLogic}
 				onChange={(val) => setLogic(val as string)}
 				onSave={(val) => onSaveLogic(val as string)}
