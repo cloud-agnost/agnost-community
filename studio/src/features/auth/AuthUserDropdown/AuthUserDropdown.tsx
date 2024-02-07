@@ -7,7 +7,15 @@ import useResourceStore from '@/store/resources/resourceStore';
 import useThemeStore from '@/store/theme/themeStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { cn, leaveChannel } from '@/utils';
-import { CodeBlock, GearSix, Laptop, LineSegments, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
+import {
+	CodeBlock,
+	GearSix,
+	Laptop,
+	LineSegments,
+	MoonStars,
+	SignOut,
+	SunDim,
+} from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
 	DropdownMenu,
@@ -40,17 +48,17 @@ export default function AuthUserDropdown() {
 		{
 			id: 'light',
 			title: 'Light',
-			icon: <SunDim />,
+			icon: <SunDim className='text-lg' />,
 		},
 		{
 			id: 'dark',
 			title: 'Dark',
-			icon: <MoonStars />,
+			icon: <MoonStars className='text-lg' />,
 		},
 		{
 			id: 'system',
 			title: 'System',
-			icon: <Laptop />,
+			icon: <Laptop className='text-lg' />,
 		},
 	];
 
@@ -134,7 +142,7 @@ export default function AuthUserDropdown() {
 											' text-brand-primary': t.id === getTheme(user?._id ?? ''),
 										})}
 									>
-										<span className='flex items-center gap-2'>
+										<span className='flex items-center gap-1'>
 											{t.icon}
 											{t.title}
 										</span>

@@ -12,7 +12,7 @@
 	}
 
 	&-portal {
-		@apply fixed inset-0 z-50 flex;
+		@apply fixed inset-0 z-[51] flex;
 
 		&-left {
 			@apply justify-start;

@@ -133,7 +133,7 @@ export default function VersionTabLayout({
 					</div>
 				</div>
 			</div>
-			<div className='flex-1'>{!loading && content}</div>
+			<div className='flex-1 h-full'>{!loading && content}</div>
 			<Loading loading={loading} />
 		</div>
 	);

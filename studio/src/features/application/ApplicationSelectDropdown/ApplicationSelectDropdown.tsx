@@ -1,19 +1,14 @@
-import { Button } from '@/components/Button';
 import { CommandItem } from '@/components/Command';
 import { SelectionDropdown } from '@/components/SelectionDropdown';
-import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Application } from '@/types';
-import { Plus } from '@phosphor-icons/react';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { CreateApplicationButton } from '..';
 import './appSelectDropdown.scss';
 
 export default function ApplicationSelectDropdown() {
-	const { t } = useTranslation();
-	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const { applications, application, openEditAppDrawer, getAppsByOrgId } = useApplicationStore();
 	const { onAppClick } = useApplicationStore();
 	const { orgId } = useParams();
@@ -37,23 +32,9 @@ export default function ApplicationSelectDropdown() {
 				onClick={() => openEditAppDrawer(application as Application)}
 			>
 				<CommandItem>
-					<Button
-						variant='primary'
-						size='full'
-						onClick={() => setOpenCreateModal(true)}
-						className='font-normal '
-					>
-						<Plus size={16} className='mr-2' />
-						{t('application.create')}
-					</Button>
+					<CreateApplicationButton size='full' />
 				</CommandItem>
 			</SelectionDropdown>
-
-			<ApplicationCreateModal
-				key={openCreateModal.toString()}
-				isOpen={openCreateModal}
-				closeModal={() => setOpenCreateModal(false)}
-			/>
 		</>
 	);
 }

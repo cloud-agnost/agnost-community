@@ -7,9 +7,9 @@ interface VersionLayoutProps {
 }
 export default function SettingsLayout({ children, navbar, className }: VersionLayoutProps) {
 	return (
-		<div className={cn('grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 h-full', className)}>
-			{navbar}
-			{children}
+		<div className={cn('flex gap-6 h-full', className)}>
+			<div className='h-full '>{navbar}</div>
+			<div className='flex-1'>{children}</div>
 		</div>
 	);
 }

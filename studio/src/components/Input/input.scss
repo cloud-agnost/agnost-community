@@ -1,5 +1,5 @@
 .input {
-	@apply flex w-full px-3 py-2 text-sm text-default dark:bg-input-background rounded appearance-none;
+	@apply flex w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
 	@apply border border-input-border hover:border-input-hover dark:border-none;
 	@apply file:border-0 file:bg-transparent file:text-sm file:font-medium;
 	@apply placeholder:text-subtle placeholder:text-sm;

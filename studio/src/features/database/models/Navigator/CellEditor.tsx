@@ -1,3 +1,4 @@
+import { Input } from '@/components/Input';
 import { FieldTypes } from '@/types';
 import { DATE_FORMAT, DATE_TIME_FORMAT, convertUTC } from '@/utils';
 import { InputMask, Replacement } from '@react-input/mask';
@@ -58,13 +59,14 @@ export default function CellEditor({
 
 	return (
 		<InputMask
+			component={Input}
 			mask={mask}
 			replacement={replacement}
 			separate
 			value={value || ''}
 			ref={refInput}
 			onChange={(event) => updateValue(event.target.value)}
-			className='w-full h-full bg-transparent border-none outline-none px-2'
+			className='w-full h-full border-none outline-none px-2'
 		/>
 	);
 }
