@@ -22,6 +22,10 @@ function App() {
 		if (!window.location.pathname.includes('studio')) {
 			window.location.pathname = `/studio${window.location.pathname}`;
 		}
+
+		setTimeout(() => {
+			document.documentElement.classList.add('has-js');
+		}, 500);
 	}, []);
 
 	useEffect(() => {
