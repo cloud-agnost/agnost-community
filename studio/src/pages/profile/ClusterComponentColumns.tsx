@@ -4,7 +4,7 @@ import { RESOURCE_ICON_MAP } from '@/constants';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { ClusterComponent, ColumnDefWithClassName } from '@/types';
 import { translate } from '@/utils';
-import { ArrowClockwise, PencilSimple } from '@phosphor-icons/react';
+import { PencilSimple } from '@phosphor-icons/react';
 
 const { openEditClusterComponent } = useClusterStore.getState();
 
