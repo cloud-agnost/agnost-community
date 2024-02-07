@@ -2,21 +2,21 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
-import { TableLoading } from '@/components/Table/Table';
+import { MODULE_PAGE_SIZE } from '@/constants';
 import { EditFile, FileColumns } from '@/features/storage';
-import { useInfiniteScroll, useTable, useToast } from '@/hooks';
+import { useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, TabTypes } from '@/types';
+import { APIError, BucketCountInfo, TabTypes } from '@/types';
 import { ArrowClockwise } from '@phosphor-icons/react';
-import { useMutation } from '@tanstack/react-query';
-import _ from 'lodash';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import InfiniteScroll from 'react-infinite-scroll-component';
-
+import { useSearchParams } from 'react-router-dom';
+import { Pagination } from '../version/navigator/Pagination';
 export default function Files() {
+	const [searchParams] = useSearchParams();
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { toast } = useToast();
 	const { t } = useTranslation();
@@ -51,21 +51,32 @@ export default function Files() {
 		},
 	];
 
-	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useInfiniteScroll(
-		{
-			queryFn: getFilesOfBucket,
-			queryKey: 'getFilesOfBucket',
-			lastFetchedPage: _.isNil(fileCountInfo) ? undefined : fileCountInfo?.currentPage - 1,
-			dataLength: files?.length,
-			disableVersionParams: true,
-			params: {
-				bckId: bucket?.id as string,
-				storageName: storage?.name as string,
-				bucketName: bucket?.name as string,
+	const { refetch, isFetching } = useQuery({
+		queryKey: [
+			'getFilesOfBucket',
+			storage?.name,
+			bucket?.id,
+			bucket?.name,
+			searchParams.get('q'),
+			searchParams.get('page'),
+			searchParams.get('size'),
+		],
+		queryFn: () =>
+			getFilesOfBucket({
+				page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
+				limit: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 				returnCountInfo: true,
-			},
-		},
-	);
+				search: searchParams.get('q') as string,
+				storageName: storage?.name,
+				bckId: bucket?.id as string,
+				bucketName: bucket?.name as string,
+			}),
+		refetchOnWindowFocus: false,
+		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
+		// &&
+		// (dataCountInfo?.[modelId]?.currentPage === undefined ||
+		// 	Math.ceil(data.length / MODULE_PAGE_SIZE) < (dataCountInfo?.[modelId]?.currentPage ?? 0)),
+	});
 	const table = useTable({
 		data: files,
 		columns: FileColumns,
@@ -82,6 +93,7 @@ export default function Files() {
 		mutationKey: ['deleteMultipleFileFromBucket'],
 		onSuccess: () => {
 			table?.resetRowSelection();
+			refetch();
 		},
 		onError: ({ details }: APIError) => {
 			table?.resetRowSelection();
@@ -147,15 +159,14 @@ export default function Files() {
 					</Button>
 				}
 			>
-				<InfiniteScroll
-					scrollableTarget='version-layout'
-					dataLength={files?.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable table={table} />
-				</InfiniteScroll>
+				<div className='space-y-6 h-full'>
+					<DataTable
+						table={table}
+						containerClassName='table-fixed w-full h-[calc(100%-6rem)] overflow-auto relative'
+						headerClassName='sticky top-0 z-10'
+					/>
+					<Pagination countInfo={fileCountInfo as BucketCountInfo} />
+				</div>
 				<EditFile open={isEditFileDialogOpen} onClose={closeFileEditDialog} />
 			</VersionTabLayout>
 		</>

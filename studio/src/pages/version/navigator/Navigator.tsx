@@ -8,7 +8,7 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { APIError, FieldTypes, ResourceInstances, TabTypes } from '@/types';
+import { APIError, BucketCountInfo, FieldTypes, ResourceInstances, TabTypes } from '@/types';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { CellEditRequestEvent } from 'ag-grid-community';
@@ -32,6 +32,7 @@ export default function Navigator() {
 		getDataOfSelectedModel,
 		data: stateData,
 		subModelData,
+		dataCountInfo,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
 	const [isGridReady, setIsGridReady] = useState(false);
@@ -96,7 +97,7 @@ export default function Navigator() {
 			getDataFromModel({
 				sortBy: searchParams.get('f') as string,
 				sortDir: searchParams.get('d') as string,
-				page: searchParams.get('page') ? Number(searchParams.get('page')) : 0,
+				page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
 				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 				id: searchParams.get('ref') as string,
 				dbType: database.type,
@@ -209,7 +210,7 @@ export default function Navigator() {
 					}
 					onGridReady={() => setIsGridReady(true)}
 				/>
-				<Pagination />
+				<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
 			</div>
 		</VersionTabLayout>
 	);

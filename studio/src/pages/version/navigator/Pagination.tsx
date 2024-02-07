@@ -1,23 +1,24 @@
 import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useNavigatorStore from '@/store/database/navigatorStore';
+import useTabStore from '@/store/version/tabStore';
 import { BucketCountInfo } from '@/types';
 import { CaretDoubleLeft, CaretDoubleRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
-export function Pagination() {
-	const { modelId } = useParams() as Record<string, string>;
-	const { dataCountInfo } = useNavigatorStore();
-
+export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { versionId } = useParams() as { versionId: string };
+	const { updateCurrentTab } = useTabStore();
 	// todo update tab path
 	function goToNextPage() {
 		const currentPage = countInfo?.currentPage;
 		const nextPage = currentPage + 1;
 		searchParams.set('page', nextPage.toString());
 		setSearchParams(searchParams);
+		updateCurrentTab(versionId, {
+			path: `${window.location.pathname}?${searchParams.toString()}`,
+		});
 	}
 
 	function goToPreviousPage() {
@@ -28,7 +29,7 @@ export function Pagination() {
 	}
 
 	function goToFirstPage() {
-		searchParams.set('page', '0');
+		searchParams.set('page', '1');
 		setSearchParams(searchParams);
 	}
 
@@ -43,21 +44,11 @@ export function Pagination() {
 		setSearchParams(searchParams);
 	}
 
-	const countInfo: BucketCountInfo = useMemo(
-		() => ({
-			totalCount: dataCountInfo?.[modelId]?.totalCount ?? 0,
-			count: dataCountInfo?.[modelId]?.count ?? 0,
-			currentPage: dataCountInfo?.[modelId]?.currentPage ?? 0,
-			pageSize: dataCountInfo?.[modelId]?.pageSize ?? 0,
-			totalPages: dataCountInfo?.[modelId]?.totalPages ?? 0,
-		}),
-		[dataCountInfo],
-	);
-
 	const paginationInfo = useMemo(
 		() => ({
-			dataCount: countInfo.pageSize * countInfo.currentPage + countInfo.count,
-			pageIndex: countInfo.currentPage === 0 ? 1 : countInfo.pageSize * countInfo.currentPage + 1,
+			dataCount: countInfo?.pageSize * (countInfo?.currentPage - 1) + countInfo?.count,
+			pageIndex:
+				countInfo?.currentPage === 1 ? 1 : countInfo?.pageSize * (countInfo?.currentPage - 1) + 1,
 		}),
 		[countInfo],
 	);
@@ -80,7 +71,7 @@ export function Pagination() {
 				</Select>
 			</div>
 			<div className='flex w-[100px] items-center justify-center text-xs '>
-				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of {countInfo.totalCount}
+				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of {countInfo?.totalCount}
 			</div>
 			<div className='flex items-center space-x-2'>
 				<Button
@@ -106,7 +97,7 @@ export function Pagination() {
 					<CaretLeft className='h-4 w-4' />
 				</Button>
 				<p className='text-xs'>
-					{countInfo?.currentPage + 1} of {countInfo?.totalPages + 1}
+					{countInfo?.currentPage} of {countInfo?.totalPages}
 				</p>
 				<Button
 					variant='icon'
