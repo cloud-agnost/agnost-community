@@ -12,7 +12,7 @@ export default function Resources() {
 		return <Icon className='w-8 h-8' />;
 	}
 	return (
-		<div className='w-full max-h-[300px] px-2 py-1 overflow-y-scroll deploy-resources'>
+		<div className='w-full max-h-[300px] px-3 py-1 overflow-y-scroll deploy-resources'>
 			<div className='text-subtle text-xs font-sfCompact leading-6 flex justify-between gap-4 mb-2'>
 				<p>{t('version.resources')}</p>
 				<p>{t('version.status')}</p>
