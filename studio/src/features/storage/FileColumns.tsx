@@ -19,7 +19,8 @@ const { copyFileInBucket, replaceFileInBucket, openFileEditDialog, deleteFileFro
 
 const queryClient = new QueryClient();
 async function deleteFileHandler(toDeleteFile: BucketFile) {
-	const { bucket, storage } = useStorageStore.getState();
+	const { bucket, storage, getFilesOfBucket, fileCountInfo } = useStorageStore.getState();
+	const info = fileCountInfo?.[bucket.id];
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
@@ -28,6 +29,15 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 				toast({
 					title: details,
 					action: 'error',
+				});
+
+				getFilesOfBucket({
+					bckId: bucket.id,
+					storageName: storage?.name,
+					bucketName: bucket.name,
+					limit: info?.pageSize ?? 25,
+					page: info?.currentPage ?? 1,
+					returnCountInfo: true,
 				});
 			},
 		})

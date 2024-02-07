@@ -221,14 +221,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getBuckets: async (params: GetStorageBuckets) => {
 			const buckets = await StorageService.getStorageBuckets(params);
-			if (buckets.info.currentPage === 1) {
-				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: {} });
-			} else {
-				set((prev) => ({
-					buckets: [...prev.buckets, ...buckets.data],
-					bucketCountInfo: buckets.info,
-				}));
-			}
+			set({ buckets: buckets.data, bucketCountInfo: buckets.info });
 			return buckets.data;
 		},
 		getBucket: async (params: DeleteBucketParams) => {
@@ -304,20 +297,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getFilesOfBucket: async (params: GetFilesParams) => {
 			const files = await StorageService.getFilesOfBucket(params);
-			if (files.info.currentPage === 1) {
-				set((state) => ({
-					files: { ...state.files, [params.bckId]: files.data },
-					fileCountInfo: { ...state.fileCountInfo, [params.bckId]: files.info },
-				}));
-			} else {
-				set((state) => ({
-					files: {
-						...state.files,
-						[params.bckId]: [...state.files[params.bckId], ...files.data],
-					},
-					fileCountInfo: { ...state.fileCountInfo, [params.bckId]: files.info },
-				}));
-			}
+			set((state) => ({
+				files: { ...state.files, [params.bckId]: files.data },
+				fileCountInfo: { ...state.fileCountInfo, [params.bckId]: files.info },
+			}));
 			return files.data;
 		},
 		uploadFileToBucket: async (params: UploadFileToBucketParams) => {

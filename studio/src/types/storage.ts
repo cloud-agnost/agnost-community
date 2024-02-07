@@ -55,7 +55,7 @@ export interface BucketCountInfo {
 	currentPage: number;
 	pageSize: number;
 	totalPages: number;
-	totalCount?: number;
+	totalCount: number;
 }
 export interface CreateStorageParams extends BaseParams, BaseRequest {
 	name: string;
@@ -90,7 +90,7 @@ export interface GetFilesParams {
 	storageName: string;
 	bucketName: string;
 	limit: number;
-	search: string;
+	search?: string;
 	page: number;
 	returnCountInfo: boolean;
 }

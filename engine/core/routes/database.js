@@ -51,7 +51,7 @@ router.get(
           },
           {
             ...(size && { limit: Number(size) }),
-            ...(size && page && { skip: Number(page) * Number(size) }),
+            ...(size && page && { skip: (Number(page) - 1) * Number(size) }),
             sort: { [field]: direction },
             returnCount: true,
           }
@@ -59,7 +59,7 @@ router.get(
 
       const countInfo = {
         totalCount: Number(info.count),
-        totalPages: Math.floor(info.count / Number(size)),
+        totalPages: Math.ceil(info.count / Number(size)),
         currentPage: Number(page),
         pageSize: Number(size),
         count: data.length,
@@ -71,7 +71,7 @@ router.get(
         return d;
       });
 
-      res.json({ data: updatedData, countInfo });
+      res.json({ countInfo, data: updatedData });
     } catch (error) {
       helper.handleError(req, res, error);
     }

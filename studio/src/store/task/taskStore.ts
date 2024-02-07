@@ -132,6 +132,10 @@ const useTaskStore = create<TaskStore & Actions>()(
 				set((prev) => ({
 					tasks: prev.tasks.filter((task) => task._id !== params.taskId),
 				}));
+				useUtilsStore.setState((prev) => {
+					const { [params.taskId]: _, ...restLogs } = prev.taskLogs;
+					return { taskLogs: restLogs };
+				});
 				if (params.onSuccess) params.onSuccess();
 				return task;
 			} catch (error) {
@@ -145,6 +149,14 @@ const useTaskStore = create<TaskStore & Actions>()(
 				set((prev) => ({
 					tasks: prev.tasks.filter((task) => !params.taskIds.includes(task._id)),
 				}));
+
+				useUtilsStore.setState?.((prev) => {
+					const taskLogs = prev.taskLogs;
+					params.taskIds.forEach((id) => {
+						delete taskLogs[id];
+					});
+					return { taskLogs: taskLogs };
+				});
 				if (params.onSuccess) params.onSuccess();
 				return tasks;
 			} catch (error) {

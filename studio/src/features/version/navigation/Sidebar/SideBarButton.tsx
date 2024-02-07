@@ -36,7 +36,7 @@ export default function SideBarButton({
 				'flex items-center [&>*]:min-w-0 justify-between gap-1 group',
 				active
 					? 'bg-button-primary/90 dark:bg-button-primary/70 text-default'
-					: 'hover:bg-subtle text-subtle hover:text-default',
+					: 'hover:bg-lighter text-subtle hover:text-default',
 			)}
 		>
 			<Button

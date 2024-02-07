@@ -118,6 +118,18 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => e._id !== params.endpointId),
 			}));
+
+			useUtilsStore.setState((prev) => {
+				const { [params.endpointId]: _, ...restLogs } = prev.endpointLogs;
+				const { [params.endpointId]: __, ...restResponse } = prev.endpointResponse;
+				const { [params.endpointId]: ___, ...restRequest } = prev.endpointRequest;
+
+				return {
+					endpointLogs: restLogs,
+					endpointResponse: restResponse,
+					endpointRequest: restRequest,
+				};
+			});
 			if (params.onSuccess) params.onSuccess();
 		} catch (error) {
 			if (params.onError) params.onError(error as APIError);
@@ -130,6 +142,20 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
 			}));
+
+			useUtilsStore.setState?.((prev) => {
+				const { endpointLogs, endpointResponse, endpointRequest } = prev;
+				params.endpointIds.forEach((id) => {
+					delete endpointResponse[id];
+					delete endpointRequest[id];
+					delete endpointLogs[id];
+				});
+				return {
+					endpointLogs,
+					endpointResponse,
+					endpointRequest,
+				};
+			});
 			if (params.onSuccess) params.onSuccess();
 		} catch (error) {
 			if (params.onError) params.onError(error as APIError);

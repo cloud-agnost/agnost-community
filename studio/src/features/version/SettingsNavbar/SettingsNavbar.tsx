@@ -11,7 +11,7 @@ export default function SettingsNavbar({ items }: { items: Item[] }) {
 	const { t } = useTranslation();
 
 	return (
-		<div className='version-settings-navbar'>
+		<div className='version-settings-navbar h-full'>
 			<h4 className='version-settings-navbar-title'>{t('version.settings.default')}</h4>
 			<nav>
 				{items.map((item) => {
@@ -25,7 +25,7 @@ export default function SettingsNavbar({ items }: { items: Item[] }) {
 							<span className='flex items-center justify-center text-xl w-6 h-6'>
 								<item.icon className='text-icon-base' />
 							</span>
-							{item.title}
+							<p className='whitespace-nowrap'>{item.title}</p>
 						</NavLink>
 					);
 				})}

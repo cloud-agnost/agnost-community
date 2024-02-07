@@ -16,9 +16,10 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { TabTypes } from '@/types';
 import { cn, joinChannel } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
-import _ from 'lodash';
+import _, { capitalize } from 'lodash';
 import { Fragment, useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
@@ -144,7 +145,9 @@ export default function Version() {
 			<VersionLayout
 				className={cn(
 					paths.slice(-1).pop(),
-					paths.some((p) => p === 'settings') && '!overflow-hidden',
+					paths.some((p) =>
+						[TabTypes.Settings, TabTypes.Bucket, TabTypes.File].includes(capitalize(p) as TabTypes),
+					) && '!overflow-hidden',
 				)}
 			>
 				<Outlet />
