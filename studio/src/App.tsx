@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from './components/Toast';
 import useThemeStore from './store/theme/themeStore';
+import { AliveScope } from 'react-activation';
 
 const queryClient = new QueryClient();
 
@@ -42,10 +43,12 @@ function App() {
 	}, [getTheme(user?._id ?? '')]);
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-			<Toaster />
-		</QueryClientProvider>
+		<AliveScope>
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+				<Toaster />
+			</QueryClientProvider>
+		</AliveScope>
 	);
 }
 

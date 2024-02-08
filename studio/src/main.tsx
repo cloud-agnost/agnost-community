@@ -1,11 +1,6 @@
-import App from '@/App.tsx';
 import '@/i18n/config';
+import App from '@/App.tsx';
 import '@/index.scss';
 import ReactDOM from 'react-dom/client';
-import { AliveScope } from 'react-activation';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	<AliveScope>
-		<App />
-	</AliveScope>,
-);
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<App />);

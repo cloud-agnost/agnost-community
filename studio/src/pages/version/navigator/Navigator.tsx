@@ -36,7 +36,6 @@ export default function Navigator() {
 		dataCountInfo,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
-	const [isGridReady, setIsGridReady] = useState(false);
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const columns = useNavigatorColumns();
@@ -104,12 +103,7 @@ export default function Navigator() {
 				dbType: database.type,
 			}),
 		refetchOnWindowFocus: false,
-		enabled:
-			isGridReady &&
-			modelId === model._id &&
-			window.location.pathname.includes(model._id) &&
-			(dataCountInfo?.[modelId] === undefined ||
-				Number(searchParams.get('page')) > (dataCountInfo?.[modelId]?.currentPage ?? 0)),
+		enabled: modelId === model._id && window.location.pathname.includes(model._id),
 	});
 
 	function onCellEditRequest(event: CellEditRequestEvent) {
@@ -219,10 +213,6 @@ export default function Navigator() {
 						onRowSelected={() =>
 							setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 						}
-						onGridReady={(e) => {
-							console.log('Grid Ready', e);
-							setIsGridReady(true);
-						}}
 					/>
 					<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
 				</div>
