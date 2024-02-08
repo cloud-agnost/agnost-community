@@ -557,12 +557,7 @@ html .light ::-webkit-scrollbar-track {
 		@apply hidden #{!important};
 	}
 }
-// .monaco-editor .parameter-hints-widget {
-// 	transform: translate(1.25rem, 50%) !important;
-// }
-// .monaco-editor [widgetId='editor.contrib.resizableContentHoverWidget'] {
-// 	@apply sm:transform translate-x-[2.25rem] translate-y-[30%] #{!important};
-// }
+
 .navigator .table-body tr:last-child td {
 	@apply border-b;
 }
@@ -596,4 +591,11 @@ button:focus-visible {
 }
 .deploy-resources {
 	scrollbar-gutter: stable both-edges;
+}
+.ka-wrapper,
+.ka-content {
+	height: 100%;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
 }

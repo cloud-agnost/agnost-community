@@ -30,7 +30,7 @@ async function onboardingLoader(params: LoaderFunctionArgs) {
 	const lastDoneStep = steps[currentStepIndex];
 
 	if (lastDoneStep && lastDoneStep.path !== url.pathname) {
-		return redirect(lastDoneStep.path);
+		// return redirect(lastDoneStep.path);
 	}
 
 	return null;
