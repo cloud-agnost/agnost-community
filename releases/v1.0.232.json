@@ -1,5 +1,5 @@
 {
-   "release": "v1.0.233",
+   "release": "v1.0.232",
    "modules": {
       "engine-core": "v1.0.73",
       "engine-monitor": "v1.0.12",
@@ -9,6 +9,6 @@
       "platform-core": "v1.0.86",
       "platform-sync": "v1.0.7",
       "platform-worker": "v1.0.8",
-      "studio": "v1.0.115"
+      "studio": "v1.0.114"
    }
 }
