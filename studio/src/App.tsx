@@ -8,7 +8,9 @@ import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from './components/Toast';
 import useThemeStore from './store/theme/themeStore';
+
 const queryClient = new QueryClient();
+
 function App() {
 	useRealtime();
 	const { getAllTypes } = useTypeStore();
