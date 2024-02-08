@@ -51,7 +51,7 @@ router.get(
 					},
 					{
 						limit: Number(size),
-						skip: (Number(page) - 1) * Number(size),
+						skip: Number(page) * Number(size),
 						sort: { [field]: direction },
 						returnCount: true,
 					}
