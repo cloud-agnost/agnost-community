@@ -26,12 +26,12 @@ async function onboardingLoader(params: LoaderFunctionArgs) {
 		return redirect(isAuthenticated ? '/organization' : '/login');
 	}
 
-	// const url = new URL(params.request.url);
-	// const lastDoneStep = steps[currentStepIndex];
+	const url = new URL(params.request.url);
+	const lastDoneStep = steps[currentStepIndex];
 
-	// if (lastDoneStep && lastDoneStep.path !== url.pathname) {
-	// 	return redirect(lastDoneStep.path);
-	// }
+	if (lastDoneStep && lastDoneStep.path !== url.pathname) {
+		// return redirect(lastDoneStep.path);
+	}
 
 	return null;
 }
