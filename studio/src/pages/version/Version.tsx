@@ -145,9 +145,8 @@ export default function Version() {
 			<VersionLayout
 				className={cn(
 					paths.slice(-1).pop(),
-					paths.some((p) =>
-						[TabTypes.Settings, TabTypes.Bucket, TabTypes.File].includes(capitalize(p) as TabTypes),
-					) && '!overflow-hidden',
+					paths.some((p) => [TabTypes.Bucket, TabTypes.File].includes(capitalize(p) as TabTypes)) &&
+						'!overflow-hidden',
 				)}
 			>
 				<Outlet />
