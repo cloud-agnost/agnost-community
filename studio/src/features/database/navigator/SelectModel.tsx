@@ -36,7 +36,7 @@ export default function SelectModel() {
 		setModel(model);
 		const count = dataCountInfo?.[model._id];
 		const path = getVersionDashboardPath(
-			`database/${dbId}/navigator/${model._id}?page=${count?.currentPage ?? 0}&limit=${
+			`database/${dbId}/navigator/${model._id}?page=${count?.currentPage ?? 1}&limit=${
 				count?.pageSize ?? MODULE_PAGE_SIZE
 			}`,
 		);
