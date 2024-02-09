@@ -23,7 +23,7 @@ export default function ProfileSettings() {
 	return (
 		<SettingsLayout
 			navbar={<SettingsNavbar items={settings} />}
-			className='p-6 full-height-without-header'
+			className='p-4 full-height-without-header'
 		>
 			<RequireAuth>
 				<Outlet />
