@@ -1,18 +1,46 @@
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
 import useDatabaseStore from '@/store/database/databaseStore';
-import { CustomCellEditorProps } from 'ag-grid-react';
-import { useEffect, useRef, useState } from 'react';
+import { ResourceInstances } from '@/types';
+import { ICellEditorParams } from 'ag-grid-community';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
 const KEY_BACKSPACE = 'Backspace';
-export default function GeoPointEditor({ value, onValueChange, eventKey }: CustomCellEditorProps) {
+const KEY_DELETE = 'Delete';
+
+const GeoPointEditor = forwardRef(({ eventKey, value }: ICellEditorParams, ref) => {
 	const database = useDatabaseStore((state) => state.database);
 	const ltdRef = useRef<HTMLInputElement>(null);
 	const lngRef = useRef<HTMLInputElement>(null);
-	const [coords, setCoords] = useState({
-		lat: database.type === 'MongoDB' ? value?.coordinates?.[0] : value?.x,
-		lng: database.type === 'MongoDB' ? value?.coordinates?.[1] : value?.y,
-	});
+	const createInitialState = () => {
+		let startValue = {
+			lat: 0,
+			lng: 0,
+		};
+
+		if (eventKey === KEY_BACKSPACE || eventKey === KEY_DELETE) {
+			startValue = {
+				lat: 0,
+				lng: 0,
+			};
+		} else if (eventKey && eventKey.length === 1) {
+			startValue = {
+				lat: parseFloat(eventKey),
+				lng: parseFloat(eventKey),
+			};
+		} else {
+			startValue = {
+				lat: database.type === ResourceInstances.MongoDB ? value?.coordinates?.[0] : value?.x,
+				lng: database.type === ResourceInstances.MongoDB ? value?.coordinates?.[1] : value?.y,
+			};
+		}
+		return {
+			value: startValue,
+		};
+	};
+	const initialState = createInitialState();
+	console.log('initialState', initialState);
+	const [coords, setCoords] = useState(initialState.value);
 
 	function onChange(lat: string, lng: string) {
 		const newCoords = {
@@ -20,38 +48,25 @@ export default function GeoPointEditor({ value, onValueChange, eventKey }: Custo
 			lng: parseFloat(lng),
 		};
 		setCoords(newCoords);
-		let newValue = {};
-		if (database.type === 'MongoDB') {
-			newValue = {
-				coordinates: [newCoords.lng, newCoords.lat],
-				type: 'Point',
-			};
-		} else {
-			newValue = {
-				x: newCoords.lat,
-				y: newCoords.lng,
-			};
-		}
-
-		onValueChange(newValue);
 	}
 
-	useEffect(() => {
-		let startValue;
+	useImperativeHandle(ref, () => {
+		return {
+			getValue() {
+				if (database.type === ResourceInstances.MongoDB) {
+					return {
+						coordinates: [coords.lng, coords.lat],
+						type: 'Point',
+					};
+				}
+				return {
+					x: coords.lat,
+					y: coords.lng,
+				};
+			},
+		};
+	});
 
-		if (eventKey === KEY_BACKSPACE) {
-			startValue = '';
-		} else if (eventKey && eventKey.length === 1) {
-			startValue = eventKey;
-		} else {
-			startValue = value;
-		}
-		if (startValue == null) {
-			startValue = '';
-		}
-
-		onChange(startValue.x, startValue.y);
-	}, []);
 	return (
 		<div className='flex gap-2 items-center w-full bg-subtle p-2'>
 			<div className='space-y-1'>
@@ -76,4 +91,7 @@ export default function GeoPointEditor({ value, onValueChange, eventKey }: Custo
 			</div>
 		</div>
 	);
-}
+});
+
+GeoPointEditor.displayName = 'GeoPointEditor';
+export default GeoPointEditor;

@@ -2,10 +2,10 @@ import { Button } from '@/components/Button';
 import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { ICellEditorParams } from 'ag-grid-community';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-interface ReferenceProps extends CustomCellRendererProps {
+interface ReferenceProps extends ICellEditorParams {
 	referenceModelIid: string;
 }
 

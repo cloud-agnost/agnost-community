@@ -2,10 +2,10 @@ import { Button } from '@/components/Button';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { FieldTypes, Model } from '@/types';
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { ICellEditorParams } from 'ag-grid-community';
 import { useParams } from 'react-router-dom';
 
-interface SubObjectProps extends CustomCellRendererProps {
+interface SubObjectProps extends ICellEditorParams {
 	subId: string;
 	type: FieldTypes;
 }

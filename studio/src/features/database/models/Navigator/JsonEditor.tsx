@@ -1,45 +1,45 @@
 import { CodeEditor } from '@/components/CodeEditor';
-import { CustomCellEditorProps } from 'ag-grid-react';
-import { useEffect } from 'react';
+import { ICellEditorParams } from 'ag-grid-community';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 const KEY_BACKSPACE = 'Backspace';
-
-export default function JsonEditor({
-	value,
-	onValueChange,
-	eventKey,
-	node,
-	column,
-}: CustomCellEditorProps) {
-	const updateValue = (value: string | undefined) => {
-		onValueChange(value === '' ? null : value);
-	};
-
-	useEffect(() => {
+const KEY_DELETE = 'Delete';
+const JSONEditor = forwardRef(({ eventKey, column, node, ...props }: ICellEditorParams, ref) => {
+	const [value, setValue] = useState<string>('');
+	const createInitialState = () => {
 		let startValue;
 
-		if (eventKey === KEY_BACKSPACE) {
+		if (eventKey === KEY_BACKSPACE || eventKey === KEY_DELETE) {
 			startValue = '';
 		} else if (eventKey && eventKey.length === 1) {
 			startValue = eventKey;
 		} else {
-			startValue = value;
-		}
-		if (startValue == null) {
-			startValue = '';
+			startValue = props.value;
 		}
 
-		updateValue(startValue);
-	}, []);
+		return {
+			value: JSON.stringify(startValue, null, 2),
+		};
+	};
+
+	const initialState = createInitialState();
 
 	useEffect(() => {
-		onValueChange(JSON.stringify(value, null, 2));
+		setValue(initialState.value);
 	}, []);
+
+	useImperativeHandle(ref, () => {
+		return {
+			getValue() {
+				return value;
+			},
+		};
+	});
 	return (
 		<div className='w-[500px] h-[210px] bg-subtle p-1 rounded'>
 			<CodeEditor
 				value={value}
-				onChange={updateValue}
+				onChange={(value) => setValue(value as string)}
 				defaultLanguage='json'
 				name={`navigator-${column.getId()}-${node.rowIndex}`}
 				className='w-full h-full'
@@ -50,4 +50,7 @@ export default function JsonEditor({
 			/>
 		</div>
 	);
-}
+});
+
+JSONEditor.displayName = 'JSONEditor';
+export default JSONEditor;

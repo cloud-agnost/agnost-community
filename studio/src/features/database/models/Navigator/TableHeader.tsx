@@ -1,12 +1,12 @@
+import { Button } from '@/components/Button';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { cn } from '@/utils';
 import { CaretUp } from '@phosphor-icons/react';
-import { CustomHeaderProps } from 'ag-grid-react';
+import { IHeaderCellComp } from 'ag-grid-community';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/Button';
 
-interface SortButtonProps extends CustomHeaderProps {
+interface SortButtonProps extends IHeaderCellComp {
 	text: string;
 	className?: string;
 	field: string;
