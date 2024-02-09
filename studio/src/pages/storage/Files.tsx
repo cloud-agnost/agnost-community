@@ -159,10 +159,10 @@ export default function Files() {
 					</Button>
 				}
 			>
-				<div className='space-y-6 h-full'>
+				<div className='h-full flex flex-col'>
 					<DataTable
 						table={table}
-						containerClassName='table-fixed w-full h-[calc(100%-6rem)] overflow-auto relative'
+						containerClassName='navigator table-fixed w-full flex-1 overflow-auto relative'
 						headerClassName='sticky top-0 z-10'
 					/>
 					<Pagination countInfo={fileCountInfo as BucketCountInfo} />

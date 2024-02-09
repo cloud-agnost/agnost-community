@@ -129,12 +129,14 @@ export default function Buckets() {
 					</Button>
 				}
 			>
-				<DataTable
-					table={table}
-					containerClassName='table-fixed w-full h-[calc(100%-5.5rem)] overflow-auto relative'
-					headerClassName='sticky top-0 z-10'
-				/>
-				<Pagination countInfo={bucketCountInfo as BucketCountInfo} />
+				<div className='h-full flex flex-col'>
+					<DataTable
+						table={table}
+						containerClassName='navigator table-fixed w-full flex-1 overflow-auto relative'
+						headerClassName='sticky top-0 z-10'
+					/>
+					<Pagination countInfo={bucketCountInfo as BucketCountInfo} />
+				</div>
 				<ConfirmationModal
 					loading={deleteLoading}
 					error={deleteError}
