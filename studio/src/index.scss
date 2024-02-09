@@ -227,6 +227,10 @@
 	}
 
 	.full-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height)));
+		height: var(--height);
+	}
+	.full-height-without-header-and-tab {
 		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
 		height: var(--height);
 	}
