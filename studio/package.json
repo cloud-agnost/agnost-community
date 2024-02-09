@@ -1,4 +1,5 @@
 {
+
    "name": "studio",
    "private": true,
    "version": "v1.0.116",
@@ -34,7 +35,7 @@
       "@react-input/mask": "^1.0.20",
       "@tanstack/react-query": "^5.10.0",
       "@tanstack/react-table": "^8.9.2",
-      "ag-grid-react": "^31.0.3",
+      "ag-grid-react": "^30.2.1",
       "axios": "^1.4.0",
       "class-variance-authority": "^0.6.0",
       "clsx": "^1.2.1",
@@ -48,7 +49,6 @@
       "localforage": "^1.10.0",
       "monaco-themes": "^0.4.4",
       "react": "^18.2.0",
-      "react-activation": "^0.12.4",
       "react-beautiful-dnd": "^13.1.1",
       "react-date-range": "2.0.0-alpha.4",
       "react-day-picker": "^8.8.0",

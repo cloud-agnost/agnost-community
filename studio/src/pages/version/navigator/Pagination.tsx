@@ -53,6 +53,16 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 		[countInfo],
 	);
 
+	function formatNumber(number: number) {
+		if (!number) return;
+		if (number < 1000) return number;
+		return number.toLocaleString('en-US', {
+			maximumFractionDigits: 2,
+			notation: 'compact',
+			compactDisplay: 'short',
+		});
+	}
+
 	return (
 		<div className='flex items-center justify-end mt-4 gap-2'>
 			<div className='flex items-center space-x-2'>
@@ -71,7 +81,8 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 				</Select>
 			</div>
 			<div className='flex w-[100px] items-center justify-center text-xs '>
-				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of {countInfo?.totalCount}
+				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of{' '}
+				{formatNumber(countInfo?.totalCount)}
 			</div>
 			<div className='flex items-center space-x-2'>
 				<Button

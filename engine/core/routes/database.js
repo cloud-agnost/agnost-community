@@ -29,33 +29,35 @@ router.get(
 			const { dbName, modelName } = req.params;
 			const { page, size, sortBy, sortDir, id, dbType } = req.query;
 
-			const query =
-				dbType === "MongoDB"
-					? {
-							$eq: [
-								"_id",
-								{
-									$toObjectId: id,
-								},
-							],
-					  }
-					: { id: id };
-			const field = sortBy ?? dbType === "MongoDB" ? "_id" : "id";
-			const direction = sortDir ?? "asc";
-			const { data, info } = await agnost
-				.db(dbName)
-				.model(modelName)
-				.findMany(
-					{
-						...(id && query),
-					},
-					{
-						limit: Number(size),
-						skip: Number(page) * Number(size),
-						sort: { [field]: direction },
-						returnCount: true,
-					}
-				);
+      const query =
+        dbType === "MongoDB"
+          ? {
+              $eq: [
+                "_id",
+                {
+                  $toObjectId: id,
+                },
+              ],
+            }
+          : { id: id };
+      const defaultField = dbType === "MongoDB" ? "_id" : "id";
+      const field = sortBy ?? defaultField;
+      const direction = sortDir ?? "asc";
+      const { data, info } = await agnost
+        .db(dbName)
+        .model(modelName)
+        .findMany(
+          {
+            ...(id && query),
+          },
+          {
+            ...(size && { limit: Number(size) }),
+            ...(size && page && { skip: (Number(page) - 1) * Number(size) }),
+            sort: { [field]: direction },
+            returnCount: true,
+          }
+        );
+
 
 			const countInfo = {
 				totalCount: Number(info.count),

@@ -6,8 +6,7 @@ import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
-import { ColDef } from 'ag-grid-community';
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { ColDef, ICellEditorParams } from 'ag-grid-community';
 
 const { deleteDataFromModel } = useNavigatorStore.getState();
 const queryClient = new QueryClient();
@@ -46,13 +45,15 @@ export const NavigatorColumns: ColDef[] = [
 		headerCheckboxSelection: true,
 		width: 50,
 		pinned: 'left',
+		resizable: true,
 	},
 	{
 		headerName: translate('general.actions'),
 		field: 'actions',
 		width: 120,
 		pinned: 'right',
-		cellRenderer: (params: CustomCellRendererProps) => {
+		resizable: true,
+		cellRenderer: (params: ICellEditorParams) => {
 			const canDeleteModel = getVersionPermission('model.delete');
 			return (
 				<TableConfirmation

@@ -3,30 +3,37 @@ import { Button } from '@/components/Button';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
 import { TableHeader } from '@/features/database/models/Navigator';
-import { useNavigatorColumns, useToast, useUpdateData, useUpdateEffect } from '@/hooks';
+import { useNavigatorColumns, useToast, useUpdateData } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, BucketCountInfo, FieldTypes, ResourceInstances, TabTypes } from '@/types';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { CellEditRequestEvent } from 'ag-grid-community';
+import {
+	CellEditRequestEvent,
+	ColumnResizedEvent,
+	FirstDataRenderedEvent,
+	GridReadyEvent,
+} from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
-import 'ag-grid-community/styles/ag-theme-quartz.css'; // Theme
+import 'ag-grid-community/styles/ag-theme-alpine.css'; // Theme
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from './Pagination';
-import KeepAlive from 'react-activation';
 
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
+	const [isGridReady, setIsGridReady] = useState(false);
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
+	const { saveColumnState, getColumnState } = useUtilsStore();
 	const {
 		getDataFromModel,
 		deleteMultipleDataFromModel,
@@ -103,7 +110,7 @@ export default function Navigator() {
 				dbType: database.type,
 			}),
 		refetchOnWindowFocus: false,
-		enabled: modelId === model._id && window.location.pathname.includes(model._id),
+		enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
 	});
 
 	function onCellEditRequest(event: CellEditRequestEvent) {
@@ -147,22 +154,41 @@ export default function Navigator() {
 		);
 	}
 
-	useUpdateEffect(() => {
-		if (gridRef.current) {
+	useEffect(() => {
+		if (!_.isNil(gridRef.current?.api)) {
 			if (isFetching) {
+				console.log('showLoadingOverlay', gridRef.current);
 				gridRef.current.api.showLoadingOverlay();
 			} else {
 				gridRef.current.api.hideOverlay();
 			}
 		}
-	}, [isFetching]);
+	}, [isFetching, gridRef.current]);
 
-	useEffect(() => {
-		console.log(
-			'gridRef.current?.api?.getColumnState()',
-			gridRef.current?.api?.setGridOption('rowData', data),
-		);
-	}, [gridRef.current?.api]);
+	function onFirstDataRendered(event: FirstDataRenderedEvent) {
+		const columnState = getColumnState(modelId);
+		if (columnState) {
+			event.columnApi.applyColumnState({
+				state: columnState,
+				applyOrder: true,
+			});
+		}
+		event.api.hideOverlay();
+	}
+
+	function onGridReady(event: GridReadyEvent) {
+		setIsGridReady(true);
+		event.api.showLoadingOverlay();
+		event.api.sizeColumnsToFit();
+	}
+	const debounceSaveGridColumnState = _.debounce((columnState) => {
+		saveColumnState(modelId, columnState);
+	}, 100);
+
+	function onSaveGridColumnState(params: ColumnResizedEvent) {
+		const columnState = params.columnApi.getColumnState();
+		debounceSaveGridColumnState(columnState);
+	}
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -188,35 +214,37 @@ export default function Navigator() {
 				</>
 			}
 		>
-			<KeepAlive cacheKey={model._id}>
-				<div className='ag-theme-quartz-dark h-full flex flex-col'>
-					<AgGridReact
-						key={model._id}
-						className='flex-1 h-[500px]'
-						ref={gridRef}
-						rowData={!_.isEmpty(subModel) ? subModelData : data}
-						columnDefs={columns}
-						autoSizeStrategy={{ type: 'fitGridWidth' }}
-						rowSelection='multiple'
-						components={{
-							agColumnHeader: TableHeader,
-						}}
-						readOnlyEdit={true}
-						onCellEditRequest={onCellEditRequest}
-						ensureDomOrder
-						suppressRowClickSelection
-						enableCellTextSelection
-						reactiveCustomComponents
-						overlayLoadingTemplate={
-							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
-						}
-						onRowSelected={() =>
-							setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
-						}
-					/>
-					<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
-				</div>
-			</KeepAlive>
+			<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
+				<AgGridReact
+					onGridReady={onGridReady}
+					key={model._id}
+					className='flex-1 h-[500px]'
+					ref={gridRef}
+					rowData={!_.isEmpty(subModel) ? subModelData : data}
+					columnDefs={columns}
+					rowSelection='multiple'
+					components={{
+						agColumnHeader: TableHeader,
+					}}
+					autoSizePadding={20}
+					readOnlyEdit={true}
+					onCellEditRequest={onCellEditRequest}
+					ensureDomOrder
+					suppressRowClickSelection
+					enableCellTextSelection
+					overlayLoadingTemplate={
+						'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
+					}
+					onRowSelected={() =>
+						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
+					}
+					onFirstDataRendered={onFirstDataRendered}
+					onColumnResized={onSaveGridColumnState}
+					onColumnValueChanged={onSaveGridColumnState}
+					onColumnMoved={onSaveGridColumnState}
+				/>
+				<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
+			</div>
 		</VersionTabLayout>
 	);
 }

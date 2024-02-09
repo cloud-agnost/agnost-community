@@ -81,6 +81,7 @@ export default function useNavigatorColumns() {
 			},
 			cellDataType: CellTypeMap[field.type],
 			valueFormatter: (params) => valueFormatter(params, field),
+			resizable: true,
 		}));
 		return [NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]];
 	}, [fields]);

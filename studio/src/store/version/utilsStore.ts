@@ -12,6 +12,7 @@ import {
 	TestTaskLogs,
 } from '@/types';
 import { filterMatchingKeys, getTypeWorker } from '@/utils';
+import { ColumnState } from 'ag-grid-community';
 import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
@@ -30,6 +31,9 @@ interface UtilsStore {
 		};
 	};
 	isSidebarOpen: boolean;
+	columnState: {
+		[modelId: string]: ColumnState[] | undefined;
+	};
 }
 
 type Actions = {
@@ -44,6 +48,9 @@ type Actions = {
 	toggleOpenEditorTab: () => void;
 	toggleWorkspaceTab: (tab: TabTypes) => void;
 	toggleSidebar: () => void;
+	saveColumnState: (modelId: string, state: ColumnState[]) => void;
+	getColumnState: (modelId: string) => ColumnState[] | undefined;
+	resetColumnState: (modelId: string) => void;
 	collapseAll: () => void;
 };
 
@@ -56,6 +63,7 @@ const initialState: UtilsStore = {
 	endpointLogs: {} as EndpointLogs,
 	sidebar: {} as UtilsStore['sidebar'],
 	isSidebarOpen: true,
+	columnState: {} as UtilsStore['columnState'],
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(
@@ -183,6 +191,26 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 								},
 							},
 						};
+					});
+				},
+				saveColumnState: (modelId, state) => {
+					set((prev) => {
+						return {
+							columnState: {
+								...prev.columnState,
+								[modelId]: state,
+							},
+						};
+					});
+				},
+				getColumnState: (modelId) => {
+					return get().columnState[modelId];
+				},
+				resetColumnState: (modelId) => {
+					set((prev) => {
+						const state = prev.columnState;
+						delete state[modelId];
+						return { columnState: state };
 					});
 				},
 			}),

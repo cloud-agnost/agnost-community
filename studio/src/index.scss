@@ -119,7 +119,7 @@
 		--function: 199 58 199;
 		--queue: 173 87 0;
 		--task: 229 34 34;
-		.ag-theme-quartz-dark {
+		.ag-theme-alpine-dark {
 			--ag-foreground-color: rgb(var(--text-base));
 			--ag-background-color: rgb(var(--theme-base-background));
 			--ag-header-foreground-color: rgb(var(--text-base));
@@ -127,7 +127,6 @@
 			--ag-odd-row-background-color: rgb(var(--theme-base-background));
 			--ag-header-column-resize-handle-color: rgb(var(--theme-lighter-background));
 			--ag-border-color: rgb(var(--theme-border));
-
 			--ag-font-size: var(--font-size-xs);
 			--ag-font-family: var(--font-sf);
 		}
@@ -228,6 +227,10 @@
 	}
 
 	.full-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height)));
+		height: var(--height);
+	}
+	.full-height-without-header-and-tab {
 		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
 		height: var(--height);
 	}
