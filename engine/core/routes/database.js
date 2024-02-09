@@ -40,7 +40,8 @@ router.get(
               ],
             }
           : { id: id };
-      const field = sortBy ?? dbType === "MongoDB" ? "_id" : "id";
+      const defaultField = dbType === "MongoDB" ? "_id" : "id";
+      const field = sortBy ?? defaultField;
       const direction = sortDir ?? "asc";
       const { data, info } = await agnost
         .db(dbName)
