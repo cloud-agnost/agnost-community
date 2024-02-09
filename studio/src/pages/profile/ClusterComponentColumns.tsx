@@ -50,14 +50,13 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 		),
 	},
 	{
-		accessorKey: 'info.size',
+		accessorKey: 'info.pvcSize',
 		header: translate('storage.file.size'),
-		cell: ({ row }) => <span className='text-sm text-default'>{row.original.info?.size}</span>,
+		cell: ({ row }) => <span className='text-sm text-default'>{row.original.info?.pvcSize}</span>,
 	},
 	{
 		header: translate('general.actions'),
 		accessorKey: 'actions',
-		className: 'actions',
 		cell: ({ row }) => {
 			return row.original.editable ? (
 				<Button
