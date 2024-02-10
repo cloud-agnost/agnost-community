@@ -451,7 +451,7 @@ curl -XPUT http://localhost:3000/deployapp -d '{
     "cpuLimit": "500m",
     "portNumber": 80,
     "image": "nginx:1.25.0",
-    "ingressPath": "/ping",
+    "ingressDomain": "test.agnost.dev",
     "env": {
       "APP_NAME": "my-app",
       "ENVIRONMENT": "staging",

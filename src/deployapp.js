@@ -23,6 +23,25 @@ function sleep(ms) {
   });
 }
 
+async function createIssuer() {
+  const issuer = {
+    "apiVersion": "cert-manager.io/v1",
+    "kind": "Issuer",
+    "metadata": { "name": "app-deploy-issuer", "namespace": namespace },
+    "spec": { "acme": { "privateKeySecretRef": { "name": "app-issuer-key" },
+              "server": "https://acme-v02.api.letsencrypt.org/directory",
+              "solvers": [ { "http01": { "ingress": { "ingressClassName": "nginx" } } } ] } }
+  };
+
+  await k8sCustomApi.createNamespacedCustomObject('cert-manager.io', 'v1', namespace, 'issuers', issuer)
+    .then((response) => {
+      console.log('Issuer created:', response.body.metadata.name);
+    })
+    .catch((err) => {
+      console.error('Error creating Issuer:', err);
+    });
+}
+
 async function scaleStatefulSet(statefulSetName, replicas) {
   try {
     res = await k8sAppsApi.readNamespacedStatefulSet(statefulSetName, namespace);
@@ -724,17 +743,39 @@ async function deleteHpa(name) {
   return "success";
 }
 
-async function createIngress(name, portNumber, path, serviceType='k8s') {
+async function createIngress(name, portNumber, path, domain, serviceType='k8s') {
   const template = fs.readFileSync('../templates/ingress.yaml', 'utf8');
   const resource = k8s.loadYaml(template);
 
   resource.metadata.name = name;
-  resource.spec.rules[0].http.paths[0].path = path + '(/|$)(.*)'
   resource.spec.rules[0].http.paths[0].backend.service.name = name;
   resource.spec.rules[0].http.paths[0].backend.service.port.number = portNumber;
 
+  if (path) {
+    resource.spec.rules[0].http.paths[0].path = path + '(/|$)(.*)';
+  } else {
+    resource.spec.rules[0].http.paths[0].path = '/';
+    // if it's not path based, no need for rewrite-target
+    delete resource.metadata.annotations['nginx.ingress.kubernetes.io/rewrite-target'];
+  }
+
+  if (domain) {
+    try {
+      issuer = await k8sCustomApi.getNamespacedCustomObject('cert-manager.io', 'v1', namespace, 'issuers', 'app-prod-issuer');
+    } catch (err) {
+      // issuer does not exist, let's create it:
+      await createIssuer();
+    }
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+    resource.metadata.annotations["cert-manager.io/issuer"] = "app-prod-issuer"
+    resource.spec.rules[0].host = domain;
+    resource.spec.tls = [ { "hosts": [ domain ], "secretName": "ingress-tls" } ];
+  }
+
   if (serviceType == "knative") {
-    resource.metadata.annotations["nginx.ingress.kubernetes.io/upstream-vhost"] = name + '.' + namespace + '.svc.cluster.local'
+    const vhost = name + '.' + namespace + '.svc.cluster.local';
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/upstream-vhost"] = vhost;
   }
 
   try {
@@ -746,13 +787,34 @@ async function createIngress(name, portNumber, path, serviceType='k8s') {
   return "sucess";
 }
 
-async function updateIngress(name, portNumber, path) {
+async function updateIngress(name, portNumber, path, domain) {
   const ing = await k8sNetworkingApi.readNamespacedIngress(name, namespace);
   const resource = ing.body;
 
-  resource.spec.rules[0].http.paths[0].path = path + '(/|$)(.*)'
   resource.spec.rules[0].http.paths[0].backend.service.name = name;
   resource.spec.rules[0].http.paths[0].backend.service.port.number = portNumber;
+
+  if (path) {
+    resource.spec.rules[0].http.paths[0].path = path + '(/|$)(.*)';
+  } else {
+    resource.spec.rules[0].http.paths[0].path = '/';
+    // if it's not path based, no need for rewrite-target
+    delete resource.metadata.annotations['nginx.ingress.kubernetes.io/rewrite-target'];
+  }
+
+  if (domain) {
+    try {
+      issuer = await k8sCustomApi.getNamespacedCustomObject('cert-manager.io', 'v1', namespace, 'issuers', 'app-prod-issuer');
+    } catch (err) {
+      // issuer does not exist, let's create it:
+      await createIssuer();
+    }
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+    resource.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+    resource.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-prod"
+    resource.spec.rules[0].host = domain;
+    resource.spec.tls = [ { "hosts": [ domain ], "secretName": "ingress-tls" } ];
+  }
 
   try {
     await k8sNetworkingApi.replaceNamespacedIngress(name, namespace, resource);
@@ -811,7 +873,7 @@ async function hpaExists(name) {
 // Create a Kubernetes deployment|statefulset|cronjob|kservice
 router.post('/deployapp', async (req, res) => {
   const { kind, identifier, image, replicaCount, portNumber, minReplicas, maxReplicas, memoryRequest, memoryLimit, memoryTarget, 
-          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
+          cpuRequest, cpuLimit, cpuTarget, ingressPath, ingressDomain, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
           containerConcurrency, initialScale, maxScale, targetUtilizationPercentage } = req.body;
 
   try {
@@ -822,8 +884,8 @@ router.post('/deployapp', async (req, res) => {
         console.log("Deployment " + resourceName + " created.");
         await createService(resourceName, portNumber, false);
         console.log("Service " + resourceName + " created.");
-        if (ingressPath) {
-          await createIngress(resourceName, portNumber, ingressPath);
+        if (ingressPath || ingressDomain) {
+          await createIngress(resourceName, portNumber, ingressPath, ingressDomain);
           console.log("Ingress " + resourceName + " created.");
         };
         if (memoryTarget && cpuTarget && minReplicas && maxReplicas) {
@@ -837,8 +899,8 @@ router.post('/deployapp', async (req, res) => {
         console.log("StatefulSet " + resourceName + " created.");
         await createService(resourceName, portNumber, true);
         console.log("Service " + resourceName + " created.");
-        if (ingressPath) {
-          await createIngress(resourceName, portNumber, ingressPath);
+        if (ingressPath || ingressDomain) {
+          await createIngress(resourceName, portNumber, ingressPath, ingressDomain);
           console.log("Ingress " + resourceName + " created.");
         }
         break;
@@ -851,8 +913,8 @@ router.post('/deployapp', async (req, res) => {
         var resourceName = identifier + '-ksvc'
         await createKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage);
         console.log("Knative service " + resourceName + " created.");
-        if (ingressPath) {
-          await createIngress(resourceName, portNumber, ingressPath, 'knative');
+        if (ingressPath || ingressDomain) {
+          await createIngress(resourceName, portNumber, ingressPath, ingressDomain, 'knative');
           console.log("Ingress " + resourceName + " created.");
         }
         break;
@@ -867,7 +929,7 @@ router.post('/deployapp', async (req, res) => {
 // Update a Kubernetes deployment|statefulset|cronjob|kservice
 router.put('/deployapp', async (req, res) => {
   const { kind, identifier, image, replicaCount, portNumber, minReplicas, maxReplicas, memoryRequest, memoryLimit, memoryTarget, 
-          cpuRequest, cpuLimit, cpuTarget, ingressPath, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
+          cpuRequest, cpuLimit, cpuTarget, ingressPath, ingressDomain, env, envRef, envFrom, storageSize, storageClass, mountPath, cronSchedule, cronCommand,
           containerConcurrency, initialScale, maxScale, targetUtilizationPercentage } = req.body;
 
   try {
@@ -878,8 +940,8 @@ router.put('/deployapp', async (req, res) => {
         console.log("Deployment " + resourceName + " updated.");
         await updateService(resourceName, portNumber, false);
         console.log("Service " + resourceName + " updated.");
-        if (ingressPath) {
-          await updateIngress(resourceName, portNumber, ingressPath);
+        if (ingressPath || ingressDomain) {
+          await updateIngress(resourceName, portNumber, ingressPath, ingressDomain);
           console.log("Ingress " + resourceName + " updated.");
         };
         if (memoryTarget && cpuTarget && minReplicas && maxReplicas) {
@@ -893,8 +955,8 @@ router.put('/deployapp', async (req, res) => {
         console.log("StatefulSet " + resourceName + " updated.");
         await updateService(resourceName, portNumber, true);
         console.log("Service " + resourceName + " updated.");
-        if (ingressPath) {
-          await updateIngress(resourceName, portNumber, ingressPath);
+        if (ingressPath || ingressDomain) {
+          await updateIngress(resourceName, portNumber, ingressPath, ingressDomain);
           console.log("Ingress " + resourceName + " updated.");
         }
         break;
@@ -907,8 +969,8 @@ router.put('/deployapp', async (req, res) => {
         var resourceName = identifier + '-ksvc';
         await updateKnativeService(resourceName, image, portNumber, containerConcurrency, memoryRequest, memoryLimit, cpuRequest, cpuLimit, env, envRef, envFrom, initialScale, maxScale, targetUtilizationPercentage);
         console.log("Knative service " + resourceName + " updated.");
-        if (ingressPath) {
-          await updateIngress(resourceName, portNumber, ingressPath);
+        if (ingressPath || ingressDomain) {
+          await updateIngress(resourceName, portNumber, ingressPath, ingressDomain);
           console.log("Ingress " + resourceName + " updated.");
         }
         break;
