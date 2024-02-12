@@ -39,7 +39,6 @@ const GeoPointEditor = forwardRef(({ eventKey, value }: ICellEditorParams, ref) 
 		};
 	};
 	const initialState = createInitialState();
-	console.log('initialState', initialState);
 	const [coords, setCoords] = useState(initialState.value);
 
 	function onChange(lat: string, lng: string) {

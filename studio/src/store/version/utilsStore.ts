@@ -108,7 +108,6 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 				},
 				setTypings: (packages) => {
 					const typeWorker = getTypeWorker();
-					console.log('intersection', get().typings, packages);
 					const intersection = filterMatchingKeys(get().typings, packages);
 					typeWorker.postMessage(intersection);
 					typeWorker.onmessage = async function (e) {
