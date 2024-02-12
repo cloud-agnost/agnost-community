@@ -33,11 +33,17 @@ interface VersionStore {
 	versions: Version[];
 	versionPage: number;
 	createCopyVersionDrawerIsOpen: boolean;
-	logBuckets: VersionLogBucket;
+	logBuckets: {
+		endpoint: VersionLogBucket;
+		task: VersionLogBucket;
+		queue: VersionLogBucket;
+	} | null;
 	deleteVersionDrawerIsOpen: boolean;
-	endpointLogs: VersionLog[];
-	taskLogs: VersionLog[];
-	queueLogs: VersionLog[];
+	logs: {
+		endpoint: VersionLog[] | null;
+		task: VersionLog[] | null;
+		queue: VersionLog[] | null;
+	} | null;
 	notifications: Notification[];
 	notificationsPreview: Notification[];
 	lastFetchedLogCount: number;
@@ -48,7 +54,13 @@ interface VersionStore {
 	designElements: DesignElement[];
 	dashboard: Dashboard;
 	packages: Record<string, string>;
-	lastFetchedLogPage: number | undefined;
+	lastFetchedLogPage:
+		| {
+				endpoint: number | undefined;
+				task: number | undefined;
+				queue: number | undefined;
+		  }
+		| undefined;
 	isSearchCommandMenuOpen: boolean;
 	isSearchViewOpen: boolean;
 	searchCodeResult: SearchCodeResult[];
@@ -99,10 +111,8 @@ const initialState: VersionStore = {
 	versions: [],
 	versionPage: 0,
 	createCopyVersionDrawerIsOpen: false,
-	logBuckets: {} as VersionLogBucket,
-	endpointLogs: [],
-	taskLogs: [],
-	queueLogs: [],
+	logBuckets: null,
+	logs: null,
 	notifications: [],
 	notificationsPreview: [],
 	log: {} as VersionLog,
@@ -225,7 +235,13 @@ const useVersionStore = create<VersionStore & Actions>()(
 				getVersionLogBuckets: async (params) => {
 					try {
 						const logBuckets = await VersionService.getVersionLogBuckets(params);
-						set({ logBuckets });
+						set((state) => ({
+							...state,
+							logBuckets: {
+								...state.logBuckets,
+								[params.type]: logBuckets as VersionLogBucket,
+							} as any,
+						}));
 						return logBuckets;
 					} catch (error) {
 						throw error as APIError;
@@ -236,12 +252,32 @@ const useVersionStore = create<VersionStore & Actions>()(
 						const logs = await VersionService.getVersionLogs(params);
 						set({ lastFetchedLogCount: logs.length });
 						if (params.page === 0) {
-							set({ [`${params.type}Logs`]: logs, lastFetchedLogPage: params.page });
+							set((state) => ({
+								...state,
+								logs: {
+									...state.logs,
+									[params.type]: logs,
+								} as any,
+								lastFetchedLogPage: {
+									...state.lastFetchedLogPage,
+									[params.type]: params.page,
+								} as any,
+							}));
 						} else {
-							set({
-								[`${params.type}Logs`]: [...get()[`${params.type}Logs`], ...logs],
-								lastFetchedLogPage: params.page,
-							});
+							set((state) => ({
+								...state,
+								logs: {
+									...state.logs,
+									[params.type]: [
+										...((state.logs && state.logs[params.type]) as VersionLog[]),
+										...logs,
+									],
+								} as any,
+								lastFetchedLogPage: {
+									...state.lastFetchedLogPage,
+									[params.type]: params.page,
+								} as any,
+							}));
 						}
 						return logs;
 					} catch (error) {

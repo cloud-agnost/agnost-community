@@ -12,13 +12,21 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
 import { Loading } from '@/components/Loading';
+import { useInfiniteScroll } from '@/hooks';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
 export default function VersionLogs({ type }: VersionLogsProps) {
 	const { t } = useTranslation();
-	const { getVersionLogBuckets, showLogDetails, closeVersionLogDetails, logBuckets } =
-		useVersionStore();
+	const {
+		getVersionLogBuckets,
+		showLogDetails,
+		closeVersionLogDetails,
+		logBuckets,
+		lastFetchedLogPage,
+		logs,
+		getVersionLogs,
+	} = useVersionStore();
 	const { appId, orgId, versionId } = useParams<{
 		appId: string;
 		orgId: string;
@@ -42,8 +50,23 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				buckets: calculateRecommendedBuckets(start, end as Date),
 			});
 		},
-		enabled: !_.isNil(searchParams.get('start')) && !_.isNil(searchParams.get('end')),
+		enabled:
+			!_.isNil(searchParams.get('start')) &&
+			!_.isNil(searchParams.get('end')) &&
+			_.isNil(logBuckets),
 		refetchOnWindowFocus: false,
+	});
+
+	const versionLogResponse = useInfiniteScroll({
+		lastFetchedPage: lastFetchedLogPage?.[type],
+		queryFn: getVersionLogs,
+		dataLength: logs?.[type]?.length ?? 0,
+		queryKey: 'versionLogs',
+		params: {
+			type,
+			start: searchParams.get('start'),
+			end: searchParams.get('end'),
+		},
 	});
 
 	useEffect(() => {
@@ -60,14 +83,19 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		}
 	}, []);
 
+	function refetchLogs() {
+		refetch();
+		versionLogResponse.refetch();
+	}
+
 	return (
 		<div className='h-full space-y-6 p-4 relative'>
-			<VersionLogCharts />
+			<VersionLogCharts type={type} refetch={refetchLogs} />
 			{isFetching ? (
 				<Loading loading={isFetching} />
-			) : logBuckets.totalHits > 0 ? (
+			) : logBuckets && logBuckets?.[type]?.totalHits > 0 ? (
 				<>
-					<VersionLogsTable type={type} />
+					<VersionLogsTable type={type} {...versionLogResponse} />
 					<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
 				</>
 			) : (
