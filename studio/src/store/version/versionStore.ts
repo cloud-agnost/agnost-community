@@ -35,7 +35,9 @@ interface VersionStore {
 	createCopyVersionDrawerIsOpen: boolean;
 	logBuckets: VersionLogBucket;
 	deleteVersionDrawerIsOpen: boolean;
-	logs: VersionLog[];
+	endpointLogs: VersionLog[];
+	taskLogs: VersionLog[];
+	queueLogs: VersionLog[];
 	notifications: Notification[];
 	notificationsPreview: Notification[];
 	lastFetchedLogCount: number;
@@ -98,7 +100,9 @@ const initialState: VersionStore = {
 	versionPage: 0,
 	createCopyVersionDrawerIsOpen: false,
 	logBuckets: {} as VersionLogBucket,
-	logs: [],
+	endpointLogs: [],
+	taskLogs: [],
+	queueLogs: [],
 	notifications: [],
 	notificationsPreview: [],
 	log: {} as VersionLog,
@@ -232,9 +236,12 @@ const useVersionStore = create<VersionStore & Actions>()(
 						const logs = await VersionService.getVersionLogs(params);
 						set({ lastFetchedLogCount: logs.length });
 						if (params.page === 0) {
-							set({ logs: logs, lastFetchedLogPage: params.page });
+							set({ [`${params.type}Logs`]: logs, lastFetchedLogPage: params.page });
 						} else {
-							set({ logs: [...get().logs, ...logs], lastFetchedLogPage: params.page });
+							set({
+								[`${params.type}Logs`]: [...get()[`${params.type}Logs`], ...logs],
+								lastFetchedLogPage: params.page,
+							});
 						}
 						return logs;
 					} catch (error) {
