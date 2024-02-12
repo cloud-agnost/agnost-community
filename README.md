@@ -122,4 +122,4 @@ If you're an experienced Agnost user, you can contribute by helping other users 
 
 Follow us on social media for the latest updates and announcements about Agnost.
 
-- Twitter: [@AgnostDev](
+- Twitter: [@AgnostDev](https://twitter.com/AgnostDev)
