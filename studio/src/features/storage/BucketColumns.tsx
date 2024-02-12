@@ -3,15 +3,12 @@ import { Badge } from '@/components/Badge';
 import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
 import { toast } from '@/hooks/useToast';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
-import { getVersionPermission, translate } from '@/utils';
+import { APIError, Bucket, TabTypes } from '@/types';
+import { DATE_TIME_FORMAT, convertUTC, getVersionPermission, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
-import { Checkbox } from 'components/Checkbox';
-import { SortButton } from 'components/DataTable';
-import { DateText } from 'components/DateText';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog } = useStorageStore.getState();
 
@@ -48,58 +45,40 @@ async function clearBucket(bucketName: string) {
 		});
 }
 
-const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
+const BucketColumns: ColDef<Bucket>[] = [
 	{
-		id: 'select',
-		enableResizing: false,
-		className: '!max-w-[25px] !w-[25px]',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected()}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
+		checkboxSelection: true,
+		headerCheckboxSelection: true,
+		width: 50,
+		pinned: 'left',
+		resizable: true,
 	},
 	{
-		id: 'name',
-		header: () => <SortButton text={translate('general.name')} field='name' />,
-		accessorKey: 'name',
-		cell: ({ row: { original } }) => (
+		field: 'name',
+		headerComponentParams: { text: translate('general.name'), field: 'name' },
+		cellRenderer: ({ value, data }: ICellRendererParams) => (
 			<TabLink
-				name={original.name}
-				path={`bucket/${original.name}`}
+				name={value}
+				path={`bucket/${value}`}
 				type={TabTypes.Bucket}
 				onClick={() => {
-					useStorageStore.setState({ bucket: original });
+					useStorageStore.setState({ bucket: data });
 				}}
 			/>
 		),
 	},
 
 	{
-		id: 'visibility',
-		header: () => (
-			<SortButton text={translate('storage.bucket.visibility.title')} field='isPublic' />
-		),
-		cell: ({
-			row: {
-				original: { isPublic },
-			},
-		}) => (
+		field: 'isPublic',
+		headerComponentParams: {
+			text: translate('storage.bucket.visibility.title'),
+			field: 'isPublic',
+		},
+		cellRenderer: ({ value }: ICellRendererParams) => (
 			<Badge
-				variant={isPublic ? 'green' : 'yellow'}
+				variant={value ? 'green' : 'yellow'}
 				text={
-					isPublic
+					value
 						? translate('storage.bucket.visibility.public')
 						: translate('storage.bucket.visibility.private')
 				}
@@ -108,14 +87,15 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		),
 	},
 	{
-		id: 'tags',
-		header: () => <SortButton text={translate('storage.bucket.tags')} field='tags' />,
-		accessorKey: 'tags',
-		cell: ({ row: { original } }) => {
-			const { tags } = original;
+		field: 'tags',
+		headerComponentParams: {
+			text: translate('storage.bucket.tags'),
+			field: 'tags',
+		},
+		cellRenderer: ({ value }: ICellRendererParams) => {
 			return (
 				<div className='flex flex-wrap gap-4'>
-					{Object.entries(tags).map(([key, value]) => (
+					{Object.entries(value).map(([key, value]) => (
 						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
 					))}
 				</div>
@@ -123,56 +103,23 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		},
 	},
 	{
-		id: 'createdAt',
-		header: () => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('general.created_at')}
-				field='createdAt'
-			/>
-		),
-		accessorKey: 'createdAt',
-		size: 200,
-		cell: ({
-			row: {
-				original: { createdAt, userId },
-			},
-		}) => {
-			const user = useOrganizationStore
-				.getState()
-				.members.find((member) => member.member._id === userId);
-
-			return user && <DateText date={createdAt} user={user} />;
+		field: 'createdAt',
+		headerComponentParams: {
+			text: translate('general.created_at'),
+			field: 'createdAt',
 		},
+		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
 	{
-		id: 'updatedAt',
-		header: () => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('general.updated_at')}
-				field='updatedAt'
-			/>
-		),
-		accessorKey: 'updatedAt',
-		size: 200,
-		cell: ({
-			row: {
-				original: { updatedAt, userId },
-			},
-		}) => {
-			const user = useOrganizationStore
-				.getState()
-				.members.find((member) => member.member._id === userId);
-
-			return user && <DateText date={updatedAt} user={user} />;
+		field: 'updatedAt',
+		headerComponentParams: {
+			text: translate('general.updated_at'),
+			field: 'updatedAt',
 		},
+		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
-
 	{
-		id: 'actions',
-		className: 'actions !w-[50px]',
-		cell: ({ row: { original } }) => {
+		cellRenderer: ({ data }: ICellRendererParams) => {
 			const canEditBucket = getVersionPermission('storage.update');
 			const canDeleteBucket = getVersionPermission('storage.delete');
 			return (
@@ -181,7 +128,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 						align='end'
 						title={translate('storage.clear.title')}
 						description={translate('storage.clear.message')}
-						onConfirm={() => clearBucket(original.name)}
+						onConfirm={() => clearBucket(data.name)}
 						contentClassName='m-0'
 						hasPermission={canDeleteBucket}
 						tooltip='Clear bucket'
@@ -189,9 +136,9 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 					/>
 
 					<ActionsCell
-						original={original}
-						onDelete={() => openDeleteBucketDialog(original)}
-						onEdit={() => openEditBucketDialog(original)}
+						original={data}
+						onDelete={() => openDeleteBucketDialog(data)}
+						onEdit={() => openEditBucketDialog(data)}
 						canEdit={canEditBucket}
 						canDelete={canDeleteBucket}
 					/>

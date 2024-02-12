@@ -1,19 +1,24 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
+import { Button } from '@/components/Button';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, BucketFile, ColumnDefWithClassName } from '@/types';
-import { formatFileSize, getVersionPermission, translate } from '@/utils';
+import { APIError, BucketFile } from '@/types';
+import {
+	DATE_TIME_FORMAT,
+	convertUTC,
+	formatFileSize,
+	getVersionPermission,
+	translate,
+} from '@/utils';
 import { Copy, Swap } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/Button';
-import { Checkbox } from 'components/Checkbox';
-import { SortButton } from 'components/DataTable';
-import { DateText } from 'components/DateText';
+import { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
 import { Link } from 'react-router-dom';
-import { toast } from '@/hooks/useToast';
+
 const { copyFileInBucket, replaceFileInBucket, openFileEditDialog, deleteFileFromBucket } =
 	useStorageStore.getState();
 
@@ -109,58 +114,42 @@ function copyFile(filePath: string) {
 			filePath,
 		});
 }
-const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
+const FileColumns: ColDef<BucketFile>[] = [
 	{
-		id: 'select',
-		enableResizing: false,
-		className: '!max-w-[40px] !w-[40px]',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected()}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
+		checkboxSelection: true,
+		headerCheckboxSelection: true,
+		width: 50,
+		pinned: 'left',
 	},
 	{
-		id: 'id',
-		header: () => <SortButton text={translate('general.id')} field='id' />,
-		accessorKey: 'id',
+		field: 'id',
+		headerComponentParams: { text: translate('general.id'), field: 'id' },
 	},
 	{
-		id: 'path',
-		header: () => <SortButton text={translate('storage.file.path')} field='path' />,
-		accessorKey: 'path',
-		className: '!w-[300px]',
-		cell: ({ row: { original } }) => {
+		field: 'path',
+		headerComponentParams: { text: translate('storage.file.path'), field: 'id' },
+		width: 300,
+		cellRenderer: ({ value, data }: ICellRendererParams) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${original.id}`;
+			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${data.id}`;
 			return (
 				<Link to={publicPath} className='link' target='_blank' rel='noopener noreferrer'>
-					{original.path}
+					{value}
 				</Link>
 			);
 		},
 	},
 	{
-		id: 'visibility',
-		header: translate('storage.bucket.visibility.title'),
-		cell: ({
-			row: {
-				original: { isPublic },
-			},
-		}) => (
+		field: 'isPublic',
+		headerComponentParams: {
+			text: translate('storage.bucket.visibility.title'),
+			field: 'isPublic',
+		},
+		cellRenderer: ({ value }: ICellRendererParams) => (
 			<Badge
-				variant={isPublic ? 'green' : 'yellow'}
+				variant={value ? 'green' : 'yellow'}
 				text={
-					isPublic
+					value
 						? translate('storage.bucket.visibility.public')
 						: translate('storage.bucket.visibility.private')
 				}
@@ -169,32 +158,30 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		),
 	},
 	{
-		id: 'size',
-		header: () => <SortButton text={translate('storage.file.size')} field='size' />,
-		accessorKey: 'size',
-		sortingFn: 'textCaseSensitive',
-		cell: ({
-			row: {
-				original: { size },
-			},
-		}) => formatFileSize(size),
+		field: 'size',
+		headerComponentParams: {
+			text: translate('storage.file.size'),
+			field: 'isPublic',
+		},
+		valueFormatter: ({ value }: ValueFormatterParams) => formatFileSize(value),
 	},
 	{
-		id: 'mimeType',
-		header: () => <SortButton text={translate('storage.file.mimeType')} field='mimeType' />,
-		accessorKey: 'mimeType',
-		sortingFn: 'textCaseSensitive',
+		field: 'mimeType',
+		headerComponentParams: {
+			text: translate('storage.file.mimeType'),
+			field: 'mimeType',
+		},
 	},
 	{
-		id: 'tags',
-		header: translate('storage.bucket.tags'),
-		accessorKey: 'tags',
-		size: 300,
-		cell: ({ row: { original } }) => {
-			const { tags } = original;
+		field: 'tags',
+		headerComponentParams: {
+			text: translate('storage.bucket.tags'),
+			field: 'tags',
+		},
+		cellRenderer: ({ value }: ICellRendererParams) => {
 			return (
 				<div className='flex flex-wrap gap-4'>
-					{Object.entries(tags).map(([key, value]) => (
+					{Object.entries(value).map(([key, value]) => (
 						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
 					))}
 				</div>
@@ -202,30 +189,24 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		},
 	},
 	{
-		id: 'uploadedAt',
-		header: () => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('general.created_at')}
-				field='uploadedAt'
-			/>
-		),
-		accessorKey: 'uploadedAt',
-		size: 200,
-		cell: ({
-			row: {
-				original: { uploadedAt },
-			},
-		}) => {
-			return <DateText date={uploadedAt} />;
+		field: 'uploadedAt',
+		headerComponentParams: {
+			text: translate('general.uploadedAt'),
+			field: 'createdAt',
 		},
+		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
-
 	{
-		id: 'actions',
-		className: 'actions w-[50px]',
-		size: 50,
-		cell: ({ row: { original } }) => {
+		field: 'updatedAt',
+		headerComponentParams: {
+			text: translate('general.updated_at'),
+			field: 'updatedAt',
+		},
+		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
+	},
+	{
+		width: 50,
+		cellRenderer: ({ data }: ICellRendererParams) => {
 			const canEditBucket = getVersionPermission('storage.update');
 			const canDeleteBucket = getVersionPermission('storage.delete');
 			return (
@@ -233,7 +214,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant='icon' size='sm' rounded onClick={() => copyFile(original.path)}>
+								<Button variant='icon' size='sm' rounded onClick={() => copyFile(data.path)}>
 									<Copy size={20} />
 								</Button>
 							</TooltipTrigger>
@@ -243,7 +224,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button variant='icon' size='sm' rounded onClick={() => replaceFile(original.path)}>
+								<Button variant='icon' size='sm' rounded onClick={() => replaceFile(data.path)}>
 									<Swap size={20} />
 								</Button>
 							</TooltipTrigger>
@@ -252,8 +233,8 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					</TooltipProvider>
 
 					<ActionsCell
-						original={original}
-						onEdit={() => openFileEditDialog(original)}
+						original={data}
+						onEdit={() => openFileEditDialog(data)}
 						canEdit={canEditBucket}
 						canDelete={canDeleteBucket}
 					>
@@ -261,7 +242,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 							align='end'
 							title={translate('storage.file.delete.title')}
 							description={translate('storage.file.delete.message')}
-							onConfirm={() => deleteFileHandler(original)}
+							onConfirm={() => deleteFileHandler(data)}
 							contentClassName='m-0'
 							hasPermission={canDeleteBucket}
 						/>
