@@ -638,15 +638,18 @@ export class ResourceManager {
                 },
             };
 
-            container.livenessProbe = {
-                httpGet: {
-                    path: "/agnost/health",
-                    port: config.get("general.defaultClusterIPPort"),
-                },
-                timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
-                periodSeconds: config.get("general.livenessProbe.periodSeconds"),
-                initialDelaySeconds: config.get("general.livenessProbe.initialDelaySeconds"),
-            };
+            container.livenessProbe = {};
+            /**
+                container.livenessProbe = {
+                    httpGet: {
+                        path: "/agnost/health",
+                        port: config.get("general.defaultClusterIPPort"),
+                    },
+                    timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
+                    periodSeconds: config.get("general.livenessProbe.periodSeconds"),
+                    initialDelaySeconds: config.get("general.livenessProbe.initialDelaySeconds"),
+                };
+            */
 
             container.readinessProbe = {
                 httpGet: {
