@@ -9,6 +9,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 
 const group = 'mongodbcommunity.mongodb.com';
 const version = 'v1';
@@ -149,6 +150,24 @@ async function deleteMongoDBResource(mongoName) {
   return 'success';
 }
 
+async function rolloutRestart(resourceName) {
+  try {
+    const sts = await k8sAppsApi.readNamespacedStatefulSet(resourceName, namespace);
+
+    // Increment the revision in the deployment template to trigger a rollout
+    sts.body.spec.template.metadata.annotations = {
+      ...sts.body.spec.template.metadata.annotations,
+      'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
+    };
+
+    await k8sAppsApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+    console.log(`Rollout restart ${resourceName} initiated successfully.`);
+  } catch (error) {
+    console.error('Error restarting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
+  }
+}
+
 // some helper functions
 async function waitForSecret(secretName) {
   const pollingInterval = 2000;
@@ -206,6 +225,18 @@ router.delete('/mongodb', async (req, res) => {
   try {
     await deleteMongoDBResource(mongoName);
     res.json({ mongodb: 'deleted'});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(JSON.parse(err.message));
+  }
+});
+
+router.post('/mongodb/restart', async (req, res) => {
+  const { mongoName } = req.body;
+
+  try {
+    await rolloutRestart(mongoName);
+    res.json({ mongodb: 'restarted'});
   } catch (err) {
     console.error(err);
     res.status(500).json(JSON.parse(err.message));

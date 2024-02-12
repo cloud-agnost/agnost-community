@@ -45,6 +45,14 @@ curl -XDELETE http://localhost:3000/mongodb -d '{
 }' -H "Content-type: application/json"
 ```
 
+### Restart mongodb
+
+```bash
+curl -XPOST http://localhost:3000/mongodb/restart -d '{
+    "mongoName": "mymongo"
+}' -H "Content-type: application/json"
+```
+
 ## Redis
 
 ### Create standalone redis
@@ -86,6 +94,14 @@ curl -XPUT http://localhost:3000/redis -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/redis -d '{
+    "clusterName": "replicated"
+}' -H "Content-type: application/json"
+```
+
+### Restart redis
+
+```bash
+curl -XPOST http://localhost:3000/redis/restart -d '{
     "clusterName": "replicated"
 }' -H "Content-type: application/json"
 ```
@@ -139,6 +155,14 @@ curl -XDELETE http://localhost:3000/mariadb -d '{
 }' -H "Content-type: application/json"
 ```
 
+### Restart mariadb
+
+```bash
+curl -XPOST http://localhost:3000/mariadb/restart -d '{
+    "serverName": "mariadb"
+}' -H "Content-type: application/json"
+```
+
 ## PostgreSQL
 
 ### Create postgresql
@@ -167,6 +191,14 @@ curl -XPUT http://localhost:3000/postgres -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/postgres -d '{
+    "serverName": "pgsql"
+}' -H "Content-type: application/json"
+```
+
+### Restart postgresql
+
+```bash
+curl -XPOST http://localhost:3000/postgres/restart -d '{
     "serverName": "pgsql"
 }' -H "Content-type: application/json"
 ```
@@ -218,6 +250,14 @@ curl -XDELETE http://localhost:3000/mysql -d '{
 }' -H "Content-type: application/json"
 ```
 
+### Restart mysql
+
+```bash
+curl -XPOST http://localhost:3000/mysql/restart -d '{
+    "clusterName": "mycluster"
+}' -H "Content-type: application/json"
+```
+
 ## RabbitMQ
 
 ### Create rabbitmq
@@ -250,6 +290,14 @@ curl -XPUT http://localhost:3000/rabbitmq -d '{
 curl -XDELETE http://localhost:3000/rabbitmq -d '{
     "clusterName": "rabbitmq-test",
     "userName": "appuser"
+}' -H "Content-type: application/json"
+```
+
+### Restart rabbitmq
+
+```bash
+curl -XPOST http://localhost:3000/rabbitmq/restart -d '{
+    "clusterName": "rabbitmq-test"
 }' -H "Content-type: application/json"
 ```
 

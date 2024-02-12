@@ -37,7 +37,6 @@ function sleep(ms) {
 
 async function rolloutRestartDeployment(deploymentName) {
   try {
-    // Get the current deployment
     const currentDeployment = await k8sApi.readNamespacedDeployment(deploymentName, namespace);
 
     // Increment the revision in the deployment template to trigger a rollout
@@ -45,12 +44,8 @@ async function rolloutRestartDeployment(deploymentName) {
       ...currentDeployment.body.spec.template.metadata.annotations,
       'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
     };
-    console.log(currentDeployment.body.spec.template.metadata.annotations);
 
-    // Apply the changes using the patchNamespacedDeployment function
-    const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
-    await k8sApi.patchNamespacedDeployment(deploymentName, namespace, { body: currentDeployment.body }, undefined, undefined, undefined, undefined, undefined, requestOptions)
-
+    await k8sApi.replaceNamespacedDeployment(deploymentName, namespace, currentDeployment.body)
     console.log(`Rollout restart of deployment ${deploymentName} initiated successfully.`);
   } catch (error) {
     console.error(`Error initiating rollout restart: ${error.message}`);

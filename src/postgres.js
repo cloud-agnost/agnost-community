@@ -82,6 +82,24 @@ async function deletePostgresql(serverName) {
   return 'success';
 }
 
+async function rolloutRestart(resourceName) {
+  try {
+    const pgsql = await k8sCustomApi.getNamespacedCustomObject(group, version, namespace, plural, resourceName);
+
+    // Increment the revision in the deployment template to trigger a rollout
+    pgsql.body.spec.podAnnotations = {
+      ...pgsql.body.spec.podAnnotations,
+      'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
+    };
+
+    await k8sCustomApi.replaceNamespacedCustomObject(group, version, namespace, plural, resourceName, pgsql.body);
+    console.log(`Rollout restart ${resourceName} initiated successfully.`);
+  } catch (error) {
+    console.error('Error restarting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
+  }
+}
+
 // some helper functions
 async function waitForSecret(secretName) {
   const pollingInterval = 2000;
@@ -150,6 +168,18 @@ router.delete('/postgres', async (req, res) => {
   try {
     await deletePostgresql(serverName);
     res.json({ postgres: "deleted"});
+  } catch (err) {
+    res.status(500).json(JSON.parse(err.message));
+  }
+});
+
+// Restart a PostgreSQL instance
+router.post('/postgres/restart', async (req, res) => {
+  const { serverName } = req.body;
+
+  try {
+    await rolloutRestart(serverName);
+    res.json({ postgres: "restarted"});
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));
   }

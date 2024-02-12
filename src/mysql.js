@@ -9,6 +9,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 
 const group = 'mysql.oracle.com';
 const version = 'v2';
@@ -129,6 +130,24 @@ async function deleteMySQLResource(clusterName) {
   return { result: 'success' };
 }
 
+async function rolloutRestart(resourceName) {
+  try {
+    const sts = await k8sAppsApi.readNamespacedStatefulSet(resourceName, namespace);
+
+    // Increment the revision in the deployment template to trigger a rollout
+    sts.body.spec.template.metadata.annotations = {
+      ...sts.body.spec.template.metadata.annotations,
+      'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
+    };
+
+    await k8sAppsApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+    console.log(`Rollout restart ${resourceName} initiated successfully.`);
+  } catch (error) {
+    console.error('Error restarting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
+  }
+}
+
 // some helper functions
 async function waitForSecret(secretName) {
   const pollingInterval = 2000;
@@ -185,6 +204,18 @@ router.delete('/mysql', async (req, res) => {
   try {
     const delResult = await deleteMySQLResource(clusterName);
     res.json({ mysql: delResult});
+  } catch (err) {
+    res.status(500).json(JSON.parse(err.message));
+  }
+});
+
+// Restart a MySQL instance
+router.post('/mysql/restart', async (req, res) => {
+  const { clusterName } = req.body;
+
+  try {
+    await rolloutRestart(clusterName);
+    res.json({ mysql: 'restarted'});
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));
   }

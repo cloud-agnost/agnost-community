@@ -202,6 +202,42 @@ async function deleteRedis(clusterName) {
   return 'success!';
 }
 
+async function rolloutRestart(clusterName) {
+  try {
+    var resourceName = clusterName + '-master';
+    const sts = await k8sApi.readNamespacedStatefulSet(resourceName, namespace);
+
+    // Increment the revision in the deployment template to trigger a rollout
+    sts.body.spec.template.metadata.annotations = {
+      ...sts.body.spec.template.metadata.annotations,
+      'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
+    };
+
+    await k8sApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+    console.log(`Rollout restart ${resourceName} initiated successfully.`);
+  } catch (error) {
+    console.error('Error restarting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
+  }
+
+  // check if it has read replicas
+  try {
+    var resourceName = clusterName + '-replicas';
+    const sts = await k8sApi.readNamespacedStatefulSet(resourceName, namespace);
+
+    // Increment the revision in the deployment template to trigger a rollout
+    sts.body.spec.template.metadata.annotations = {
+      ...sts.body.spec.template.metadata.annotations,
+      'kubectl.kubernetes.io/restartedAt': new Date().toISOString(),
+    };
+
+    await k8sApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body)
+    console.log(`Rollout restart ${resourceName} initiated successfully.`);
+  } catch (error) {
+    console.log('No read replicas to restart...');
+  }
+}
+
 // some helper functions
 async function waitForSecret(secretName) {
   const pollingInterval = 2000;
@@ -267,6 +303,18 @@ router.delete('/redis', async (req, res) => {
   try {
     await deleteRedis(clusterName);
     res.json({ redis: "deleted"});
+  } catch (err) {
+    res.status(500).json(JSON.parse(err.message));
+  }
+});
+
+// Rollout restart a Redis instance
+router.post('/redis/restart', async (req, res) => {
+  const { clusterName } = req.body;
+
+  try {
+    await rolloutRestart(clusterName);
+    res.json({ redis: "restarted"});
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));
   }
