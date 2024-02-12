@@ -131,7 +131,7 @@ export default function DeploymentStatusCard() {
 
 					<DropdownMenuItemContainer>
 						<DropdownMenuSeparator className='!m-0' />
-						<DropdownMenuItem onClick={() => setIsLogsOpen(true)} className='link'>
+						<DropdownMenuItem onClick={() => setIsLogsOpen(true)}>
 							{t('version.view_logs')}
 						</DropdownMenuItem>
 						<DropdownMenuSeparator className='!m-0' />
