@@ -58,7 +58,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 		if (number < 1000) return number;
 		return number.toLocaleString('en-US', {
 			maximumFractionDigits: 2,
-			notation: 'compact',
+			notation: 'standard',
 			compactDisplay: 'short',
 		});
 	}
@@ -80,7 +80,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					</SelectContent>
 				</Select>
 			</div>
-			<div className='flex w-[100px] items-center justify-center text-xs '>
+			<div className='flex w-[125px] items-center justify-center text-xs whitespace-nowrap'>
 				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of{' '}
 				{formatNumber(countInfo?.totalCount)}
 			</div>
