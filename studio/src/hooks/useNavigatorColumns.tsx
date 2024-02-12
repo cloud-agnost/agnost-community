@@ -60,6 +60,8 @@ export default function useNavigatorColumns() {
 				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB
 					? 75
 					: undefined,
+			width: 200,
+			minWidth: 100,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:
