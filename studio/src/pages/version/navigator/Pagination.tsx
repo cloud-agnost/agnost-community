@@ -108,7 +108,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					<CaretLeft className='h-4 w-4' />
 				</Button>
 				<p className='text-xs'>
-					{countInfo?.currentPage} of {countInfo?.totalPages}
+					{countInfo?.currentPage} of {formatNumber(countInfo?.totalPages)}
 				</p>
 				<Button
 					variant='icon'
