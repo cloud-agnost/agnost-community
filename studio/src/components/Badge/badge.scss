@@ -2,10 +2,11 @@
 	@apply py-1 px-1.5 bg-elements-strong-purple inline-flex justify-center items-center gap-1 rounded;
 	@apply bg-lighter;
 	&-text {
-		@apply text-xs text-default font-sfCompact;
+		@apply text-xs font-sfCompact;
 	}
 	&-green {
 		@apply bg-elements-subtle-green dark:bg-elements-strong-green;
+		@apply text-elements-green;
 		.badge-dot {
 			@apply bg-elements-green;
 		}
@@ -14,7 +15,7 @@
 		}
 	}
 	&-blue {
-		@apply bg-elements-subtle-blue dark:bg-elements-strong-blue;
+		@apply bg-elements-subtle-blue dark:bg-elements-strong-blue text-elements-blue;
 		.badge-dot {
 			@apply bg-elements-blue;
 		}
@@ -23,7 +24,7 @@
 		}
 	}
 	&-yellow {
-		@apply bg-elements-subtle-yellow dark:bg-elements-strong-yellow;
+		@apply bg-elements-subtle-yellow dark:bg-elements-strong-yellow text-elements-yellow;
 		.badge-dot {
 			@apply bg-elements-yellow;
 		}
@@ -32,7 +33,7 @@
 		}
 	}
 	&-purple {
-		@apply bg-elements-subtle-purple dark:bg-elements-strong-purple;
+		@apply bg-elements-subtle-purple dark:bg-elements-strong-purple text-elements-purple;
 		.badge-dot {
 			@apply bg-elements-purple;
 		}
@@ -41,7 +42,7 @@
 		}
 	}
 	&-red {
-		@apply bg-elements-subtle-red dark:bg-elements-strong-red;
+		@apply bg-elements-subtle-red dark:bg-elements-strong-red text-elements-red;
 		.badge-dot {
 			@apply bg-elements-red;
 		}
@@ -50,7 +51,7 @@
 		}
 	}
 	&-orange {
-		@apply bg-elements-subtle-orange dark:bg-elements-strong-orange;
+		@apply bg-elements-subtle-orange dark:bg-elements-strong-orange text-elements-orange;
 		.badge-dot {
 			@apply bg-elements-orange;
 		}
