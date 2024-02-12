@@ -104,7 +104,7 @@ Agnost is an open-source project, and we welcome contributions from the communit
 If you're a developer and want to contribute code to the project, you can start by checking the open issues in the
 [Agnost GitHub repository](https://github.com/cloud-agnost). If you want to work on a specific issue, please comment on the issue to let others know you're working on it.
 
-Before you start coding, please review the [contributing guidelines](https://github.com/cloud-agnost/agnost-community/CONTRIBUTING.md) and [code of conduct](https://github.com/cloud-agnost/agnost-community/CODE_OF_CONDUCT.md) to understand the project's development process and expectations.
+Before you start coding, please review the [contributing guidelines](https://github.com/cloud-agnost/agnost-community/CONTRIBUTING.md) and [code of conduct]([https://github.com/cloud-agnost/agnost-community/CODE_OF_CONDUCT.md](https://github.com/cloud-agnost/agnost-community/blob/master/CODE_OF_CONDUCT.md)) to understand the project's development process and expectations.
 
 ### Improve Documentation
 
