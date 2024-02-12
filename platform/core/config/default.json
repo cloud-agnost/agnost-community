@@ -92,6 +92,9 @@
       "scaleToZeroPodRetentionPeriod": "10m00s",
       "target": 10,
       "containerConcurrency": 10,
+      "livenessProbe": {
+        "enabled": true
+      },
       "cpu": {
         "request": "125m",
         "limit": "250m"
