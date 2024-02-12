@@ -104,7 +104,7 @@ export default function SelectOAuthProviders() {
 				{version.authentication.providers.length ? (
 					version.authentication.providers.map((p) => (
 						<div
-							className='flex justify-between items-center bg-subtle p-2 rounded-lg group'
+							className='flex justify-between items-center bg-lighter p-2 rounded-lg group'
 							key={p._id}
 						>
 							<div className='flex gap-2'>
@@ -112,10 +112,22 @@ export default function SelectOAuthProviders() {
 								<p className='font-sfCompact text-default'>{capitalize(p.provider)}</p>
 							</div>
 							<div className='invisible group-hover:visible'>
-								<Button variant='icon' onClick={() => setEditedProvider(p)} disabled={!canEdit}>
-									<PencilSimple className='text-subtle w-5 h-5' />
+								<Button
+									variant='icon'
+									rounded
+									size='sm'
+									onClick={() => setEditedProvider(p)}
+									disabled={!canEdit}
+								>
+									<PencilSimple size={20} className='text-subtle' />
 								</Button>
-								<Button variant='icon' onClick={() => setToDeleteProvider(p)} disabled={!canEdit}>
+								<Button
+									variant='icon'
+									rounded
+									size='sm'
+									onClick={() => setToDeleteProvider(p)}
+									disabled={!canEdit}
+								>
 									<Trash size={20} className='text-subtle' />
 								</Button>
 							</div>
