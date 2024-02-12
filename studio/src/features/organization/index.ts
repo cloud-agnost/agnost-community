@@ -3,6 +3,8 @@ export { default as OrganizationCreateModal } from './OrganizationCreateModal';
 export { default as ChangeOrganizationAvatar } from './Settings/ChangeOrganizationAvatar';
 export { default as ChangeOrganizationName } from './Settings/ChangeOrganizationName';
 export { default as DeleteOrganization } from './Settings/DeleteOrganization';
+export { default as OrganizationInvitation } from './Settings/Members/OrganizationInvitation';
+export { default as OrganizationInvitationDrawer } from './Settings/Members/OrganizationInvitationDrawer';
 export { default as OrganizationInvitationTable } from './Settings/Members/OrganizationInvitationTable';
 export { OrganizationInvitationsColumns } from './Settings/Members/OrganizationInvitationsColumns';
 export { OrganizationMembersColumns } from './Settings/Members/OrganizationMembersColumns';

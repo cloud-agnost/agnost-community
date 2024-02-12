@@ -18,6 +18,7 @@ export { default as ConnectKafkaWithSSL } from './AddResource/Queue/ConnectKafka
 export { default as ConnectQueue } from './AddResource/Queue/ConnectQueue';
 export { default as ConnectRabbitMqWithObject } from './AddResource/Queue/ConnectRabbitMqWithObject';
 export { default as ConnectRabbitMqWithURI } from './AddResource/Queue/ConnectRabbitMqWithURI';
+export { default as SelectResourceTypeModal } from './AddResource/SelectResourceTypeModal';
 export { default as ConnectAWS } from './AddResource/Storage/ConnectAWS';
 export { default as ConnectAzure } from './AddResource/Storage/ConnectAzure';
 export { default as ConnectGCP } from './AddResource/Storage/ConnectGCP';
