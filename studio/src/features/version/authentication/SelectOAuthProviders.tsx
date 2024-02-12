@@ -33,7 +33,7 @@ export default function SelectOAuthProviders() {
 
 	function getIcon(provider: OAuthProviderTypes): JSX.Element {
 		const Icon = OAUTH_ICON_MAP[provider];
-		return <Icon className='w-5 h-5' />;
+		return <Icon className='size-3.5' />;
 	}
 	function handleDeleteOAuthConfig() {
 		deleteOAuthConfig({
@@ -62,7 +62,7 @@ export default function SelectOAuthProviders() {
 	}, [version]);
 	return (
 		<SettingsFormItem
-			className='py-0'
+			className='py-0 !max-w-lg'
 			contentClassName='p-4 border border-border rounded-lg space-y-4'
 			title={t('version.authentication.auth_providers')}
 			description={t('version.authentication.auth_providers_desc')}
@@ -104,12 +104,12 @@ export default function SelectOAuthProviders() {
 				{version.authentication.providers.length ? (
 					version.authentication.providers.map((p) => (
 						<div
-							className='flex justify-between items-center bg-lighter p-2 rounded-lg group'
+							className='flex justify-between items-center py-1 px-2 rounded-lg group border border-border'
 							key={p._id}
 						>
 							<div className='flex gap-2'>
 								{getIcon(p.provider)}
-								<p className='font-sfCompact text-default'>{capitalize(p.provider)}</p>
+								<p className='font-sfCompact text-default text-xs'>{capitalize(p.provider)}</p>
 							</div>
 							<div className='invisible group-hover:visible'>
 								<Button
@@ -119,7 +119,7 @@ export default function SelectOAuthProviders() {
 									onClick={() => setEditedProvider(p)}
 									disabled={!canEdit}
 								>
-									<PencilSimple size={20} className='text-subtle' />
+									<PencilSimple size={18} className='text-subtle' />
 								</Button>
 								<Button
 									variant='icon'
@@ -128,7 +128,7 @@ export default function SelectOAuthProviders() {
 									onClick={() => setToDeleteProvider(p)}
 									disabled={!canEdit}
 								>
-									<Trash size={20} className='text-subtle' />
+									<Trash size={18} className='text-subtle' />
 								</Button>
 							</div>
 						</div>
