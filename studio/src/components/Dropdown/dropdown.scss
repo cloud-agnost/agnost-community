@@ -53,7 +53,7 @@
 	}
 
 	&-separator {
-		@apply h-px bg-wrapper-border m-0;
+		@apply h-px bg-border dark:bg-wrapper-border m-0;
 	}
 
 	&-shortcut {
