@@ -99,7 +99,7 @@ export default function VersionTabLayout({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4 p-4 flex flex-col', className)}>
+		<div className={cn('h-full space-y-4 p-4', className)}>
 			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
 				{breadCrumb}
 				<div className='flex items-center justify-between flex-1'>
@@ -133,7 +133,7 @@ export default function VersionTabLayout({
 					</div>
 				</div>
 			</div>
-			<div className='flex-1 h-full'>{!loading && content}</div>
+			<div className='h-[calc(100%-2.5rem)]'>{!loading && content}</div>
 			<Loading loading={loading} />
 		</div>
 	);
