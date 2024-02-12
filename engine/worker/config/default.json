@@ -45,8 +45,8 @@
         "defaultClusterIPPort": 4000,
         "defaultKnativeIngressPort": 80,
         "livenessProbe": {
-            "timeoutSeconds": 45,
-            "periodSeconds": 90,
+            "timeoutSeconds": 60,
+            "periodSeconds": 120,
             "initialDelaySeconds": 30
         },
         "readinessProbe": {
