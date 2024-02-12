@@ -23,8 +23,8 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 export default function AddResourceButton() {
 	const canCreateResource = useAuthorizeOrg('resource.create');
-	const { selectResourceType, toggleCreateResourceModal } = useResourceStore();
 	const { instanceTypes } = useTypeStore();
+	const { selectResourceType, toggleCreateResourceModal } = useResourceStore();
 	const { t } = useTranslation();
 
 	function getIcon(type: string) {

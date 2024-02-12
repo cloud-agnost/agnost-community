@@ -7,6 +7,7 @@ import {
 	GetResourceRequest,
 	GetResourcesRequest,
 	Resource,
+	ResourceCreateType,
 	ResourceType,
 	UpdateManagedResourceConfigurationRequest,
 	UpdateResourceAccessSettingsRequest,
@@ -29,6 +30,8 @@ export interface ResourceStore {
 	deletedResource: Resource | null;
 	isEditResourceModalOpen: boolean;
 	resourceToEdit: Resource;
+	isSelectResourceTypeModalOpen: boolean;
+	selectedResourceCreateType: ResourceCreateType | undefined;
 }
 
 type Actions = {
@@ -50,6 +53,8 @@ type Actions = {
 	openEditResourceModal: (resource: Resource, type: string) => void;
 	closeEditResourceModal: () => void;
 	getOrgResources: (req: GetResourcesRequest) => Promise<Resource[]>;
+	openSelectResourceTypeModal: (type: ResourceCreateType) => void;
+	closeSelectResourceTypeModal: () => void;
 	reset: () => void;
 };
 const initialState: ResourceStore = {
@@ -66,6 +71,8 @@ const initialState: ResourceStore = {
 	deletedResource: null,
 	isEditResourceModalOpen: false,
 	resourceToEdit: {} as Resource,
+	isSelectResourceTypeModalOpen: false,
+	selectedResourceCreateType: undefined,
 };
 
 const useResourceStore = create<ResourceStore & Actions>()(
@@ -256,6 +263,16 @@ const useResourceStore = create<ResourceStore & Actions>()(
 				throw error as APIError;
 			}
 		},
+		openSelectResourceTypeModal: (type) =>
+			set({
+				isSelectResourceTypeModalOpen: true,
+				selectedResourceCreateType: type,
+			}),
+		closeSelectResourceTypeModal: () =>
+			set({
+				selectedResourceCreateType: undefined,
+				isSelectResourceTypeModalOpen: false,
+			}),
 		reset: () => {
 			set(initialState);
 		},
