@@ -7,15 +7,18 @@ import {
 } from '@/features/version/DeploymentStatusCard/index.ts';
 import { useAuthorizeVersion, useEnvironmentStatus, useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-import { APIError, EnvironmentStatus } from '@/types';
+import { APIError, EnvironmentStatus, ResourceCreateType } from '@/types';
 import { cn } from '@/utils';
 import { ArrowClockwise, Cloud } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItemContainer,
 	DropdownMenuLabel,
 	DropdownMenuTrigger,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
 } from 'components/Dropdown';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +26,7 @@ import './deploymentStatusCard.scss';
 import { useParams } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 import { Alert, AlertTitle } from '@/components/Alert';
+import useResourceStore from '@/store/resources/resourceStore';
 
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
@@ -30,6 +34,7 @@ export default function DeploymentStatusCard() {
 	const canDeploy = useAuthorizeVersion('env.deploy');
 	const { getEnvironmentResources, environment, redeployAppVersionToEnvironment, resources } =
 		useEnvironmentStore();
+	const { openSelectResourceTypeModal } = useResourceStore();
 	const envStatus = useEnvironmentStatus();
 	const classes = ENV_STATUS_CLASS_MAP[envStatus as EnvironmentStatus];
 	const { toast } = useToast();
@@ -124,11 +129,22 @@ export default function DeploymentStatusCard() {
 						<Resources />
 					</div>
 
-					<footer className='deployment-status-footer'>
-						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
+					<DropdownMenuItemContainer>
+						<DropdownMenuSeparator className='!m-0' />
+						<DropdownMenuItem onClick={() => setIsLogsOpen(true)} className='link'>
 							{t('version.view_logs')}
-						</Button>
-					</footer>
+						</DropdownMenuItem>
+						<DropdownMenuSeparator className='!m-0' />
+						<DropdownMenuItem onClick={() => openSelectResourceTypeModal(ResourceCreateType.New)}>
+							Add New Resource
+						</DropdownMenuItem>
+						<DropdownMenuSeparator className='!m-0' />
+						<DropdownMenuItem
+							onClick={() => openSelectResourceTypeModal(ResourceCreateType.Existing)}
+						>
+							Connect Existing Resource
+						</DropdownMenuItem>
+					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<DeploymentLogsDrawer open={isLogsOpen} onOpenChange={setIsLogsOpen} />

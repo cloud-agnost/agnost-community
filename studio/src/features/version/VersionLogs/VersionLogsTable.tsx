@@ -5,13 +5,21 @@ import useVersionStore from '@/store/version/versionStore';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
 import { VersionLogColumns } from './VersionLogColumns';
+import { useMemo } from 'react';
 
 interface VersionLogsTableProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
 
 export default function VersionLogsTable({ type }: VersionLogsTableProps) {
-	const { logs, getVersionLogs, lastFetchedLogPage } = useVersionStore();
+	const { endpointLogs, queueLogs, taskLogs, getVersionLogs, lastFetchedLogPage } =
+		useVersionStore();
+	const logs = useMemo(() => {
+		if (type === 'endpoint') return endpointLogs;
+		if (type === 'queue') return queueLogs;
+		return taskLogs;
+	}, [type, taskLogs, endpointLogs, queueLogs]);
+	console.log(logs);
 	const [searchParams] = useSearchParams();
 	const table = useTable({
 		data: logs,
