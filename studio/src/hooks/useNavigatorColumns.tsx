@@ -61,7 +61,6 @@ export default function useNavigatorColumns() {
 					? 75
 					: undefined,
 			width: 200,
-			minWidth: 100,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:
