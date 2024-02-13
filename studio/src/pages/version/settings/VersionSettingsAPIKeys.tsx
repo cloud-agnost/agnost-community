@@ -51,7 +51,6 @@ export default function VersionSettingsAPIKeys() {
 	return (
 		<>
 			<VersionTabLayout
-				className='p-0'
 				type={TabTypes.APIKeys}
 				title={t('version.settings.api_keys') as string}
 				isEmpty={!sortedApiKeys.length}

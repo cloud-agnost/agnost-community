@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 const KEY_BACKSPACE = 'Backspace';
 const KEY_DELETE = 'Delete';
+
 const JSONEditor = forwardRef(({ eventKey, column, node, ...props }: ICellEditorParams, ref) => {
 	const [value, setValue] = useState<string>('');
 	const createInitialState = () => {
@@ -35,6 +36,7 @@ const JSONEditor = forwardRef(({ eventKey, column, node, ...props }: ICellEditor
 			},
 		};
 	});
+
 	return (
 		<div className='w-[500px] h-[210px] bg-subtle p-1 rounded'>
 			<CodeEditor

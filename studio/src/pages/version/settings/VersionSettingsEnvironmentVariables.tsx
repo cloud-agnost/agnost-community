@@ -43,7 +43,6 @@ export default function VersionSettingsEnvironmentVariables() {
 	return (
 		<>
 			<VersionTabLayout
-				className='p-0'
 				type={TabTypes.EnvironmentVariables}
 				title={t('version.settings.environment_variables') as string}
 				isEmpty={!sortedVariables.length}

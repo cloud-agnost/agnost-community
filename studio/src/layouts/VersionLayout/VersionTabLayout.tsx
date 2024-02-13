@@ -5,6 +5,7 @@ import { SearchInput } from '@/components/SearchInput';
 import { SelectedRowButton } from '@/components/Table';
 import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
+import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { ReactNode } from 'react';
@@ -79,9 +80,11 @@ export default function VersionTabLayout({
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
 							<span className='ml-2'>
-								{t('general.module_create', {
-									module: type,
-								})}
+								{type === TabTypes.NPMPackages
+									? t('version.npm.install')
+									: t('general.module_create', {
+											module: type,
+										})}
 							</span>
 						</Button>
 					) : (
@@ -124,9 +127,11 @@ export default function VersionTabLayout({
 							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 								<Plus size={14} />
 								<span className='ml-1'>
-									{t('general.module_create', {
-										module: type,
-									})}
+									{type === TabTypes.NPMPackages
+										? t('version.npm.install')
+										: t('general.module_create', {
+												module: type,
+											})}
 								</span>
 							</Button>
 						)}

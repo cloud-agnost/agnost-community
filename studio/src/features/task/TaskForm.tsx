@@ -64,7 +64,7 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 						<div className='space-x-'>
 							<FormDescription>{t('task.syntax_description')}</FormDescription>
 
-							<div className='space-y-1 text-sm'>
+							<div className='space-y-1 text-xs'>
 								<div className='flex items-center space-x-2 mt-4'>
 									<p className='text-default'>*</p>
 									<p className='text-subtle'>
@@ -92,7 +92,7 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 							</div>
 
 							<Separator className='my-4' />
-							<div className='space-y-1 text-sm'>
+							<div className='space-y-1 text-xs'>
 								<div className='flex items-center space-x-2 mt-4'>
 									<p className='text-default'>0 0 * * 1-5</p>
 									<p className='text-subtle'>{describeCronExpression('0 0 * * 1-5')}</p>

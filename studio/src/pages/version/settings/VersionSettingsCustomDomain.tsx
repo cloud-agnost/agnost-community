@@ -88,7 +88,6 @@ export default function VersionSettingsCustomDomain() {
 				</div>
 			) : (
 				<VersionTabLayout
-					className='p-0'
 					type={TabTypes.CustomDomains}
 					title={t('cluster.custom_domain') as string}
 					isEmpty={!versionDomains.length}
