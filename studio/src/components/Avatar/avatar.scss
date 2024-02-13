@@ -13,31 +13,31 @@
 		}
 	}
 	&-xxs {
-		@apply w-5 h-5 text-[10px];
+		@apply size-5 text-[10px];
 	}
 	&-xs {
-		@apply w-6 h-6 text-xs;
+		@apply size-6 text-xs;
 	}
 	&-sm {
-		@apply w-7 h-7 text-xs;
+		@apply size-7 text-xs;
 	}
 	&-md {
-		@apply w-10 h-10 text-base;
+		@apply size-8 text-base;
 	}
 	&-lg {
-		@apply w-12 h-12 text-lg;
+		@apply size-12 text-lg;
 	}
 	&-xl {
-		@apply w-14 h-14 text-2xl;
+		@apply size-14 text-2xl;
 	}
 	&-2xl {
-		@apply w-16 h-16 text-2xl;
+		@apply size-16 text-2xl;
 	}
 	&-3xl {
-		@apply w-20 h-20 text-3xl;
+		@apply size-20 text-3xl;
 	}
 	&-4xl {
-		@apply w-32 h-32 text-6xl;
+		@apply size-32 text-6xl;
 	}
 	&-square {
 		@apply rounded-sm;

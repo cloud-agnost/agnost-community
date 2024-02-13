@@ -205,7 +205,7 @@ const FileColumns: ColDef<BucketFile>[] = [
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
 	{
-		width: 50,
+		pinned: 'right',
 		cellRenderer: ({ data }: ICellRendererParams) => {
 			const canEditBucket = getVersionPermission('storage.update');
 			const canDeleteBucket = getVersionPermission('storage.delete');

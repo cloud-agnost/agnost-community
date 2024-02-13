@@ -29,7 +29,9 @@ export default function Resizer({ hide, orientation, className, ...props }: Resi
 						className={cn(
 							'rounded',
 							orientation === 'vertical' ? 'h-8 w-0.5' : 'h-0.5 w-8',
-							isResizing ? 'active-resizer' : 'bg-subtle group-hover:bg-base-reverse',
+							isResizing
+								? 'active-resizer'
+								: 'bg-wrapper-background-hover group-hover:bg-base-reverse',
 							isResizing && orientation === 'horizontal' && 'w-full',
 							isResizing && orientation === 'vertical' && 'h-full',
 						)}

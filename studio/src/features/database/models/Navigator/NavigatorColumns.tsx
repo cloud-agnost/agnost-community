@@ -48,9 +48,7 @@ export const NavigatorColumns: ColDef[] = [
 		resizable: true,
 	},
 	{
-		headerName: translate('general.actions'),
-		field: 'actions',
-		width: 120,
+		width: 200,
 		pinned: 'right',
 		resizable: true,
 		cellRenderer: (params: ICellRendererParams) => {

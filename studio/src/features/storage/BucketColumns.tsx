@@ -119,6 +119,8 @@ const BucketColumns: ColDef<Bucket>[] = [
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
 	{
+		width: 150,
+		pinned: 'right',
 		cellRenderer: ({ data }: ICellRendererParams) => {
 			const canEditBucket = getVersionPermission('storage.update');
 			const canDeleteBucket = getVersionPermission('storage.delete');
