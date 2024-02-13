@@ -42,7 +42,6 @@ export default function VersionSettingsNPMPackages() {
 	return (
 		<>
 			<VersionTabLayout
-				className='p-0'
 				type={TabTypes.NPMPackages}
 				title={t('version.settings.npm_packages') as string}
 				isEmpty={!sortedPackages.length}

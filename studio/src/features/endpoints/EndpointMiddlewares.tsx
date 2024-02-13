@@ -93,7 +93,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 					<DropdownMenuItemContainer className='bg-input-background'>
 						<DropdownMenuItem
 							onClick={toggleCreateModal}
-							className='flex gap-[10px] text-default text-xs font-medium hover:bg-[#343B4D]'
+							className='flex gap-[10px] text-default text-xs font-medium hover:bg-lighter dark:hover:bg-[#343B4D]'
 						>
 							<Plus size={14} weight='bold' />
 							<span>{t('version.middleware.add_middleware')}</span>
@@ -109,7 +109,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 										else onChange([mw.iid]);
 									}}
 									key={index}
-									className='hover:bg-[#343B4D]'
+									className='hover:bg-lighter dark:hover:bg-[#343B4D]'
 								>
 									<div className='flex flex-col'>
 										<span>{mw.name}</span>

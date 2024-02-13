@@ -728,17 +728,18 @@ export const INSTANCE_PORT_MAP: Record<string, number> = {
 	Redis: 6379,
 	RabbitMQ: 5672,
 };
-export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
-	GET: 'text-elements-blue',
-	POST: 'text-elements-green',
-	PUT: 'text-elements-yellow',
-	DELETE: 'text-elements-red',
-};
+
 export const ENDPOINT_METHOD_BG_COLOR: Record<string, string> = {
 	GET: '!bg-elements-subtle-blue dark:!bg-elements-strong-blue',
 	POST: '!bg-elements-subtle-green dark:!bg-elements-strong-green',
 	PUT: '!bg-elements-subtle-yellow dark:!bg-elements-strong-yellow',
 	DELETE: '!bg-elements-subtle-red dark:!bg-elements-strong-red',
+};
+export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
+	GET: 'dark:!text-elements-subtle-blue !text-elements-strong-blue',
+	POST: 'dark:!text-elements-subtle-green !text-elements-strong-green',
+	PUT: 'dark:!text-elements-subtle-yellow !text-elements-strong-yellow',
+	DELETE: 'dark:!text-elements-subtle-red !text-elements-strong-red',
 };
 
 export const ENDPOINT_RESPONSE_TABS = [

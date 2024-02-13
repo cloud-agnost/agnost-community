@@ -84,7 +84,7 @@ export default function CreateFieldButton() {
 							<Fragment key={key}>
 								{index !== 0 && <DropdownMenuSeparator />}
 								<DropdownMenuGroup className='grid grid-cols-2 gap-y-1 gap-1'>
-									<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>
+									<DropdownMenuLabel className='col-span-2 text-subtle text-xs font-medium'>
 										{toDisplayName(key)}
 									</DropdownMenuLabel>
 									{types

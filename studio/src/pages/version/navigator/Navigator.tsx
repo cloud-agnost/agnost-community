@@ -171,6 +171,7 @@ export default function Navigator() {
 				state: columnState,
 				applyOrder: true,
 			});
+			console.log('applying columnState', columnState);
 		}
 		event.api.hideOverlay();
 	}
@@ -178,7 +179,6 @@ export default function Navigator() {
 	function onGridReady(event: GridReadyEvent) {
 		setIsGridReady(true);
 		event.api.showLoadingOverlay();
-		event.api.sizeColumnsToFit();
 	}
 	const debounceSaveGridColumnState = _.debounce((columnState) => {
 		saveColumnState(modelId, columnState);

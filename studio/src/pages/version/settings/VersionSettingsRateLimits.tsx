@@ -44,7 +44,6 @@ export default function VersionSettingsRateLimits() {
 	return (
 		<>
 			<VersionTabLayout
-				className='p-0'
 				type={TabTypes.RateLimits}
 				title={t('version.settings.rate_limits') as string}
 				isEmpty={!sortedLimits.length}

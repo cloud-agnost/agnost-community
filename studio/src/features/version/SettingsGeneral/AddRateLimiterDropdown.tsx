@@ -53,7 +53,7 @@ export default function AddRateLimiterDropdown({
 						<DropdownMenuItem
 							onClick={() => setAddRateLimitDrawerIsOpen(true)}
 							className={cn(
-								_.isNil(hasToAddAsDefault) && 'hover:bg-[#343B4D]',
+								_.isNil(hasToAddAsDefault) && 'hover:bg-lighter dark:hover:bg-[#343B4D]',
 								'gap-[10px] text-xs',
 							)}
 						>
@@ -67,7 +67,7 @@ export default function AddRateLimiterDropdown({
 								onClick={() => onSelect(limiter)}
 								key={index}
 								className={cn(
-									_.isNil(hasToAddAsDefault) && 'hover:bg-[#343B4D]',
+									_.isNil(hasToAddAsDefault) && 'hover:bg-lighter dark:hover:bg-[#343B4D]',
 									'gap-[10px] text-xs ',
 								)}
 							>

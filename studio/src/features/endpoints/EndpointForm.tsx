@@ -13,7 +13,11 @@ import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Separator } from '@/components/Separator';
 import { Switch } from '@/components/Switch';
-import { ALL_HTTP_METHODS, ENDPOINT_METHOD_BG_COLOR } from '@/constants';
+import {
+	ALL_HTTP_METHODS,
+	ENDPOINT_METHOD_BG_COLOR,
+	ENDPOINT_METHOD_TEXT_COLOR,
+} from '@/constants';
 import useVersionStore from '@/store/version/versionStore';
 import { CreateEndpointSchema, RateLimit } from '@/types';
 import { cn, reorder } from '@/utils';
@@ -102,6 +106,7 @@ export default function EndpointForm({ loading }: { loading: boolean }) {
 											className={cn(
 												'w-[100px] rounded-none rounded-l',
 												ENDPOINT_METHOD_BG_COLOR[field.value],
+												ENDPOINT_METHOD_TEXT_COLOR[field.value],
 											)}
 											error={Boolean(form.formState.errors.method)}
 										>
