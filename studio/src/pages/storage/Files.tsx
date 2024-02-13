@@ -193,6 +193,7 @@ export default function Files() {
 						}
 						defaultColDef={{
 							resizable: true,
+							flex: 1,
 						}}
 					/>
 					<Pagination countInfo={fileCountInfo as BucketCountInfo} />

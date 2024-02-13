@@ -159,6 +159,7 @@ export default function Buckets() {
 						components={{
 							agColumnHeader: TableHeader,
 						}}
+						autoSizePadding={20}
 						ensureDomOrder
 						suppressRowClickSelection
 						enableCellTextSelection
@@ -168,8 +169,10 @@ export default function Buckets() {
 						onRowSelected={(event) =>
 							setSelectedRowCount(event?.api.getSelectedNodes().length ?? 0)
 						}
+						columnHoverHighlight={false}
 						defaultColDef={{
 							resizable: true,
+							flex: 1,
 						}}
 					/>
 					<Pagination countInfo={bucketCountInfo as BucketCountInfo} />
