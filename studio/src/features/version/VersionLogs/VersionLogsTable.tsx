@@ -1,28 +1,26 @@
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { useInfiniteScroll, useTable } from '@/hooks';
+import { useTable } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
+import { APIError } from '@/types';
+import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useSearchParams } from 'react-router-dom';
 import { VersionLogColumns } from './VersionLogColumns';
-import { useMemo } from 'react';
 
-interface VersionLogsTableProps {
+type VersionLogsTableProps = UseInfiniteQueryResult<InfiniteData<any, unknown>, APIError> & {
 	type: 'queue' | 'task' | 'endpoint';
-}
+};
 
-export default function VersionLogsTable({ type }: VersionLogsTableProps) {
-	const { endpointLogs, queueLogs, taskLogs, getVersionLogs, lastFetchedLogPage } =
-		useVersionStore();
-	const logs = useMemo(() => {
-		if (type === 'endpoint') return endpointLogs;
-		if (type === 'queue') return queueLogs;
-		return taskLogs;
-	}, [type, taskLogs, endpointLogs, queueLogs]);
-	console.log(logs);
-	const [searchParams] = useSearchParams();
+export default function VersionLogsTable({
+	type,
+	hasNextPage,
+	isPending,
+	fetchNextPage,
+}: VersionLogsTableProps) {
+	const { logs } = useVersionStore();
+
 	const table = useTable({
-		data: logs,
+		data: logs?.[type] ?? [],
 		columns: VersionLogColumns,
 		initialState: {
 			columnVisibility: {
@@ -31,22 +29,11 @@ export default function VersionLogsTable({ type }: VersionLogsTableProps) {
 			},
 		},
 	});
-	const { hasNextPage, fetchNextPage, isPending } = useInfiniteScroll({
-		lastFetchedPage: lastFetchedLogPage,
-		queryFn: getVersionLogs,
-		dataLength: logs.length,
-		queryKey: 'versionLogs',
-		params: {
-			type,
-			start: searchParams.get('start'),
-			end: searchParams.get('end'),
-		},
-	});
 
 	return (
 		<InfiniteScroll
 			scrollableTarget='version-layout'
-			dataLength={logs?.length}
+			dataLength={logs?.[type]?.length ?? 0}
 			next={fetchNextPage}
 			hasMore={hasNextPage}
 			loader={isPending && <TableLoading />}

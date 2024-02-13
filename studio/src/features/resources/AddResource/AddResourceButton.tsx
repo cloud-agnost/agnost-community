@@ -64,7 +64,7 @@ export default function AddResourceButton() {
 										(r) => type.id !== ResourceCreateType.New || r !== 'storage',
 									).map((resourceType) => (
 										<Fragment key={resourceType}>
-											<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>
+											<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-[11px] font-medium'>
 												{capitalize(resourceType)}
 											</DropdownMenuLabel>
 											{instanceTypes[resourceType as keyof typeof instanceTypes].map(

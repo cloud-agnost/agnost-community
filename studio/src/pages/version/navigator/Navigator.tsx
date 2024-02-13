@@ -58,7 +58,7 @@ export default function Navigator() {
 		onSuccess: () => {
 			setSelectedRowCount(0);
 			gridRef.current?.api.deselectAll();
-			refetch;
+			refetch();
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
@@ -157,7 +157,6 @@ export default function Navigator() {
 	useEffect(() => {
 		if (!_.isNil(gridRef.current?.api)) {
 			if (isFetching) {
-				console.log('showLoadingOverlay', gridRef.current);
 				gridRef.current.api.showLoadingOverlay();
 			} else {
 				gridRef.current.api.hideOverlay();
@@ -186,7 +185,9 @@ export default function Navigator() {
 	}, 100);
 
 	function onSaveGridColumnState(params: ColumnResizedEvent) {
+		console.log('onSaveGridColumnState', params.type);
 		const columnState = params.columnApi.getColumnState();
+		console.log('columnState', columnState);
 		debounceSaveGridColumnState(columnState);
 	}
 	return (

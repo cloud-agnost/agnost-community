@@ -293,7 +293,6 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	}
 
 	const models = getModelsOfSelectedDb(apiParams.dbId);
-	console.log(models);
 	if (_.isEmpty(models)) {
 		const models = await getModelsOfDatabase(apiParams);
 		setModel(models.find((m) => m._id === apiParams.modelId) ?? models[0]);

@@ -15,9 +15,11 @@ import { Model } from '@/types';
 import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 export default function SelectModel() {
 	const { versionId, modelId } = useParams() as { versionId: string; modelId: string };
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { t } = useTranslation();
 	const { dbId } = useParams() as { dbId: string };
 	const navigate = useNavigate();
 	const { updateCurrentTab } = useTabStore();
@@ -42,6 +44,7 @@ export default function SelectModel() {
 		);
 		updateCurrentTab(versionId, {
 			path,
+			title: `${t('database.navigator.title')} - ${model.name} `,
 		});
 		navigate(path);
 	}

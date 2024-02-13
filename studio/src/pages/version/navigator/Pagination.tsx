@@ -80,10 +80,10 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					</SelectContent>
 				</Select>
 			</div>
-			<div className='flex w-[125px] items-center justify-center text-xs whitespace-nowrap'>
+			<span className='flex items-center justify-center text-xs whitespace-nowrap'>
 				{paginationInfo.pageIndex} - {paginationInfo.dataCount} of{' '}
 				{formatNumber(countInfo?.totalCount)}
-			</div>
+			</span>
 			<div className='flex items-center space-x-2'>
 				<Button
 					variant='icon'
@@ -107,9 +107,9 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					<span className='sr-only'>Go to previous page</span>
 					<CaretLeft className='h-4 w-4' />
 				</Button>
-				<p className='text-xs'>
-					{countInfo?.currentPage} of {countInfo?.totalPages}
-				</p>
+				<span className='text-xs'>
+					{countInfo?.currentPage} of {formatNumber(countInfo?.totalPages)}
+				</span>
 				<Button
 					variant='icon'
 					size='sm'

@@ -1,23 +1,27 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { MODULE_PAGE_SIZE } from '@/constants';
+import TableHeader from '@/features/database/models/Navigator/TableHeader';
 import { EditFile, FileColumns } from '@/features/storage';
-import { useTable, useToast } from '@/hooks';
+import { useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, BucketCountInfo, TabTypes } from '@/types';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { GridReadyEvent } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import _ from 'lodash';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Pagination } from '../version/navigator/Pagination';
 export default function Files() {
 	const [searchParams] = useSearchParams();
-	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [selectedRowCount, setSelectedRowCount] = useState(0);
+	const gridRef = useRef<AgGridReact<any>>(null);
 	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { getVersionDashboardPath } = useVersionStore();
@@ -77,26 +81,23 @@ export default function Files() {
 		// (dataCountInfo?.[modelId]?.currentPage === undefined ||
 		// 	Math.ceil(data.length / MODULE_PAGE_SIZE) < (dataCountInfo?.[modelId]?.currentPage ?? 0)),
 	});
-	const table = useTable({
-		data: files,
-		columns: FileColumns,
-	});
 
 	const { mutateAsync: deleteMultipleFileMutation } = useMutation({
 		mutationFn: () =>
 			deleteMultipleFileFromBucket({
-				filePaths: table.getSelectedRowModel().rows.map((row) => row.original.path),
+				filePaths: gridRef.current?.api
+					.getSelectedNodes()
+					.map((node) => node.data.path) as string[],
 				storageName: storage?.name as string,
 				bucketName: bucket?.name as string,
 				bckId: bucket?.id as string,
 			}),
 		mutationKey: ['deleteMultipleFileFromBucket'],
 		onSuccess: () => {
-			table?.resetRowSelection();
+			gridRef.current?.api.deselectAll();
 			refetch();
 		},
 		onError: ({ details }: APIError) => {
-			table?.resetRowSelection();
 			toast({ action: 'error', title: details });
 		},
 	});
@@ -132,11 +133,21 @@ export default function Files() {
 		};
 		fileInput.click();
 	}
-	async function onRefresh() {
-		setIsRefreshing(true);
-		await refetch();
-		setIsRefreshing(false);
+
+	function onGridReady(event: GridReadyEvent) {
+		event.api.showLoadingOverlay();
+		event.api.sizeColumnsToFit();
 	}
+
+	useEffect(() => {
+		if (!_.isNil(gridRef.current?.api)) {
+			if (isFetching) {
+				gridRef.current.api.showLoadingOverlay();
+			} else {
+				gridRef.current.api.hideOverlay();
+			}
+		}
+	}, [isFetching, gridRef.current]);
 	return (
 		<>
 			{uploadLoading && (uploadProgress > 0 || uploadProgress < 100) && (
@@ -150,20 +161,39 @@ export default function Files() {
 				openCreateModal={uploadFileHandler}
 				onMultipleDelete={deleteMultipleFileMutation}
 				loading={isFetching && (!files?.length || files[0].bucketId !== bucket.id)}
-				selectedRowCount={table.getSelectedRowModel().rows.length}
-				onClearSelected={() => table.toggleAllRowsSelected(false)}
+				selectedRowCount={selectedRowCount}
+				onClearSelected={() => gridRef.current?.api.deselectAll()}
 				handlerButton={
-					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-						{!isRefreshing && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}
+					<Button variant='secondary' onClick={() => refetch()} iconOnly>
+						<ArrowClockwise className='mr-1 w-3.5 h-3.5' />
 						{t('general.refresh')}
 					</Button>
 				}
 			>
-				<div className='h-full flex flex-col'>
-					<DataTable
-						table={table}
-						containerClassName='navigator table-fixed w-full flex-1 overflow-auto relative'
-						headerClassName='sticky top-0 z-10'
+				<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
+					<AgGridReact
+						ref={gridRef}
+						onGridReady={onGridReady}
+						key={storage._id}
+						className='flex-1 h-[500px]'
+						rowData={files}
+						columnDefs={FileColumns}
+						rowSelection='multiple'
+						components={{
+							agColumnHeader: TableHeader,
+						}}
+						ensureDomOrder
+						suppressRowClickSelection
+						enableCellTextSelection
+						overlayLoadingTemplate={
+							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
+						}
+						onRowSelected={(event) =>
+							setSelectedRowCount(event?.api.getSelectedNodes().length ?? 0)
+						}
+						defaultColDef={{
+							resizable: true,
+						}}
 					/>
 					<Pagination countInfo={fileCountInfo as BucketCountInfo} />
 				</div>

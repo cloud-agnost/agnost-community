@@ -37,7 +37,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
-		className: '!max-w-[15px] !w-[15px]',
+		className: '!max-w-[30px] !w-[30px]',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -59,6 +59,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
+		size: 300,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -69,6 +70,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	},
 	{
 		id: 'created_at',
+		size: 400,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -77,7 +79,6 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			/>
 		),
 		accessorKey: 'createdAt',
-		size: 200,
 		cell: ({
 			row: {
 				original: { createdAt, createdBy },
@@ -93,6 +94,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 
 	{
 		id: 'updatedAt',
+		size: 300,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -103,7 +105,6 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		accessorKey: 'updatedAt',
 		enableSorting: true,
 		sortingFn: 'datetime',
-		size: 200,
 		cell: ({
 			row: {
 				original: { updatedAt, updatedBy },
@@ -119,7 +120,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 
 	{
 		id: 'actions',
-		className: 'actions !w-[50px]',
+		className: 'actions !w-[100px]',
 		cell: ({ row: { original } }) => {
 			const canEditModel = getVersionPermission('model.update');
 			const canDeleteModel = getVersionPermission('model.delete');
