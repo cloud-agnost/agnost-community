@@ -106,7 +106,7 @@ export default function VersionTabLayout({
 			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
 				{breadCrumb}
 				<div className='flex items-center justify-between flex-1'>
-					<h1 className='text-default text-sm text-center'>{title}</h1>
+					<h1 className='text-default text-sm text-center font-semibold'>{title}</h1>
 					<div className='flex items-center justify-center gap-2'>
 						{searchable && (
 							<SearchInput
