@@ -88,7 +88,9 @@ export default function VersionTabLayout({
 							</span>
 						</Button>
 					) : (
-						handlerButton
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						handlerButton?.props?.children[handlerButton?.props?.children.length - 1]
 					)}
 				</EmptyState>
 			);
@@ -101,6 +103,7 @@ export default function VersionTabLayout({
 			path: pathname + search,
 		});
 	}, [search]);
+
 	return (
 		<div className={cn('h-full space-y-4 p-4', className)}>
 			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
