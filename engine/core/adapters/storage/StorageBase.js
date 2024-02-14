@@ -855,12 +855,13 @@ export class StorageBase {
 	async getBucketMetadata(storageId, bucketName, detailed = false) {
 		// Get connection to storage metadata database
 		const db = this.getDB();
-		const metadata = await db
-			.collection("buckets")
-			.findOne(
-				{ storageId: storageId, name: bucketName },
-				{ readPreference: "secondaryPreferred", projection: { _id: 0 } }
-			);
+		const metadata = await db.collection("buckets").findOne(
+			{
+				storageId: storageId,
+				$or: [{ name: bucketName }, { id: bucketName }],
+			},
+			{ readPreference: "secondaryPreferred", projection: { _id: 0 } }
+		);
 
 		if (detailed && metadata) {
 			const cursor = await db.collection("files").aggregate(
@@ -1074,7 +1075,7 @@ export class StorageBase {
 		const metadata = await db
 			.collection("files")
 			.findOne(
-				{ bucketId: bucketId, path },
+				{ bucketId: bucketId, $or: [{ path }, { id: path }] },
 				{ readPreference: "secondaryPreferred", projection: { _id: 0 } }
 			);
 
