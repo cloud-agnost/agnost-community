@@ -30,7 +30,8 @@ export type Modules =
 	| TabTypes.EnvironmentVariables
 	| TabTypes.NPMPackages
 	| TabTypes.Realtime
-	| TabTypes.RateLimits;
+	| TabTypes.RateLimits
+	| TabTypes.Navigator;
 
 interface EmptyStateProps {
 	title: string;
