@@ -34,12 +34,13 @@ export default function DatePicker({ className, error, clearable, ...props }: Da
 		<Popover>
 			<PopoverTrigger asChild>
 				<Button
-					variant={'outline'}
+					variant='outline'
 					className={cn(
 						'w-full px-3 relative justify-start text-left font-normal bg-input-background disabled:cursor-not-allowed disabled:opacity-50',
 						!props.selected && 'text-muted-foreground',
 					)}
 					onClick={(e) => e.stopPropagation()}
+					size='sm'
 				>
 					<CalendarBlank
 						className={cn('mr-2 h-4 w-4', !props.selected ? 'text-subtle' : 'text-default')}
