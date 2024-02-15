@@ -366,7 +366,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		}
 		if (packagesToInstall.length > 0) {
 			this.addLog(t("Installing packages: %s", packagesToInstall.join(", ")));
-			installCommand = `npm install ${packagesToInstall.join(" ")}`;
+			installCommand = `npm install ${packagesToInstall.join(" ")} --force`;
 		}
 
 		if (uninstallCommand && installCommand)
