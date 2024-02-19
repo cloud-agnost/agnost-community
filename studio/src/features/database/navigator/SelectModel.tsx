@@ -56,7 +56,7 @@ export default function SelectModel() {
 					<CaretDown size={14} />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align='end' className='max-h-[650px] overflow-y-auto'>
+			<DropdownMenuContent align='end' className='max-h-[250px] overflow-y-auto'>
 				<DropdownMenuItemContainer>
 					{models?.map((model) => (
 						<DropdownMenuItem
