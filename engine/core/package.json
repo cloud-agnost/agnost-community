@@ -11,7 +11,7 @@
    "author": "Ümit Çakmak",
    "license": "ISC",
    "dependencies": {
-      "@agnost/server": "1.4.9",
+      "@agnost/server": "1.4.10",
       "@azure/storage-blob": "12.17.0",
       "@google-cloud/storage": "6.12.0",
       "amqplib": "0.10.3",
