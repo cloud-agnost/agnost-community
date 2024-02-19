@@ -42,7 +42,6 @@ export default function Workspace() {
 	const navigate = useTabNavigate();
 	const { sidebar, toggleWorkspaceTab } = useUtilsStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { getCurrentTab } = useTabStore();
 	const { toast } = useToast();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const [toDeleteData, setToDeleteData] = useState<{
@@ -50,7 +49,6 @@ export default function Workspace() {
 		data: WorkspaceDataType;
 	} | null>(null);
 	const [openInfoModal, setOpenInfoModal] = useState(false);
-	const currentTab = getCurrentTab(versionId);
 	const { t } = useTranslation();
 	const { openEditCacheModal } = useCacheStore();
 	const { getFunction, data } = useStores();
@@ -156,9 +154,7 @@ export default function Workspace() {
 							<SideBarButton
 								key={data._id}
 								id={data._id}
-								active={
-									window.location.pathname.includes(data._id) && item.type === currentTab?.type
-								}
+								active={window.location.pathname.includes(data._id)}
 								onClick={() => handleDataClick(data, item.type)}
 								title={data.name}
 								type={item.type}
@@ -170,7 +166,6 @@ export default function Workspace() {
 											rounded
 											className={cn(
 												window.location.pathname.includes(data._id) &&
-													item.type === currentTab?.type &&
 													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
 												'!p-0 !h-5 hidden group-hover:inline-flex',
 											)}
