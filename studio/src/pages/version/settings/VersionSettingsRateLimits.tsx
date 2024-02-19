@@ -53,6 +53,7 @@ export default function VersionSettingsRateLimits() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
+				className='overflow-auto'
 			>
 				<DataTable<RateLimit> table={table} className='table-fixed' />
 			</VersionTabLayout>

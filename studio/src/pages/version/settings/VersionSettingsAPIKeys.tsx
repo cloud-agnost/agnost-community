@@ -60,6 +60,7 @@ export default function VersionSettingsAPIKeys() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
+				className='overflow-auto'
 			>
 				<DataTable table={table} className='table-fixed' />
 			</VersionTabLayout>
