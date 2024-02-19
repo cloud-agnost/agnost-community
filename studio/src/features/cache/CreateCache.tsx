@@ -1,22 +1,20 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
-import CacheForm from './CacheForm';
+import useCacheStore from '@/store/cache/cacheStore';
 import { APIError, CreateCacheSchema } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import useCacheStore from '@/store/cache/cacheStore';
-import { useMutation } from '@tanstack/react-query';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { useEffect } from 'react';
+import CacheForm from './CacheForm';
 
 export default function CreateCache() {
 	const { t } = useTranslation();
 	const { createCache, isCreateCacheModalOpen, toggleCreateModal } = useCacheStore();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -38,12 +36,6 @@ export default function CreateCache() {
 		mutationFn: createCache,
 		onSuccess: () => {
 			resetAndClose();
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });

@@ -2,36 +2,26 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { TableConfirmation } from '@/components/Table';
 import { BADGE_COLOR_MAP } from '@/constants';
+import { toast } from '@/hooks/useToast';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError, ColumnDefWithClassName, TabTypes, Task } from '@/types';
 import { describeCronExpression, getVersionPermission, translate } from '@/utils';
+import { Calendar } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TabLink } from '../version/Tabs';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { toast } from '@/hooks/useToast';
-import { Calendar } from '@phosphor-icons/react';
 
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();
-const { getEnvironmentResources } = useEnvironmentStore.getState();
 async function deleteHandler(task: Task) {
-	const environment = useEnvironmentStore.getState().environment;
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteTask,
-			onSuccess: () => {
-				getEnvironmentResources({
-					orgId: environment?.orgId,
-					appId: environment?.appId,
-					envId: environment?._id,
-					versionId: environment?.versionId,
-				});
-			},
+
 			onError: (error: APIError) => {
 				toast({
 					title: error.details,

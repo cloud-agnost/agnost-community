@@ -3,17 +3,16 @@ import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useResourceStore from '@/store/resources/resourceStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateDatabaseSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import useVersionStore from '@/store/version/versionStore';
-import { useEffect } from 'react';
 export default function CreateDatabase() {
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
@@ -29,7 +28,6 @@ export default function CreateDatabase() {
 		orgId: string;
 	};
 	const { createDatabase, isCreateDatabaseDialogOpen, toggleCreateModal } = useDatabaseStore();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
@@ -39,12 +37,7 @@ export default function CreateDatabase() {
 		onSuccess: (database) => {
 			toggleCreateModal();
 			form.reset();
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
+
 			navigate({
 				title: database.name,
 				path: getVersionDashboardPath(`database/${database._id}/models`),

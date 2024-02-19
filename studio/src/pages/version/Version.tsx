@@ -12,7 +12,6 @@ import { VersionLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useCacheStore from '@/store/cache/cacheStore';
 import useDatabaseStore from '@/store/database/databaseStore';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
@@ -29,7 +28,6 @@ export default function Version() {
 	const { getVersionById, toggleSearchCommandMenu } = useVersionStore();
 	const { toggleSidebar } = useUtilsStore();
 	const { getAppById, application } = useApplicationStore();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const { deleteCache, closeDeleteCacheModal, toDeleteCache, isDeleteCacheModalOpen } =
 		useCacheStore();
@@ -52,12 +50,6 @@ export default function Version() {
 				versionId: versionId as string,
 			}),
 		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 			closeDeleteStorageModal();
 		},
 	});
@@ -75,12 +67,6 @@ export default function Version() {
 				versionId: toDeleteDatabase.versionId,
 			}),
 		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 			closeDeleteDatabaseModal();
 		},
 	});
@@ -98,12 +84,6 @@ export default function Version() {
 				versionId: versionId as string,
 			}),
 		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 			closeDeleteCacheModal();
 		},
 	});

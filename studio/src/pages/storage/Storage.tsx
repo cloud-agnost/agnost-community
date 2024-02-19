@@ -4,7 +4,6 @@ import { StorageColumns } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
@@ -30,17 +29,10 @@ export default function MainStorage() {
 		dataLength: storages.length,
 		lastFetchedPage,
 	});
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 
 	const { mutateAsync: deleteMultipleStoragesMutation } = useMutation({
 		mutationFn: deleteMultipleStorages,
 		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 			table?.resetRowSelection();
 		},
 		onError: ({ details }: APIError) => {

@@ -1,26 +1,24 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateMessageQueueSchema, TabTypes } from '@/types';
 import { removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
-import { useEffect } from 'react';
 
 export default function CreateMessageQueue() {
 	const { t } = useTranslation();
 	const { createQueue, isCreateQueueModalOpen, toggleCreateModal } = useMessageQueueStore();
 	const navigate = useTabNavigate();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -45,12 +43,6 @@ export default function CreateMessageQueue() {
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.MessageQueue,
-			});
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
 			});
 		},
 		onError: ({ details }: APIError) => {
