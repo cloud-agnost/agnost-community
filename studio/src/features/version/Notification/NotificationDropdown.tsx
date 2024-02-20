@@ -108,9 +108,13 @@ function NotificationItem({ notification }: { notification: Notification }) {
 				<Description description={notification.description} />
 				<div className='text-subtle text-[10px]'>{getRelativeTime(notification.createdAt)}</div>
 			</div>
-			{notificationLastSeen < new Date(notification.createdAt) && (
-				<div className='w-2 h-2 rounded-full bg-elements-blue' />
-			)}
+
+			<div
+				className={cn(
+					'w-2 h-2 rounded-full bg-elements-blue',
+					notificationLastSeen < new Date(notification.createdAt) ? 'visible' : 'invisible',
+				)}
+			/>
 		</div>
 	);
 }
