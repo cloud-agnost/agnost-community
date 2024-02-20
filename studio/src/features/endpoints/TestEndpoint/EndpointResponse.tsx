@@ -103,7 +103,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 					)}
 				</div>
 			</TabsContent>
-			<TabsContent value='console' className='h-full'>
+			<TabsContent value='console' className='h-[calc(100%-4rem)]'>
 				<Logs logs={logs as Log[]} />
 			</TabsContent>
 		</Tabs>
