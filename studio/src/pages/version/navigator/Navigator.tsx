@@ -31,7 +31,6 @@ export default function Navigator() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
-	const [isGridReady, setIsGridReady] = useState(false);
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
 	const { saveColumnState, getColumnState } = useUtilsStore();
 	const {
@@ -110,7 +109,7 @@ export default function Navigator() {
 				dbType: database.type,
 			}),
 		refetchOnWindowFocus: false,
-		enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
+		enabled: modelId === model._id && window.location.pathname.includes(model._id),
 	});
 
 	function onCellEditRequest(event: CellEditRequestEvent) {
@@ -177,7 +176,6 @@ export default function Navigator() {
 	}
 
 	function onGridReady(event: GridReadyEvent) {
-		setIsGridReady(true);
 		event.api.showLoadingOverlay();
 	}
 	const debounceSaveGridColumnState = _.debounce((columnState) => {
@@ -185,15 +183,13 @@ export default function Navigator() {
 	}, 100);
 
 	function onSaveGridColumnState(params: ColumnResizedEvent) {
-		console.log('onSaveGridColumnState', params.type);
 		const columnState = params.columnApi.getColumnState();
-		console.log('columnState', columnState);
 		debounceSaveGridColumnState(columnState);
 	}
 	return (
 		<VersionTabLayout
-			isEmpty={false}
-			type={TabTypes.Field}
+			isEmpty={!data.length}
+			type={TabTypes.Navigator}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
 			loading={false}
