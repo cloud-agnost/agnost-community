@@ -18,8 +18,6 @@ import {
 	FirstDataRenderedEvent,
 	GridReadyEvent,
 } from 'ag-grid-community';
-import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
-import 'ag-grid-community/styles/ag-theme-alpine.css'; // Theme
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
