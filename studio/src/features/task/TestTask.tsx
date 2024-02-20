@@ -73,7 +73,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						</Button>
 					</div>
 					<Separator />
-					<div className='flex-1'>
+					<div className='flex-1 overflow-auto'>
 						<Logs logs={taskLogs?.[taskId as string] as Log[]} />
 					</div>
 				</div>
