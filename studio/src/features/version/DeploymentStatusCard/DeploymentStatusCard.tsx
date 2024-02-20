@@ -32,7 +32,7 @@ export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
 	const canDeploy = useAuthorizeVersion('env.deploy');
-	const { getEnvironmentResources, environment, redeployAppVersionToEnvironment, resources } =
+	const { getEnvironmentResources, environment, redeployAppVersionToEnvironment } =
 		useEnvironmentStore();
 	const { openSelectResourceTypeModal } = useResourceStore();
 	const envStatus = useEnvironmentStatus();
@@ -44,7 +44,7 @@ export default function DeploymentStatusCard() {
 		orgId: string;
 	}>();
 	function handleOpenChange(open: boolean) {
-		if (open && !resources) {
+		if (open) {
 			getEnvironmentResources({
 				orgId: environment?.orgId,
 				appId: environment?.appId,

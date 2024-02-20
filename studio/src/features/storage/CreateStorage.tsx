@@ -1,18 +1,17 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateStorageSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import StorageForm from './StorageForm';
-import useVersionStore from '@/store/version/versionStore';
-import { useEffect } from 'react';
 
 export default function CreateStorage() {
 	const { t } = useTranslation();
@@ -28,16 +27,9 @@ export default function CreateStorage() {
 	const form = useForm<z.infer<typeof CreateStorageSchema>>({
 		resolver: zodResolver(CreateStorageSchema),
 	});
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { mutateAsync: createMutation, isPending } = useMutation({
 		mutationFn: createStorage,
 		onSuccess: (storage) => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
 			onCloseHandler();
 			navigate({
 				title: storage.name,

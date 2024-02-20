@@ -2,7 +2,6 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
 import { toast } from '@/hooks/useToast';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
@@ -14,7 +13,6 @@ import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
 
 const { openEditQueueModal, deleteQueue } = useMessageQueueStore.getState();
-const { getEnvironmentResources } = useEnvironmentStore.getState();
 const queryClient = new QueryClient();
 
 async function deleteHandler(mq: MessageQueue) {
@@ -26,15 +24,6 @@ async function deleteHandler(mq: MessageQueue) {
 				toast({
 					title: error.details,
 					action: 'error',
-				});
-			},
-			onSuccess: () => {
-				const { environment } = useEnvironmentStore.getState();
-				getEnvironmentResources({
-					orgId: environment?.orgId,
-					appId: environment?.appId,
-					envId: environment?._id,
-					versionId: environment?.versionId,
 				});
 			},
 		})

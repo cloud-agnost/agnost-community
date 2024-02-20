@@ -1,7 +1,6 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTaskStore from '@/store/task/taskStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -35,7 +34,6 @@ export default function CreateTask() {
 		orgId: string;
 	}>();
 	const { getResources } = useResourceStore();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 
 	useEffect(() => {
 		if (isCreateTaskModalOpen) {
@@ -57,12 +55,7 @@ export default function CreateTask() {
 				isDashboard: false,
 				type: TabTypes.Task,
 			});
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
+
 			handleClose();
 		},
 		onError: ({ details }: APIError) => {
