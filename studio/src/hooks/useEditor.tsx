@@ -64,6 +64,9 @@ import { useDebounceFn } from '.';
 import { SURROUND_MENU_ITEMS } from '@/constants';
 import { useSearchParams } from 'react-router-dom';
 export const EDITOR_OPTIONS: EditorProps['options'] = {
+	minimap: {
+		enabled: false,
+	},
 	quickSuggestions: {
 		strings: true,
 		other: true,
@@ -78,8 +81,8 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	lineNumbersMinChars: 3,
 	scrollBeyondLastLine: false,
 	scrollbar: {},
-	renderLineHighlight: 'all', //Enable rendering of current line highlight
-	folding: true, //Enable code folding
+	renderLineHighlight: 'all',
+	folding: true,
 	codeLens: true,
 	unicodeHighlight: {
 		allowedLocales: {
