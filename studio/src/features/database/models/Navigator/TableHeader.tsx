@@ -7,7 +7,7 @@ import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Field, FieldTypes } from '@/types';
 import { cn } from '@/utils';
-import { CaretUp, FunnelSimple } from '@phosphor-icons/react';
+import { CaretUp, FunnelSimple, X } from '@phosphor-icons/react';
 import { IHeaderParams } from 'ag-grid-community';
 import _ from 'lodash';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -97,7 +97,13 @@ export default function TableHeader({ className, field, filterable }: SortButton
 					<PopoverContent align='center' className='p-2 bg-subtle min-w-[210px]'>
 						<div className='space-y-4'>
 							{!_.isNil(selectedFilter) && (
-								<Button size='full' onClick={() => clearColumnFilter(field?.name as string)}>
+								<Button
+									size='full'
+									onClick={() => clearColumnFilter(field?.name as string)}
+									variant='text'
+									className='items-center'
+								>
+									<X size={14} className='mr-2' />
 									Clear Filter
 								</Button>
 							)}
