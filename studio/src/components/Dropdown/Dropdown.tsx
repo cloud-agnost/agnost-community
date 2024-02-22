@@ -96,12 +96,10 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 		checked={checked}
 		{...props}
 	>
-		<span>
-			<DropdownMenuPrimitive.ItemIndicator>
-				<Check className='h-4 w-4' />
-			</DropdownMenuPrimitive.ItemIndicator>
-		</span>
 		{children}
+		<DropdownMenuPrimitive.ItemIndicator>
+			<Check className='h-4 w-4' />
+		</DropdownMenuPrimitive.ItemIndicator>
 	</DropdownMenuPrimitive.CheckboxItem>
 ));
 DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
