@@ -1,7 +1,7 @@
 .alert {
 	@apply relative  border border-transparent flex items-center justify-center w-full;
 	&-title {
-		@apply text-default font-semibold [&_p]:leading-tight;
+		@apply text-default text-sm font-semibold [&_p]:leading-tight;
 	}
 	&-md {
 		&.alert {
@@ -46,6 +46,6 @@
 	}
 
 	&-description {
-		@apply text-sm text-subtle [&_p]:leading-relaxed font-sfCompact;
+		@apply text-xs text-subtle [&_p]:leading-relaxed font-sfCompact;
 	}
 }
