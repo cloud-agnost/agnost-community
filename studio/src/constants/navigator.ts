@@ -162,8 +162,8 @@ export const BOOLEAN_FILTERS = [
 ];
 
 export const GeoPointFilterTypes = [
-	{ label: 'Distance Greater than', value: 'distanceLessThan' },
-	{ label: 'Distance Less than', value: 'distanceGreaterThan' },
+	{ label: 'Distance Greater than', value: 'distanceGreaterThan' },
+	{ label: 'Distance Less than', value: 'distanceLessThan' },
 ];
 
 export const MONGODB_FILTERS = [
