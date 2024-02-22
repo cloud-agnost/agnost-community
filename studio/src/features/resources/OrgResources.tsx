@@ -45,6 +45,7 @@ export default function OrgResources() {
 		mutateAsync: deleteMutate,
 		isPending: deleteLoading,
 		error,
+		reset,
 	} = useMutation({
 		mutationFn: deleteResource,
 		mutationKey: ['deleteResource'],
@@ -99,7 +100,10 @@ export default function OrgResources() {
 					})
 				}
 				isOpen={isDeletedResourceModalOpen}
-				closeModal={closeDeleteResourceModal}
+				closeModal={() => {
+					reset();
+					closeDeleteResourceModal();
+				}}
 				loading={deleteLoading}
 				error={error}
 				closable
