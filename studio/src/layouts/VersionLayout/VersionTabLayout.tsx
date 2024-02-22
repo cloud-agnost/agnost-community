@@ -7,7 +7,7 @@ import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { TabTypes } from '@/types';
 import { cn } from '@/utils';
-import { Plus } from '@phosphor-icons/react';
+import { Download, Plus, Upload } from '@phosphor-icons/react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
@@ -54,6 +54,36 @@ export default function VersionTabLayout({
 	function onClearHandler() {
 		searchParams.delete('q');
 		setSearchParams(searchParams);
+	}
+
+	function buttonContent() {
+		switch (type) {
+			case TabTypes.NPMPackages:
+				return (
+					<>
+						<Download size={14} />
+						{t('version.npm.install')}
+					</>
+				);
+				break;
+			case TabTypes.File:
+				return (
+					<>
+						<Upload size={14} />
+						{t('storage.file.upload')}
+					</>
+				);
+				break;
+			default:
+				return (
+					<>
+						<Plus size={14} />
+						{t('general.module_create', {
+							module: type,
+						})}
+					</>
+				);
+		}
 	}
 
 	let content;
@@ -127,15 +157,13 @@ export default function VersionTabLayout({
 						) : null}
 						{handlerButton}
 						{!!openCreateModal && (
-							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
-								<Plus size={14} />
-								<span className='ml-1'>
-									{type === TabTypes.NPMPackages
-										? t('version.npm.install')
-										: t('general.module_create', {
-												module: type,
-											})}
-								</span>
+							<Button
+								variant='primary'
+								onClick={openCreateModal}
+								disabled={disabled}
+								className='gap-2'
+							>
+								{buttonContent()}
 							</Button>
 						)}
 					</div>
