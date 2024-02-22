@@ -165,7 +165,10 @@ export default function EditVersionAndReplica() {
 				)}
 				<div className='flex justify-end'>
 					<Button className='ml-2' size='lg' loading={isPending} type='submit'>
-						{t('general.save')}
+						{form.watch('instance') === ResourceInstances.RabbitMQ ||
+						form.watch('type') === ResourceType.Cache
+							? t('resources.update_version')
+							: t('resources.update_replica_and_version')}
 					</Button>
 				</div>
 			</form>
