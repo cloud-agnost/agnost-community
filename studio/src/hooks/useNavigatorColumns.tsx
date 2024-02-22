@@ -54,13 +54,9 @@ export default function useNavigatorColumns() {
 				field.type !== FieldTypes.OBJECT &&
 				field.type !== FieldTypes.OBJECT_LIST &&
 				!field.immutable,
-			filter: true,
-			headerComponentParams: { text: field.name, field: field.name },
+			headerComponentParams: { field: field, filterable: field.indexed },
 			maxWidth:
-				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB
-					? 75
-					: undefined,
-			width: 200,
+				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 75 : 1000,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:
@@ -82,7 +78,6 @@ export default function useNavigatorColumns() {
 			},
 			cellDataType: CellTypeMap[field.type],
 			valueFormatter: (params) => valueFormatter(params, field),
-			resizable: true,
 		}));
 		return [NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]];
 	}, [fields]);
