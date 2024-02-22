@@ -161,6 +161,16 @@ export default function Navigator() {
 		}
 	}, [isFetching, gridRef.current]);
 
+	useEffect(() => {
+		if (!_.isNil(gridRef.current?.api)) {
+			if (data.length === 0 && !isFetching) {
+				gridRef.current.api.showNoRowsOverlay();
+			} else {
+				gridRef.current.api.hideOverlay();
+			}
+		}
+	}, [data, gridRef.current, isFetching]);
+
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
@@ -186,7 +196,7 @@ export default function Navigator() {
 	}
 	return (
 		<VersionTabLayout
-			isEmpty={!data.length}
+			isEmpty={false}
 			type={TabTypes.Navigator}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
@@ -230,6 +240,7 @@ export default function Navigator() {
 					overlayLoadingTemplate={
 						'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 					}
+					overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 					onRowSelected={() =>
 						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
