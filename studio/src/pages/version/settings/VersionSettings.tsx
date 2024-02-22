@@ -10,7 +10,7 @@ export default function VersionSettings() {
 	return (
 		<SettingsLayout
 			navbar={!isSidebarOpen && <SettingsNavbar items={VERSION_SETTINGS_MENU_ITEMS} />}
-			className={cn('full-max-height-without-header', isSidebarOpen && 'block')}
+			className={cn('full-height-without-header-and-tab ')}
 		>
 			<Outlet />
 		</SettingsLayout>
