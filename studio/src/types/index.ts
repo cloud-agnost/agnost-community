@@ -34,6 +34,7 @@ export {
 	ResourceCreateType,
 	ResourceInstances,
 	ResourceType,
+	ResourceUpdateType,
 } from './resource.ts';
 export * from './schema.ts';
 export type * from './storage.ts';
@@ -43,4 +44,4 @@ export { CreateTaskSchema } from './task.ts';
 export type * from './type.ts';
 export { OAuthProviderTypes, PhoneAuthSMSProviders, SMTPSchema } from './type.ts';
 export type * from './version.ts';
-export { TabTypes, TemplateTypes, EnvVariableSchema } from './version.ts';
+export { EnvVariableSchema, TabTypes, TemplateTypes } from './version.ts';
