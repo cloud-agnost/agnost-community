@@ -52,6 +52,7 @@ export default function VersionSettingsEnvironmentVariables() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
+				className='overflow-auto'
 			>
 				<DataTable table={table} className='table-fixed' />
 			</VersionTabLayout>

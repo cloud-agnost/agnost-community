@@ -51,6 +51,7 @@ export default function VersionSettingsNPMPackages() {
 				onClearSelected={() => table.toggleAllRowsSelected(false)}
 				disabled={!canCreate}
 				loading={false}
+				className='overflow-auto'
 			>
 				<DataTable<NPMPackage> table={table} className='table-fixed' />
 			</VersionTabLayout>
