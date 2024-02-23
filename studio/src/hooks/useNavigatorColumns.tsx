@@ -54,7 +54,12 @@ export default function useNavigatorColumns() {
 				field.type !== FieldTypes.OBJECT &&
 				field.type !== FieldTypes.OBJECT_LIST &&
 				!field.immutable,
-			headerComponentParams: { field: field, filterable: field.indexed },
+			headerComponentParams: {
+				field: field.type,
+				text: field.name,
+				filterable: field.indexed,
+				selectList: field.enum?.selectList,
+			},
 			maxWidth:
 				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 75 : 1000,
 			cellEditor: NavigatorCellEditorMap[field.type],

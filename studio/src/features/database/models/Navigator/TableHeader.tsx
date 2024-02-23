@@ -5,7 +5,7 @@ import { useColumnFilter } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { Field, FieldTypes } from '@/types';
+import { FieldTypes } from '@/types';
 import { cn } from '@/utils';
 import { CaretUp, FunnelSimple, X } from '@phosphor-icons/react';
 import { IHeaderParams } from 'ag-grid-community';
@@ -13,13 +13,21 @@ import _ from 'lodash';
 import { useLocation, useSearchParams } from 'react-router-dom';
 interface SortButtonProps extends IHeaderParams {
 	className?: string;
-	field?: Field;
-	filterable: boolean;
+	field?: FieldTypes;
+	text: string;
+	filterable?: boolean;
+	selectList?: string[];
 }
 
-export default function TableHeader({ className, field, filterable }: SortButtonProps) {
+export default function TableHeader({
+	className,
+	field,
+	text,
+	filterable,
+	selectList,
+}: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { selectedFilter } = useColumnFilter(field?.name as string, field?.type as FieldTypes);
+	const { selectedFilter } = useColumnFilter(text as string, field as FieldTypes);
 	const { updateCurrentTab } = useTabStore();
 	const { version } = useVersionStore();
 	const { pathname } = useLocation();
@@ -29,11 +37,11 @@ export default function TableHeader({ className, field, filterable }: SortButton
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');
 		let newDirection = defaultDirection;
-		if (currentField === field?.name) {
+		if (currentField === text) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
 
-		searchParams.set('f', field?.name as string);
+		searchParams.set('f', text as string);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {
@@ -44,15 +52,9 @@ export default function TableHeader({ className, field, filterable }: SortButton
 	};
 
 	function getFilterComponent() {
-		const Comp = CellFilterMap[field?.type as FieldTypes];
+		const Comp = CellFilterMap[field as FieldTypes];
 		if (Comp) {
-			return (
-				<Comp
-					type={field?.type}
-					columnName={field?.name}
-					options={field?.enum?.selectList as string[]}
-				/>
-			);
+			return <Comp type={field} columnName={name} options={selectList as string[]} />;
 		}
 		return null;
 	}
@@ -65,8 +67,8 @@ export default function TableHeader({ className, field, filterable }: SortButton
 				size='sm'
 				className={cn('justify-start w-full h-full', className)}
 			>
-				<p className='truncate'>{field?.name}</p>
-				{searchParams.get('f') === field?.name && (
+				<p className='truncate'>{text}</p>
+				{searchParams.get('f') === text && (
 					<div className='ml-2'>
 						<CaretUp
 							size={14}
@@ -79,7 +81,7 @@ export default function TableHeader({ className, field, filterable }: SortButton
 				)}
 			</Button>
 
-			{CellFilterMap[field?.type as FieldTypes] && filterable && (
+			{CellFilterMap[field as FieldTypes] && filterable && (
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -99,7 +101,7 @@ export default function TableHeader({ className, field, filterable }: SortButton
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
-									onClick={() => clearColumnFilter(field?.name as string)}
+									onClick={() => clearColumnFilter(text as string)}
 									variant='text'
 									className='items-center'
 								>
