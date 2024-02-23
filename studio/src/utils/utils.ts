@@ -13,7 +13,6 @@ import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
-import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, RealtimeData } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
