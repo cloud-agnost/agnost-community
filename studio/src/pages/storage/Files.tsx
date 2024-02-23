@@ -96,7 +96,6 @@ export default function Files() {
 		onSuccess: () => {
 			gridRef.current?.api.deselectAll();
 			refetch();
-			setSelectedRowCount(0);
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
@@ -136,6 +135,7 @@ export default function Files() {
 	}
 
 	function onGridReady(event: GridReadyEvent) {
+		event.api.showLoadingOverlay();
 		event.api.sizeColumnsToFit();
 	}
 
