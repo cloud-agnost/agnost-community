@@ -27,8 +27,8 @@ function generateQuery({
 
 	if (filterType === Filters.GeoPoint) {
 		query[queryKeys[0]] = [
-			columnName,
-			{ $distance: [{ $point: condition.filter }, condition.filterFrom] },
+			{ $distance: [{ $point: condition.filter }, columnName] },
+			condition.filterFrom,
 		];
 		return query;
 	}
