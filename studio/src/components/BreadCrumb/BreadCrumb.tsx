@@ -26,7 +26,7 @@ export default function BreadCrumb({ className, items }: BreadCrumbProps) {
 				{filteredItems.map((item, index) => {
 					const Component = item.url ? Button : 'span';
 					return (
-						<Fragment key={item.name}>
+						<Fragment key={`${item.name}-${index}`}>
 							<Component
 								variant='blank'
 								size='sm'
