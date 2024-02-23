@@ -13,6 +13,7 @@ import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, RealtimeData } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
@@ -507,5 +508,17 @@ export function isElementInViewport(el: Element) {
 		rect.left >= 0 &&
 		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
 		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+	);
+}
+
+export function isWithinParentBounds(el: Element, parent: Element) {
+	const elRect = el.getBoundingClientRect();
+	const parentRect = parent.getBoundingClientRect();
+
+	return (
+		elRect.top >= parentRect.top &&
+		elRect.left >= parentRect.left &&
+		elRect.bottom <= parentRect.bottom &&
+		elRect.right <= parentRect.right
 	);
 }
