@@ -66,7 +66,7 @@ const Schema = z.object({
 	}),
 	domain: z
 		.object({
-			type: z.enum(AUTHORIZATION_OPTIONS).default('all'),
+			type: z.enum(AUTHORIZATION_OPTIONS),
 			list: z.array(
 				z.object({
 					domain: z
