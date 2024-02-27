@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import useTabStore from '@/store/version/tabStore';
 import { BucketCountInfo } from '@/types';
 import { CaretDoubleLeft, CaretDoubleRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import _ from 'lodash';
 import { useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -54,15 +55,15 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	);
 
 	function formatNumber(number: number) {
-		if (!number) return;
-		if (number < 1000) return number;
-		return number.toLocaleString('en-US', {
+		if (_.isNil(number)) return;
+		const total = number === 0 ? number + 1 : number;
+		if (total < 1000) return total;
+		return total.toLocaleString('en-US', {
 			maximumFractionDigits: 2,
 			notation: 'standard',
 			compactDisplay: 'short',
 		});
 	}
-
 	return (
 		<div className='flex items-center justify-end mt-4 gap-2'>
 			<div className='flex items-center space-x-2'>
