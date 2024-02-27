@@ -91,7 +91,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='hidden h-8 w-8 p-0 lg:flex'
 					onClick={goToFirstPage}
-					disabled={!countInfo?.currentPage}
+					disabled={countInfo?.currentPage === 1}
 				>
 					<span className='sr-only'>Go to first page</span>
 					<CaretDoubleLeft className='h-4 w-4' />
@@ -102,7 +102,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='h-8 w-8 p-0'
 					onClick={goToPreviousPage}
-					disabled={!countInfo?.currentPage}
+					disabled={countInfo?.currentPage === 1}
 				>
 					<span className='sr-only'>Go to previous page</span>
 					<CaretLeft className='h-4 w-4' />
