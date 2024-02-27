@@ -106,7 +106,7 @@ export default function Files() {
 	const { mutateAsync: uploadFileMutation, isPending: uploadLoading } = useMutation({
 		mutationFn: (files: FileList | null) =>
 			uploadFileToBucket({
-				bckId: bucket?.id as string,
+				bckId: bucket?.id,
 				storageName: storage?.name,
 				bucketName: bucket?.name,
 				isPublic: true,
@@ -117,6 +117,7 @@ export default function Files() {
 		onSuccess: () => {
 			toast({ action: 'success', title: t('storage.upload_success') as string });
 			useStorageStore.setState({ uploadProgress: 0 });
+			refetch();
 		},
 		onError: (error: APIError) => {
 			toast({ action: 'error', title: error.details });

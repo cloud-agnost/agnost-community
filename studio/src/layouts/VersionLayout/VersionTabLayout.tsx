@@ -65,7 +65,6 @@ export default function VersionTabLayout({
 						{t('version.npm.install')}
 					</>
 				);
-				break;
 			case TabTypes.File:
 				return (
 					<>
@@ -73,7 +72,6 @@ export default function VersionTabLayout({
 						{t('storage.file.upload')}
 					</>
 				);
-				break;
 			default:
 				return (
 					<>
@@ -107,15 +105,13 @@ export default function VersionTabLayout({
 					})}
 				>
 					{openCreateModal ? (
-						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
-							<Plus size={16} />
-							<span className='ml-2'>
-								{type === TabTypes.NPMPackages
-									? t('version.npm.install')
-									: t('general.module_create', {
-											module: type,
-										})}
-							</span>
+						<Button
+							variant='primary'
+							onClick={openCreateModal}
+							disabled={disabled}
+							className='gap-2'
+						>
+							{buttonContent()}
 						</Button>
 					) : (
 						handlerButton
