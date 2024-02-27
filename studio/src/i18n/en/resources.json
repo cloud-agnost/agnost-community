@@ -112,5 +112,8 @@
 	"version": "Version",
 	"select_version": "Select Version",
 	"invalid_name": "Resource names can include only numbers, lowercase letters and '-' characters",
-	"edit_success": "Resource updated successfully"
+	"edit_success": "Resource updated successfully",
+	"update_size": "Update Size",
+	"update_version": "Update Version",
+	"update_replica_and_version": "Update Replica and Version"
 }

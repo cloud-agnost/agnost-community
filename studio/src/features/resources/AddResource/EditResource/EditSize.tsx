@@ -106,7 +106,7 @@ export default function EditSize() {
 					)}
 				/>
 				<Button className='ml-2' size='lg' loading={isPending} type='submit'>
-					{t('general.save')}
+					{t('resources.update_size')}
 				</Button>
 			</form>
 		</Form>
