@@ -642,3 +642,8 @@ export interface DeleteResourceRequest {
 	resourceId: string;
 	orgId: string;
 }
+
+export enum ResourceUpdateType {
+	Size = 'size',
+	Others = 'others',
+}

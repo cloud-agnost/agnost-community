@@ -3,7 +3,7 @@ import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
-import { APIError, CreateResourceSchema } from '@/types';
+import { APIError, CreateResourceSchema, ResourceUpdateType } from '@/types';
 import { isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -67,7 +67,7 @@ export default function EditSize() {
 	function onSubmit(data: z.infer<typeof CreateResourceSchema>) {
 		updateResourceMutate({
 			orgId,
-			updateType: 'others',
+			updateType: ResourceUpdateType.Size,
 			resourceId: resourceToEdit?._id,
 			...data,
 		});
