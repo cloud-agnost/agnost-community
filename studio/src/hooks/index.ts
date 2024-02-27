@@ -17,3 +17,4 @@ export { default as useUpdateEffect } from './useUpdateEffect.tsx';
 export { default as useUpdateVersion } from './useUpdateVersion.tsx';
 export { default as useVersionDropdownItems } from './useVersionDropdownItems.tsx';
 export { default as useStores } from './useStores.tsx';
+export { default as useColumnFilter } from './useColumnFilter.tsx';

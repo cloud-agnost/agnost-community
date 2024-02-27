@@ -16,6 +16,7 @@ export { MiddlewareSchema } from './middleware.ts';
 export type * from './model.ts';
 export { FieldTypes } from './model.ts';
 export type * from './navigator.ts';
+export { ConditionsType, Filters, Operators } from './navigator.ts';
 export type * from './organization.ts';
 export { CreateOrganizationSchema } from './organization.ts';
 export type * from './queue.ts';

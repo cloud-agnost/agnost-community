@@ -17,11 +17,17 @@ export default class NavigatorService {
 			?.iid}/agnost/database/${dbName}/model/${modelName}`;
 	}
 
-	static async getDataFromModel({ ...params }: GetDataFromModelParams) {
+	static async getDataFromModel({ filter, ...params }: GetDataFromModelParams) {
 		return (
-			await http.get(this.getUrl(), {
-				params,
-			})
+			await http.post(
+				this.getUrl(),
+				{
+					filter,
+				},
+				{
+					params,
+				},
+			)
 		).data;
 	}
 
