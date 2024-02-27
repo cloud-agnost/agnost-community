@@ -24,6 +24,7 @@ const dirname = path.dirname(filename);
 
 var childManager = null;
 var childProcess = null;
+
 // If this is the primary process then fork a child process
 if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
@@ -64,6 +65,7 @@ if (cluster.isPrimary) {
 	connectToDatabase();
 	// Connect to message queue
 	connectToQueue(false);
+
 	// Connect to cache server(s)
 	await connectToRedisCache();
 	// Create the child process manager which will set up the API server
@@ -116,10 +118,19 @@ async function finalizePrimaryProcessStartup() {
 
 	// Fork child process
 	childProcess = cluster.fork();
+	childProcess.on("message", (message) => {
+		if (message === "updating") global.childProcessStatus = "updating";
+		else if (message === "ready") global.childProcessStatus = "ready";
+	});
 
 	cluster.on("exit", function (worker, code, signal) {
 		logger.warn(`Child process ${worker.process.pid} died`);
 		childProcess = cluster.fork();
+
+		childProcess.on("message", (message) => {
+			if (message === "updating") global.childProcessStatus = "updating";
+			else if (message === "ready") global.childProcessStatus = "ready";
+		});
 	});
 
 	// In production environment we do not need to check for heartbeat, kubernetes will restart the process if it is unresponsive

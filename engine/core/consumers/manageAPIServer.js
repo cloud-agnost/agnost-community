@@ -57,6 +57,7 @@ export const manageAPIServerHandler = (connection, envId) => {
 							msgObj.subAction === "save-email-auth" ||
 							updateCount >= config.get("general.maxUpdatesBeforeRestart")
 						) {
+							await waitUntilChildProcessIsReady();
 							await manager.initializeCore();
 							// Restart worker(s)
 							for (const worker of Object.values(cluster.workers)) {
@@ -66,7 +67,9 @@ export const manageAPIServerHandler = (connection, envId) => {
 							// Reset update count
 							updateCount = 0;
 						} else {
+							await waitUntilChildProcessIsReady();
 							await manager.initializeCore();
+
 							// Send a message from the master process to the worker.
 							for (const worker of Object.values(cluster.workers)) {
 								worker.send("restart");
@@ -87,3 +90,26 @@ export const manageAPIServerHandler = (connection, envId) => {
 		);
 	});
 };
+
+async function waitUntilChildProcessIsReady() {
+	return new Promise(async (resolve, reject) => {
+		if (childProcessStatus === "ready") {
+			return resolve();
+		}
+
+		const start = Date.now();
+		const sleepInterval = config.get(
+			"general.childReadinessWaitSleepInternalMs"
+		);
+
+		while (
+			Date.now() - start <
+			config.get("general.childProcessReadyTimeoutSeconds") * 1000
+		) {
+			if (childProcessStatus === "ready") return resolve();
+			await helper.sleep(sleepInterval);
+		}
+
+		resolve();
+	});
+}

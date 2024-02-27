@@ -19,6 +19,7 @@ export const logRequest = (endpoint) => (req, res, time) => {
 		}`
 	);
 
+	const debugChannel = req.header("Agnost-Session");
 	// Calculate size of the request and response body, if they are larger than certain size we do not log their content
 	const conn = getDBClient();
 	const reqBodySize = Buffer.byteLength(JSON.stringify(req.body));
@@ -50,6 +51,7 @@ export const logRequest = (endpoint) => (req, res, time) => {
 			resBodySize > config.get("general.maxLogPayloadSizeKB") * 1024
 				? t("Payload too large to lostoreg")
 				: res.body,
+		debug: debugChannel ? true : false,
 	};
 
 	// Save log to the database

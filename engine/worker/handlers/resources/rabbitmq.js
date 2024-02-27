@@ -8,6 +8,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 
 const group = "rabbitmq.com";
 const version = "v1beta1";
@@ -148,4 +149,22 @@ export async function deleteRabbitmqCluster(clusterName, userName) {
     }
 
     return "success";
+}
+
+export async function restartRabbitMQ(resourceName) {
+    try {
+        const sts = await k8sAppsApi.readNamespacedStatefulSet(resourceName + "-server", namespace);
+
+        // Increment the revision in the deployment template to trigger a rollout
+        sts.body.spec.template.metadata.annotations = {
+            ...sts.body.spec.template.metadata.annotations,
+            "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
+        };
+
+        await k8sAppsApi.replaceNamespacedStatefulSet(resourceName + "-server", namespace, sts.body);
+        console.log(`Rollout restart ${resourceName} initiated successfully.`);
+    } catch (error) {
+        console.error("Error restarting resource:", error.body);
+        throw new AgnostError(error.body?.message);
+    }
 }

@@ -597,6 +597,13 @@ function escapeStringRegexp(text) {
 	return text.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
 
+// Function to simulate sleep
+function sleep(ms) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
 export default {
 	generateSlug,
 	generateFileName,
@@ -631,4 +638,5 @@ export default {
 	createSession,
 	deleteSession,
 	escapeStringRegexp,
+	sleep,
 };

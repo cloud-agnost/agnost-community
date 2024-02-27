@@ -91,6 +91,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 				this.addLog(
 					t("API server has the latest configuration, no changes applied")
 				);
+				this.addLog(t("********* MANAGER PROCESS END *********"));
 				// Send the deployment telemetry information to the platform
 				// await this.sendEnvironmentLogs("OK");
 				return;

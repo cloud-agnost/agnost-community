@@ -114,7 +114,10 @@ export const submitTask = (payload) => {
 		);
 
 		channel.sendToQueue(
-			`process-task-${payload.envId}-${payload.taskName}-${randNumber}`,
+			`process-task-${payload.envId}-${payload.taskName.replaceAll(
+				" ",
+				"-"
+			)}-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

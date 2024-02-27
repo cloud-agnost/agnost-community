@@ -8,6 +8,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 
 const group = "mongodbcommunity.mongodb.com";
 const version = "v1";
@@ -16,6 +17,41 @@ const plural = "mongodbcommunity";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function calculateLogStorageSize(storageSize) {
+    // Parse the storage size and unit
+    const [, size, unit] = storageSize.match(/(\d+)([A-Za-z]+)/);
+
+    // Convert the size to bytes
+    let bytes = parseInt(size);
+    switch (unit.toLowerCase()) {
+        case "ki":
+            bytes *= 1024;
+            break;
+        case "mi":
+            bytes *= Math.pow(1024, 2);
+            break;
+        case "gi":
+            bytes *= Math.pow(1024, 3);
+            break;
+        // Default to bytes if the unit is not recognized
+        default:
+            break;
+    }
+
+    const twentyPercent = 0.2 * bytes;
+
+    // Format the result back to the original unit
+    if (twentyPercent >= Math.pow(1024, 3)) {
+        return `${Math.ceil(twentyPercent / Math.pow(1024, 3))}Gi`;
+    } else if (twentyPercent >= Math.pow(1024, 2)) {
+        return `${Math.ceil(twentyPercent / Math.pow(1024, 2))}Mi`;
+    } else if (twentyPercent >= 1024) {
+        return `${Math.ceil(twentyPercent / 1024)}Ki`;
+    } else {
+        return `${Math.ceil(twentyPercent)}`;
+    }
+}
 
 export async function createMongoDBResource(mongoName, mongoVersion, size, userName, passwd, replicaCount) {
     const manifest = fs.readFileSync(`${__dirname}/manifests/mongodbcommunity.yaml`, "utf8");
@@ -41,6 +77,9 @@ export async function createMongoDBResource(mongoName, mongoVersion, size, userN
                     resource.spec.statefulSet.spec.selector.matchLabels.app = mongoName + "-svc";
                     resource.spec.statefulSet.spec.template.metadata.labels.app = mongoName + "-svc";
                     resource.spec.statefulSet.spec.volumeClaimTemplates[0].spec.resources.requests.storage = size;
+                    const logStorageSize = calculateLogStorageSize(size);
+                    resource.spec.statefulSet.spec.volumeClaimTemplates[1].spec.resources.requests.storage =
+                        logStorageSize;
                     await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
                     break;
                 default:
@@ -63,7 +102,7 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
             members: replicaCount,
         },
     };
-    const pvcPatch = {
+    const dataPvcPatch = {
         spec: {
             resources: {
                 requests: {
@@ -72,6 +111,8 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
             },
         },
     };
+    const logStorageSize = calculateLogStorageSize(size);
+    const logPvcPatch = { spec: { resources: { requests: { storage: logStorageSize } } } };
     const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
 
     try {
@@ -93,10 +134,11 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
         pvcList.body.items.forEach(async (pvc) => {
             var pvcName = pvc.metadata.name;
             if (pvcName.includes("data-volume-" + mongoName + "-")) {
+                console.log("Updating data volume");
                 await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
                     pvcName,
                     namespace,
-                    pvcPatch,
+                    dataPvcPatch,
                     undefined,
                     undefined,
                     undefined,
@@ -104,7 +146,21 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
                     undefined,
                     requestOptions
                 );
-                // console.log("PersistentVolumeClaim " + pvcName + " updated...");
+                console.log("PersistentVolumeClaim " + pvcName + " updated...", size);
+            } else if (pvcName.includes("logs-volume-" + mongoName + "-")) {
+                console.log("Updating logs volume");
+                await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
+                    pvcName,
+                    namespace,
+                    logPvcPatch,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    requestOptions
+                );
+                console.log("PersistentVolumeClaim " + pvcName + " updated...", logStorageSize);
             }
         });
     } catch (error) {
@@ -145,4 +201,22 @@ export async function deleteMongoDBResource(mongoName) {
     }
 
     return "success";
+}
+
+export async function restartMongoDB(resourceName) {
+    try {
+        const sts = await k8sAppsApi.readNamespacedStatefulSet(resourceName, namespace);
+
+        // Increment the revision in the deployment template to trigger a rollout
+        sts.body.spec.template.metadata.annotations = {
+            ...sts.body.spec.template.metadata.annotations,
+            "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
+        };
+
+        await k8sAppsApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+        // console.log(`Rollout restart ${resourceName} initiated successfully.`);
+    } catch (error) {
+        console.error("Error restarting resource:", resourceName, error);
+        throw new AgnostError(error.body?.message);
+    }
 }

@@ -51,6 +51,9 @@ export const manageResourceHandler = (connection, queue) => {
                     case "restart":
                         result = await manager.restartAPIServer();
                         break;
+                    case "restart-managed":
+                        result = await manager.restartManagedResource();
+                        break;
                     default:
                         // Not a supported operation type
                         channel.ack(msg);

@@ -107,6 +107,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
+		// Send message to master process
+		process.send("updating");
+
 		// Reset deployment status
 		this.overallStatus = "OK";
 		this.addLog(t("********* CHILD PROCESS INIT START *********"));
@@ -116,11 +119,18 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		if (!envObj) {
 			// Initialize express server
 			await this.initExpressServer();
-			// We completed server initialization and can accept incoming requests
-			global.SERVER_STATUS = "running";
 
 			// Spin up the express server
 			await this.startExpressServer();
+
+			this.addLog(t("********* CHILD PROCESS INIT END *********"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs(this.overallStatus);
+
+			// We completed server initialization and can accept incoming requests
+			global.SERVER_STATUS = "running";
+			// Send message to master process
+			// process.send("ready");
 			return;
 		}
 
@@ -138,6 +148,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
+
 		// Spin up the express server
 		await this.startExpressServer();
 
@@ -166,6 +177,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
+
+		// Send message to master process
+		process.send("ready");
 	}
 
 	/**
@@ -173,6 +187,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * can update an API server faster
 	 */
 	async restartCore() {
+		// Send message to master process
+		process.send("updating");
+
 		// Reset deployment status
 		this.overallStatus = "OK";
 		this.addLog(t("********* CHILD PROCESS RESTART *********"));
@@ -215,11 +232,18 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		if (!envObj) {
 			// Initialize express server
 			await this.initExpressServer();
-			// We completed server initialization and can accept incoming requests
-			global.SERVER_STATUS = "running";
 
 			// Spin up the express server
 			await this.startExpressServer();
+
+			this.addLog(t("********* CHILD PROCESS INIT END *********"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs(this.overallStatus);
+
+			// We completed server initialization and can accept incoming requests
+			global.SERVER_STATUS = "running";
+			// Send message to master process
+			// process.send("ready");
 			return;
 		}
 
@@ -266,6 +290,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
+
+		// Send message to master process
+		process.send("ready");
 	}
 
 	/**
@@ -383,7 +410,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Adds the endpoints and associated middlewares of the API server as routes to the express server app
 	 */
 	async manageEndpoints() {
-		// Add the default system endpoings
+		// Add the default system endpoints
 		await this.initializeDefaultEndpoints();
 
 		// First load the endpoints configuration file
