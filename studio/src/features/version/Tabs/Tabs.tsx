@@ -5,7 +5,7 @@ import { useStores, useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab, TabTypes } from '@/types';
-import { formatCode, generateId, isElementInViewport, reorder } from '@/utils';
+import { formatCode, generateId, isWithinParentBounds, reorder } from '@/utils';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -57,16 +57,17 @@ export default function Tabs() {
 			const selectedTab = scrollContainer?.current?.querySelector('[data-active=true]');
 			const firstElement = scrollContainer?.current?.querySelector('.tab-item');
 			const sidebar = document.getElementById('side-navigation');
+			const elRect = firstElement?.getBoundingClientRect();
 			if (
 				selectedTab &&
-				!isElementInViewport(selectedTab) &&
-				firstElement?.getBoundingClientRect()
+				scrollContainer.current &&
+				!isWithinParentBounds(selectedTab, scrollContainer.current) &&
+				elRect
 			) {
-				// if sidebar is open, scroll to the left of the selected tab
 				scrollContainer?.current?.scrollBy({
 					left:
 						selectedTab?.getBoundingClientRect().left -
-						firstElement?.getBoundingClientRect()?.width -
+						elRect?.width -
 						(sidebar?.getBoundingClientRect()?.width ?? 0),
 					behavior: 'smooth',
 				});
