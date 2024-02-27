@@ -64,7 +64,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						})}
 					</DrawerTitle>
 				</DrawerHeader>
-				<div className='flex-1 p-6 space-y-6 h-full flex flex-col'>
+				<div className='p-4 space-y-6 flex flex-col flex-1 h-full overflow-auto'>
 					<APIServerAlert />
 					<div className='flex items-center justify-between'>
 						<span className='text-sm font-semibold text-default'>{task.name}</span>
