@@ -104,7 +104,6 @@ export default function EditVersionAndReplica() {
 								<FormControl className='flex'>
 									<Input
 										type='number'
-										disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
 										placeholder={t('resources.database.instance_placeholder') ?? ''}
 										error={!!form.formState.errors.config?.instances}
 										{...field}
@@ -171,8 +170,7 @@ export default function EditVersionAndReplica() {
 				)}
 				<div className='flex justify-end'>
 					<Button className='ml-2' size='lg' loading={isPending} type='submit'>
-						{form.watch('instance') === ResourceInstances.RabbitMQ ||
-						form.watch('type') === ResourceType.Cache
+						{form.watch('type') === ResourceType.Cache
 							? t('resources.update_version')
 							: t('resources.update_replica_and_version')}
 					</Button>
