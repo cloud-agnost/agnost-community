@@ -27,7 +27,7 @@ export default function TableHeader({
 	selectList,
 }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { selectedFilter } = useColumnFilter(text as string, field as FieldTypes);
+	const { selectedFilter } = useColumnFilter(text, field as FieldTypes);
 	const { updateCurrentTab } = useTabStore();
 	const { version } = useVersionStore();
 	const { pathname } = useLocation();
@@ -41,7 +41,7 @@ export default function TableHeader({
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
 
-		searchParams.set('f', text as string);
+		searchParams.set('f', text);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {
@@ -101,7 +101,7 @@ export default function TableHeader({
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
-									onClick={() => clearColumnFilter(text as string)}
+									onClick={() => clearColumnFilter(text)}
 									variant='text'
 									className='items-center'
 								>
