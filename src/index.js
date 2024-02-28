@@ -14,6 +14,8 @@ const deploymentRestartRoutes = require('./deploymentRestart');
 const dockerCredenaials = require('./dockerCredentials');
 const resizeMinio = require('./resizeMinio');
 const deployApp = require('./deployapp');
+const tektonInfra = require('./tektonInfra');
+const tektonPipeline = require('./tektonPipeline');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -28,6 +30,8 @@ app.use('/', deploymentRestartRoutes);
 app.use('/', dockerCredenaials);
 app.use('/', resizeMinio);
 app.use('/', deployApp);
+app.use('/', tektonInfra);
+app.use('/', tektonPipeline);
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));

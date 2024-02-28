@@ -881,3 +881,47 @@ curl -XDELETE http://localhost:3000/deployapp -d '{
     "identifier": "my-app"
 }' -H "Content-type: application/json"
 ```
+
+## Tekton CI/CD
+
+### Tekton infra
+
+#### Install Infra
+
+```bash
+curl -XPOST http://localhost:3000/tektonInfra
+```
+
+#### Delete Infra
+
+```bash
+curl -XDELETE http://localhost:3000/tektonInfra
+```
+
+### GitHub Pipeline create
+
+```bash
+curl -XPOST http://localhost:3000/tektonPipeline -d '{
+    "gitRepoId": "4sfde896343",
+    "gitRepoType": "github",
+    "gitRepoUrl": "https://github.com/OWNER/REPO",
+    "gitPat": "ghp_xxx",
+    "containerRegistry": "ghcr.io/OWNER",
+    "containerRegistryType": "ghcr",
+    "containerRegistryId": "9efe58b87a60",
+    "resourceKind": "Deployment",
+    "resourceName": "my-app-dply"
+}' -H "Content-type: application/json"
+```
+
+### GitHub Pipeline delete
+
+```bash
+curl -XDELETE http://localhost:3000/tektonPipeline -d '{
+    "gitRepoId": "4sfde896343",
+    "gitRepoType": "github",
+    "gitRepoUrl": "https://github.com/OWNER/REPO",
+    "gitPat": "ghp_xxx",
+    "hookId": "463611028".
+}' -H "Content-type: application/json"
+```
