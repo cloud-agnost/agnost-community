@@ -22,13 +22,14 @@ import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
 	CellEditRequestEvent,
-	ColumnResizedEvent,
+	ColumnState,
 	FirstDataRenderedEvent,
 	GridReadyEvent,
+	ColumnResizedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from './Pagination';
@@ -50,7 +51,6 @@ export default function Navigator() {
 
 	const database = useDatabaseStore((state) => state.database);
 	const { model, subModel } = useModelStore();
-
 	const canMultiDelete = true;
 	const columns = useNavigatorColumns();
 
@@ -193,6 +193,7 @@ export default function Navigator() {
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
+			console.log('onFirstDataRendered');
 			event.columnApi.applyColumnState({
 				state: columnState,
 				applyOrder: true,
@@ -205,14 +206,21 @@ export default function Navigator() {
 		event.api.showLoadingOverlay();
 		event.api.sizeColumnsToFit();
 	}
-	const debounceSaveGridColumnState = _.debounce((columnState) => {
-		saveColumnState(modelId, columnState);
-	}, 100);
 
-	function onSaveGridColumnState(params: ColumnResizedEvent) {
-		const columnState = params.columnApi.getColumnState();
-		debounceSaveGridColumnState(columnState);
-	}
+	const saveColumnStateDebounced = useCallback(
+		_.debounce((columnState: ColumnState[]) => {
+			saveColumnState(modelId, columnState);
+		}, 1000),
+		[modelId, saveColumnState],
+	);
+
+	const handleColumnStateChange = useCallback(
+		(params: ColumnResizedEvent) => {
+			const columnState = params.columnApi.getColumnState();
+			saveColumnStateDebounced(columnState);
+		},
+		[saveColumnStateDebounced],
+	);
 
 	return (
 		<VersionTabLayout
@@ -230,7 +238,7 @@ export default function Navigator() {
 					<Button variant='outline' onClick={handleExportClick} disabled={!canMultiDelete}>
 						Export as CSV
 					</Button>
-					{!_.isEmpty(columnFilters) && (
+					{!_.isEmpty(modelColumnFilter) && (
 						<Button variant='outline' onClick={clearAllColumnFilters} disabled={!canMultiDelete}>
 							Clear Filters
 						</Button>
@@ -269,12 +277,11 @@ export default function Navigator() {
 						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
 					onFirstDataRendered={onFirstDataRendered}
-					onColumnResized={onSaveGridColumnState}
-					onColumnValueChanged={onSaveGridColumnState}
-					onColumnMoved={onSaveGridColumnState}
+					onColumnResized={handleColumnStateChange}
+					onColumnValueChanged={handleColumnStateChange}
+					onColumnMoved={handleColumnStateChange}
 					defaultColDef={{
 						resizable: true,
-						initialWidth: 200,
 						width: 200,
 					}}
 				/>
