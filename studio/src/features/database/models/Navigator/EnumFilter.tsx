@@ -9,7 +9,7 @@ import { useColumnFilter } from '@/hooks';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ConditionsType, FilterProps } from '@/types';
 import { CaretDown } from '@phosphor-icons/react';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface EnumFilterProps extends FilterProps {
@@ -19,53 +19,67 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 	const { t } = useTranslation();
 	const { setColumnFilters, clearColumnFilter } = useUtilsStore();
 	const { selectedFilter, filterType } = useColumnFilter(columnName, type);
-	const values = useMemo(
-		() => (selectedFilter?.conditions[0].filter ?? []) as string[],
-		[selectedFilter],
-	);
-	function onFilterChange(filter: string, checked: boolean) {
-		const selectedValues = checked ? [...values, filter] : values.filter((v) => v !== filter);
+	const [filter, setFilter] = useState(selectedFilter);
 
-		if (selectedValues.length === 0) {
+	function onFilterChange(newFilter: string, checked: boolean) {
+		const conditions = (filter?.conditions?.[0]?.filter as string[]) ?? [];
+		if (checked) {
+			conditions.push(newFilter);
+		} else {
+			const index = conditions.indexOf(newFilter);
+			conditions.splice(index, 1);
+		}
+		setFilter((prev) => ({
+			...prev,
+			filterType,
+			conditions: [{ filter: conditions, type: ConditionsType.Includes }],
+		}));
+	}
+
+	function applyFilter() {
+		if ((filter?.conditions?.[0]?.filter as string[])?.length === 0) {
 			clearColumnFilter(columnName);
 			return;
 		} else {
-			setColumnFilters(columnName, {
-				filterType,
-				conditions: [
-					{
-						type: ConditionsType.Includes,
-						filter: selectedValues,
-					},
-				],
-			});
+			setColumnFilters(columnName, filter);
 		}
 	}
 
-	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild className='w-full'>
-				<Button variant='secondary' className='gap-2' size='full'>
-					{values?.length > 0
-						? t('general.selected', {
-								count: values.length,
-							})
-						: t('general.filter')}
+	useEffect(() => {
+		setFilter(selectedFilter);
+	}, [selectedFilter]);
 
-					<CaretDown />
+	return (
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild className='w-full'>
+					<Button variant='secondary' className='gap-2' size='full'>
+						{(filter?.conditions?.[0]?.filter as string[])?.length > 0
+							? t('general.selected', {
+									count: (filter?.conditions?.[0]?.filter as string[])?.length,
+								})
+							: t('general.filter')}
+
+						<CaretDown />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className='w-full min-w-[200px]'>
+					{options.map((option) => (
+						<DropdownMenuCheckboxItem
+							key={option}
+							checked={(filter?.conditions?.[0]?.filter as string[])?.includes(option)}
+							onCheckedChange={(checked) => onFilterChange(option, checked)}
+						>
+							{option}
+						</DropdownMenuCheckboxItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+			{filter?.conditions[0]?.filter ? (
+				<Button variant='primary' onClick={applyFilter} size='full'>
+					Apply
 				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent className='w-full'>
-				{options.map((option) => (
-					<DropdownMenuCheckboxItem
-						key={option}
-						checked={values.includes(option)}
-						onCheckedChange={(checked) => onFilterChange(option, checked)}
-					>
-						{option}
-					</DropdownMenuCheckboxItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
+			) : null}
+		</>
 	);
 }

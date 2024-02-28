@@ -8,53 +8,63 @@ import { useState } from 'react';
 interface GeopointFilterItemProps {
 	onUpdates: (updates: Condition) => void;
 	condition?: Condition;
-	conditionType?: ConditionsType;
 	onConditionChange?: (condition: ConditionsType) => void;
 }
 
-export default function GeopointFilterItem({
-	onUpdates,
-	condition,
-	conditionType,
-	onConditionChange,
-}: GeopointFilterItemProps) {
-	const [longitude, setLongitude] = useState((condition?.filter as number[])?.[0] ?? null);
-	const [latitude, setLatitude] = useState((condition?.filter as number[])?.[1] ?? null);
-	const [distance, setDistance] = useState(condition?.filterFrom ?? '');
+interface GeopointFilterItemState {
+	longitude: number | null;
+	latitude: number | null;
+	distance: number | null;
+	conditionType: ConditionsType;
+}
 
+export default function GeopointFilterItem({ onUpdates, condition }: GeopointFilterItemProps) {
+	const [filterCondition, setFilterCondition] = useState<GeopointFilterItemState>({
+		longitude: (condition?.filter as number[])?.[0] ?? null,
+		latitude: (condition?.filter as number[])?.[1] ?? null,
+		distance: condition?.filterFrom as number,
+		conditionType: condition?.type as ConditionsType,
+	});
 	useUpdateEffect(() => {
-		if (longitude && latitude && distance) {
+		if (filterCondition) {
 			onUpdates({
-				filter: [longitude, latitude],
-				filterFrom: distance,
-				type: conditionType,
+				filter: [filterCondition.longitude as number, filterCondition.latitude as number],
+				filterFrom: filterCondition.distance,
+				type: filterCondition.conditionType,
 			});
 		}
-	}, [longitude, latitude, distance]);
+	}, [filterCondition]);
 
 	useUpdateEffect(() => {
-		setLongitude((condition?.filter as number[])?.[0] ?? null);
-		setLatitude((condition?.filter as number[])?.[1] ?? null);
-		setDistance(condition?.filterFrom ?? '');
+		setFilterCondition({
+			longitude: (condition?.filter as number[])?.[0] ?? null,
+			latitude: (condition?.filter as number[])?.[1] ?? null,
+			distance: condition?.filterFrom as number,
+			conditionType: condition?.type as ConditionsType,
+		});
 	}, [condition]);
 
-	function onChange(value: string, cb: (value: number) => void) {
+	function onChange(value: string, key: string) {
 		const number = Number(value);
 		if (!isNaN(number)) {
-			cb(number);
+			setFilterCondition((prev) => ({ ...prev, [key]: number }));
 		}
 	}
-
 	return (
 		<div className='space-y-4'>
 			<Select
-				onValueChange={onConditionChange}
-				defaultValue={conditionType ?? ConditionsType.DistanceGreaterThan}
+				onValueChange={(value) =>
+					setFilterCondition((prev) => ({ ...prev, conditionType: value as ConditionsType }))
+				}
+				defaultValue={filterCondition.conditionType}
+				key={filterCondition.conditionType}
 			>
 				<SelectTrigger className='w-full text-xs'>
 					<SelectValue placeholder='Choose One'>
-						{GeoPointFilterTypes.find((filter) => filter.value === conditionType)?.label ||
-							'Select Condition'}
+						{
+							GeoPointFilterTypes.find((filter) => filter.value === filterCondition.conditionType)
+								?.label
+						}
 					</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
@@ -68,20 +78,20 @@ export default function GeopointFilterItem({
 			<Input
 				type='number'
 				placeholder='Longitude'
-				value={longitude}
-				onChange={(e) => onChange(e.target.value, setLongitude)}
+				value={filterCondition.longitude ?? ''}
+				onChange={(e) => onChange(e.target.value, 'longitude')}
 			/>
 			<Input
 				type='number'
 				placeholder='Latitude'
-				value={latitude}
-				onChange={(e) => onChange(e.target.value, setLatitude)}
+				value={filterCondition.latitude ?? ''}
+				onChange={(e) => onChange(e.target.value, 'latitude')}
 			/>
 			<Input
 				type='number'
 				placeholder='Distance (km)'
-				value={distance}
-				onChange={(e) => onChange(e.target.value, setDistance)}
+				value={filterCondition.distance ?? ''}
+				onChange={(e) => onChange(e.target.value, 'distance')}
 			/>
 		</div>
 	);

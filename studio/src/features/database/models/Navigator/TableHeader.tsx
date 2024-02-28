@@ -98,6 +98,7 @@ export default function TableHeader({
 					</PopoverTrigger>
 					<PopoverContent align='center' className='p-2 bg-subtle min-w-[210px]'>
 						<div className='space-y-4'>
+							{getFilterComponent()}
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
@@ -109,7 +110,6 @@ export default function TableHeader({
 									Clear Filter
 								</Button>
 							)}
-							{getFilterComponent()}
 						</div>
 					</PopoverContent>
 				</Popover>

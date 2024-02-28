@@ -1,71 +1,76 @@
-import { useColumnFilter, useUpdateEffect } from '@/hooks';
-import useUtilsStore from '@/store/version/utilsStore';
-import { ConditionsType, FilterProps, Operators } from '@/types';
+import { Button } from '@/components/Button';
+import { useColumnFilter } from '@/hooks';
+import { Condition, FilterProps, Operators } from '@/types';
+import { useEffect, useState } from 'react';
 import GeopointFilterItem from './GeopointFilterItem';
 import OperatorSelect from './OperatorSelect';
-import { useState } from 'react';
 
 export default function GeopointFilter({ columnName, type }: FilterProps) {
-	const { setColumnFilters } = useUtilsStore();
-	const { selectedFilter, filterType } = useColumnFilter(columnName, type);
+	const { selectedFilter, filterType, applyFilter } = useColumnFilter(columnName, type);
+	const [filter, setFilter] = useState(selectedFilter);
+	const updateFilterConditions = (conditionIndex: number, updates: Condition) => {
+		const initialConditions = filter?.conditions || [];
+		let conditions: Condition[] = [];
+		if (conditionIndex >= initialConditions.length) {
+			conditions = new Array(conditionIndex + 1).fill({}).map((val, index) => {
+				return index === conditionIndex ? { ...val, ...updates } : initialConditions[index] || {};
+			});
+		} else {
+			conditions = initialConditions.map((condition, index) => {
+				if (index === conditionIndex) {
+					return { ...condition, ...updates };
+				}
+				return condition;
+			});
+		}
 
-	const [selectedType, setSelectedType] = useState(
-		selectedFilter?.conditions[0]?.type ?? ConditionsType.DistanceGreaterThan,
-	);
-
-	const [selectedType2, setSelectedType2] = useState(
-		selectedFilter?.conditions[1]?.type ?? ConditionsType.DistanceGreaterThan,
-	);
-
-	const updateFilterConditions = (index: number, updates: any) => {
-		const newConditions = [...(selectedFilter?.conditions || [])];
-		newConditions[index] = {
-			...newConditions[index],
-			...updates,
-		};
-
-		setColumnFilters(columnName, {
-			...selectedFilter,
+		setFilter((prev) => ({
+			...prev,
 			filterType,
-			conditions: newConditions,
-		});
+			conditions,
+		}));
 	};
-
-	useUpdateEffect(() => {
-		if (selectedFilter?.conditions[0]?.filter && selectedFilter?.conditions[0]?.filterFrom) {
-			updateFilterConditions(0, { type: selectedType });
+	function updateOperator(operator: Operators) {
+		if (operator === Operators.None) {
+			setFilter((prev) => ({
+				filterType,
+				conditions: [prev.conditions[0]],
+			}));
+			return;
 		}
-	}, [selectedType]);
+		setFilter((prev) => ({ ...prev, operator }));
+	}
 
-	useUpdateEffect(() => {
-		if (selectedFilter?.conditions[1]?.filter && selectedFilter?.conditions[1]?.filterFrom) {
-			updateFilterConditions(1, { type: selectedType2 });
-		}
-	}, [selectedType2]);
+	useEffect(() => {
+		setFilter(selectedFilter);
+	}, [selectedFilter]);
 
 	return (
 		<div className='space-y-6'>
 			<GeopointFilterItem
 				onUpdates={(updates) => updateFilterConditions(0, updates)}
-				condition={selectedFilter?.conditions[0]}
-				conditionType={selectedType}
-				onConditionChange={(condition) => setSelectedType(condition)}
+				condition={filter?.conditions[0]}
 			/>
-			{(selectedFilter?.conditions[0]?.filter || selectedFilter?.conditions[1]?.filter) && (
-				<>
-					<OperatorSelect
-						defaultValue={selectedFilter?.operator ?? Operators.None}
-						columnName={columnName}
-						type={type}
-					/>
-					<GeopointFilterItem
-						onUpdates={(updates) => updateFilterConditions(1, updates)}
-						condition={selectedFilter?.conditions[1]}
-						conditionType={selectedType2}
-						onConditionChange={(condition) => setSelectedType2(condition)}
-					/>
-				</>
+
+			{filter?.conditions[0]?.filter && (
+				<OperatorSelect
+					defaultValue={filter?.operator ?? Operators.None}
+					onOperatorChange={updateOperator}
+				/>
 			)}
+
+			{filter?.operator && filter?.operator !== Operators.None && (
+				<GeopointFilterItem
+					onUpdates={(updates) => updateFilterConditions(1, updates)}
+					condition={filter?.conditions[1]}
+				/>
+			)}
+
+			{filter?.conditions[0]?.filter ? (
+				<Button variant='primary' onClick={() => applyFilter(filter)} size='full'>
+					Apply
+				</Button>
+			) : null}
 		</div>
 	);
 }

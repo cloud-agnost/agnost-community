@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 export default function useColumnFilter(columnName: string, type: FieldTypes) {
 	const model = useModelStore((state) => state.model);
 	const columnFilters = useUtilsStore((state) => state.columnFilters);
+	const setColumnFilters = useUtilsStore((state) => state.setColumnFilters);
 
 	const filterType = CellTypeMap[type] as Filters;
 	const selectedFilter = useMemo(
@@ -14,8 +15,14 @@ export default function useColumnFilter(columnName: string, type: FieldTypes) {
 		[columnFilters?.[model._id]?.[columnName], columnName],
 	);
 
+	function applyFilter(filter: ColumnFilterType) {
+		setColumnFilters(columnName, filter);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+	}
+
 	return {
 		selectedFilter,
 		filterType,
+		applyFilter,
 	};
 }

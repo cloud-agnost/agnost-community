@@ -4,38 +4,42 @@ import {
 	CellMaskMap,
 	CellTypeMap,
 	DATE_FILTERS,
+	ID_FILTERS,
 	MONGODB_FILTERS,
 	NUMBER_FILTERS,
 	TEXT_FILTERS,
 } from '@/constants';
 import { useDebounce, useUpdateEffect } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
-import { ConditionsType, FilterProps, Filters, ResourceInstances } from '@/types';
+import { Condition, ConditionsType, FieldTypes, Filters, ResourceInstances } from '@/types';
 import { useMask } from '@react-input/mask';
 import React, { useMemo, useState } from 'react';
 
 export default function ColumnFilter({
 	onFilterChange,
-	onConditionChange,
 	type,
-	selectedCondition,
-	filterValue,
-}: FilterProps & {
+	condition,
+}: {
 	onFilterChange: (filter: any) => void;
-	onConditionChange: (condition: ConditionsType) => void;
-	selectedCondition: ConditionsType;
-	filterValue: string | number | null;
+	condition: Condition;
+	type: FieldTypes;
 }) {
-	const [search, setSearch] = useState(filterValue || '');
-	const searchTerm = useDebounce(search as string, 500);
+	const [filterCondition, setFilterCondition] = useState({
+		filter: condition?.filter ?? '',
+		type: condition?.type,
+	});
 
+	const searchTerm = useDebounce(filterCondition.filter as string, 500);
+	const db = useDatabaseStore((state) => state.database);
 	const filterType = useMemo(() => CellTypeMap[type], [type]);
 	const maskOptions = CellMaskMap[type];
 	const mask = useMask(maskOptions);
 
 	const database = useDatabaseStore((state) => state.database);
 	const filters = useMemo(() => {
-		// push mongo filters if db type is mongo
+		if (type === FieldTypes.ID) {
+			return ID_FILTERS;
+		}
 		let filters = [];
 
 		if (filterType === Filters.Date) filters = DATE_FILTERS;
@@ -62,55 +66,73 @@ export default function ColumnFilter({
 		const { value } = e.target;
 		if (filterType === Filters.Number) {
 			if (value === '' || !isNaN(Number(value))) {
-				setSearch(Number(value));
+				setFilterCondition((prev) => ({ ...prev, filter: Number(value) }));
 			}
 		} else {
-			setSearch(value);
+			setFilterCondition((prev) => ({ ...prev, filter: value }));
 		}
 	}
 
 	useUpdateEffect(() => {
-		if (search && selectedCondition) {
-			onFilterChange({
-				filter: search,
-				type: selectedCondition,
-			});
+		if (filterCondition) {
+			onFilterChange(filterCondition);
 		}
-	}, [searchTerm]);
+	}, [searchTerm, filterCondition.type]);
 
 	useUpdateEffect(() => {
-		setSearch(filterValue || '');
-	}, [filterValue]);
+		console.log(
+			'conditionType',
+			condition?.type,
+			filters.find((filter) => filter.value === condition?.type)?.label,
+		);
+		setFilterCondition({
+			filter: condition?.filter ?? '',
+			type: condition?.type,
+		});
+	}, [condition]);
 
 	return (
 		<>
 			<Select
-				onValueChange={onConditionChange}
-				defaultValue={selectedCondition ?? ConditionsType.Equals}
+				onValueChange={(value) =>
+					setFilterCondition((prev) => ({ ...prev, type: value as ConditionsType }))
+				}
+				value={filterCondition.type}
+				key={filterCondition.type}
 			>
 				<SelectTrigger className='w-full text-xs'>
-					<SelectValue placeholder='Choose One'>
-						{filters.find((filter) => filter.value === selectedCondition)?.label ||
-							'Select Condition'}
+					<SelectValue placeholder='Choose One' key={filterCondition.type}>
+						{filters.find((filter) => filter.value === filterCondition.type)?.label}
 					</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
 					{filters.map((filter) => (
-						<SelectItem key={filter.value} value={filter.value}>
+						<SelectItem key={filter.value} value={filter.value} className='text-xs font-normal'>
 							{filter.label}
 						</SelectItem>
 					))}
 				</SelectContent>
 			</Select>
-			{![ConditionsType.IsEmpty, ConditionsType.IsNotEmpty].includes(selectedCondition) && (
-				<Input
-					{...inputProps}
-					type={filterType === Filters.Number ? 'number' : 'text'}
-					value={search}
-					onChange={onChange}
-					placeholder='Filter'
-				/>
-			)}
+			{filterCondition.type &&
+				![
+					ConditionsType.IsEmpty,
+					ConditionsType.IsNotEmpty,
+					ConditionsType.IsNull,
+					ConditionsType.IsNotNull,
+				].includes(filterCondition.type as ConditionsType) && (
+					<Input
+						{...inputProps}
+						type={
+							filterType === Filters.Number ||
+							(type === FieldTypes.ID && db.type !== ResourceInstances.MongoDB)
+								? 'number'
+								: 'text'
+						}
+						value={filterCondition.filter as string}
+						onChange={onChange}
+						placeholder='Filter'
+					/>
+				)}
 		</>
 	);
 }
