@@ -16,7 +16,7 @@ function generateQuery({
 	const queryKeys = Object.keys(query);
 
 	if (condition.type === ConditionsType.NotContains) {
-		query.$not.$includes = [columnName, condition.filter];
+		query.$not.$includes = [columnName, condition.filter, false];
 		return query;
 	}
 
@@ -42,8 +42,14 @@ function generateQuery({
 		query.$exists = columnName;
 		return query;
 	}
-
-	query[queryKeys[queryKeys.length - 1]] = [columnName, condition?.filter ?? null];
+	if (columnName === '_id') {
+		query[queryKeys[queryKeys.length - 1]] = [
+			columnName,
+			{
+				$toObjectId: condition?.filter ?? null,
+			},
+		];
+	} else query[queryKeys[queryKeys.length - 1]] = [columnName, condition?.filter ?? null];
 	return query;
 }
 
