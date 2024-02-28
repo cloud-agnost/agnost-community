@@ -61,7 +61,7 @@ export default function useNavigatorColumns() {
 				selectList: field.enum?.selectList,
 			},
 			maxWidth:
-				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 75 : 1000,
+				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 100 : 1000,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:
@@ -83,6 +83,7 @@ export default function useNavigatorColumns() {
 			},
 			cellDataType: CellTypeMap[field.type],
 			valueFormatter: (params) => valueFormatter(params, field),
+			resizable: true,
 		}));
 		return [NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]];
 	}, [fields]);
