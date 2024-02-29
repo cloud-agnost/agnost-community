@@ -204,7 +204,7 @@ export default function Navigator() {
 
 	function onGridReady(event: GridReadyEvent) {
 		event.api.showLoadingOverlay();
-		event.api.sizeColumnsToFit();
+		// event.api.sizeColumnsToFit();
 	}
 
 	const saveColumnStateDebounced = useCallback(
