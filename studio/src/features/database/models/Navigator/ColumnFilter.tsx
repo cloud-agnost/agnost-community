@@ -12,8 +12,8 @@ import {
 import { useDebounce, useUpdateEffect } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import { Condition, ConditionsType, FieldTypes, Filters, ResourceInstances } from '@/types';
-import { useMask } from '@react-input/mask';
-import React, { useMemo, useState } from 'react';
+import { InputMask } from '@react-input/mask';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export default function ColumnFilter({
 	onFilterChange,
@@ -28,12 +28,10 @@ export default function ColumnFilter({
 		filter: condition?.filter ?? '',
 		type: condition?.type,
 	});
-
 	const searchTerm = useDebounce(filterCondition.filter as string, 500);
 	const db = useDatabaseStore((state) => state.database);
 	const filterType = useMemo(() => CellTypeMap[type], [type]);
-	const maskOptions = CellMaskMap[type];
-	const mask = useMask(maskOptions);
+	const InputComp = filterType === Filters.Date ? InputMask : Input;
 
 	const database = useDatabaseStore((state) => state.database);
 	const filters = useMemo(() => {
@@ -54,9 +52,13 @@ export default function ColumnFilter({
 	}, [filterType, database.type]);
 
 	const inputProps = useMemo(() => {
+		console.log('mask');
 		if (filterType === Filters.Date) {
 			return {
-				ref: mask,
+				mask: CellMaskMap[type]?.mask,
+				replacement: CellMaskMap[type]?.replacement,
+				seperate: true,
+				component: Input,
 			};
 		}
 		return {};
@@ -80,11 +82,6 @@ export default function ColumnFilter({
 	}, [searchTerm, filterCondition.type]);
 
 	useUpdateEffect(() => {
-		console.log(
-			'conditionType',
-			condition?.type,
-			filters.find((filter) => filter.value === condition?.type)?.label,
-		);
 		setFilterCondition({
 			filter: condition?.filter ?? '',
 			type: condition?.type,
@@ -120,7 +117,7 @@ export default function ColumnFilter({
 					ConditionsType.IsNull,
 					ConditionsType.IsNotNull,
 				].includes(filterCondition.type as ConditionsType) && (
-					<Input
+					<InputComp
 						{...inputProps}
 						type={
 							filterType === Filters.Number ||
