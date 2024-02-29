@@ -69,30 +69,34 @@ export default function GeopointFilterItem({ onUpdates, condition }: GeopointFil
 				</SelectTrigger>
 				<SelectContent>
 					{GeoPointFilterTypes.map((filter) => (
-						<SelectItem key={filter.value} value={filter.value}>
+						<SelectItem key={filter.value} value={filter.value} className='text-xs'>
 							{filter.label}
 						</SelectItem>
 					))}
 				</SelectContent>
 			</Select>
-			<Input
-				type='number'
-				placeholder='Longitude'
-				value={filterCondition.longitude ?? ''}
-				onChange={(e) => onChange(e.target.value, 'longitude')}
-			/>
-			<Input
-				type='number'
-				placeholder='Latitude'
-				value={filterCondition.latitude ?? ''}
-				onChange={(e) => onChange(e.target.value, 'latitude')}
-			/>
-			<Input
-				type='number'
-				placeholder='Distance (km)'
-				value={filterCondition.distance ?? ''}
-				onChange={(e) => onChange(e.target.value, 'distance')}
-			/>
+			{filterCondition.conditionType && (
+				<>
+					<Input
+						type='number'
+						placeholder='Longitude'
+						value={filterCondition.longitude ?? ''}
+						onChange={(e) => onChange(e.target.value, 'longitude')}
+					/>
+					<Input
+						type='number'
+						placeholder='Latitude'
+						value={filterCondition.latitude ?? ''}
+						onChange={(e) => onChange(e.target.value, 'latitude')}
+					/>
+					<Input
+						type='number'
+						placeholder='Distance (km)'
+						value={filterCondition.distance ?? ''}
+						onChange={(e) => onChange(e.target.value, 'distance')}
+					/>
+				</>
+			)}
 		</div>
 	);
 }
