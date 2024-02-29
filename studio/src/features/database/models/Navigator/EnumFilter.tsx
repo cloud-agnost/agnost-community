@@ -8,6 +8,7 @@ import {
 import { useColumnFilter } from '@/hooks';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ConditionsType, FilterProps } from '@/types';
+import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +44,7 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 		} else {
 			setColumnFilters(columnName, filter);
 		}
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	useEffect(() => {
@@ -53,12 +55,21 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild className='w-full'>
-					<Button variant='secondary' className='gap-2' size='full'>
+					<Button
+						variant='blank'
+						className={cn(
+							'select !bg-input-background w-full text-xs',
+							(filter?.conditions?.[0]?.filter as string[])?.length > 0
+								? 'text-default'
+								: 'text-subtle',
+						)}
+						size='full'
+					>
 						{(filter?.conditions?.[0]?.filter as string[])?.length > 0
 							? t('general.selected', {
 									count: (filter?.conditions?.[0]?.filter as string[])?.length,
 								})
-							: t('general.filter')}
+							: t('general.chooseOne')}
 
 						<CaretDown />
 					</Button>
