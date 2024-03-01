@@ -285,7 +285,7 @@ export default function Navigator() {
 						width: 200,
 					}}
 				/>
-				<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
+				{!isFetching && <Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />}
 			</div>
 		</VersionTabLayout>
 	);
