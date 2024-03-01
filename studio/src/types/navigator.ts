@@ -30,7 +30,7 @@ export type NavigatorComponentProps = {
 };
 
 export interface Condition {
-	filter: string | string[] | number | number[] | null;
+	filter: string | string[] | number | number[] | boolean | null;
 	filterFrom?: string | number | null;
 	type?: ConditionsType;
 }

@@ -11,7 +11,7 @@ import {
 	SubObject,
 } from '@/features/database/models/Navigator';
 
-import { FieldTypes } from '@/types';
+import { ConditionsType, FieldTypes, Operators } from '@/types';
 import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT_WITH_SECONDS } from '@/utils';
 import { Replacement } from '@react-input/mask';
 import { ElementType } from 'react';
@@ -75,7 +75,7 @@ export const CellRendererMap: Record<string, ElementType> = {
 };
 
 export const CellFilterMap: Record<FieldTypes, ElementType | undefined> = {
-	[FieldTypes.ID]: undefined,
+	[FieldTypes.ID]: DefaultFilter,
 	[FieldTypes.TEXT]: DefaultFilter,
 	[FieldTypes.RICH_TEXT]: DefaultFilter,
 	[FieldTypes.ENCRYPTED_TEXT]: undefined,
@@ -127,33 +127,40 @@ export const CellMaskMap: Record<string, { mask: string; replacement: Replacemen
 };
 
 export const FILTERS = [
-	{ label: 'Equals', value: 'equals' },
-	{ label: 'Does not equal', value: 'notEquals' },
-	{ label: 'Is Null', value: 'isNull' },
-	{ label: 'Is not null', value: 'isNotNull' },
+	{ label: 'Equals', value: ConditionsType.Equals },
+	{ label: 'Does not equal', value: ConditionsType.NotEquals },
+	{ label: 'Is Null', value: ConditionsType.IsNull },
+	{ label: 'Is Not null', value: ConditionsType.IsNotNull },
 ];
 
 export const TEXT_FILTERS = [
-	{ label: 'Contains', value: 'contains' },
-	{ label: 'Does not contain', value: 'notContains' },
-	{ label: 'Begins with', value: 'beginsWith' },
-	{ label: 'Ends with', value: 'endsWith' },
+	{ label: 'Contains', value: ConditionsType.Contains },
+	{ label: 'Does not contain', value: ConditionsType.NotContains },
+	{ label: 'Begins with', value: ConditionsType.BeginsWith },
+	{ label: 'Ends with', value: ConditionsType.EndsWith },
 	...FILTERS,
 ];
 
 export const NUMBER_FILTERS = [
-	{ label: 'Greater than', value: 'greaterThan' },
-	{ label: 'Greater than or equal', value: 'greaterThanOrEqual' },
-	{ label: 'Less than', value: 'lessThan' },
-	{ label: 'Less than or equal', value: 'lessThanOrEqual' },
-	{ label: 'Between', value: 'between' },
+	{ label: 'Greater than', value: ConditionsType.GreaterThan },
+	{ label: 'Greater than or equal', value: ConditionsType.GreaterThanOrEqual },
+	{ label: 'Less than', value: ConditionsType.LessThan },
+	{ label: 'Less than or equal', value: ConditionsType.LessThanOrEqual },
 	...FILTERS,
 ];
 export const DATE_FILTERS = [
-	{ label: 'Greater than', value: 'greaterThan' },
-	{ label: 'Less than', value: 'lessThan' },
-	{ label: 'In Range', value: 'inRange' },
+	{ label: 'Greater than', value: ConditionsType.GreaterThan },
+	{ label: 'Less than', value: ConditionsType.LessThan },
 	...FILTERS,
+];
+
+export const ID_FILTERS = [
+	{ label: 'Greater than', value: ConditionsType.GreaterThan },
+	{ label: 'Greater than or equal', value: ConditionsType.GreaterThanOrEqual },
+	{ label: 'Less than', value: ConditionsType.LessThan },
+	{ label: 'Less than or equal', value: ConditionsType.LessThanOrEqual },
+	{ label: 'Equals', value: ConditionsType.Equals },
+	{ label: 'Does not equal', value: ConditionsType.NotEquals },
 ];
 
 export const BOOLEAN_FILTERS = [
@@ -162,19 +169,19 @@ export const BOOLEAN_FILTERS = [
 ];
 
 export const GeoPointFilterTypes = [
-	{ label: 'Distance Greater than', value: 'distanceGreaterThan' },
-	{ label: 'Distance Less than', value: 'distanceLessThan' },
+	{ label: 'Distance Greater than', value: ConditionsType.DistanceGreaterThan },
+	{ label: 'Distance Less than', value: ConditionsType.DistanceLessThan },
 ];
 
 export const MONGODB_FILTERS = [
-	{ label: 'Is Empty', value: 'isEmpty' },
-	{ label: 'Is Not Empty', value: 'isNotEmpty' },
+	{ label: 'Is Empty', value: ConditionsType.IsEmpty },
+	{ label: 'Is Not Empty', value: ConditionsType.IsNotEmpty },
 ];
 
 export const OPERATORS = [
-	{ label: 'And', value: '$and' },
-	{ label: 'Or', value: '$or' },
-	{ label: 'None', value: 'none' },
+	{ label: 'And', value: Operators.And },
+	{ label: 'Or', value: Operators.Or },
+	{ label: 'None', value: Operators.None },
 ];
 export const QUERY_TEMPLATES = {
 	contains: { $includes: [] },
