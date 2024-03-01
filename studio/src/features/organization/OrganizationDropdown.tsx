@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './organization.scss';
+import { resetAfterVersionChange } from '@/utils';
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const { user } = useAuthStore();
@@ -62,6 +63,11 @@ export function OrganizationDropdown() {
 		selectOrganization(org);
 	}
 
+	function navigateOrg() {
+		resetAfterVersionChange();
+		navigate(`/organization/${organization?._id}`);
+	}
+
 	useEffect(() => {
 		if (_.isEmpty(organizations)) {
 			getAllOrganizationByUser();
@@ -74,7 +80,7 @@ export function OrganizationDropdown() {
 				data={organizations}
 				selectedData={organization}
 				onSelect={(org) => onSelect(org as Organization)}
-				onClick={() => navigate(`/organization/${organization?._id}`)}
+				onClick={navigateOrg}
 			>
 				<CommandItem
 					className='flex !justify-center'
