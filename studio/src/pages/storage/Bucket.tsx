@@ -115,7 +115,6 @@ export default function Buckets() {
 	}, [versionId, orgId, appId, storageId]);
 
 	function onGridReady(event: GridReadyEvent) {
-		event.api.showLoadingOverlay();
 		event.api.sizeColumnsToFit();
 	}
 
@@ -128,6 +127,7 @@ export default function Buckets() {
 			}
 		}
 	}, [isFetching, gridRef.current]);
+
 	return (
 		<>
 			<VersionTabLayout

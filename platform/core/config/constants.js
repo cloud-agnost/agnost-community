@@ -593,6 +593,7 @@ export const resourceActions = [
 	"bind",
 	"check",
 	"restart",
+	"restart-managed",
 ];
 
 export const resourceStatuses = [
@@ -603,6 +604,7 @@ export const resourceStatuses = [
 	"Updating",
 	"Deleting",
 	"Idle",
+	"Restarting",
 ];
 
 export const resourceTypes = [

@@ -9,18 +9,27 @@ import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import useUtilsStore from '@/store/version/utilsStore';
-import { APIError, BucketCountInfo, FieldTypes, ResourceInstances, TabTypes } from '@/types';
+import {
+	APIError,
+	BucketCountInfo,
+	ColumnFilters,
+	FieldTypes,
+	ResourceInstances,
+	TabTypes,
+} from '@/types';
+import { queryBuilder } from '@/utils';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
 	CellEditRequestEvent,
-	ColumnResizedEvent,
+	ColumnState,
 	FirstDataRenderedEvent,
 	GridReadyEvent,
+	ColumnResizedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from './Pagination';
@@ -30,7 +39,7 @@ export default function Navigator() {
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
-	const { saveColumnState, getColumnState } = useUtilsStore();
+	const { saveColumnState, getColumnState, columnFilters, clearAllColumnFilters } = useUtilsStore();
 	const {
 		getDataFromModel,
 		deleteMultipleDataFromModel,
@@ -39,13 +48,21 @@ export default function Navigator() {
 		subModelData,
 		dataCountInfo,
 	} = useNavigatorStore();
+
 	const database = useDatabaseStore((state) => state.database);
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const columns = useNavigatorColumns();
+
 	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
 	const gridRef = useRef<AgGridReact<any>>(null);
+
 	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
+	const modelColumnFilter = useMemo(
+		() => columnFilters?.[modelId] ?? [],
+		[modelId, columnFilters?.[model._id]],
+	);
+
 	const updateData = useUpdateData();
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
 
@@ -96,6 +113,7 @@ export default function Navigator() {
 			searchParams.get('page'),
 			searchParams.get('size'),
 			database.type,
+			modelColumnFilter,
 		],
 		queryFn: () =>
 			getDataFromModel({
@@ -105,6 +123,7 @@ export default function Navigator() {
 				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 				id: searchParams.get('ref') as string,
 				dbType: database.type,
+				filter: queryBuilder(modelColumnFilter as ColumnFilters),
 			}),
 		refetchOnWindowFocus: false,
 		enabled: modelId === model._id && window.location.pathname.includes(model._id),
@@ -161,32 +180,51 @@ export default function Navigator() {
 		}
 	}, [isFetching, gridRef.current]);
 
+	useEffect(() => {
+		if (!_.isNil(gridRef.current?.api)) {
+			if (data.length === 0 && !isFetching) {
+				gridRef.current.api.showNoRowsOverlay();
+			} else {
+				gridRef.current.api.hideOverlay();
+			}
+		}
+	}, [data, gridRef.current, isFetching]);
+
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
+			console.log('onFirstDataRendered');
 			event.columnApi.applyColumnState({
 				state: columnState,
 				applyOrder: true,
 			});
-			console.log('applying columnState', columnState);
 		}
 		event.api.hideOverlay();
 	}
 
 	function onGridReady(event: GridReadyEvent) {
 		event.api.showLoadingOverlay();
+		// event.api.sizeColumnsToFit();
 	}
-	const debounceSaveGridColumnState = _.debounce((columnState) => {
-		saveColumnState(modelId, columnState);
-	}, 100);
 
-	function onSaveGridColumnState(params: ColumnResizedEvent) {
-		const columnState = params.columnApi.getColumnState();
-		debounceSaveGridColumnState(columnState);
-	}
+	const saveColumnStateDebounced = useCallback(
+		_.debounce((columnState: ColumnState[]) => {
+			saveColumnState(modelId, columnState);
+		}, 1000),
+		[modelId, saveColumnState],
+	);
+
+	const handleColumnStateChange = useCallback(
+		(params: ColumnResizedEvent) => {
+			const columnState = params.columnApi.getColumnState();
+			saveColumnStateDebounced(columnState);
+		},
+		[saveColumnStateDebounced],
+	);
+
 	return (
 		<VersionTabLayout
-			isEmpty={!data.length}
+			isEmpty={false}
 			type={TabTypes.Navigator}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
@@ -200,6 +238,11 @@ export default function Navigator() {
 					<Button variant='outline' onClick={handleExportClick} disabled={!canMultiDelete}>
 						Export as CSV
 					</Button>
+					{!_.isEmpty(modelColumnFilter) && (
+						<Button variant='outline' onClick={clearAllColumnFilters} disabled={!canMultiDelete}>
+							Clear Filters
+						</Button>
+					)}
 					<Button variant='secondary' onClick={() => refetch()} iconOnly>
 						<ArrowClockwise className='mr-1 text-sm' />
 						{t('general.refresh')}
@@ -211,9 +254,9 @@ export default function Navigator() {
 		>
 			<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
 				<AgGridReact
+					className='w-full h-full'
 					onGridReady={onGridReady}
 					key={model._id}
-					className='flex-1 h-[500px]'
 					ref={gridRef}
 					rowData={!_.isEmpty(subModel) ? subModelData : data}
 					columnDefs={columns}
@@ -221,7 +264,6 @@ export default function Navigator() {
 					components={{
 						agColumnHeader: TableHeader,
 					}}
-					autoSizePadding={20}
 					readOnlyEdit={true}
 					onCellEditRequest={onCellEditRequest}
 					ensureDomOrder
@@ -230,13 +272,18 @@ export default function Navigator() {
 					overlayLoadingTemplate={
 						'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 					}
+					overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 					onRowSelected={() =>
 						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
 					onFirstDataRendered={onFirstDataRendered}
-					onColumnResized={onSaveGridColumnState}
-					onColumnValueChanged={onSaveGridColumnState}
-					onColumnMoved={onSaveGridColumnState}
+					onColumnResized={handleColumnStateChange}
+					onColumnValueChanged={handleColumnStateChange}
+					onColumnMoved={handleColumnStateChange}
+					defaultColDef={{
+						resizable: true,
+						width: 200,
+					}}
 				/>
 				<Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />
 			</div>

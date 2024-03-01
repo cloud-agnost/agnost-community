@@ -231,3 +231,44 @@ export async function deleteRedis(clusterName) {
 
     return "success!";
 }
+
+export async function restartRedis(clusterName) {
+    try {
+        var resourceName = clusterName + "-master";
+        const sts = await k8sApi.readNamespacedStatefulSet(resourceName, namespace);
+
+        // Increment the revision in the deployment template to trigger a rollout
+        sts.body.spec.template.metadata.annotations = {
+            ...sts.body.spec.template.metadata.annotations,
+            "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
+        };
+
+        await k8sApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+        // console.log(`Rollout restart ${resourceName} initiated successfully.`);
+    } catch (error) {
+        console.error("Error restarting resource:", error.body);
+        throw new AgnostError(error.body?.message);
+    }
+
+    // check if it has read replicas
+    try {
+        var resourceName = clusterName + "-replicas";
+        const sts = await k8sApi.readNamespacedStatefulSet(resourceName, namespace);
+
+        // Increment the revision in the deployment template to trigger a rollout
+        sts.body.spec.template.metadata.annotations = {
+            ...sts.body.spec.template.metadata.annotations,
+            "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
+        };
+
+        try {
+            await k8sApi.replaceNamespacedStatefulSet(resourceName, namespace, sts.body);
+            // console.log(`Rollout restart ${resourceName} initiated successfully.`);
+        } catch (error) {
+            console.error("Error restarting resource:", error.body);
+            throw new AgnostError(error.body?.message);
+        }
+    } catch (error) {
+        console.log("No read replicas to restart...");
+    }
+}

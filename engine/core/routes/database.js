@@ -17,17 +17,19 @@ const router = express.Router({ mergeParams: true });
 @access     private
 */
 
-router.get(
-	"/:dbName/model/:modelName",
-	authManageStorage,
-	getResponseBody,
-	responseTime(logRequestToConsole),
-	applyDefaultRateLimiters(),
-	checkServerStatus,
-	async (req, res) => {
-		try {
-			const { dbName, modelName } = req.params;
-			const { page, size, sortBy, sortDir, id, dbType } = req.query;
+router.post(
+  "/:dbName/model/:modelName",
+  authManageStorage,
+  getResponseBody,
+  responseTime(logRequestToConsole),
+  applyDefaultRateLimiters(),
+  checkServerStatus,
+  checkContentType,
+  async (req, res) => {
+    try {
+      const { dbName, modelName } = req.params;
+      const { page, size, sortBy, sortDir, id, dbType } = req.query;
+      const { filter } = req.body;
 
       const query =
         dbType === "MongoDB"
@@ -43,12 +45,17 @@ router.get(
       const defaultField = dbType === "MongoDB" ? "_id" : "id";
       const field = sortBy ?? defaultField;
       const direction = sortDir ?? "asc";
+
+      const queryFilter = [...filter];
+      if (id) queryFilter.unshift(query);
       const { data, info } = await agnost
         .db(dbName)
         .model(modelName)
         .findMany(
           {
-            ...(id && query),
+            ...(queryFilter.length > 1
+              ? { $and: queryFilter }
+              : queryFilter[0] ?? {}),
           },
           {
             ...(size && { limit: Number(size) }),
@@ -58,54 +65,27 @@ router.get(
           }
         );
 
+      const countInfo = {
+        totalCount: Number(info.count),
+        totalPages: Math.ceil(info.count / Number(size)),
+        currentPage: Number(page),
+        pageSize: Number(size),
+        count: data.length,
+      };
 
-			const countInfo = {
-				totalCount: Number(info.count),
-				totalPages: Math.ceil(info.count / Number(size)),
-				currentPage: Number(page),
-				pageSize: Number(size),
-				count: data.length,
-			};
+      const updatedData = data.map((d) => {
+        d.id = d?._id ?? d.id;
+        delete d._id;
+        return d;
+      });
 
-			const updatedData = data.map((d) => {
-				d.id = d?._id ?? d.id;
-				delete d._id;
-				return d;
-			});
-
-			res.json({ countInfo, data: updatedData });
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
+      res.json({ countInfo, data: updatedData });
+    } catch (error) {
+      helper.handleError(req, res, error);
+    }
+  }
 );
 
-/*
-@route      /:dbName/model/:modelName
-@method     POST
-@desc       Create a data in the model
-@access     private
-*/
-router.post(
-	"/:dbName/model/:modelName",
-	authManageStorage,
-	getResponseBody,
-	responseTime(logRequestToConsole),
-	applyDefaultRateLimiters(),
-	checkContentType,
-	checkServerStatus,
-	async (req, res) => {
-		try {
-			const { dbName, modelName } = req.params;
-
-			const data = await agnost.db(dbName).model(modelName).createOne(req.body);
-
-			res.json(data);
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
-);
 /*
 @route      /:dbName/model/:modelName/:id
 @method     POST
@@ -113,50 +93,50 @@ router.post(
 @access     private
 */
 router.put(
-	"/:dbName/model/:modelName/:id",
-	authManageStorage,
-	getResponseBody,
-	responseTime(logRequestToConsole),
-	applyDefaultRateLimiters(),
-	checkContentType,
-	checkServerStatus,
-	async (req, res) => {
-		try {
-			const { dbName, modelName, id } = req.params;
-			const { data, isSubObjectUpdate } = req.body;
-			const mongoClient = agnost.db(dbName).getClient();
-			const actualDbName = agnost.db(dbName).getActualDbName();
+  "/:dbName/model/:modelName/:id",
+  authManageStorage,
+  getResponseBody,
+  responseTime(logRequestToConsole),
+  applyDefaultRateLimiters(),
+  checkContentType,
+  checkServerStatus,
+  async (req, res) => {
+    try {
+      const { dbName, modelName, id } = req.params;
+      const { data, isSubObjectUpdate } = req.body;
+      const mongoClient = agnost.db(dbName).getClient();
+      const actualDbName = agnost.db(dbName).getActualDbName();
 
-			if (isSubObjectUpdate) {
-				const value = await mongoClient
-					.db(actualDbName)
-					.collection(modelName)
-					.findOneAndUpdate(
-						{ _id: helper.objectId(id) },
-						{
-							$set: data,
-						},
-						{
-							returnDocument: "after",
-						}
-					);
+      if (isSubObjectUpdate) {
+        const value = await mongoClient
+          .db(actualDbName)
+          .collection(modelName)
+          .findOneAndUpdate(
+            { _id: helper.objectId(id) },
+            {
+              $set: data,
+            },
+            {
+              returnDocument: "after",
+            }
+          );
 
-				value.id = value?._id ?? value.id;
-				delete value._id;
-				res.json(value);
-			} else {
-				const updatedData = await agnost
-					.db(dbName)
-					.model(modelName)
-					.updateById(id, data);
-				updatedData.id = updatedData?._id ?? updatedData.id;
-				delete updatedData._id;
-				res.json(updatedData);
-			}
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
+        value.id = value?._id ?? value.id;
+        delete value._id;
+        res.json(value);
+      } else {
+        const updatedData = await agnost
+          .db(dbName)
+          .model(modelName)
+          .updateById(id, data);
+        updatedData.id = updatedData?._id ?? updatedData.id;
+        delete updatedData._id;
+        res.json(updatedData);
+      }
+    } catch (error) {
+      helper.handleError(req, res, error);
+    }
+  }
 );
 /*
 @route      /:dbName/model/:modelName/:id
@@ -165,25 +145,25 @@ router.put(
 @access     private
 */
 router.delete(
-	"/:dbName/model/:modelName/delete-multi",
-	authManageStorage,
-	getResponseBody,
-	responseTime(logRequestToConsole),
-	applyDefaultRateLimiters(),
-	checkContentType,
-	checkServerStatus,
-	async (req, res) => {
-		try {
-			const { dbName, modelName } = req.params;
-			const { ids } = req.body;
-			ids.forEach(async (id) => {
-				await agnost.db(dbName).model(modelName).deleteById(id);
-			});
-			res.json();
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
+  "/:dbName/model/:modelName/delete-multi",
+  authManageStorage,
+  getResponseBody,
+  responseTime(logRequestToConsole),
+  applyDefaultRateLimiters(),
+  checkContentType,
+  checkServerStatus,
+  async (req, res) => {
+    try {
+      const { dbName, modelName } = req.params;
+      const { ids } = req.body;
+      ids.forEach(async (id) => {
+        await agnost.db(dbName).model(modelName).deleteById(id);
+      });
+      res.json();
+    } catch (error) {
+      helper.handleError(req, res, error);
+    }
+  }
 );
 /*
 @route      /:dbName/model/:modelName/:id
@@ -192,24 +172,24 @@ router.delete(
 @access     private
 */
 router.delete(
-	"/:dbName/model/:modelName/:id",
-	authManageStorage,
-	getResponseBody,
-	responseTime(logRequestToConsole),
-	applyDefaultRateLimiters(),
-	checkContentType,
-	checkServerStatus,
-	async (req, res) => {
-		try {
-			const { dbName, modelName, id } = req.params;
+  "/:dbName/model/:modelName/:id",
+  authManageStorage,
+  getResponseBody,
+  responseTime(logRequestToConsole),
+  applyDefaultRateLimiters(),
+  checkContentType,
+  checkServerStatus,
+  async (req, res) => {
+    try {
+      const { dbName, modelName, id } = req.params;
 
-			const data = await agnost.db(dbName).model(modelName).deleteById(id);
+      const data = await agnost.db(dbName).model(modelName).deleteById(id);
 
-			res.json(data);
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
+      res.json(data);
+    } catch (error) {
+      helper.handleError(req, res, error);
+    }
+  }
 );
 
 export default router;

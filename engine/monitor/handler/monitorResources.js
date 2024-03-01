@@ -46,7 +46,9 @@ export default async function monitorResources() {
 						setCachedStatus(statusCache, resource, result);
 						// If the resource is being created, updated or deleted and if we face an error it might be possible that it is undergoing an operation and we need to give time to it to complete its opeation
 						if (
-							["Creating", "Updating", "Deleting"].includes(resource.status)
+							["Creating", "Updating", "Deleting", "Restarting"].includes(
+								resource.status
+							)
 						) {
 							// Check duration of the operation
 							const now = Date.now();

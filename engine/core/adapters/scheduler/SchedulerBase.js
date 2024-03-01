@@ -154,6 +154,7 @@ export class SchedulerBase {
 				envId: META.getEnvObj()._id,
 				taskId: task._id,
 				errors: errors,
+				debug: debugChannel ? true : false,
 			};
 
 			// Save log to the database

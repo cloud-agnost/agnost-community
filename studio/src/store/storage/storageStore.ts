@@ -232,7 +232,17 @@ const useStorageStore = create<StorageStore & Actions>()(
 		createBucket: async (params: CreateBucketParams) => {
 			try {
 				const createdBucket = await StorageService.createBucket(params);
-				set({ buckets: [createdBucket, ...get().buckets] });
+				set((state) => ({
+					buckets: [createdBucket, ...get().buckets],
+					bucketCountInfo: {
+						...state.bucketCountInfo,
+						count: (state.bucketCountInfo?.count ?? 0) + 1,
+						totalCount: (state.bucketCountInfo?.totalCount ?? 0) + 1,
+						currentPage: state.bucketCountInfo?.currentPage ?? 1,
+						pageSize: state.bucketCountInfo?.pageSize ?? 1,
+						totalPages: state.bucketCountInfo?.totalPages ?? 1,
+					},
+				}));
 				params.onSuccess?.();
 				return createdBucket;
 			} catch (error) {
@@ -306,8 +316,21 @@ const useStorageStore = create<StorageStore & Actions>()(
 		uploadFileToBucket: async (params: UploadFileToBucketParams) => {
 			try {
 				const newFiles = await StorageService.uploadFileToBucket(params);
+
 				set((state) => ({
 					files: { ...state.files, [params.bckId]: [...newFiles, ...state.files[params.bckId]] },
+					fileCountInfo: {
+						...state.fileCountInfo,
+						[params.bckId]: {
+							...state.fileCountInfo?.[params.bckId],
+							count: (state.fileCountInfo?.[params.bckId]?.count ?? 0) + params.files.length,
+							totalCount:
+								(state.fileCountInfo?.[params.bckId]?.totalCount ?? 0) + params.files.length,
+							currentPage: state.fileCountInfo?.[params.bckId]?.currentPage ?? 1,
+							pageSize: state.fileCountInfo?.[params.bckId]?.pageSize ?? 1,
+							totalPages: state.fileCountInfo?.[params.bckId]?.totalPages ?? 1,
+						},
+					},
 				}));
 				params.onSuccess?.();
 				return newFiles;

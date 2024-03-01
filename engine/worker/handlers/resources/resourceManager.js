@@ -1,10 +1,10 @@
 import axios from "axios";
 import k8s from "@kubernetes/client-node";
-import { createRedis, deleteRedis, updateRedis } from "./redis.js";
-import { createRabbitmqCluster, updateRabbitmqCluster, deleteRabbitmqCluster } from "./rabbitmq.js";
-import { createMongoDBResource, updateMongoDBResource, deleteMongoDBResource } from "./mongodb.js";
-import { createPostgresql, updatePostgresql, deletePostgresql, waitForSecret } from "./postgres.js";
-import { createMySQLResource, updateMySQLResource, deleteMySQLResource } from "./mysql.js";
+import { createRedis, deleteRedis, updateRedis, restartRedis } from "./redis.js";
+import { createRabbitmqCluster, updateRabbitmqCluster, deleteRabbitmqCluster, restartRabbitMQ } from "./rabbitmq.js";
+import { createMongoDBResource, updateMongoDBResource, deleteMongoDBResource, restartMongoDB } from "./mongodb.js";
+import { createPostgresql, updatePostgresql, deletePostgresql, waitForSecret, restartPostgreSQL } from "./postgres.js";
+import { createMySQLResource, updateMySQLResource, deleteMySQLResource, restartMySQL } from "./mysql.js";
 import { updateMinioStorageSize } from "./minio.js";
 import { getDBClient } from "../../init/db.js";
 
@@ -186,14 +186,14 @@ export class ResourceManager {
                         );
                     break;
                 case "database":
-                    if (this.getResourceInstance() === "MongoDB")
+                    if (this.getResourceInstance() === "MongoDB") {
                         await updateMongoDBResource(
                             this.getResourceName(),
                             resource.config.version,
                             resource.config.size,
                             resource.config.replicas
                         );
-                    else if (this.getResourceInstance() === "PostgreSQL") {
+                    } else if (this.getResourceInstance() === "PostgreSQL") {
                         await updatePostgresql(
                             this.getResourceName(),
                             resource.config.version,
@@ -251,6 +251,44 @@ export class ResourceManager {
         } catch (error) {
             // Send the deployment telemetry information to the platform
             this.addLog([t("Resource update failed"), error.name, error.message, error.stack].join("\n"), "Error");
+            await this.sendResourceLogs("Error");
+            return { success: false, error };
+        }
+    }
+
+    /**
+     * Restarts the managed resource
+     */
+    async restartManagedResource() {
+        try {
+            this.addLog(t("Restarting managed resource"));
+            const resource = this.getResource();
+            switch (this.getResourceType()) {
+                case "cache":
+                    if (this.getResourceInstance() === "Redis") await restartRedis(this.getResourceName());
+                    break;
+                case "queue":
+                    if (this.getResourceInstance() === "RabbitMQ") await restartRabbitMQ(this.getResourceName());
+                    break;
+                case "database":
+                    if (this.getResourceInstance() === "MongoDB") {
+                        await restartMongoDB(this.getResourceName());
+                    } else if (this.getResourceInstance() === "PostgreSQL") {
+                        await restartPostgreSQL(this.getResourceName());
+                    } else if (this.getResourceInstance() === "MySQL") {
+                        await restartMySQL(this.getResourceName());
+                    }
+                    break;
+                default:
+                    break;
+            }
+            this.addLog(t("Completed resource restart successfully"));
+            // Send the resource telemetry information to the platform
+            await this.sendResourceLogs("OK");
+            return { success: true };
+        } catch (error) {
+            // Send the deployment telemetry information to the platform
+            this.addLog([t("Resource restart failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendResourceLogs("Error");
             return { success: false, error };
         }

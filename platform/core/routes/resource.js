@@ -508,7 +508,7 @@ router.put(
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
-				["Creating", "Updating", "Deleting", "Binding"].includes(
+				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
 					resource.status
 				)
 			) {
@@ -666,7 +666,7 @@ router.put(
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
-				["Creating", "Updating", "Deleting", "Binding"].includes(
+				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
 					resource.status
 				)
 			) {
@@ -744,6 +744,115 @@ router.put(
 				{
 					orgId: org._id,
 					appId: updatedResource.appId,
+					resourceId: resource._id,
+				}
+			);
+		} catch (error) {
+			await resourceCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/resource/:resourceId/restart
+@method     POST
+@desc       Restarts the managed resource
+@access     private
+*/
+router.post(
+	"/:resourceId/restart",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateResource,
+	authorizeOrgAction("org.resource.update"),
+	async (req, res) => {
+		const session = await resourceCtrl.startSession();
+		try {
+			const { org, user, resource } = req;
+
+			if (!resource.managed) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is not a managed resource. You cannot restart a resource that is not managed by the Agnost cluster.",
+						resource.instance,
+						resource.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
+			// unless the previous one is completed
+			if (
+				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
+					resource.status
+				)
+			) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is in '%s' status. You need to wait for the completion of the existing operation.",
+						resource.instance,
+						resource.name,
+						resource.status
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			const updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					status: "Restarting",
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: resource._id, session }
+			);
+
+			const logObj = await resLogCtrl.create(
+				{
+					orgId: org._id,
+					resourceId: resource._id,
+					action: "restart-managed",
+					status: "Restarting",
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			await resourceCtrl.commit(session);
+
+			const decryptedResource = helper.decryptResourceData(updatedResource);
+			res.json(decryptedResource);
+
+			// Update the managed resource
+			await resourceCtrl.manageClusterResources([
+				{ resource: updatedResource, log: logObj },
+			]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"update",
+				t(
+					"Restarted '%s' resource named '%s'",
+					resource.instance,
+					resource.name
+				),
+				decryptedResource,
+				{
+					orgId: org._id,
+					appId: resource.appId,
 					resourceId: resource._id,
 				}
 			);

@@ -509,3 +509,15 @@ export function isElementInViewport(el: Element) {
 		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 }
+
+export function isWithinParentBounds(el: Element, parent: Element) {
+	const elRect = el.getBoundingClientRect();
+	const parentRect = parent.getBoundingClientRect();
+
+	return (
+		elRect.top >= parentRect.top &&
+		elRect.left >= parentRect.left &&
+		elRect.bottom <= parentRect.bottom &&
+		elRect.right <= parentRect.right
+	);
+}

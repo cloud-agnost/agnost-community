@@ -114,3 +114,21 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
+
+export async function restartPostgreSQL(resourceName) {
+    try {
+        const pgsql = await k8sCustomApi.getNamespacedCustomObject(group, version, namespace, plural, resourceName);
+
+        // Increment the revision in the deployment template to trigger a rollout
+        pgsql.body.spec.podAnnotations = {
+            ...pgsql.body.spec.podAnnotations,
+            "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
+        };
+
+        await k8sCustomApi.replaceNamespacedCustomObject(group, version, namespace, plural, resourceName, pgsql.body);
+        // console.log(`Rollout restart ${resourceName} initiated successfully.`);
+    } catch (error) {
+        console.error("Error restarting resource:", error.body);
+        throw new AgnostError(error.body?.message);
+    }
+}

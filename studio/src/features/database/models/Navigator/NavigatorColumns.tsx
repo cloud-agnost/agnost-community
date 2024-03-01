@@ -3,14 +3,16 @@ import { toast } from '@/hooks/useToast';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { APIError } from '@/types';
-import { getVersionPermission, translate } from '@/utils';
+import { getVersionPermission, queryBuilder, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 const { deleteDataFromModel } = useNavigatorStore.getState();
 const queryClient = new QueryClient();
 async function deleteHandler(id: string) {
+	const { columnFilters } = useUtilsStore.getState();
 	const { model } = useModelStore.getState();
 	const { database } = useDatabaseStore.getState();
 	const { dataCountInfo, getDataFromModel } = useNavigatorStore.getState();
@@ -29,6 +31,7 @@ async function deleteHandler(id: string) {
 					page: countInfo?.currentPage ?? 0,
 					size: countInfo?.pageSize ?? 0,
 					dbType: database.type,
+					filter: queryBuilder(columnFilters?.[model._id] ?? {}),
 				});
 			},
 		})
@@ -46,11 +49,15 @@ export const NavigatorColumns: ColDef[] = [
 		width: 50,
 		pinned: 'left',
 		resizable: true,
+		filter: false,
+		suppressMenu: true,
 	},
 	{
 		width: 200,
 		pinned: 'right',
 		resizable: true,
+		filter: false,
+		suppressMenu: true,
 		cellRenderer: (params: ICellRendererParams) => {
 			const canDeleteModel = getVersionPermission('model.delete');
 			return (

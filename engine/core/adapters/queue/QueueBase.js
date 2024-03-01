@@ -171,6 +171,7 @@ export class QueueBase {
 						? t("Message too large to store")
 						: payload,
 				errors: errors,
+				debug: debugChannel ? true : false,
 			};
 
 			// Save log to the database

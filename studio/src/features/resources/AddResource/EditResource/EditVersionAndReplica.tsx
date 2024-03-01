@@ -4,7 +4,13 @@ import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import useResourceStore from '@/store/resources/resourceStore';
-import { APIError, CreateResourceSchema, ResourceInstances, ResourceType } from '@/types';
+import {
+	APIError,
+	CreateResourceSchema,
+	ResourceInstances,
+	ResourceType,
+	ResourceUpdateType,
+} from '@/types';
 import { isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -67,7 +73,7 @@ export default function EditVersionAndReplica() {
 
 	function onSubmit(data: z.infer<typeof CreateResourceSchema>) {
 		updateResourceMutate({
-			updateType: 'others',
+			updateType: ResourceUpdateType.Others,
 			resourceId: resourceToEdit?._id,
 			orgId,
 			...data,
@@ -98,7 +104,6 @@ export default function EditVersionAndReplica() {
 								<FormControl className='flex'>
 									<Input
 										type='number'
-										disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
 										placeholder={t('resources.database.instance_placeholder') ?? ''}
 										error={!!form.formState.errors.config?.instances}
 										{...field}
@@ -165,7 +170,9 @@ export default function EditVersionAndReplica() {
 				)}
 				<div className='flex justify-end'>
 					<Button className='ml-2' size='lg' loading={isPending} type='submit'>
-						{t('general.save')}
+						{form.watch('type') === ResourceType.Cache
+							? t('resources.update_version')
+							: t('resources.update_replica_and_version')}
 					</Button>
 				</div>
 			</form>

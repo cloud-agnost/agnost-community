@@ -1,10 +1,12 @@
 import { CustomStateStorage } from '@/helpers/state';
 import { create } from '@/helpers/store';
 import {
+	ColumnFilterType,
 	EndpointLogs,
 	EndpointRequest,
 	EndpointResponse,
 	Log,
+	ModelColumnFilters,
 	TabTypes,
 	TestEndpointParams,
 	TestQueueLogs,
@@ -15,6 +17,7 @@ import { filterMatchingKeys, getTypeWorker } from '@/utils';
 import { ColumnState } from 'ag-grid-community';
 import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
+import useModelStore from '../database/modelStore';
 import useVersionStore from './versionStore';
 
 interface UtilsStore {
@@ -34,6 +37,7 @@ interface UtilsStore {
 	columnState: {
 		[modelId: string]: ColumnState[] | undefined;
 	};
+	columnFilters: ModelColumnFilters | undefined;
 }
 
 type Actions = {
@@ -52,6 +56,9 @@ type Actions = {
 	getColumnState: (modelId: string) => ColumnState[] | undefined;
 	resetColumnState: (modelId: string) => void;
 	collapseAll: () => void;
+	setColumnFilters: (columnName: string, filter: ColumnFilterType) => void;
+	clearAllColumnFilters: () => void;
+	clearColumnFilter: (columnName: string) => void;
 };
 
 const initialState: UtilsStore = {
@@ -64,6 +71,7 @@ const initialState: UtilsStore = {
 	sidebar: {} as UtilsStore['sidebar'],
 	isSidebarOpen: true,
 	columnState: {} as UtilsStore['columnState'],
+	columnFilters: undefined,
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(
@@ -212,7 +220,43 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 						return { columnState: state };
 					});
 				},
+				setColumnFilters: (columnName, filter) => {
+					const modelId = useModelStore.getState().model._id;
+					set((prev) => {
+						return {
+							columnFilters: {
+								...prev.columnFilters,
+								[modelId]: {
+									...prev.columnFilters?.[modelId],
+									[columnName]: filter,
+								},
+							},
+						};
+					});
+				},
+				clearAllColumnFilters: () => {
+					const modelId = useModelStore.getState().model._id;
+					set((prev) => {
+						const state = prev.columnFilters;
+						delete state?.[modelId];
+						return { columnFilters: state };
+					});
+				},
+				clearColumnFilter: (columnName) => {
+					const modelId = useModelStore.getState().model._id;
+					set((prev) => {
+						const state = prev.columnFilters?.[modelId];
+						delete state?.[columnName];
+						return {
+							columnFilters: {
+								...prev.columnFilters,
+								[modelId]: state,
+							},
+						};
+					});
+				},
 			}),
+
 			{ name: 'utils-store', storage: CustomStateStorage },
 		),
 	),
