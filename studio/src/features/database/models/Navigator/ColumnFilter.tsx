@@ -13,7 +13,7 @@ import { useDebounce, useUpdateEffect } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import { Condition, ConditionsType, FieldTypes, Filters, ResourceInstances } from '@/types';
 import { InputMask } from '@react-input/mask';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 export default function ColumnFilter({
 	onFilterChange,

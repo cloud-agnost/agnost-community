@@ -12,13 +12,14 @@ module.exports = {
 		'plugin:jsx-a11y/recommended',
 		'prettier',
 		'plugin:@tanstack/eslint-plugin-query/recommended',
+		'plugin:i18next/recommended',
 	],
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
 	},
-	plugins: ['react-refresh', 'react', '@tanstack/query'],
+	plugins: ['react-refresh', 'react', '@tanstack/query', 'i18next'],
 	rules: {
 		'react-refresh/only-export-components': 'warn',
 		'react/react-in-jsx-scope': 'off',
