@@ -1,4 +1,4 @@
-import storageCtrl from "../controllers/cache.js";
+import storageCtrl from "../controllers/storage.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
