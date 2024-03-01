@@ -199,7 +199,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.clearLogs();
 		await this.closeHttpServer();
 
-		// We haven't refreshed the META manager so that we can access the old values
+		/* 		// We haven't refreshed the META manager so that we can access the old values
 		// Clear queue channels
 		const queueus = await META.getQueues();
 		for (const queue of queueus) {
@@ -217,7 +217,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			if (adapterObj) {
 				await adapterObj.closeChannels();
 			}
-		}
+		} */
 
 		// We haven't refreshed the META manager so that we can access the old values
 		// Clear environment variables

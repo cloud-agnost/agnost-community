@@ -1690,10 +1690,9 @@ router.get(
 				sort[sortBy] = sortDir == "asc" ? 1 : -1;
 			} else sort = { name: 1 };
 
+			const escaped = helper.escapeStringRegexp(find);
 			// Adjust the search term for whole word matching
-			const searchTermRegex = matchWholeWord
-				? `\\b${helper.escapeStringRegexp(find)}\\b`
-				: helper.escapeStringRegexp(find);
+			const searchTermRegex = matchWholeWord ? `\\b${escaped}\\b` : escaped;
 
 			// Perform the text search
 			const searchOptions = matchCase
@@ -1703,11 +1702,11 @@ router.get(
 			let searchQuery = null;
 			if (matchCase) {
 				searchQuery = {
-					$regex: helper.escapeStringRegexp(find),
+					$regex: escaped,
 				};
 			} else {
 				searchQuery = {
-					$regex: helper.escapeStringRegexp(find),
+					$regex: escaped,
 					$options: matchCase ? undefined : "i",
 				};
 			}
@@ -1738,7 +1737,7 @@ router.get(
 								if (searchOptions.test(line)) {
 									return {
 										lineNumber: index + 1, // Adding 1 because line numbers start from 1
-										lineText: helper.highlight(line, find, matchCase),
+										lineText: helper.highlight(line, escaped, matchCase),
 									};
 								}
 								return null;
