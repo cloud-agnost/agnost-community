@@ -61,7 +61,7 @@ export default function useNavigatorColumns() {
 				selectList: field.enum?.selectList,
 			},
 			maxWidth:
-				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 100 : 1000,
+				field.type === FieldTypes.ID && database.type !== ResourceInstances.MongoDB ? 100 : 10000,
 			cellEditor: NavigatorCellEditorMap[field.type],
 			cellRenderer: CellRendererMap[field.type],
 			cellEditorPopup:

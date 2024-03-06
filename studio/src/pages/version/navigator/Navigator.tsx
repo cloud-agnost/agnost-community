@@ -193,7 +193,6 @@ export default function Navigator() {
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
-			console.log('onFirstDataRendered');
 			event.columnApi.applyColumnState({
 				state: columnState,
 				applyOrder: true,
@@ -204,7 +203,7 @@ export default function Navigator() {
 
 	function onGridReady(event: GridReadyEvent) {
 		event.api.showLoadingOverlay();
-		// event.api.sizeColumnsToFit();
+		if (model.fields.length <= 5) event.api.sizeColumnsToFit();
 	}
 
 	const saveColumnStateDebounced = useCallback(
@@ -282,7 +281,6 @@ export default function Navigator() {
 					onColumnMoved={handleColumnStateChange}
 					defaultColDef={{
 						resizable: true,
-						width: 200,
 					}}
 				/>
 				{!isFetching && <Pagination countInfo={dataCountInfo?.[modelId] as BucketCountInfo} />}
