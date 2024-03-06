@@ -54,6 +54,7 @@ export default function Workspace() {
 	const { t } = useTranslation();
 	const { openEditCacheModal } = useCacheStore();
 	const { getFunction, data } = useStores();
+
 	const { mutateAsync: deleteMutation, isPending } = useMutation({
 		mutationFn: handleDeleteMutation,
 		onSuccess: () => {
@@ -238,6 +239,8 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 				versionId,
 				page: 0,
 				size: 250,
+				sortBy: 'name',
+				sort: 'asc',
 			});
 		}
 	}
