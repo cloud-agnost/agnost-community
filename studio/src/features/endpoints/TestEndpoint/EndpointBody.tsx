@@ -56,7 +56,10 @@ export default function EndpointBody() {
 										className='min-h-[100px] h-full'
 										containerClassName='h-[calc(100%-6rem)]'
 										value={field.value}
-										onChange={field.onChange}
+										onChange={(val) => {
+											console.log('=======OnEpBodyChange======', val);
+											field.onChange(val);
+										}}
 										defaultLanguage='json'
 										name={`endpointBody-${endpoint._id}`}
 									/>
