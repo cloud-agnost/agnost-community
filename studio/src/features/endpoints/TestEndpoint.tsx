@@ -20,6 +20,7 @@ import {
 	leaveChannel,
 	serializedStringToFile,
 } from '@/utils';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -137,7 +138,18 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		leaveChannel(debugChannel as string);
 		setDebugChannel(null);
 		onClose();
+		handleCancelRequest();
 	}
+
+	function handleCancelRequest() {
+		if (window.controller) {
+			window.controller.abort();
+		}
+		window.controller = new AbortController();
+		leaveChannel(debugChannel as string);
+		setDebugChannel(null);
+	}
+
 	useEffect(() => {
 		const header = {
 			key: 'Content-Type',
@@ -224,15 +236,27 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 								/>
 							</div>
 						</div>
-						<Button
-							className='ml-3'
-							variant='primary'
-							onClick={() => form.handleSubmit(onSubmit)()}
-							loading={isPending}
-							disabled={environment?.serverStatus !== 'OK'}
-						>
-							{t('endpoint.test.send')}
-						</Button>
+
+						{isPending ? (
+							<Button
+								className='ml-3'
+								variant='secondary'
+								onClick={handleCancelRequest}
+								disabled={environment?.serverStatus !== 'OK'}
+							>
+								{t('endpoint.test.abort')}
+							</Button>
+						) : (
+							<Button
+								className='ml-3'
+								variant='primary'
+								onClick={() => form.handleSubmit(onSubmit)()}
+								loading={isPending}
+								disabled={environment?.serverStatus !== 'OK'}
+							>
+								{t('endpoint.test.send')}
+							</Button>
+						)}
 					</div>
 					<nav className='flex border-b'>
 						{TEST_ENDPOINTS_MENU_ITEMS.filter(

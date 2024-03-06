@@ -47,7 +47,7 @@
 		"title": "Test Endpoint",
 		"params": "Params",
 		"headers": "Headers",
-
+		"abort": "Abort",
 		"body": "Body",
 		"files": "Files",
 		"query_params": "Query Params",
