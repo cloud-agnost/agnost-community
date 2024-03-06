@@ -399,6 +399,8 @@ declare global {
 	var ts: typeof import('typescript');
 	// eslint-disable-next-line no-var
 	var editor: import('monaco-editor').editor.IStandaloneCodeEditor;
+	// eslint-disable-next-line no-var
+	var controller: AbortController;
 }
 
 declare module '@tanstack/react-query' {
