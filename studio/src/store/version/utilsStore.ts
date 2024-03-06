@@ -85,6 +85,7 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 					}));
 				},
 				setEndpointResponse: (response, epId) => {
+					console.log('========setting response=======', epId, response);
 					set((prev) => ({
 						endpointResponse: {
 							...prev.endpointResponse,
