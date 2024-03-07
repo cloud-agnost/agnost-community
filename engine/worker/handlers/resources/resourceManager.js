@@ -436,6 +436,7 @@ export class ResourceManager {
                 timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
                 periodSeconds: config.get("general.readinessProbe.periodSeconds"),
                 initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+                failureThreshold: config.get("general.readinessProbe.failureThreshold"),
             };
 
             // Apply updated Knative Service
@@ -608,6 +609,7 @@ export class ResourceManager {
                                     timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
                                     periodSeconds: config.get("general.readinessProbe.periodSeconds"),
                                     initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+                                    failureThreshold: config.get("general.readinessProbe.failureThreshold"),
                                 },
                             },
                         ],
@@ -694,6 +696,7 @@ export class ResourceManager {
                 timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
                 periodSeconds: config.get("general.readinessProbe.periodSeconds"),
                 initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+                failureThreshold: config.get("general.readinessProbe.failureThreshold"),
             };
 
             // Apply updated Knative Service
