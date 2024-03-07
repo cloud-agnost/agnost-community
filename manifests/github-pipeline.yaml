@@ -15,6 +15,8 @@ spec:
       value: willbereplaced
     - name: githubpat
       value: willbereplaced
+    - name: gitbranch
+      value: willbereplaced
     - name: gitrevision
       value: $(body.head_commit.id)
     - name: gitrepo
@@ -34,6 +36,7 @@ spec:
     - name: resourcenamespace
     - name: containerregistry
     - name: githubpat
+    - name: gitbranch
     - name: gitrevision
     - name: gitrepo
     - name: imagename
@@ -51,7 +54,7 @@ spec:
           workspaces:
           - name: ws
           volumes:
-          - name: kaniko-secret
+          - name: regcred
             secret:
               secretName: ghcr-regcred
               items:
@@ -64,22 +67,48 @@ spec:
               #!/bin/sh
               echo "$(tt.params.containerregistry)/$(tt.params.imagename):$(echo $(tt.params.gitrevision) | head -c 7)" > $(workspaces.ws.path)/image
           - name: build
-            image: gcr.io/kaniko-project/executor:debug
+            image: gcr.io/kaniko-project/executor:v1.21.1-debug
             script: |
               #!/busybox/sh
               export IMAGE=$(cat $(workspaces.ws.path)/image)
               export CONTEXT=$(echo $(tt.params.gitrepo) | sed "s|git://|git://$(tt.params.githubpat)@|")
-              /kaniko/executor \
-                --destination=${IMAGE} \
-                --context=${CONTEXT}
+              if [ "$(tt.params.containerregistry)" == "local-registry.default:5000" ]; then
+                /kaniko/executor \
+                  --destination=${IMAGE} \
+                  --context=${CONTEXT} \
+                  --git branch=$(tt.params.gitbranch) \
+                  --no-push \
+                  --tar-path=$(workspaces.ws.path)/image.tar
+              else
+                /kaniko/executor \
+                  --destination=${IMAGE} \
+                  --context=${CONTEXT} \
+                  --git branch=$(tt.params.gitbranch)
+              fi
             volumeMounts:
-            - name: kaniko-secret
+            - name: regcred
               mountPath: /kaniko/.docker/
+          - image: quay.io/skopeo/stable:latest
+            name: local-push
+            script: |
+              #!/bin/bash
+              if [ "$(tt.params.containerregistry)" == "local-registry.default:5000" ]; then
+                export IMAGE=$(cat $(workspaces.ws.path)/image)
+                skopeo --insecure-policy copy \
+                  --dest-authfile /root/.docker/config.json \
+                  --dest-tls-verify=false --format=oci \
+                  docker-archive:$(workspaces.ws.path)/image.tar docker://${IMAGE}
+              else
+                echo "Not using local registry, skipping ..."
+              fi
+            volumeMounts:
+            - mountPath: /root/.docker/
+              name: regcred
           - name: deploy
             image: bitnami/kubectl:1.29.2
             script: |
               #!/usr/bin/bash
-              export IMAGE=$(cat $(workspaces.ws.path)/image)
+              export IMAGE=$(cat $(workspaces.ws.path)/image | sed 's/local-registry.default:5000/localhost:30050/')
               kubectl set image $(tt.params.kind)/$(tt.params.resourcename) $(tt.params.resourcename)=${IMAGE} -n $(tt.params.resourcenamespace)
               kubectl rollout status $(tt.params.kind)/$(tt.params.resourcename) -n $(tt.params.resourcenamespace) -w
               kubectl annotate $(tt.params.kind)/$(tt.params.resourcename) kubernetes.io/change-cause="Update image to ${IMAGE}" -n $(tt.params.resourcenamespace)
@@ -143,6 +172,12 @@ spec:
                 secretKey: secretToken
             - name: "eventTypes"
               value: ["push"]
+        - name: "Only for the specific branch"
+          ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "body.ref == 'refs/heads/master'"
       bindings:
         - ref: github-push-binding
       template:

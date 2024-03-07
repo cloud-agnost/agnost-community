@@ -91,7 +91,7 @@ function sleep(ms) {
   });
 }
 
-async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName) {
+async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName) {
   const manifestFilePath = '../manifests/' + gitRepoType + '-pipeline.yaml';
   const manifest = fs.readFileSync(manifestFilePath, 'utf8');
   const resources = k8s.loadAllYaml(manifest);
@@ -136,6 +136,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, contai
           break;
         case('EventListener'):
           resource.spec.triggers[0].interceptors[0].params[0].value.secretName += resourceNameSuffix;
+          resource.spec.triggers[0].interceptors[1].params[0].value = `body.ref == 'refs/heads/${gitBranch}'`;
           resource.spec.triggers[0].bindings[0].ref += resourceNameSuffix;
           resource.spec.triggers[0].template.ref += resourceNameSuffix;
           resource.spec.resources.kubernetesResource.spec.template.spec.serviceAccountName += resourceNameSuffix;
@@ -145,12 +146,21 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, contai
           resource.spec.params[0].value = appKind;
           resource.spec.params[1].value = appName;
           resource.spec.params[2].value = namespace;
-          resource.spec.params[3].value = containerRegistry;
+          if (containerRegistryType == 'local') {
+            resource.spec.params[3].value = 'local-registry.' + namespace + ":5000";
+          } else {
+            resource.spec.params[3].value = containerRegistry;
+          }
           resource.spec.params[4].value = gitPat;
+          resource.spec.params[5].value = gitBranch;
           await k8sCustomObjectApi.createNamespacedCustomObject(group, version, resource_namespace, 'triggerbindings', resource);
           break;
         case('TriggerTemplate'):
-          secretName = 'regcred-' + containerRegistryType + '-' + containerRegistryId;
+          if (containerRegistryType == 'local') {
+            secretName = 'regcred-local-registry';
+          } else {
+            secretName = 'regcred-' + containerRegistryType + '-' + containerRegistryId;
+          }
           resource.spec.resourcetemplates[0].spec.taskSpec.volumes[0].secret.secretName = secretName;
           resource.spec.resourcetemplates[0].spec.serviceAccountName += resourceNameSuffix;
           await k8sCustomObjectApi.createNamespacedCustomObject(group, version, resource_namespace, 'triggertemplates', resource);
@@ -251,10 +261,10 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
 
 
 router.post('/tektonPipeline', async (req, res) => {
-  const { gitRepoId, gitRepoType, gitRepoUrl, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName } = req.body;
+  const { gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName } = req.body;
 
   try {
-    const webhookConfig = await createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName);
+    const webhookConfig = await createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName);
     res.json(webhookConfig);
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));

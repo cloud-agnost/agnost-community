@@ -889,28 +889,46 @@ curl -XDELETE http://localhost:3000/deployapp -d '{
 #### Install Infra
 
 ```bash
-curl -XPOST http://localhost:3000/tektonInfra
+curl -XPOST http://localhost:3000/tektonInfra -d '{
+    "localRegistryEnabled": true
+}' -H "Content-type: application/json"
 ```
 
 #### Delete Infra
 
 ```bash
-curl -XDELETE http://localhost:3000/tektonInfra
+curl -XDELETE http://localhost:3000/tektonInfra -d '{
+    "localRegistryEnabled": true
+}' -H "Content-type: application/json"
 ```
 
 ### GitHub Pipeline create
 
 ```bash
+# Container Registry: GitHub/GHCR
 curl -XPOST http://localhost:3000/tektonPipeline -d '{
-    "gitRepoId": "4sfde896343",
+    "gitRepoId": "4sfde896344",
     "gitRepoType": "github",
     "gitRepoUrl": "https://github.com/OWNER/REPO",
+    "gitBranch": "main",
     "gitPat": "ghp_xxx",
     "containerRegistry": "ghcr.io/OWNER",
     "containerRegistryType": "ghcr",
     "containerRegistryId": "9efe58b87a60",
-    "resourceKind": "Deployment",
-    "resourceName": "my-app-dply"
+    "appKind": "Deployment",
+    "appName": "my-app-dply"
+}' -H "Content-type: application/json"
+
+# Container Registry: Local registry inside the cluster
+curl -XPOST http://localhost:3000/tektonPipeline -d '{
+    "gitRepoId": "4sfde896343",
+    "gitRepoType": "github",
+    "gitRepoUrl": "https://github.com/OWNER/REPO",
+    "gitBranch": "main",
+    "gitPat": "ghp_xxx",
+    "containerRegistryType": "local",
+    "appKind": "Deployment",
+    "appName": "my-app-dply"
 }' -H "Content-type: application/json"
 ```
 
