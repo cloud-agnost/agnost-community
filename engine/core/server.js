@@ -77,6 +77,8 @@ if (cluster.isPrimary) {
 	process.on("message", (message) => {
 		if (message === "restart") {
 			childManager.restartCore();
+		} else if (message === "primary_failed") {
+			global.SERVER_STATUS = "primary_failed";
 		}
 	});
 

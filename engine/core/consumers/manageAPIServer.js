@@ -71,11 +71,20 @@ export const manageAPIServerHandler = (connection, envId) => {
 								process.kill(pid, "SIGSTOP");
 							}
 
-							await manager.initializeCore();
+							const { status } = await manager.initializeCore();
 
 							// Resume child process
 							for (const pid of workerPid) {
 								process.kill(pid, "SIGCONT");
+							}
+
+							// If the status is error, we should not restart the worker
+							if (status === "Error") {
+								// Send a message from the master process to the worker.
+								for (const worker of Object.values(cluster.workers)) {
+									worker.send("primary_failed");
+								}
+								return;
 							}
 
 							// Restart worker(s)
@@ -93,11 +102,22 @@ export const manageAPIServerHandler = (connection, envId) => {
 								process.kill(pid, "SIGSTOP");
 							}
 
-							await manager.initializeCore();
+							const { status } = await manager.initializeCore();
+
+							console.log("****here is the status", status);
 
 							// Resume child process
 							for (const pid of workerPid) {
 								process.kill(pid, "SIGCONT");
+							}
+
+							// If the status is error, we should not restart the worker
+							if (status === "Error") {
+								// Send a message from the master process to the worker.
+								for (const worker of Object.values(cluster.workers)) {
+									worker.send("primary_failed");
+								}
+								return;
 							}
 
 							// Send a message from the master process to the worker.

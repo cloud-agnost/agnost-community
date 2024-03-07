@@ -92,8 +92,6 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 					t("API server has the latest configuration, no changes applied")
 				);
 				this.addLog(t("********* MANAGER PROCESS END *********"));
-				// Send the deployment telemetry information to the platform
-				// await this.sendEnvironmentLogs("OK");
 				return;
 			}
 		}
@@ -103,10 +101,15 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		// Save all configuration files
 		await this.saveConfig();
 		// Manage NPM packages
-		await this.manageNPMPackages();
+		const { status } = await this.manageNPMPackages();
+		if (status === "Error") {
+			this.addLog(t("********* MANAGER PROCESS END *********"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("Error");
+			return { status: "Error" };
+		}
 		this.addLog(t("********* MANAGER PROCESS END *********"));
-		// Send the deployment telemetry information to the platform
-		// await this.sendEnvironmentLogs("OK");
+		return { status: "OK" };
 	}
 
 	/**
@@ -374,10 +377,20 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			finalCommand = `${uninstallCommand} && ${installCommand}`;
 		else if (uninstallCommand) finalCommand = uninstallCommand;
 		else if (installCommand) finalCommand = installCommand;
-		else return;
+		else return { status: "OK" };
 
-		// Execute the final command in async mode
-		execSync(finalCommand, { stdio: "inherit" });
+		try {
+			// Execute the final command in sync mode
+			execSync(finalCommand, { stdio: "inherit" });
+		} catch (err) {
+			this.addLog(
+				t("Install/uninstall packages failed: %s", err.message),
+				"Error"
+			);
+			return { status: "Error" };
+		}
+
 		this.addLog(t("Install/uninstall packages completed"));
+		return { status: "OK" };
 	}
 }
