@@ -130,7 +130,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
 			// Send message to master process
-			// process.send("ready");
+			process.send("ready");
 			return;
 		}
 
@@ -243,7 +243,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
 			// Send message to master process
-			// process.send("ready");
+			process.send("ready");
 			return;
 		}
 

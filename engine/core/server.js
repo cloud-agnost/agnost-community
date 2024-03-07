@@ -167,6 +167,7 @@ function initGlobals() {
 	// Add logger to the global object
 	global.logger = logger;
 	global.__dirname = dirname;
+	global.childProcessStatus = "creating";
 
 	// To correctly identify errors thrown by the engine vs. system thrown errors
 	global.AgnostError = class extends Error {

@@ -1,6 +1,7 @@
 import cluster from "cluster";
 import { getKey } from "../init/cache.js";
 import { PrimaryProcessDeploymentManager } from "../handlers/primaryProcessManager.js";
+import e from "express";
 
 var updateCount = 0;
 
@@ -49,6 +50,12 @@ export const manageAPIServerHandler = (connection, envId) => {
 						// Check to see if resources have changed or not and whether we are dedeploying the version, if not we can update the child process faster, no need to kill it
 						const hasResourceChange = await manager.hasResourceChange();
 						const hasDBPoolSizeChange = await manager.hasDBPoolSizeChange();
+
+						// Get the worker process ids
+						const workerPid = Object.values(cluster.workers).map(
+							(e) => e.process.pid
+						);
+
 						if (
 							hasResourceChange ||
 							hasDBPoolSizeChange ||
@@ -58,7 +65,19 @@ export const manageAPIServerHandler = (connection, envId) => {
 							updateCount >= config.get("general.maxUpdatesBeforeRestart")
 						) {
 							await waitUntilChildProcessIsReady();
+
+							// Stop child process
+							for (const pid of workerPid) {
+								process.kill(pid, "SIGSTOP");
+							}
+
 							await manager.initializeCore();
+
+							// Resume child process
+							for (const pid of workerPid) {
+								process.kill(pid, "SIGCONT");
+							}
+
 							// Restart worker(s)
 							for (const worker of Object.values(cluster.workers)) {
 								worker.kill("SIGINT");
@@ -68,7 +87,18 @@ export const manageAPIServerHandler = (connection, envId) => {
 							updateCount = 0;
 						} else {
 							await waitUntilChildProcessIsReady();
+
+							// Stop child process
+							for (const pid of workerPid) {
+								process.kill(pid, "SIGSTOP");
+							}
+
 							await manager.initializeCore();
+
+							// Resume child process
+							for (const pid of workerPid) {
+								process.kill(pid, "SIGCONT");
+							}
 
 							// Send a message from the master process to the worker.
 							for (const worker of Object.values(cluster.workers)) {
