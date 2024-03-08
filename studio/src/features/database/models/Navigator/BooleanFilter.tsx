@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BOOLEAN_FILTERS } from '@/constants';
 import { useColumnFilter } from '@/hooks';
 import { ConditionsType, FilterProps } from '@/types';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
 export default function BooleanFilter({ type, columnName }: FilterProps) {
@@ -42,7 +43,7 @@ export default function BooleanFilter({ type, columnName }: FilterProps) {
 					))}
 				</SelectContent>
 			</Select>
-			{filter?.conditions[0]?.filter ? (
+			{!_.isNil(filter?.conditions[0]?.filter) ? (
 				<Button variant='primary' onClick={() => applyFilter(filter)} size='full'>
 					Apply
 				</Button>
