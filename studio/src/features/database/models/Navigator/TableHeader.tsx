@@ -59,6 +59,11 @@ export default function TableHeader({
 		return null;
 	}
 
+	function handleClearColumnFilter() {
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+		clearColumnFilter(text);
+	}
+
 	return (
 		<div className='flex items-center w-full h-full'>
 			<Button
@@ -102,7 +107,7 @@ export default function TableHeader({
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
-									onClick={() => clearColumnFilter(text)}
+									onClick={handleClearColumnFilter}
 									variant='text'
 									className='items-center'
 								>
