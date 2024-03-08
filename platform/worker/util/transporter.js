@@ -5,10 +5,9 @@ import config from "config";
 var transporter = null;
 var fromEmail = null;
 var fromName = null;
+var config = null;
 
 export async function getTransport() {
-	if (transporter) return { transporter, fromEmail, fromName };
-
 	// Get the SMTP server configuration. Make api call to the platform to to get the SMTP configuration
 	try {
 		const smtpConfig = await axios.get(
@@ -21,6 +20,12 @@ export async function getTransport() {
 			}
 		);
 
+		let configStr = JSON.stringify(smtpConfig.data);
+
+		if (transporter && config && config === configStr)
+			return { transporter, fromEmail, fromName };
+
+		config = configStr;
 		transporter = nodemailer.createTransport({
 			host: smtpConfig.data.host,
 			port: smtpConfig.data.port,
