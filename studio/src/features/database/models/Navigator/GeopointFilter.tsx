@@ -4,6 +4,7 @@ import { Condition, FilterProps, Operators } from '@/types';
 import { useEffect, useState } from 'react';
 import GeopointFilterItem from './GeopointFilterItem';
 import OperatorSelect from './OperatorSelect';
+import _ from 'lodash';
 
 export default function GeopointFilter({ columnName, type }: FilterProps) {
 	const { selectedFilter, filterType, applyFilter } = useColumnFilter(columnName, type);
@@ -52,7 +53,7 @@ export default function GeopointFilter({ columnName, type }: FilterProps) {
 				condition={filter?.conditions[0]}
 			/>
 
-			{filter?.conditions[0]?.filter && (
+			{!_.isNil(filter?.conditions[0]?.filter) && (
 				<OperatorSelect
 					defaultValue={filter?.operator ?? Operators.None}
 					onOperatorChange={updateOperator}
@@ -66,7 +67,7 @@ export default function GeopointFilter({ columnName, type }: FilterProps) {
 				/>
 			)}
 
-			{filter?.conditions[0]?.filter ? (
+			{!_.isNil(filter?.conditions[0]?.filter) ? (
 				<Button variant='primary' onClick={() => applyFilter(filter)} size='full'>
 					Apply
 				</Button>

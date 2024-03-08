@@ -38,6 +38,7 @@ export default function CreateStorage() {
 				isDashboard: false,
 				type: TabTypes.Bucket,
 			});
+			useStorageStore.setState({ buckets: [] });
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });

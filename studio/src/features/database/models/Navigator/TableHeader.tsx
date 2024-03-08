@@ -109,7 +109,7 @@ export default function TableHeader({
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
-									onClick={handleClearColumnFilter}
+									onClick={handleClearFilter}
 									variant='text'
 									className='items-center'
 								>

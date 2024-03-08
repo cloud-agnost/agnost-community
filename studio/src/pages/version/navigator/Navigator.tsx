@@ -182,7 +182,9 @@ export default function Navigator() {
 
 	useEffect(() => {
 		if (!_.isNil(gridRef.current?.api)) {
-			if (data.length === 0 && !isFetching) {
+			if (isFetching) {
+				gridRef.current.api.showLoadingOverlay();
+			} else if (data.length === 0) {
 				gridRef.current.api.showNoRowsOverlay();
 			} else {
 				gridRef.current.api.hideOverlay();
@@ -193,7 +195,7 @@ export default function Navigator() {
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
-			event.columnApi.applyColumnState({
+			event.api.applyColumnState({
 				state: columnState,
 				applyOrder: true,
 			});
@@ -215,7 +217,7 @@ export default function Navigator() {
 
 	const handleColumnStateChange = useCallback(
 		(params: ColumnResizedEvent) => {
-			const columnState = params.columnApi.getColumnState();
+			const columnState = params.api.getColumnState();
 			saveColumnStateDebounced(columnState);
 		},
 		[saveColumnStateDebounced],
@@ -242,7 +244,7 @@ export default function Navigator() {
 							Clear Filters
 						</Button>
 					)}
-					<Button variant='secondary' onClick={() => refetch()} iconOnly>
+					<Button variant='secondary' onClick={() => refetch()} iconOnly disabled={isFetching}>
 						<ArrowClockwise className='mr-1 text-sm' />
 						{t('general.refresh')}
 					</Button>
