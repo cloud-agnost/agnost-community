@@ -3,11 +3,12 @@ import useModelStore from '@/store/database/modelStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ColumnFilterType, FieldTypes, Filters } from '@/types';
 import { useMemo } from 'react';
-
+import { useSearchParams } from 'react-router-dom';
 export default function useColumnFilter(columnName: string, type: FieldTypes) {
 	const model = useModelStore((state) => state.model);
 	const columnFilters = useUtilsStore((state) => state.columnFilters);
 	const setColumnFilters = useUtilsStore((state) => state.setColumnFilters);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const filterType = CellTypeMap[type] as Filters;
 	const selectedFilter = useMemo(
@@ -17,6 +18,8 @@ export default function useColumnFilter(columnName: string, type: FieldTypes) {
 
 	function applyFilter(filter: ColumnFilterType) {
 		setColumnFilters(columnName, filter);
+		searchParams.set('page', '1');
+		setSearchParams(searchParams);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 

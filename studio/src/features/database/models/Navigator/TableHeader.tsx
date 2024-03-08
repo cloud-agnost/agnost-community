@@ -51,6 +51,12 @@ export default function TableHeader({
 		}
 	};
 
+	function handleClearFilter() {
+		clearColumnFilter(text);
+		searchParams.set('page', '1');
+		setSearchParams(searchParams);
+	}
+
 	function getFilterComponent() {
 		const Comp = CellFilterMap[field as FieldTypes];
 		if (Comp) {
@@ -107,7 +113,7 @@ export default function TableHeader({
 							{!_.isNil(selectedFilter) && (
 								<Button
 									size='full'
-									onClick={handleClearColumnFilter}
+									onClick={handleClearFilter}
 									variant='text'
 									className='items-center'
 								>
