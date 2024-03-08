@@ -244,7 +244,7 @@ export default function Navigator() {
 							Clear Filters
 						</Button>
 					)}
-					<Button variant='secondary' onClick={() => refetch()} iconOnly>
+					<Button variant='secondary' onClick={() => refetch()} iconOnly disabled={isFetching}>
 						<ArrowClockwise className='mr-1 text-sm' />
 						{t('general.refresh')}
 					</Button>
