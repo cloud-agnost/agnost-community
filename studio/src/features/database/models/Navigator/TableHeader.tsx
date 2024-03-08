@@ -51,17 +51,19 @@ export default function TableHeader({
 		}
 	};
 
+	function handleClearFilter() {
+		clearColumnFilter(text);
+		searchParams.set('page', '1');
+		setSearchParams(searchParams);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+	}
+
 	function getFilterComponent() {
 		const Comp = CellFilterMap[field as FieldTypes];
 		if (Comp) {
 			return <Comp type={field} columnName={text} options={selectList as string[]} />;
 		}
 		return null;
-	}
-
-	function handleClearColumnFilter() {
-		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-		clearColumnFilter(text);
 	}
 
 	return (
