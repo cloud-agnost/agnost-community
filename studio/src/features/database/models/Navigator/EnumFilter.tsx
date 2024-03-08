@@ -12,7 +12,7 @@ import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { useSearchParams } from 'react-router-dom';
 interface EnumFilterProps extends FilterProps {
 	options: string[];
 }
@@ -21,7 +21,7 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 	const { setColumnFilters, clearColumnFilter } = useUtilsStore();
 	const { selectedFilter, filterType } = useColumnFilter(columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
-
+	const [searchParams, setSearchParams] = useSearchParams();
 	function onFilterChange(newFilter: string, checked: boolean) {
 		const conditions = (filter?.conditions?.[0]?.filter as string[]) ?? [];
 		if (checked) {
@@ -45,6 +45,8 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 			setColumnFilters(columnName, filter);
 		}
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+		searchParams.set('page', '1');
+		setSearchParams(searchParams);
 	}
 
 	useEffect(() => {
