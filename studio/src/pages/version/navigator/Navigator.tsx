@@ -182,7 +182,9 @@ export default function Navigator() {
 
 	useEffect(() => {
 		if (!_.isNil(gridRef.current?.api)) {
-			if (data.length === 0 && !isFetching) {
+			if (isFetching) {
+				gridRef.current.api.showLoadingOverlay();
+			} else if (data.length === 0) {
 				gridRef.current.api.showNoRowsOverlay();
 			} else {
 				gridRef.current.api.hideOverlay();
