@@ -10,6 +10,7 @@ import useUtilsStore from '@/store/version/utilsStore';
 import { ConditionsType, FilterProps } from '@/types';
 import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -88,7 +89,7 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{filter?.conditions[0]?.filter ? (
+			{!_.isNil(filter?.conditions[0]?.filter) ? (
 				<Button variant='primary' onClick={applyFilter} size='full'>
 					Apply
 				</Button>
