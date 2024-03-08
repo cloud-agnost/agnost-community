@@ -193,7 +193,7 @@ export default function Navigator() {
 	function onFirstDataRendered(event: FirstDataRenderedEvent) {
 		const columnState = getColumnState(modelId);
 		if (columnState) {
-			event.columnApi.applyColumnState({
+			event.api.applyColumnState({
 				state: columnState,
 				applyOrder: true,
 			});
@@ -215,7 +215,7 @@ export default function Navigator() {
 
 	const handleColumnStateChange = useCallback(
 		(params: ColumnResizedEvent) => {
-			const columnState = params.columnApi.getColumnState();
+			const columnState = params.api.getColumnState();
 			saveColumnStateDebounced(columnState);
 		},
 		[saveColumnStateDebounced],
