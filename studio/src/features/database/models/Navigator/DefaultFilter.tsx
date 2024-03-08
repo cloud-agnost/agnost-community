@@ -4,6 +4,7 @@ import { Condition, FilterProps, Operators } from '@/types';
 import { useEffect, useState } from 'react';
 import ColumnFilter from './ColumnFilter';
 import OperatorSelect from './OperatorSelect';
+import _ from 'lodash';
 
 export default function DefaultFilter({ type, columnName }: FilterProps) {
 	const { selectedFilter, filterType, applyFilter } = useColumnFilter(columnName, type);
@@ -52,7 +53,7 @@ export default function DefaultFilter({ type, columnName }: FilterProps) {
 				type={type}
 				condition={filter?.conditions[0]}
 			/>
-			{filter?.conditions[0]?.filter && (
+			{!_.isNil(filter?.conditions[0]?.filter) && (
 				<OperatorSelect
 					defaultValue={filter?.operator ?? Operators.None}
 					onOperatorChange={(operator) => updateOperator(operator)}
@@ -67,7 +68,7 @@ export default function DefaultFilter({ type, columnName }: FilterProps) {
 				/>
 			)}
 
-			{filter?.conditions[0]?.filter ? (
+			{!_.isNil(filter?.conditions[0]?.filter) ? (
 				<Button variant='primary' onClick={() => applyFilter(filter)} size='full'>
 					Apply
 				</Button>
