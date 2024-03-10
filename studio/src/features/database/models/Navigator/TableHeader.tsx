@@ -55,6 +55,7 @@ export default function TableHeader({
 		clearColumnFilter(text);
 		searchParams.set('page', '1');
 		setSearchParams(searchParams);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	function getFilterComponent() {
@@ -63,11 +64,6 @@ export default function TableHeader({
 			return <Comp type={field} columnName={text} options={selectList as string[]} />;
 		}
 		return null;
-	}
-
-	function handleClearColumnFilter() {
-		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-		clearColumnFilter(text);
 	}
 
 	return (
