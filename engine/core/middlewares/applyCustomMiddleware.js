@@ -36,11 +36,18 @@ export const applyCustomMiddleware =
 			// Check the default exported entitity is a callable function or not
 			if (
 				!(
-					middlewareFunction &&
-					typeof middlewareFunction === "function" &&
-					(middlewareFunction.constructor ||
-						middlewareFunction.call ||
-						middlewareFunction.apply)
+					(middlewareFunction &&
+						typeof middlewareFunction === "function" &&
+						(middlewareFunction.constructor ||
+							middlewareFunction.call ||
+							middlewareFunction.apply)) ||
+					(Array.isArray(middlewareFunction) &&
+						middlewareFunction.every(
+							(entry) =>
+								entry &&
+								typeof entry === "function" &&
+								(entry.constructor || entry.call || entry.apply)
+						))
 				)
 			) {
 				return returnError(
