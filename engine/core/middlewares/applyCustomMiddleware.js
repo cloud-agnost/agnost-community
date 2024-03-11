@@ -65,8 +65,11 @@ export const applyCustomMiddleware =
 			}
 
 			try {
+				if (Array.isArray(middlewareFunction)) {
+					return middlewareFunction;
+				}
 				// Run the function
-				await middlewareFunction(req, res, next);
+				else await middlewareFunction(req, res, next);
 			} catch (error) {
 				return returnError(
 					res,
