@@ -68,7 +68,14 @@ export const applyCustomMiddleware =
 				// Run the function(s)
 				if (Array.isArray(middlewareFunction)) {
 					for (let i = 0; i < middlewareFunction.length; i++) {
-						await middlewareFunction[i](req, res, next);
+						if (i == middlewareFunction.length - 1)
+							await middlewareFunction[i](req, res, next);
+						else
+							await middlewareFunction[i](req, res, () => {
+								nextCalled = true;
+							});
+
+						if (!nextCalled) break;
 					}
 				} else {
 					await middlewareFunction(req, res, next);
