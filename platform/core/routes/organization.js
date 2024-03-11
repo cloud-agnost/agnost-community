@@ -493,7 +493,7 @@ router.post(
 					to: entry.email,
 					role: entry.role,
 					organization: org.name,
-					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=org-invite`,
+					url: `${uiBaseURL}/studio/redirect-handle?token=${entry.token}&type=org-invite`,
 				});
 			});
 
@@ -707,7 +707,7 @@ router.post(
 				to: invite.email,
 				role: invite.role,
 				organization: org.name,
-				url: `${uiBaseURL}/redirect-handle?token=${invite.token}&type=org-invite`,
+				url: `${uiBaseURL}/studio/redirect-handle?token=${invite.token}&type=org-invite`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications

@@ -316,7 +316,7 @@ router.post(
 					role: entry.role,
 					organization: orgObj.name,
 					app: app.name,
-					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
+					url: `${uiBaseURL}/studio/redirect-handle?token=${entry.token}&type=app-invite`,
 				});
 			});
 

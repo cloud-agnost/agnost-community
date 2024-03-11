@@ -678,12 +678,9 @@ export class StorageBase {
 	 * @throws Throws an exception if bucket cannot be identified.
 	 */
 	async listBucketFiles(storage, bucketName, options) {
-		console.log("**here1", Date.now());
 		const bucketObj = await this.getBucketInfo(storage, bucketName);
 		if (!bucketObj)
 			throw new AgnostError(t("The bucket '%s' cannot be found.", bucketName));
-
-		console.log("**here2", Date.now());
 
 		let search = null;
 		let pageNumber = 1;
@@ -709,8 +706,6 @@ export class StorageBase {
 			query.path = { $regex: helper.escapeStringRegexp(search), $options: "i" };
 		const skip = pageSize * (pageNumber - 1);
 
-		console.log("**here3", Date.now(), JSON.stringify(query, null, 2));
-
 		// Get connection to storage metadata database
 		const db = this.getDB();
 		const dataCursor = await db.collection("files").find(query, {
@@ -721,14 +716,10 @@ export class StorageBase {
 			projection: { _id: 0 },
 		});
 
-		console.log("**here4", Date.now());
-
 		if (returnCountInfo) {
 			const docCount = await db.collection("files").countDocuments(query, {
 				readPreference: "secondaryPreferred",
 			});
-
-			console.log("**here5", Date.now());
 
 			let totalPages = realNumber.div(docCount, pageSize);
 			totalPages = totalPages
@@ -747,14 +738,11 @@ export class StorageBase {
 			else {
 				const result = await dataCursor.toArray();
 				await dataCursor.close();
-				console.log("**here6", Date.now());
 
 				return { info: countInfo, data: result };
 			}
 		} else {
 			const result = await dataCursor.toArray();
-			console.log("**here7", Date.now());
-
 			await dataCursor.close();
 			return result;
 		}

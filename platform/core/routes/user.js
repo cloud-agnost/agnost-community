@@ -573,7 +573,7 @@ router.post(
 			// Send the contact email verification link to the new email address
 			sendMessage("send-contact-email-token", {
 				to: email,
-				url: `${uiBaseURL}/v1/user/contact-email/${token}`,
+				url: `${uiBaseURL}/studio/v1/user/contact-email/${token}`,
 			});
 
 			res.json();
@@ -711,7 +711,7 @@ router.post(
 			// Send the login email verification link to the new email address
 			sendMessage("send-login-email-token", {
 				to: email,
-				url: `${uiBaseURL}/redirect-handle?token=${token}&type=change-email`,
+				url: `${uiBaseURL}/studio/redirect-handle?token=${token}&type=change-email`,
 			});
 
 			res.json();
@@ -848,7 +848,7 @@ router.post(
 			// Send the forgot password change link link to the email address
 			sendMessage("send-reset-pwd-token", {
 				to: email,
-				url: `${uiBaseURL}/redirect-handle?token=${token}&type=reset-pwd`,
+				url: `${uiBaseURL}/studio/redirect-handle?token=${token}&type=reset-pwd`,
 			});
 
 			res.json();
