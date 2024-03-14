@@ -904,6 +904,12 @@ curl -XDELETE http://localhost:3000/tektonInfra -d '{
 
 ### GitHub Pipeline create
 
+> In case of mono repo, you can provide the path to the Dockerfile with
+>
+> `gitSubPath` optional parameter. e.g.:
+>
+> `"gitSubPath": "/newapp/app1"`
+
 ```bash
 # Container Registry: GitHub/GHCR
 curl -XPOST http://localhost:3000/tektonPipeline -d '{
@@ -915,6 +921,7 @@ curl -XPOST http://localhost:3000/tektonPipeline -d '{
     "containerRegistry": "ghcr.io/OWNER",
     "containerRegistryType": "ghcr",
     "containerRegistryId": "9efe58b87a60",
+    "containerImageName": "myimage1",
     "appKind": "Deployment",
     "appName": "my-app-dply"
 }' -H "Content-type: application/json"
@@ -927,9 +934,12 @@ curl -XPOST http://localhost:3000/tektonPipeline -d '{
     "gitBranch": "main",
     "gitPat": "ghp_xxx",
     "containerRegistryType": "local",
+    "containerImageName": "myimage2",
     "appKind": "Deployment",
     "appName": "my-app-dply"
 }' -H "Content-type: application/json"
+
+
 ```
 
 ### GitHub Pipeline delete

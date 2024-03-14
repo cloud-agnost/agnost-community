@@ -91,7 +91,7 @@ function sleep(ms) {
   });
 }
 
-async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName) {
+async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/', gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName) {
   const manifestFilePath = '../manifests/' + gitRepoType + '-pipeline.yaml';
   const manifest = fs.readFileSync(manifestFilePath, 'utf8');
   const resources = k8s.loadAllYaml(manifest);
@@ -140,6 +140,14 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, git
           resource.spec.triggers[0].bindings[0].ref += resourceNameSuffix;
           resource.spec.triggers[0].template.ref += resourceNameSuffix;
           resource.spec.resources.kubernetesResource.spec.template.spec.serviceAccountName += resourceNameSuffix;
+          if (gitSubPath != '/') {
+            resource.spec.triggers[0].interceptors[1].params[1].name = 'filter'
+            // remove leading slash, if exists
+            var path = gitSubPath.replace(/^\/+/, '')
+            resource.spec.triggers[0].interceptors[1].params[1].value = `extensions.changed_files.matches("${path}")`;
+          } else {
+            delete resource.spec.triggers[0].interceptors[1].params[1];
+          }
           await k8sCustomObjectApi.createNamespacedCustomObject(group, version, resource_namespace, 'eventlisteners', resource);
           break;
         case('TriggerBinding'):
@@ -153,6 +161,8 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, git
           }
           resource.spec.params[4].value = gitPat;
           resource.spec.params[5].value = gitBranch;
+          resource.spec.params[6].value = gitSubPath;
+          resource.spec.params[7].value = containerImageName;
           await k8sCustomObjectApi.createNamespacedCustomObject(group, version, resource_namespace, 'triggerbindings', resource);
           break;
         case('TriggerTemplate'):
@@ -261,10 +271,10 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
 
 
 router.post('/tektonPipeline', async (req, res) => {
-  const { gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName } = req.body;
+  const { gitRepoId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName } = req.body;
 
   try {
-    const webhookConfig = await createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, appKind, appName);
+    const webhookConfig = await createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName);
     res.json(webhookConfig);
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));

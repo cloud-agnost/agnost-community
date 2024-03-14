@@ -17,12 +17,15 @@ spec:
       value: willbereplaced
     - name: gitbranch
       value: willbereplaced
+    - name: gitsubpath
+      value: willbereplaced
+    - name: imagename
+      value: willbereplaced
     - name: gitrevision
       value: $(body.head_commit.id)
     - name: gitrepo
       value: $(body.repository.git_url)
-    - name: imagename
-      value: $(body.repository.name)
+
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
@@ -37,6 +40,7 @@ spec:
     - name: containerregistry
     - name: githubpat
     - name: gitbranch
+    - name: gitsubpath
     - name: gitrevision
     - name: gitrepo
     - name: imagename
@@ -76,6 +80,7 @@ spec:
                 /kaniko/executor \
                   --destination=${IMAGE} \
                   --context=${CONTEXT} \
+                  --context-sub-path=$(tt.params.gitsubpath) \
                   --git branch=$(tt.params.gitbranch) \
                   --no-push \
                   --tar-path=$(workspaces.ws.path)/image.tar
@@ -83,6 +88,7 @@ spec:
                 /kaniko/executor \
                   --destination=${IMAGE} \
                   --context=${CONTEXT} \
+                  --context-sub-path=$(tt.params.gitsubpath) \
                   --git branch=$(tt.params.gitbranch)
               fi
             volumeMounts:
@@ -172,12 +178,17 @@ spec:
                 secretKey: secretToken
             - name: "eventTypes"
               value: ["push"]
+            - name: "addChangedFiles"
+              value:
+                enabled: true
         - name: "Only for the specific branch"
           ref:
             name: "cel"
           params:
             - name: "filter"
               value: "body.ref == 'refs/heads/master'"
+            - name: "filter"
+              value: "will be replaced or removed"
       bindings:
         - ref: github-push-binding
       template:
