@@ -636,7 +636,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot sign in with an email and password.",
@@ -788,7 +788,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send a verification email.",
@@ -936,7 +936,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send a magic link email.",
@@ -1084,7 +1084,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send a reset password email.",
@@ -1633,7 +1633,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot change the password of accounts that are authorized using Oauth2 providers.",
@@ -1757,7 +1757,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot change the email of accounts that are authorized using Oauth2 providers.",
@@ -2349,7 +2349,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							result.data.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send phone verification SMS code.",
@@ -2478,7 +2478,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							result.data.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot sign in with a phone number and password.",
@@ -2633,7 +2633,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							result.data.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send sign-in SMS code.",
@@ -2935,7 +2935,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							result.data.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot change the phone number for accounts that are authorized using Oauth2 providers.",
@@ -3101,7 +3101,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidProvider,
 							result.data.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot send a reset password SMS code.",

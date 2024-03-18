@@ -137,6 +137,7 @@ const ERROR_CODES = {
 	realtimeNotEnabled: "realtime_not_enabled",
 	getMembersError: "get_channel_members_error",
 	fileUploadError: "file_upload_error",
+	invalidProvider: "invalid_provider",
 };
 
 export default ERROR_CODES;
