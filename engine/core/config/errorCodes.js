@@ -35,6 +35,7 @@ const ERROR_CODES = {
 	missingAccessToken: "missing_access_token",
 	invalidSession: "invalid_session",
 	invalidCredentials: "invalid_credentials",
+	invalidSignInCredentials: "invalid_sign_in_credentials",
 	storageNotFound: "storage_not_found",
 	bucketNotFound: "bucket_not_found",
 	queueNotFound: "queue_not_found",

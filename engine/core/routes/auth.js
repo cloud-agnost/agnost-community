@@ -620,7 +620,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidCredentials,
+							ERROR_CODES.invalidSignInCredentials,
 							t("Invalid credentials. Email or password provided is invalid.")
 						)
 					);
