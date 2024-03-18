@@ -30,7 +30,9 @@ export const applyRules = (action) => {
 					.withMessage(t("Email needs to be provided, cannot be left empty."))
 					.bail()
 					.isEmail()
-					.withMessage(t("Not a valid email address format")),
+					.withMessage(t("Not a valid email address format"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
 				body("password")
 					.not()
 					.isEmpty()
@@ -96,7 +98,9 @@ export const applyRules = (action) => {
 					.withMessage(t("Email needs to be provided, cannot be left empty."))
 					.bail()
 					.isEmail()
-					.withMessage(t("Not a valid email address format")),
+					.withMessage(t("Not a valid email address format"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
 				body("password")
 					.not()
 					.isEmpty()
@@ -228,7 +232,9 @@ export const applyRules = (action) => {
 					.withMessage(t("Email needs to be provided, cannot be left empty."))
 					.bail()
 					.isEmail()
-					.withMessage(t("Not a valid email address format")),
+					.withMessage(t("Not a valid email address format"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
 				body("redirectURL")
 					.not()
 					.isEmpty()
@@ -298,7 +304,9 @@ export const applyRules = (action) => {
 					.withMessage(t("Email needs to be provided, cannot be left empty."))
 					.bail()
 					.isEmail()
-					.withMessage(t("Not a valid email address format")),
+					.withMessage(t("Not a valid email address format"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
 			];
 		case "change-phone":
 			return [
