@@ -22,29 +22,23 @@ const router = express.Router({ mergeParams: true });
 
 function getBaseURL(req) {
 	if (req.query.base) return req.query.base;
-	else return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
+	else {
+		let origin = req.header("origin");
+		if (!origin) {
+			origin = req.header("x-forwarded-host");
+			if (origin) {
+				let port = req.header("x-forwarded-port");
+				if (port === "80" || port === "443")
+					return `${req.header("x-forwarded-proto")}://${origin}`;
+				else return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+			} else {
+				return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
+			}
+		} else return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
+	}
 }
 
 const loginOauthProvider = async (req, res, next) => {
-	let origin = req.header("origin");
-	if (!origin) {
-		origin = req.header("x-forwarded-host");
-		if (origin) {
-			let port = req.header("x-forwarded-port");
-			if (port === "80" || port === "443")
-				origin = `${req.header("x-forwarded-proto")}://${origin}`;
-			else origin = `${req.header("x-forwarded-proto")}://${origin}:${port}`;
-		} else {
-			let host = req.get("host");
-			if (host && req.protocol) origin = req.protocol + "://" + host;
-		}
-	}
-
-	console.log("***origin", origin);
-
-	console.log("***req.params", req.params);
-	console.log("***req.query", req.query);
-	console.log("***req.headers", req.headers);
 	console.log("***getBaseURL", getBaseURL(req));
 
 	let strategy = createStrategy(
@@ -75,8 +69,6 @@ const loginOauthProvider = async (req, res, next) => {
 	}
 
 	// If not already set then set the redirect session parameter. Twitter does not support state parameter that is why we need to store it in session
-	console.log("***req.session.redirect", req?.query?.redirect);
-
 	if (!req.session.redirect) req.session.redirect = req.query.redirect;
 	passport.authenticate(
 		strategy,
