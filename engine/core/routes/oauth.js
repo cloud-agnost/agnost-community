@@ -26,10 +26,27 @@ function getBaseURL(req) {
 }
 
 const loginOauthProvider = async (req, res, next) => {
+	let origin = req.header("origin");
+	if (!origin) {
+		origin = req.header("x-forwarded-host");
+		if (origin) {
+			let port = req.header("x-forwarded-port");
+			if (port === "80" || port === "443")
+				origin = `${req.header("x-forwarded-proto")}://${origin}`;
+			else origin = `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+		} else {
+			let host = req.get("host");
+			if (host && req.protocol) origin = req.protocol + "://" + host;
+		}
+	}
+
+	console.log("***origin", origin);
+
 	console.log("***req.params", req.params);
 	console.log("***req.query", req.query);
 	console.log("***req.headers", req.headers);
 	console.log("***getBaseURL", getBaseURL(req));
+
 	let strategy = createStrategy(
 		req.provider,
 		`${getBaseURL(req)}/agnost/oauth/${req.provider.name}/callback`,
