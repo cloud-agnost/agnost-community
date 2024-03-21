@@ -68,6 +68,8 @@ const loginOauthProvider = async (req, res, next) => {
 		// Custom error and success handling
 		function (err, user, info) {
 			console.log("***rcallback", err, user, info);
+			console.log("***req.query.state", req.query?.state);
+			console.log("***req.query.redirect", req.query?.redirect);
 
 			if (err || !user) {
 				return processRedirect(
