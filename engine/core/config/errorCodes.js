@@ -139,6 +139,7 @@ const ERROR_CODES = {
 	getMembersError: "get_channel_members_error",
 	fileUploadError: "file_upload_error",
 	invalidProvider: "invalid_provider",
+	functionExecutionError: "function_execution_error",
 };
 
 export default ERROR_CODES;

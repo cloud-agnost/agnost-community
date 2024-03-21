@@ -1,3 +1,5 @@
+import ERROR_CODES from "../../config/errorCodes.js";
+
 /**
  * Runs the customer helper functions
  */
@@ -67,9 +69,10 @@ export class FunctionAdapter {
 				t(
 					"An error occurred while running the '%s' helper function. %s",
 					functionName,
-					error.message,
-					error.specifics
-				)
+					error.message
+				),
+				ERROR_CODES.functionExecutionError,
+				error.specifics
 			);
 		}
 	}
