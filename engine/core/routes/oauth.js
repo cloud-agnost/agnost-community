@@ -39,8 +39,6 @@ function getBaseURL(req) {
 }
 
 const loginOauthProvider = async (req, res, next) => {
-	console.log("***getBaseURL", getBaseURL(req));
-
 	let strategy = createStrategy(
 		req.provider,
 		`${getBaseURL(req)}/agnost/oauth/${req.provider.name}/callback`,
@@ -79,10 +77,6 @@ const loginOauthProvider = async (req, res, next) => {
 		},
 		// Custom error and success handling
 		function (err, user, info) {
-			console.log("***rcallback", err, user, info);
-			console.log("***req.query.state", req.query?.state);
-			console.log("***req.query.redirect", req.query?.redirect);
-
 			if (err || !user) {
 				return processRedirect(
 					req,
@@ -173,8 +167,6 @@ function createStrategy(provider, callbackURL, req) {
 
 const verifyCallback = (req) => {
 	return async (accessToken, refreshToken, profile, done) => {
-		console.log("***verifyCallback", accessToken, refreshToken, profile);
-
 		const { userDb, userModel } = req;
 		// Get normalized user data
 		const userData = await getNormalizedUserData(
@@ -182,8 +174,6 @@ const verifyCallback = (req) => {
 			profile,
 			accessToken
 		);
-
-		console.log("***getNormalizedUserData", userData);
 
 		// Check if there is already an account with the provided email reqistered
 		if (userData.email) {
@@ -218,8 +208,6 @@ const verifyCallback = (req) => {
 			);
 
 		if (userWithProviderId) {
-			console.log("***userWithProviderId", true);
-
 			// User data already exists in the database, return success, no need to create user data in the database
 			req.authResult = {
 				user: userWithProviderId,
@@ -236,8 +224,6 @@ const verifyCallback = (req) => {
 
 			return done(null, req.authResult);
 		} else {
-			console.log("***userWithProviderId", false);
-
 			// Create user authentication data in the database
 			userData.signUpAt = new Date();
 
@@ -363,13 +349,6 @@ router.get(
 	checkOAuthProvider,
 	loginOauthProvider,
 	(req, res) => {
-		console.log(
-			"***u/oauth/:provider/callback",
-			req.query.state,
-			req.session?.redirect,
-			req.authResult
-		);
-
 		return processRedirect(req, res, req.query.state ?? req.session.redirect, {
 			access_token: req.authResult.accessToken.key,
 			action: req.authResult.action,
