@@ -67,7 +67,8 @@ export class FunctionAdapter {
 				t(
 					"An error occurred while running the '%s' helper function. %s",
 					functionName,
-					error.message
+					error.message,
+					error.specifics
 				)
 			);
 		}
