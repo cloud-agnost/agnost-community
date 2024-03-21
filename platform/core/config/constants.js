@@ -1294,7 +1294,7 @@ export const apiServerDefaultPackages = {
 	nocache: "3.0.4",
 	"on-headers": "1.0.2",
 	passport: "0.6.0",
-	"passport-google-oauth": "2.0.0",
+	"passport-google-oauth20": "2.0.0",
 	"passport-facebook": "3.0.0",
 	"passport-twitter": "1.0.4",
 	"passport-github2": "0.1.12",

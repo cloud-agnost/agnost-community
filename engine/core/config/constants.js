@@ -27,7 +27,7 @@ export const corePackages = [
 	"nocache",
 	"on-headers",
 	"passport",
-	"passport-google-oauth",
+	"passport-google-oauth20",
 	"passport-facebook",
 	"passport-twitter",
 	"passport-github2",
