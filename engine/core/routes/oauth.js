@@ -26,6 +26,9 @@ function getBaseURL(req) {
 }
 
 const loginOauthProvider = async (req, res, next) => {
+	console.log("***req.params", req.params);
+	console.log("***req.query", req.query);
+	console.log("***req.headers", req.headers);
 	console.log("***getBaseURL", getBaseURL(req));
 	let strategy = createStrategy(
 		req.provider,
