@@ -23,7 +23,7 @@ export const checkSession = async (socket) => {
 			if (realtimeConfig.sessionRequired) {
 				if (!sessionToken) {
 					return resolve(
-						errorMessage(
+						helper.errorMessage(
 							{
 								error: t("Realtime Connection Error - Missing Session Token"),
 								details: t(
@@ -42,7 +42,7 @@ export const checkSession = async (socket) => {
 					async (error, decoded) => {
 						if (error) {
 							return resolve(
-								errorMessage(
+								helper.errorMessage(
 									{
 										error: t(
 											"Realtime Connection Error - Invalid Session Token"
@@ -62,7 +62,7 @@ export const checkSession = async (socket) => {
 
 							if (!session) {
 								return resolve(
-									errorMessage(
+									helper.errorMessage(
 										{
 											error: t(
 												"Realtime Connection Error - Invalid Session Token"
