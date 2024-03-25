@@ -139,6 +139,7 @@ const ERROR_CODES = {
 	getMembersError: "get_channel_members_error",
 	fileUploadError: "file_upload_error",
 	invalidProvider: "invalid_provider",
+	invalidProviderSignIn: "invalid_provider_sign_in",
 	functionExecutionError: "function_execution_error",
 };
 

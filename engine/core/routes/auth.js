@@ -636,7 +636,7 @@ router.post(
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.invalidProvider,
+							ERROR_CODES.invalidProviderSignIn,
 							existingUser.provider
 								? t(
 										"Invalid credentials. You have signed up using your %s credentials. You cannot sign in with an email and password.",
