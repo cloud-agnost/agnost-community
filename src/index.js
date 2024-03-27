@@ -16,6 +16,7 @@ const resizeMinio = require('./resizeMinio');
 const deployApp = require('./deployapp');
 const tektonInfra = require('./tektonInfra');
 const tektonPipeline = require('./tektonPipeline');
+const { watchPipelineEvents } = require('./pipelineEvents');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -32,6 +33,9 @@ app.use('/', resizeMinio);
 app.use('/', deployApp);
 app.use('/', tektonInfra);
 app.use('/', tektonPipeline);
+
+// Call pipeline event watcher
+watchPipelineEvents();
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));
