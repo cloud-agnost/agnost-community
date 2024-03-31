@@ -104,8 +104,6 @@ export const manageAPIServerHandler = (connection, envId) => {
 
 							const { status } = await manager.initializeCore();
 
-							console.log("****here is the status", status);
-
 							// Resume child process
 							for (const pid of workerPid) {
 								process.kill(pid, "SIGCONT");
