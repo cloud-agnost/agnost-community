@@ -101,6 +101,9 @@ router.get(
 			res.set("Cross-Origin-Resource-Policy", "cross-origin");
 			res.set("Access-Control-Allow-Origin", "*");
 			res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+			res.set("Cache-Control", "public, max-age=31536000");
+			res.set("Expires", new Date(Date.now() + 31536000000).toUTCString()); // 1 year from now
+			res.set("Pragma", "cache"); // Encourage caching
 
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
@@ -235,6 +238,9 @@ router.get(
 			res.set("Cross-Origin-Resource-Policy", "cross-origin");
 			res.set("Access-Control-Allow-Origin", "*");
 			res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+			res.set("Cache-Control", "public, max-age=31536000");
+			res.set("Expires", new Date(Date.now() + 31536000000).toUTCString()); // 1 year from now
+			res.set("Pragma", "cache"); // Encourage caching
 
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
