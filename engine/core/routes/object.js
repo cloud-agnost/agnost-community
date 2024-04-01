@@ -104,6 +104,7 @@ router.get(
 			res.set("Cache-Control", "public, max-age=31536000");
 			res.set("Expires", new Date(Date.now() + 31536000000).toUTCString()); // 1 year from now
 			res.set("Pragma", "cache"); // Encourage caching
+			res.set("Last-Modified", fileInfo.updatedAt); // Replace with actual date
 
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
@@ -241,6 +242,7 @@ router.get(
 			res.set("Cache-Control", "public, max-age=31536000");
 			res.set("Expires", new Date(Date.now() + 31536000000).toUTCString()); // 1 year from now
 			res.set("Pragma", "cache"); // Encourage caching
+			res.set("Last-Modified", fileInfo.updatedAt); // Replace with actual date
 
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
