@@ -28,7 +28,9 @@ data:
     # Enable AOF https://redis.io/topics/persistence#append-only-file
     appendonly yes
     # Disable RDB persistence, AOF persistence already enabled.
-    save ""
+    save 900 1
+    save 300 10
+    save 60 10000
     # End of common configuration
   master.conf: |-
     dir /data
