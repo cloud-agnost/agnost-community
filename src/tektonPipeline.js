@@ -72,13 +72,15 @@ async function deleteGithubWebhook(gitPat, gitRepoUrl, hookId) {
 }
 
 async function createGitlabWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, gitBranch) {
-  const gitlabBaseUrl = 'https://gitlab.com/api/v4';
-  const path = new URL(gitRepoUrl).pathname;
-  const projectName = path.split('/')[2];
+  const gitlabUrl = new URL(gitRepoUrl);
+  const apiPath = '/api/v4';
+  const projectName = gitlabUrl.pathname.split('/')[2];
+  gitlabUrl.pathname = apiPath;
+  const gitlabApiBaseUrl = gitlabUrl.toString();
 
   try {
     // Step 1: Get User ID
-    const responseUser = await fetch(`${gitlabBaseUrl}/user`, { headers: { 'PRIVATE-TOKEN': gitPat }});
+    const responseUser = await fetch(`${gitlabApiBaseUrl}/user`, { headers: { 'PRIVATE-TOKEN': gitPat }});
     if (!responseUser.ok) {
       throw new Error('Failed to fetch user data');
     }
@@ -86,7 +88,7 @@ async function createGitlabWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
     const userId = user.id;
 
     // Step 2: Get All Project IDs Owned by User
-    const responseProject = await fetch(`${gitlabBaseUrl}/users/${userId}/projects`, { headers: { 'PRIVATE-TOKEN': gitPat } });
+    const responseProject = await fetch(`${gitlabApiBaseUrl}/users/${userId}/projects`, { headers: { 'PRIVATE-TOKEN': gitPat } });
     if (!responseProject.ok) {
       throw new Error('Failed to fetch project data');
     }
@@ -112,7 +114,7 @@ async function createGitlabWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
       token: secretToken,
       push_events_branch_filter: gitBranch
     };
-    const response = await fetch(`${gitlabBaseUrl}/projects/${projectId}/hooks`, {
+    const response = await fetch(`${gitlabApiBaseUrl}/projects/${projectId}/hooks`, {
       method: 'POST',
       headers: {
         'PRIVATE-TOKEN': gitPat,
@@ -131,13 +133,15 @@ async function createGitlabWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
 }
 
 async function deleteGitlabWebhook(gitPat, gitRepoUrl, hookId) {
-  const gitlabBaseUrl = 'https://gitlab.com/api/v4';
-  const path = new URL(gitRepoUrl).pathname;
-  const projectName = path.split('/')[2];
+  const gitlabUrl = new URL(gitRepoUrl);
+  const apiPath = '/api/v4';
+  const projectName = gitlabUrl.pathname.split('/')[2];
+  gitlabUrl.pathname = apiPath;
+  const gitlabApiBaseUrl = gitlabUrl.toString();
   
   try {
     // Step 1: Get User ID
-    const responseUser = await fetch(`${gitlabBaseUrl}/user`, { headers: { 'PRIVATE-TOKEN': gitPat }});
+    const responseUser = await fetch(`${gitlabApiBaseUrl}/user`, { headers: { 'PRIVATE-TOKEN': gitPat }});
     if (!responseUser.ok) {
       throw new Error('Failed to fetch user data');
     }
@@ -145,7 +149,7 @@ async function deleteGitlabWebhook(gitPat, gitRepoUrl, hookId) {
     const userId = user.id;
 
     // Step 2: Get All Project IDs Owned by User
-    const responseProject = await fetch(`${gitlabBaseUrl}/users/${userId}/projects`, { headers: { 'PRIVATE-TOKEN': gitPat } });
+    const responseProject = await fetch(`${gitlabApiBaseUrl}/users/${userId}/projects`, { headers: { 'PRIVATE-TOKEN': gitPat } });
     if (!responseProject.ok) {
       throw new Error('Failed to fetch project data');
     }
@@ -160,7 +164,7 @@ async function deleteGitlabWebhook(gitPat, gitRepoUrl, hookId) {
     const projectId = project.id;
 
     // Step 4: Delete Webhook
-    const response = await fetch(`${gitlabBaseUrl}/projects/${projectId}/hooks/${hookId}`, {
+    const response = await fetch(`${gitlabApiBaseUrl}/projects/${projectId}/hooks/${hookId}`, {
       method: 'DELETE',
       headers: {
         'PRIVATE-TOKEN': gitPat,
