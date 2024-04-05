@@ -66,9 +66,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
-		enableSorting: true,
 		sortingFn: 'textCaseSensitive',
-		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 			return <TabLink name={name} path={`${_id}`} type={TabTypes.Endpoint} />;
@@ -79,6 +78,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		header: () => <SortButton text={translate('endpoint.method')} field='method' />,
 		accessorKey: 'method',
 		size: 100,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { method } = row.original;
 			return <MethodBadge method={method} />;
@@ -89,6 +89,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
 		accessorKey: 'path',
 		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { path } = row.original;
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
@@ -105,6 +106,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		accessorKey: 'apiKeyRequired',
 		header: () => <SortButton text={translate('endpoint.apiKey')} field='apiKeyRequired' />,
 		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { apiKeyRequired } = row.original;
 			const apiKeyRequiredText = apiKeyRequired
@@ -142,6 +144,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'createdAt',
 		header: () => <SortButton text={translate('general.created_at')} field='createdAt' />,
 		accessorKey: 'createdAt',
+		enableSorting: true,
 		size: 200,
 		cell: ({ row }) => {
 			const { createdAt, createdBy } = row.original;
@@ -157,6 +160,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'updatedAt',
 		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
 		accessorKey: 'updatedAt',
+		enableSorting: true,
 		size: 200,
 		cell: ({ row }) => {
 			const { updatedAt, updatedBy } = row.original;
@@ -170,6 +174,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'actions',
 		className: 'actions',
 		size: 145,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const canEditEndpoint = getVersionPermission('endpoint.update');
 			const canDeleteEndpoint = getVersionPermission('endpoint.delete');

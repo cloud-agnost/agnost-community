@@ -17,12 +17,8 @@ export default function SearchEntities() {
 	const searchTerm = useDebounce(search, 500);
 	const { addTab } = useTabStore();
 	const { appId, orgId, versionId } = useParams() as Record<string, string>;
-	const {
-		searchDesignElements,
-		isSearchCommandMenuOpen,
-
-		getVersionDashboardPath,
-	} = useVersionStore();
+	const { searchDesignElements, isSearchCommandMenuOpen, getVersionDashboardPath } =
+		useVersionStore();
 
 	const getIcon = useTabIcon('w-5 h-5');
 	useUpdateEffect(() => {

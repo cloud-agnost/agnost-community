@@ -149,6 +149,7 @@ export interface TestEndpointParams extends BaseRequest {
 	path: string;
 	envId: string;
 	consoleLogId: string;
+	signal: AbortSignal;
 	params: {
 		queryParams?: Record<string, string>[];
 		pathVariables?: { value: string; key: string }[];

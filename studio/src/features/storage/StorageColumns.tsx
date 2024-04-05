@@ -37,6 +37,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
+		enableSorting: true,
 		cell: ({ row: { original } }) => {
 			const { name, _id } = original;
 			return (
@@ -55,6 +56,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'instance',
 		header: translate('general.instance'),
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { iid },
@@ -65,6 +67,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	},
 	{
 		id: 'createdAt',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'

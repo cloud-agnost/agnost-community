@@ -72,7 +72,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		header: translate('general.key'),
 		accessorKey: 'key',
 		className: '!max-w-[420px]',
-		enableSorting: false,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { key },
@@ -92,6 +92,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			<span className='whitespace-nowrap'>{translate('version.api_key.realtime_allowed')}</span>
 		),
 		accessorKey: 'allowRealtime',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { allowRealtime },
@@ -115,6 +116,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		id: 'type',
 		header: translate('general.type'),
 		accessorKey: 'type',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -155,6 +157,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		),
 		accessorKey: 'authorizedIPs',
 		className: 'max-w-[300px]',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { authorizedIPs, IPAuthorization },

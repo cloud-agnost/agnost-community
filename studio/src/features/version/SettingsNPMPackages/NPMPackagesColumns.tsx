@@ -50,12 +50,14 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 		accessorKey: 'name',
 		sortingFn: 'text',
 		size: 300,
+		enableSorting: true,
 	},
 	{
 		id: 'version',
 		size: 200,
 		header: translate('general.version'),
 		accessorKey: 'version',
+		enableSorting: true,
 	},
 	{
 		id: 'created_at',

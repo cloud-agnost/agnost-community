@@ -53,9 +53,9 @@ export const NavigatorColumns: ColDef[] = [
 		suppressMenu: true,
 	},
 	{
-		maxWidth: 100,
+		maxWidth: 70,
 		pinned: 'right',
-		resizable: true,
+		resizable: false,
 		filter: false,
 		suppressMenu: true,
 		cellRenderer: (params: ICellRendererParams) => {

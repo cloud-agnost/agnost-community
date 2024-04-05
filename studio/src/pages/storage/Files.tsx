@@ -88,14 +88,18 @@ export default function Files() {
 				filePaths: gridRef.current?.api
 					.getSelectedNodes()
 					.map((node) => node.data.path) as string[],
-				storageName: storage?.name as string,
-				bucketName: bucket?.name as string,
-				bckId: bucket?.id as string,
+				storageName: storage?.name,
+				bucketName: bucket?.name,
+				bckId: bucket?.id,
 			}),
 		mutationKey: ['deleteMultipleFileFromBucket'],
 		onSuccess: () => {
+			const page = Number(searchParams.get('page'));
+			if (!!fileCountInfo?.pageSize && page > 1) {
+				searchParams.set('page', (page - 1).toPrecision());
+			} else refetch();
+
 			gridRef.current?.api.deselectAll();
-			refetch();
 			setSelectedRowCount(0);
 		},
 		onError: ({ details }: APIError) => {
@@ -157,7 +161,7 @@ export default function Files() {
 			<VersionTabLayout
 				searchable
 				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
-				isEmpty={files?.length === 0}
+				isEmpty={false}
 				type={TabTypes.File}
 				openCreateModal={uploadFileHandler}
 				onMultipleDelete={deleteMultipleFileMutation}
@@ -186,6 +190,7 @@ export default function Files() {
 						ensureDomOrder
 						suppressRowClickSelection
 						enableCellTextSelection
+						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 						overlayLoadingTemplate={
 							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 						}

@@ -22,7 +22,7 @@ import {
 } from '@/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -88,6 +88,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { endpointRequest } = useUtilsStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [debugChannel, setDebugChannel] = useState<string | null>('');
+	const [isRequesting, setIsRequesting] = useState(false);
+
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
 		defaultValues: {
@@ -105,8 +107,15 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			body: '{}',
 		},
 	});
-	const { mutateAsync: testEndpointMutate, isPending } = useMutation({
+	const {
+		mutateAsync: testEndpointMutate,
+		isPending,
+		reset,
+	} = useMutation({
 		mutationFn: testEndpoint,
+		onSettled: () => {
+			setIsRequesting(false); // Reset the request state
+		},
 		onError: ({ details }: APIError) => {
 			toast({
 				title: details,
@@ -120,6 +129,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		const id = generateId();
 		setDebugChannel(id);
 		joinChannel(id);
+		setIsRequesting(true);
+		const controller = new AbortController();
 		testEndpointMutate({
 			epId: endpoint?._id,
 			envId: environment?.iid,
@@ -131,7 +142,13 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
+			signal: controller?.signal,
 		});
+
+		return () => {
+			reset();
+			controller.abort();
+		};
 	}
 
 	function handleClose() {
@@ -142,10 +159,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}
 
 	function handleCancelRequest() {
-		if (window.controller) {
-			window.controller.abort();
-		}
-		window.controller = new AbortController();
+		reset();
 		leaveChannel(debugChannel as string);
 		setDebugChannel(null);
 	}
@@ -239,10 +253,11 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 
 						{isPending ? (
 							<Button
-								className='ml-3'
+								className='ml-3 !pointer-events-auto !cursor-pointer'
 								variant='secondary'
 								onClick={handleCancelRequest}
 								disabled={environment?.serverStatus !== 'OK'}
+								loading={isPending}
 							>
 								{t('endpoint.test.abort')}
 							</Button>
@@ -296,7 +311,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						</Panel>
 						<Resizer className='my-6' orientation='horizontal' />
 						<Panel minSize={30}>
-							<EndpointResponse className='h-full' editorClassName='h-full' />
+							<EndpointResponse className='h-full' editorClassName='h-full' loading={isPending} />
 						</Panel>
 					</PanelGroup>
 				</Form>

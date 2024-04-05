@@ -153,7 +153,7 @@
 		"phone_authentication_success": "Phone authentication settings saved successfully",
 		"oAuth_provider_desc": "The {{params}} and Callback/Redirect URL need to authenticate with {{provider}} can be set up from the <platform>{{platform}}</platform>.",
 		"callback_url": "Callback/Redirect URL",
-		"callback_url_desc": "Please use this URL below to configure your {{provider}} developer app. You need to copy this URL and add it as a callback or redirect URI in your {{provider}} developer app.",
+		"callback_url_desc": "Please use this URL below to configure your {{provider}} developer app. You need to copy this URL and add it as a callback or redirect URI in your {{provider}} developer app.If you have defined a custom domain for your app version you can also use this custom domain in your redirect url, such as https://mydomain.com//agnost/oauth/google/callback",
 		"google": "Google Developer Console",
 		"facebook": "Meta For Developer",
 		"twitter": "Twitter Developer Platform",

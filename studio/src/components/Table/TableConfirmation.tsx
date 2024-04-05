@@ -58,7 +58,7 @@ export function TableConfirmation({
 								size='sm'
 								onClick={(e) => e.stopPropagation()}
 							>
-								{icon ?? <Trash size={20} />}
+								{icon ?? <Trash size={16} />}
 							</Button>
 						</TooltipTrigger>
 					</PopoverTrigger>

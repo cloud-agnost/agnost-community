@@ -79,6 +79,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			/>
 		),
 		accessorKey: 'createdAt',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { createdAt, createdBy },

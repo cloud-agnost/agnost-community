@@ -92,6 +92,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'type',
 		header: () => <SortButton text={translate('general.type')} field='type' />,
 		accessorKey: 'type',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -110,6 +111,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'unique',
 		header: () => <SortButton text={translate('general.unique')} field='unique' />,
 		accessorKey: 'unique',
+
 		enableSorting: true,
 		cell: ({
 			row: {
@@ -129,6 +131,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'indexed',
 		header: () => <SortButton text={translate('general.indexed')} field='indexed' />,
 		accessorKey: 'indexed',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { indexed },
@@ -147,6 +150,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'required',
 		header: () => <SortButton text={translate('general.required')} field='required' />,
 		accessorKey: 'required',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { required },
@@ -166,6 +170,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		className: 'whitespace-nowrap',
 		header: () => <SortButton text={translate('general.read-only')} field='immutable' />,
 		accessorKey: 'immutable',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { immutable },
@@ -191,6 +196,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		),
 		accessorKey: 'createdAt',
 		size: 200,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { createdAt, createdBy },
@@ -215,6 +221,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		),
 		accessorKey: 'updatedAt',
 		size: 200,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { updatedAt, updatedBy },

@@ -142,7 +142,6 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
 			}));
-
 			useUtilsStore.setState?.((prev) => {
 				const { endpointLogs, endpointResponse, endpointRequest } = prev;
 				params.endpointIds.forEach((id) => {
