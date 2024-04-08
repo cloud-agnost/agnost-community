@@ -186,7 +186,10 @@ export interface BaseGetRequest {
 	end?: string;
 	search?: string;
 }
-export type GetModulesRequest = BaseGetRequest & BaseParams;
+export type GetModulesRequest = BaseGetRequest &
+	BaseParams & {
+		workspace?: boolean;
+	};
 
 export interface SortOption {
 	name: string;

@@ -17,7 +17,10 @@ export interface Cache {
 	updatedAt: string;
 	__v: number;
 }
-export type GetCachesOfAppVersionParams = BaseParams & BaseGetRequest;
+export type GetCachesOfAppVersionParams = BaseParams &
+	BaseGetRequest & {
+		workspace?: boolean;
+	};
 export type GetCacheByIdParams = BaseParams & {
 	cacheId: string;
 };

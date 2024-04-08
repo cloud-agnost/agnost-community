@@ -154,19 +154,14 @@ export default class EndpointService {
 		} else {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}
-		try {
-			console.log('Requesting', signal);
-			const response = await test[method](
-				`${useEnvironmentStore.getState().environment?.iid}${path}`,
-				opt,
-				{
-					...options,
-					signal,
-				},
-			);
-			return response;
-		} catch (error) {
-			console.log('Request was canceled');
-		}
+		const response = await test[method](
+			`${useEnvironmentStore.getState().environment?.iid}${path}`,
+			opt,
+			{
+				...options,
+				signal,
+			},
+		);
+		return response;
 	}
 }

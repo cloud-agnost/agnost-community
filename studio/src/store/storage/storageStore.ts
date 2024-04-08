@@ -28,6 +28,7 @@ import { devtools } from 'zustand/middleware';
 import useVersionStore from '../version/versionStore';
 export interface StorageStore {
 	storages: Storage[];
+	workspaceStorages: Storage[];
 	storage: Storage;
 	bucket: Bucket;
 	buckets: Bucket[];
@@ -90,6 +91,7 @@ type Actions = {
 
 const initialState: StorageStore = {
 	storages: [],
+	workspaceStorages: [],
 	storage: {} as Storage,
 	bucket: {} as Bucket,
 	buckets: [],
@@ -148,6 +150,11 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getStorages: async (params: GetStoragesParams) => {
 			const storages = await StorageService.getStorages(params);
+			if (params.workspace) {
+				set({ workspaceStorages: storages });
+				return storages;
+			}
+
 			if (params.page === 0) {
 				set({ storages, lastFetchedPage: params.page });
 			} else {

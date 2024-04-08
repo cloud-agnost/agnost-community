@@ -52,7 +52,6 @@ export default function ColumnFilter({
 	}, [filterType, database.type]);
 
 	const inputProps = useMemo(() => {
-		console.log('mask');
 		if (filterType === Filters.Date) {
 			return {
 				mask: CellMaskMap[type]?.mask,

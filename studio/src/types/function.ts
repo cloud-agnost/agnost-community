@@ -17,7 +17,11 @@ export interface HelperFunction {
 	updatedAt: string;
 	__v: number;
 }
-export type getFunctions = BaseParams & BaseGetRequest;
+export type getFunctions = BaseParams &
+	BaseGetRequest & {
+		workspace?: boolean;
+	};
+
 export type GetFunctionByIdParams = BaseParams & {
 	funcId: string;
 };

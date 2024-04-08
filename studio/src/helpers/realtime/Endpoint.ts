@@ -6,7 +6,6 @@ import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/type
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint implements RealtimeActions<EndpointType> {
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
-		console.log('log', { message, timestamp, id, type });
 		setTimeout(() => {
 			useUtilsStore.getState?.().setEndpointLogs(id as string, {
 				message: message as string,

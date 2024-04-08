@@ -14,6 +14,7 @@ import useVersionStore from '../version/versionStore';
 
 interface DatabaseStore {
 	databases: Database[];
+	workspaceDatabases: Database[];
 	database: Database;
 	toDeleteDatabase: Database;
 	isDeleteDatabaseDialogOpen: boolean;
@@ -39,6 +40,7 @@ type Actions = {
 
 const initialState: DatabaseStore = {
 	databases: [],
+	workspaceDatabases: [],
 	database: {} as Database,
 	toDeleteDatabase: {} as Database,
 	isDeleteDatabaseDialogOpen: false,
@@ -73,6 +75,10 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				}),
 			getDatabases: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
 				const databases = await DatabaseService.getDatabases(params);
+				if (params.workspace) {
+					set({ workspaceDatabases: databases });
+					return databases;
+				}
 				set({ databases, isDatabaseFetched: true });
 				return databases;
 			},

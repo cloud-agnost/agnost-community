@@ -51,7 +51,7 @@ export default function Files() {
 			url: bucketUrl,
 		},
 		{
-			name: bucket?.name as string,
+			name: bucket?.name,
 		},
 	];
 
@@ -64,6 +64,8 @@ export default function Files() {
 			searchParams.get('q'),
 			searchParams.get('page'),
 			searchParams.get('size'),
+			searchParams.get('f'),
+			searchParams.get('d'),
 		],
 		queryFn: () =>
 			getFilesOfBucket({
@@ -72,8 +74,11 @@ export default function Files() {
 				returnCountInfo: true,
 				search: searchParams.get('q') as string,
 				storageName: storage?.name,
-				bckId: bucket?.id as string,
-				bucketName: bucket?.name as string,
+				bckId: bucket?.id,
+				bucketName: bucket?.name,
+				sortBy: searchParams.get('f') as string,
+				sortDir: searchParams.get('d') as string,
+				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 			}),
 		refetchOnWindowFocus: false,
 		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),

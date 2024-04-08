@@ -1,10 +1,11 @@
 import { Button } from '@/components/Button';
 import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
+import { ConditionsType, Filters } from '@/types';
 import { ICellEditorParams } from 'ag-grid-community';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 interface ReferenceProps extends ICellEditorParams {
 	referenceModelIid: string;
 }
@@ -13,6 +14,7 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { getModelsOfSelectedDb, resetNestedModels, setModel, getSpecificModelByIidOfDatabase } =
 		useModelStore();
+	const { setColumnFilters } = useUtilsStore();
 	const { dbId, versionId, appId, orgId } = useParams() as {
 		dbId: string;
 		versionId: string;
@@ -32,6 +34,7 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 				versionId,
 				modelIid: referenceModelIid,
 			}));
+
 		if (referenceModel) {
 			resetNestedModels();
 			searchParams.delete('f');
@@ -39,11 +42,18 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 			searchParams.delete('ref');
 			setSearchParams(searchParams);
 			setModel(referenceModel);
-			const path = getVersionDashboardPath(
-				`database/${dbId}/navigator/${referenceModel._id}?ref=${value}`,
-			);
+			const path = getVersionDashboardPath(`database/${dbId}/navigator/${referenceModel._id}`);
 			updateCurrentTab(versionId, {
 				path,
+			});
+			setColumnFilters('id', {
+				filterType: Filters.Text,
+				conditions: [
+					{
+						filter: value,
+						type: ConditionsType.Equals,
+					},
+				],
 			});
 			navigate(path);
 		}

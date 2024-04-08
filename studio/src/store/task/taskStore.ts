@@ -19,6 +19,7 @@ import useUtilsStore from '../version/utilsStore';
 import useVersionStore from '../version/versionStore';
 export interface TaskStore {
 	task: Task;
+	workspaceTasks: Task[];
 	tasks: Task[];
 	lastFetchedPage: number | undefined;
 	isEditTaskModalOpen: boolean;
@@ -46,6 +47,7 @@ type Actions = {
 const initialState: TaskStore = {
 	task: {} as Task,
 	tasks: [],
+	workspaceTasks: [],
 	lastFetchedPage: undefined,
 	isEditTaskModalOpen: false,
 	isCreateTaskModalOpen: false,
@@ -74,6 +76,11 @@ const useTaskStore = create<TaskStore & Actions>()(
 		},
 		getTasks: async (params: GetTasksParams) => {
 			const tasks = await TaskService.getTasks(params);
+			if (params.workspace) {
+				set({ workspaceTasks: tasks });
+				return tasks;
+			}
+
 			if (params.page === 0) {
 				set({ tasks, lastFetchedPage: params.page });
 			} else {

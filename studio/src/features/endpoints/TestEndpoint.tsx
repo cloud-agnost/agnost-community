@@ -21,8 +21,9 @@ import {
 	serializedStringToFile,
 } from '@/utils';
 
+import { APIServerAlert } from '@/components/APIServerAlert';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +36,6 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
-import { APIServerAlert } from '@/components/APIServerAlert';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -88,7 +88,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { endpointRequest } = useUtilsStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [debugChannel, setDebugChannel] = useState<string | null>('');
-	const [isRequesting, setIsRequesting] = useState(false);
 
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
@@ -113,9 +112,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		reset,
 	} = useMutation({
 		mutationFn: testEndpoint,
-		onSettled: () => {
-			setIsRequesting(false); // Reset the request state
-		},
 		onError: ({ details }: APIError) => {
 			toast({
 				title: details,
@@ -129,7 +125,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		const id = generateId();
 		setDebugChannel(id);
 		joinChannel(id);
-		setIsRequesting(true);
 		const controller = new AbortController();
 		testEndpointMutate({
 			epId: endpoint?._id,

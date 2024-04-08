@@ -35,7 +35,6 @@ export default function NotificationDropdown() {
 		});
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
-	console.log(notificationsPreview.length);
 	useEffect(() => {
 		if (orgId && versionId && appId) {
 			getVersionNotificationsPreview({

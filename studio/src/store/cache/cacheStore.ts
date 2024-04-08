@@ -15,6 +15,7 @@ import useVersionStore from '../version/versionStore';
 
 interface CacheStore {
 	caches: Cache[];
+	workspaceCaches: Cache[];
 	cache: Cache;
 	loading: boolean;
 	error: APIError | null;
@@ -45,6 +46,7 @@ const initialState: CacheStore = {
 	cache: {} as Cache,
 	loading: false,
 	error: null,
+	workspaceCaches: [],
 	isEditCacheModalOpen: false,
 	toDeleteCache: {} as Cache,
 	isDeleteCacheModalOpen: false,
@@ -59,6 +61,11 @@ const useCacheStore = create<CacheStore & Actions>()(
 			getCaches: async (params: GetCachesOfAppVersionParams) => {
 				try {
 					const caches = await CacheService.getCaches(params);
+					if (params.workspace) {
+						set({ workspaceCaches: caches });
+						return caches;
+					}
+
 					if (params.page === 0) {
 						set({ caches, lastFetchedPage: params.page });
 					} else {

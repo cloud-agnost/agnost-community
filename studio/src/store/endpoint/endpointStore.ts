@@ -21,6 +21,7 @@ import useVersionStore from '../version/versionStore';
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
+	workSpaceEndpoints: Endpoint[];
 	endpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedPage: number | undefined;
@@ -54,6 +55,7 @@ const initialState: EndpointStore = {
 	selectEndpointDialogOpen: false,
 	endpoints: [],
 	endpoint: {} as Endpoint,
+	workSpaceEndpoints: [],
 	selectedEndpointIds: [],
 	lastFetchedPage: undefined,
 	isEditEndpointModalOpen: false,
@@ -99,6 +101,12 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	getEndpoints: async (params) => {
 		try {
 			const endpoints = await EndpointService.getEndpoints(params);
+
+			if (params.workspace) {
+				set({ workSpaceEndpoints: endpoints });
+				return endpoints;
+			}
+
 			if (params.page === 0) {
 				set({ endpoints, lastFetchedPage: params.page });
 			} else {

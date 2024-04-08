@@ -1,6 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
-import { Button } from '@/components/Button';
+import { Button, buttonVariants } from '@/components/Button';
 import { TableConfirmation } from '@/components/Table';
 import { toast } from '@/hooks/useToast';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -13,7 +13,7 @@ import {
 	getVersionPermission,
 	translate,
 } from '@/utils';
-import { Copy, Swap } from '@phosphor-icons/react';
+import { Copy, Download, Swap } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
 import { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
@@ -41,6 +41,7 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 					storageName: storage?.name,
 					bucketName: bucket.name,
 					limit: info?.pageSize ?? 25,
+					size: info?.pageSize ?? 25,
 					page: info?.currentPage ?? 1,
 					returnCountInfo: true,
 				});
@@ -209,6 +210,8 @@ const FileColumns: ColDef<BucketFile>[] = [
 		cellRenderer: ({ data }: ICellRendererParams) => {
 			const canEditBucket = getVersionPermission('storage.update');
 			const canDeleteBucket = getVersionPermission('storage.delete');
+			const environment = useEnvironmentStore.getState().environment;
+			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${data.id}`;
 			return (
 				<div className='flex items-center justify-end'>
 					<TooltipProvider>
@@ -229,6 +232,26 @@ const FileColumns: ColDef<BucketFile>[] = [
 								</Button>
 							</TooltipTrigger>
 							<TooltipContent>{translate('storage.file.replace')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Link
+									to={publicPath}
+									target='_blank'
+									download={data.path}
+									className={buttonVariants({
+										variant: 'icon',
+										size: 'sm',
+										rounded: true,
+									})}
+									rel='noopener noreferrer'
+								>
+									<Download size={20} />
+								</Link>
+							</TooltipTrigger>
+							<TooltipContent>{translate('storage.file.download')}</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 

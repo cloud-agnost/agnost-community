@@ -1,25 +1,19 @@
 import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useTabStore from '@/store/version/tabStore';
 import { BucketCountInfo } from '@/types';
 import { CaretDoubleLeft, CaretDoubleRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { versionId } = useParams() as { versionId: string };
-	const { updateCurrentTab } = useTabStore();
-	// todo update tab path
+
 	function goToNextPage() {
 		const currentPage = paginationInfo?.currentPage;
 		const nextPage = currentPage + 1;
 		searchParams.set('page', nextPage.toString());
 		setSearchParams(searchParams);
-		updateCurrentTab(versionId, {
-			path: `${window.location.pathname}?${searchParams.toString()}`,
-		});
 	}
 
 	function goToPreviousPage() {
@@ -72,7 +66,6 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 				currentPage: currentPage,
 			};
 	}
-	console.log(paginationInfo, countInfo);
 	return (
 		<div className='flex items-center justify-end mt-4 gap-2'>
 			<div className='flex items-center space-x-2'>

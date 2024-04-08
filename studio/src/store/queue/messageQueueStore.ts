@@ -19,6 +19,7 @@ import useVersionStore from '../version/versionStore';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
+	workspaceQueues: MessageQueue[];
 	queue: MessageQueue;
 	lastFetchedPage: number | undefined;
 	isEditQueueModalOpen: boolean;
@@ -45,6 +46,7 @@ type Actions = {
 
 const initialState: MessageQueueStore = {
 	queues: [],
+	workspaceQueues: [],
 	queue: {} as MessageQueue,
 	lastFetchedPage: undefined,
 	isEditQueueModalOpen: false,
@@ -63,6 +65,10 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 		},
 		getQueues: async (params: GetMessageQueuesParams) => {
 			const queues = await QueueService.getQueues(params);
+			if (params.workspace) {
+				set({ workspaceQueues: queues });
+				return queues;
+			}
 			if (params.page === 0) {
 				set({ queues, lastFetchedPage: params.page });
 			} else {

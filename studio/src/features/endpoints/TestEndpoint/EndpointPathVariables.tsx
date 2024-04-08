@@ -26,8 +26,11 @@ export default function EndpointPathVariables() {
 	useEffect(() => {
 		if (endpoint?.path) {
 			const pathParams = getPathParams(endpoint?.path);
+			console.log(pathParams, pathParamFields);
 			if (pathParams.length > pathParamFields.length) {
+				console.log('appending path params', pathParams);
 				pathParams.forEach((p) => {
+					if (pathParamFields.some((param) => param.key === p)) return;
 					appendPathParams({ key: p, value: '' });
 				});
 			}

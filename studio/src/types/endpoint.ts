@@ -141,7 +141,9 @@ export interface DeleteMultipleEndpointsParams extends BaseParams, BaseRequest {
 export interface GetEndpointsByIidParams extends BaseParams {
 	iids: string[];
 }
-export interface GetEndpointsParams extends BaseParams, BaseGetRequest {}
+export interface GetEndpointsParams extends BaseParams, BaseGetRequest {
+	workspace?: boolean;
+}
 
 export type TestMethods = 'get' | 'post' | 'put' | 'delete';
 export interface TestEndpointParams extends BaseRequest {

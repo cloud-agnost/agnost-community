@@ -17,6 +17,7 @@ import useVersionStore from '../version/versionStore';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];
+	workspaceMiddlewares: Middleware[];
 	middleware: Middleware;
 	isEditMiddlewareModalOpen: boolean;
 	lastFetchedPage: number | undefined;
@@ -42,6 +43,7 @@ type Actions = {
 
 const initialState: MiddlewareStore = {
 	middlewares: [],
+	workspaceMiddlewares: [],
 	middleware: {} as Middleware,
 	lastFetchedPage: undefined,
 	isEditMiddlewareModalOpen: false,
@@ -74,6 +76,10 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 		},
 		getMiddlewares: async (params: GetModulesRequest) => {
 			const middlewares = await MiddlewareService.getMiddlewares(params);
+			if (params.workspace) {
+				set({ workspaceMiddlewares: middlewares });
+				return middlewares;
+			}
 
 			if (params.page === 0) {
 				set({ middlewares, lastFetchedPage: params.page });

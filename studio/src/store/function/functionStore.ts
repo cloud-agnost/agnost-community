@@ -6,6 +6,7 @@ import { devtools } from 'zustand/middleware';
 import useVersionStore from '../version/versionStore';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
+	workspaceFunctions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
 	isEditFunctionDrawerOpen: boolean;
 	lastFetchedPage: number | undefined;
@@ -32,6 +33,7 @@ type Actions = {
 
 const initialState: FunctionStore = {
 	functions: [],
+	workspaceFunctions: [],
 	function: {} as funcTypes.HelperFunction,
 	isEditFunctionDrawerOpen: false,
 	lastFetchedPage: undefined,
@@ -44,6 +46,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		...initialState,
 		getFunctions: async (params) => {
 			const functions = await FunctionService.getFunctions(params);
+			if (params.workspace) {
+				set({ workspaceFunctions: functions });
+				return functions;
+			}
 			if (params.page === 0) {
 				set({ functions });
 			} else {
