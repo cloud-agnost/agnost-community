@@ -111,6 +111,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 					workspaceDatabases: prev.workspaceDatabases.map((db) =>
 						db._id === database._id ? database : db,
 					),
+					database: database._id === prev.database._id ? database : prev.database,
 				}));
 				return database;
 			},

@@ -7,11 +7,14 @@ import { RealtimeActions } from './RealtimeActions';
 export default class Middleware implements RealtimeActions<MiddlewareType> {
 	delete({ identifiers }: RealtimeActionParams<MiddlewareType>): void {
 		const { removeTabByPath } = useTabStore.getState();
-		useMiddlewareStore.setState?.({
-			middlewares: useMiddlewareStore
-				.getState?.()
-				.middlewares.filter((middleware) => middleware._id !== identifiers.middlewareId),
-		});
+		useMiddlewareStore.setState?.((state) => ({
+			middlewares: state.middlewares.filter(
+				(middleware) => middleware._id !== identifiers.middlewareId,
+			),
+			workspaceMiddlewares: state.workspaceMiddlewares.filter(
+				(middleware) => middleware._id !== identifiers.middlewareId,
+			),
+		}));
 		removeTabByPath(identifiers.versionId as string, identifiers.middlewareId as string);
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
@@ -29,23 +32,24 @@ export default class Middleware implements RealtimeActions<MiddlewareType> {
 			},
 			filter: (tab) => tab.path.includes(data._id),
 		});
-		useMiddlewareStore.setState?.({
-			middlewares: useMiddlewareStore.getState?.().middlewares.map((middleware) => {
-				if (middleware._id === data._id) {
-					return data;
-				}
-				return middleware;
-			}),
-			middleware: data,
-		});
+		useMiddlewareStore.setState?.((state) => ({
+			middlewares: state.middlewares.map((middleware) =>
+				middleware._id === data._id ? data : middleware,
+			),
+			workspaceMiddlewares: state.workspaceMiddlewares.map((middleware) =>
+				middleware._id === data._id ? data : middleware,
+			),
+			middleware: data._id === state.middleware._id ? data : state.middleware,
+		}));
 		if (data.logic) {
 			useMiddlewareStore.getState?.().setLogics(data._id, data.logic);
 		}
 	}
 	create({ data }: RealtimeActionParams<MiddlewareType>): void {
-		useMiddlewareStore.setState?.({
-			middlewares: [data, ...useMiddlewareStore.getState().middlewares],
-		});
+		useMiddlewareStore.setState?.((state) => ({
+			middlewares: [data, ...state.middlewares],
+			workspaceMiddlewares: [data, ...state.workspaceMiddlewares],
+		}));
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
 				...state.dashboard,

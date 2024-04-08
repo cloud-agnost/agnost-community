@@ -15,7 +15,7 @@ export default function EditTask() {
 	const { t } = useTranslation();
 	const {
 		updateFunction,
-		function: helper,
+		toEditFunction: helper,
 		isEditFunctionDrawerOpen,
 		closeEditFunctionModal,
 	} = useFunctionStore();

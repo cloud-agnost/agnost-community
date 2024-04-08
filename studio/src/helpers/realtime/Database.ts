@@ -9,11 +9,12 @@ import { RealtimeActions } from './RealtimeActions';
 class Database implements RealtimeActions<DatabaseType> {
 	delete({ identifiers }: RealtimeActionParams<DatabaseType>): void {
 		const { removeTabByPath } = useTabStore.getState();
-		useDatabaseStore.setState?.({
-			databases: useDatabaseStore
-				.getState?.()
-				.databases.filter((database) => database._id !== identifiers.dbId),
-		});
+		useDatabaseStore.setState?.((state) => ({
+			databases: state.databases.filter((database) => database._id !== identifiers.dbId),
+			workspaceDatabases: state.workspaceDatabases.filter(
+				(database) => database._id !== identifiers.dbId,
+			),
+		}));
 
 		useModelStore.setState?.((state) => ({
 			models: _.omit(state.models, identifiers.dbId as string),
@@ -29,15 +30,13 @@ class Database implements RealtimeActions<DatabaseType> {
 	}
 	update({ data }: RealtimeActionParams<DatabaseType>): void {
 		const { updateTab } = useTabStore.getState();
-		useDatabaseStore.setState?.({
-			databases: useDatabaseStore.getState?.().databases.map((database) => {
-				if (database._id === data._id) {
-					return data;
-				}
-				return database;
-			}),
-			database: data,
-		});
+		useDatabaseStore.setState?.((state) => ({
+			databases: state.databases.map((database) => (database._id === data._id ? data : database)),
+			workspaceDatabases: state.workspaceDatabases.map((database) =>
+				database._id === data._id ? data : database,
+			),
+			database: data._id === state.database._id ? data : state.database,
+		}));
 		updateTab({
 			versionId: data.versionId,
 			tab: {
@@ -47,9 +46,10 @@ class Database implements RealtimeActions<DatabaseType> {
 		});
 	}
 	create({ data }: RealtimeActionParams<DatabaseType>): void {
-		useDatabaseStore.setState?.({
-			databases: [...useDatabaseStore.getState().databases, data],
-		});
+		useDatabaseStore.setState?.((state) => ({
+			databases: [data, ...state.databases],
+			workspaceDatabases: [data, ...state.workspaceDatabases],
+		}));
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
 				...state.dashboard,

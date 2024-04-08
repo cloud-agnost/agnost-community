@@ -19,6 +19,7 @@ import useUtilsStore from '../version/utilsStore';
 import useVersionStore from '../version/versionStore';
 export interface TaskStore {
 	task: Task;
+	toEditTask: Task;
 	workspaceTasks: Task[];
 	tasks: Task[];
 	lastFetchedPage: number | undefined;
@@ -46,6 +47,7 @@ type Actions = {
 
 const initialState: TaskStore = {
 	task: {} as Task,
+	toEditTask: {} as Task,
 	tasks: [],
 	workspaceTasks: [],
 	lastFetchedPage: undefined,
@@ -58,7 +60,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
 		openEditTaskModal: (task: Task) => {
-			set({ task, isEditTaskModalOpen: true });
+			set({ toEditTask: task, isEditTaskModalOpen: true });
 		},
 		closeEditTaskModal: () => {
 			set({ isEditTaskModalOpen: false });
@@ -116,7 +118,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 				set((prev) => ({
 					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
-					task,
+					task: task._id === prev.task._id ? task : prev.task,
 				}));
 
 				if (params.onSuccess) params.onSuccess();

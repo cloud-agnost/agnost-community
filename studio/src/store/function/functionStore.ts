@@ -8,6 +8,7 @@ interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
 	workspaceFunctions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
+	toEditFunction: funcTypes.HelperFunction;
 	isEditFunctionDrawerOpen: boolean;
 	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
@@ -35,9 +36,11 @@ const initialState: FunctionStore = {
 	functions: [],
 	workspaceFunctions: [],
 	function: {} as funcTypes.HelperFunction,
+	toEditFunction: {} as funcTypes.HelperFunction,
 	isEditFunctionDrawerOpen: false,
 	lastFetchedPage: undefined,
 	logics: {},
+
 	isCreateFunctionDrawerOpen: false,
 };
 
@@ -125,6 +128,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				set((prev) => ({
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
 					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
+					function: func._id === prev.function._id ? func : prev.function,
 				}));
 				params.onSuccess?.();
 				return func;
@@ -151,7 +155,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		},
 		closeEditFunctionModal: () => set({ isEditFunctionDrawerOpen: false }),
 		openEditFunctionModal: (func) => {
-			set({ function: func, isEditFunctionDrawerOpen: true });
+			set({ toEditFunction: func, isEditFunctionDrawerOpen: true });
 		},
 
 		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),

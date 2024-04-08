@@ -106,11 +106,11 @@ const useCacheStore = create<CacheStore & Actions>()(
 			updateCache: async (params: UpdateCacheParams) => {
 				try {
 					const cache = await CacheService.updateCache(params);
-					set({
-						caches: get().caches.map((c) => (c._id === cache._id ? cache : c)),
-						workspaceCaches: get().workspaceCaches.map((c) => (c._id === cache._id ? cache : c)),
-						cache,
-					});
+					set((prev) => ({
+						caches: prev.caches.map((c) => (c._id === cache._id ? cache : c)),
+						workspaceCaches: prev.workspaceCaches.map((c) => (c._id === cache._id ? cache : c)),
+						cache: cache._id === prev.cache._id ? cache : prev.cache,
+					}));
 					if (params.onSuccess) params.onSuccess(cache);
 				} catch (error) {
 					if (params.onError) params.onError(error as APIError);

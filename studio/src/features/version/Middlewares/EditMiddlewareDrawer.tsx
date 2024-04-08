@@ -14,20 +14,24 @@ import MiddlewareForm from './MiddlewareForm';
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
-	const { middleware, closeEditMiddlewareModal, isEditMiddlewareModalOpen, updateMiddleware } =
-		useMiddlewareStore();
+	const {
+		toEditMiddleware,
+		closeEditMiddlewareModal,
+		isEditMiddlewareModalOpen,
+		updateMiddleware,
+	} = useMiddlewareStore();
 
 	const form = useForm<z.infer<typeof MiddlewareSchema>>({
 		resolver: zodResolver(MiddlewareSchema),
 		defaultValues: {
-			name: middleware?.name,
+			name: toEditMiddleware?.name,
 		},
 	});
 
 	useEffect(() => {
-		if (isEditMiddlewareModalOpen && middleware) {
+		if (isEditMiddlewareModalOpen && toEditMiddleware) {
 			form.reset({
-				name: middleware.name,
+				name: toEditMiddleware.name,
 			});
 		}
 	}, [isEditMiddlewareModalOpen]);
@@ -50,12 +54,12 @@ export default function EditMiddlewareDrawer() {
 	});
 
 	async function onSubmit(data: z.infer<typeof MiddlewareSchema>) {
-		if (!middleware) return;
+		if (!toEditMiddleware) return;
 		updateMiddlewareMutation({
-			orgId: middleware.orgId,
-			appId: middleware.appId,
-			versionId: middleware.versionId,
-			mwId: middleware._id,
+			orgId: toEditMiddleware.orgId,
+			appId: toEditMiddleware.appId,
+			versionId: toEditMiddleware.versionId,
+			mwId: toEditMiddleware._id,
 			name: data.name,
 		});
 	}

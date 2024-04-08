@@ -16,7 +16,8 @@ import MessageQueueForm from './MessageQueueForm';
 
 export default function EditMessageQueue() {
 	const { t } = useTranslation();
-	const { updateQueue, queue, isEditQueueModalOpen, closeEditQueueModal } = useMessageQueueStore();
+	const { updateQueue, toEditQueue, isEditQueueModalOpen, closeEditQueueModal } =
+		useMessageQueueStore();
 	const environment = useEnvironmentStore((state) => state.environment);
 	const { versionId, appId, orgId } = useParams() as Record<string, string>;
 	const { toast } = useToast();
@@ -41,19 +42,19 @@ export default function EditMessageQueue() {
 	function onSubmit(data: z.infer<typeof MessageQueueSchema>) {
 		const params = removeEmptyFields(data) as z.infer<typeof MessageQueueSchema>;
 		updateQueueMutate({
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			queueId: queue._id,
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			queueId: toEditQueue._id,
 			...params,
 		});
 	}
 
 	useEffect(() => {
-		if (queue) {
-			form.reset(queue);
+		if (toEditQueue) {
+			form.reset(toEditQueue);
 		}
-	}, [isEditQueueModalOpen, queue, environment]);
+	}, [isEditQueueModalOpen, toEditQueue, environment]);
 
 	return (
 		<Drawer open={isEditQueueModalOpen} onOpenChange={closeEditQueueModal}>
@@ -61,7 +62,7 @@ export default function EditMessageQueue() {
 				<DrawerHeader>
 					<DrawerTitle>
 						{t('queue.edit', {
-							name: queue?.name,
+							name: toEditQueue?.name,
 						})}
 					</DrawerTitle>
 				</DrawerHeader>

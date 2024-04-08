@@ -17,6 +17,7 @@ import useVersionStore from '../version/versionStore';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];
+	toEditMiddleware: Middleware;
 	workspaceMiddlewares: Middleware[];
 	middleware: Middleware;
 	isEditMiddlewareModalOpen: boolean;
@@ -49,6 +50,7 @@ const initialState: MiddlewareStore = {
 	isEditMiddlewareModalOpen: false,
 	logics: {},
 	isCreateMiddlewareDrawerOpen: false,
+	toEditMiddleware: {} as Middleware,
 };
 
 const useMiddlewareStore = create<MiddlewareStore & Actions>()(
@@ -138,6 +140,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				workspaceMiddlewares: prev.workspaceMiddlewares.map((mw) =>
 					mw._id === params.mwId ? middleware : mw,
 				),
+				middleware: middleware._id === prev.middleware._id ? middleware : prev.middleware,
 			}));
 			return middleware;
 		},
@@ -162,7 +165,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			}
 		},
 		openEditMiddlewareModal: (middleware) => {
-			set({ isEditMiddlewareModalOpen: true, middleware });
+			set({ isEditMiddlewareModalOpen: true, toEditMiddleware: middleware });
 		},
 		closeEditMiddlewareModal: () => {
 			set({ isEditMiddlewareModalOpen: false });

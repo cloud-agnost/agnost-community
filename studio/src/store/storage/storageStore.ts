@@ -204,16 +204,15 @@ const useStorageStore = create<StorageStore & Actions>()(
 		updateStorage: async (params: UpdateStorageParams) => {
 			try {
 				const updatedStorage = await StorageService.updateStorage(params);
-				set({
-					storages: get().storages.map((storage) => {
-						if (storage._id === updatedStorage._id) return updatedStorage;
-						return storage;
-					}),
-					workspaceStorages: get().workspaceStorages.map((storage) => {
-						if (storage._id === updatedStorage._id) return updatedStorage;
-						return storage;
-					}),
-				});
+				set((state) => ({
+					storages: state.storages.map((storage) =>
+						storage._id === updatedStorage._id ? updatedStorage : storage,
+					),
+					workspaceStorages: state.workspaceStorages.map((storage) =>
+						storage._id === updatedStorage._id ? updatedStorage : storage,
+					),
+					storage: updatedStorage._id === state.storage._id ? updatedStorage : state.storage,
+				}));
 				params.onSuccess?.();
 				return updatedStorage;
 			} catch (error) {

@@ -21,6 +21,7 @@ interface MessageQueueStore {
 	queues: MessageQueue[];
 	workspaceQueues: MessageQueue[];
 	queue: MessageQueue;
+	toEditQueue: MessageQueue;
 	lastFetchedPage: number | undefined;
 	isEditQueueModalOpen: boolean;
 	logics: Record<string, string>;
@@ -52,13 +53,14 @@ const initialState: MessageQueueStore = {
 	isEditQueueModalOpen: false,
 	logics: {},
 	isCreateQueueModalOpen: false,
+	toEditQueue: {} as MessageQueue,
 };
 
 const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
 		openEditQueueModal: (queue: MessageQueue) => {
-			set({ queue, isEditQueueModalOpen: true });
+			set({ toEditQueue: queue, isEditQueueModalOpen: true });
 		},
 		closeEditQueueModal: () => {
 			set({ isEditQueueModalOpen: false });
@@ -157,7 +159,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
 					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
-					queue,
+					queue: queue._id === prev.queue._id ? queue : prev.queue,
 				}));
 				if (params.onSuccess) params.onSuccess();
 				return queue;

@@ -23,6 +23,7 @@ interface EndpointStore {
 	endpoints: Endpoint[];
 	workSpaceEndpoints: Endpoint[];
 	endpoint: Endpoint;
+	toEditEndpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedPage: number | undefined;
 	isEditEndpointModalOpen: boolean;
@@ -61,11 +62,12 @@ const initialState: EndpointStore = {
 	isEditEndpointModalOpen: false,
 	logics: {},
 	isCreateEndpointDialogOpen: false,
+	toEditEndpoint: {} as Endpoint,
 };
 
 const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	...initialState,
-	openEditEndpointModal: (endpoint) => set({ endpoint, isEditEndpointModalOpen: true }),
+	openEditEndpointModal: (toEditEndpoint) => set({ toEditEndpoint, isEditEndpointModalOpen: true }),
 	closeEditEndpointModal: () => set({ isEditEndpointModalOpen: false }),
 	setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 	setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
@@ -184,8 +186,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 					e._id === endpoint._id ? endpoint : e,
 				),
 				endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
-				endpoint,
+				endpoint: endpoint._id === prev.endpoint._id ? endpoint : prev.endpoint,
 			}));
+
 			if (params.onSuccess) params.onSuccess();
 			return endpoint;
 		} catch (error) {
