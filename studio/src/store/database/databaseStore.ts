@@ -94,6 +94,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.createDatabase(params);
 				set((prev) => ({
 					databases: [database, ...prev.databases],
+					workspaceDatabases: [database, ...prev.workspaceDatabases],
 				}));
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -107,6 +108,9 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.updateDatabaseName(params);
 				set((prev) => ({
 					databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
+					workspaceDatabases: prev.workspaceDatabases.map((db) =>
+						db._id === database._id ? database : db,
+					),
 				}));
 				return database;
 			},
@@ -114,6 +118,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				await DatabaseService.deleteDatabase(params);
 				set((prev) => ({
 					databases: prev.databases.filter((db) => db._id !== params.dbId),
+					workspaceDatabases: prev.workspaceDatabases.filter((db) => db._id !== params.dbId),
 				}));
 			},
 			toggleCreateModal: () =>

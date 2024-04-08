@@ -73,7 +73,10 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	createEndpoint: async (params) => {
 		try {
 			const endpoint = await EndpointService.createEndpoint(params);
-			set((prev) => ({ endpoints: [endpoint, ...prev.endpoints] }));
+			set((prev) => ({
+				endpoints: [endpoint, ...prev.endpoints],
+				workSpaceEndpoints: [endpoint, ...prev.workSpaceEndpoints],
+			}));
 			if (params.onSuccess) params.onSuccess(endpoint);
 			useVersionStore.setState?.((state) => ({
 				dashboard: {
@@ -125,6 +128,7 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			await EndpointService.deleteEndpoint(params);
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => e._id !== params.endpointId),
+				workSpaceEndpoints: prev.workSpaceEndpoints.filter((e) => e._id !== params.endpointId),
 			}));
 
 			useUtilsStore.setState((prev) => {
@@ -149,6 +153,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			await EndpointService.deleteMultipleEndpoints(params);
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
+				workSpaceEndpoints: prev.workSpaceEndpoints.filter(
+					(e) => !params.endpointIds.includes(e._id),
+				),
 			}));
 			useUtilsStore.setState?.((prev) => {
 				const { endpointLogs, endpointResponse, endpointRequest } = prev;
@@ -173,6 +180,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		try {
 			const endpoint = await EndpointService.updateEndpoint(params);
 			set((prev) => ({
+				workSpaceEndpoints: prev.workSpaceEndpoints.map((e) =>
+					e._id === endpoint._id ? endpoint : e,
+				),
 				endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 				endpoint,
 			}));
@@ -187,6 +197,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		try {
 			const endpoint = await EndpointService.saveEndpointLogic(params);
 			set((prev) => ({
+				workSpaceEndpoints: prev.workSpaceEndpoints.map((e) =>
+					e._id === endpoint._id ? endpoint : e,
+				),
 				endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 				endpoint,
 			}));

@@ -129,7 +129,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 		createStorage: async (params: CreateStorageParams) => {
 			try {
 				const createdStorage = await StorageService.createStorage(params);
-				set({ storages: [createdStorage, ...get().storages] });
+				set({
+					storages: [createdStorage, ...get().storages],
+					workspaceStorages: [createdStorage, ...get().workspaceStorages],
+				});
 				params.onSuccess?.();
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -171,6 +174,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 				await StorageService.deleteStorage(params);
 				set({
 					storages: get().storages.filter((storage) => storage._id !== params.storageId),
+					workspaceStorages: get().workspaceStorages.filter(
+						(storage) => storage._id !== params.storageId,
+					),
 				});
 
 				params.onSuccess?.();
@@ -184,6 +190,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 				await StorageService.deleteMultipleStorage(params);
 				set({
 					storages: get().storages.filter((storage) => !params.storageIds.includes(storage._id)),
+					workspaceStorages: get().workspaceStorages.filter(
+						(storage) => !params.storageIds.includes(storage._id),
+					),
 				});
 
 				params.onSuccess?.();
@@ -197,6 +206,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 				const updatedStorage = await StorageService.updateStorage(params);
 				set({
 					storages: get().storages.map((storage) => {
+						if (storage._id === updatedStorage._id) return updatedStorage;
+						return storage;
+					}),
+					workspaceStorages: get().workspaceStorages.map((storage) => {
 						if (storage._id === updatedStorage._id) return updatedStorage;
 						return storage;
 					}),

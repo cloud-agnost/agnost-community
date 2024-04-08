@@ -92,7 +92,11 @@ const useTaskStore = create<TaskStore & Actions>()(
 		createTask: async (params: CreateTaskParams) => {
 			try {
 				const task = await TaskService.createTask(params);
-				set((prev) => ({ tasks: [task, ...prev.tasks] }));
+				set((prev) => ({
+					tasks: [task, ...prev.tasks],
+					workspaceTasks: [task, ...prev.workspaceTasks],
+					task,
+				}));
 				if (params.onSuccess) params.onSuccess(task);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -110,6 +114,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.updateTaskProperties(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 					task,
 				}));
@@ -125,6 +130,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.saveTaskLogic(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 					task,
 				}));
@@ -137,6 +143,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.deleteTask(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.filter((task) => task._id !== params.taskId),
 					tasks: prev.tasks.filter((task) => task._id !== params.taskId),
 				}));
 				useUtilsStore.setState((prev) => {
@@ -154,6 +161,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const tasks = await TaskService.deleteMultipleTasks(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.filter((task) => !params.taskIds.includes(task._id)),
 					tasks: prev.tasks.filter((task) => !params.taskIds.includes(task._id)),
 				}));
 

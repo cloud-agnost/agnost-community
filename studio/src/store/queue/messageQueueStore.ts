@@ -95,6 +95,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				await QueueService.deleteQueue(params);
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => queue._id !== params.queueId),
+					workspaceQueues: prev.workspaceQueues.filter((queue) => queue._id !== params.queueId),
 				}));
 
 				useUtilsStore.setState?.((prev) => {
@@ -113,6 +114,9 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.deleteMultipleQueues(params);
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => !params.queueIds.includes(queue._id)),
+					workspaceQueues: prev.workspaceQueues.filter(
+						(queue) => !params.queueIds.includes(queue._id),
+					),
 				}));
 				useUtilsStore.setState?.((prev) => {
 					const testQueueLogs = prev.testQueueLogs;
@@ -130,7 +134,10 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 		createQueue: async (params: CreateMessageQueueParams) => {
 			try {
 				const queue = await QueueService.createQueue(params);
-				set((prev) => ({ queues: [queue, ...prev.queues] }));
+				set((prev) => ({
+					queues: [queue, ...prev.queues],
+					workspaceQueues: [queue, ...prev.workspaceQueues],
+				}));
 				if (params.onSuccess) params.onSuccess(queue);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -149,6 +156,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.updateQueue(params);
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
+					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
 					queue,
 				}));
 				if (params.onSuccess) params.onSuccess();
@@ -163,6 +171,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.updateQueueLogic(params);
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
+					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
 					queue,
 					editedLogic: queue.logic,
 				}));

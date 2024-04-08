@@ -74,6 +74,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				await FunctionService.deleteFunction(params);
 				set((prev) => ({
 					functions: prev.functions.filter((func) => func._id !== params.functionId),
+					workspaceFunctions: prev.workspaceFunctions.filter(
+						(func) => func._id !== params.functionId,
+					),
 				}));
 				params.onSuccess?.();
 			} catch (err) {
@@ -86,6 +89,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				await FunctionService.deleteMultipleFunctions(params);
 				set((prev) => ({
 					functions: prev.functions.filter((func) => !params.functionIds.includes(func._id)),
+					workspaceFunctions: prev.workspaceFunctions.filter(
+						(func) => !params.functionIds.includes(func._id),
+					),
 				}));
 				params.onSuccess?.();
 			} catch (err) {
@@ -96,7 +102,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		createFunction: async (params) => {
 			try {
 				const func = await FunctionService.createFunction(params);
-				set((prev) => ({ functions: [func, ...prev.functions] }));
+				set((prev) => ({
+					functions: [func, ...prev.functions],
+					workspaceFunctions: [func, ...prev.workspaceFunctions],
+				}));
 				params.onSuccess?.(func);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -115,6 +124,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				const func = await FunctionService.updateFunction(params);
 				set((prev) => ({
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
+					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
 				}));
 				params.onSuccess?.();
 				return func;
@@ -127,6 +137,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			try {
 				const func = await FunctionService.saveFunctionCode(params);
 				set((prev) => ({
+					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
 					function: func,
 					editedLogic: func.logic,

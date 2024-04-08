@@ -57,7 +57,10 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 		createMiddleware: async (params: CreateMiddlewareParams) => {
 			try {
 				const middleware = await MiddlewareService.createMiddleware(params);
-				set((prev) => ({ middlewares: [middleware, ...prev.middlewares] }));
+				set((prev) => ({
+					middlewares: [middleware, ...prev.middlewares],
+					workspaceMiddlewares: [middleware, ...prev.workspaceMiddlewares],
+				}));
 				if (params.onSuccess) {
 					params.onSuccess(middleware);
 				}
@@ -108,6 +111,9 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				await MiddlewareService.deleteMiddleware(params);
 				set((prev) => ({
 					middlewares: prev.middlewares.filter((mw) => mw._id !== params.middlewareId),
+					workspaceMiddlewares: prev.workspaceMiddlewares.filter(
+						(mw) => mw._id !== params.middlewareId,
+					),
 				}));
 				if (params.onSuccess) params.onSuccess();
 			} catch (e) {
@@ -120,12 +126,18 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			await MiddlewareService.deleteMultipleMiddlewares(params);
 			set((prev) => ({
 				middlewares: prev.middlewares.filter((mw) => !params.middlewareIds.includes(mw._id)),
+				workspaceMiddlewares: prev.workspaceMiddlewares.filter(
+					(mw) => !params.middlewareIds.includes(mw._id),
+				),
 			}));
 		},
 		updateMiddleware: async (params: UpdateMiddlewareParams) => {
 			const middleware = await MiddlewareService.updateMiddleware(params);
 			set((prev) => ({
 				middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
+				workspaceMiddlewares: prev.workspaceMiddlewares.map((mw) =>
+					mw._id === params.mwId ? middleware : mw,
+				),
 			}));
 			return middleware;
 		},
@@ -134,6 +146,9 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				const middleware = await MiddlewareService.saveMiddlewareCode(params);
 				set((prev) => ({
 					middlewares: prev.middlewares.map((mw) =>
+						mw._id === params.middlewareId ? middleware : mw,
+					),
+					workspaceMiddlewares: prev.workspaceMiddlewares.map((mw) =>
 						mw._id === params.middlewareId ? middleware : mw,
 					),
 					middleware,
