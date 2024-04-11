@@ -169,7 +169,7 @@ export default function EditVersionAndReplica() {
 					/>
 				)}
 				<div className='flex justify-end'>
-					<Button className='ml-2' size='lg' loading={isPending} type='submit'>
+					<Button className='ml-2 whitespace-nowrap' size='xl' loading={isPending} type='submit'>
 						{form.watch('type') === ResourceType.Cache
 							? t('resources.update_version')
 							: t('resources.update_replica_and_version')}

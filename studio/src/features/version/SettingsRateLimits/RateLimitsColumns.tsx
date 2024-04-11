@@ -67,6 +67,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 		header: translate('general.limit'),
 		accessorKey: 'limit',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { duration, rate },

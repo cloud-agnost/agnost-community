@@ -21,7 +21,9 @@ import useVersionStore from '../version/versionStore';
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
+	workSpaceEndpoints: Endpoint[];
 	endpoint: Endpoint;
+	toEditEndpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedPage: number | undefined;
 	isEditEndpointModalOpen: boolean;
@@ -54,16 +56,18 @@ const initialState: EndpointStore = {
 	selectEndpointDialogOpen: false,
 	endpoints: [],
 	endpoint: {} as Endpoint,
+	workSpaceEndpoints: [],
 	selectedEndpointIds: [],
 	lastFetchedPage: undefined,
 	isEditEndpointModalOpen: false,
 	logics: {},
 	isCreateEndpointDialogOpen: false,
+	toEditEndpoint: {} as Endpoint,
 };
 
 const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	...initialState,
-	openEditEndpointModal: (endpoint) => set({ endpoint, isEditEndpointModalOpen: true }),
+	openEditEndpointModal: (toEditEndpoint) => set({ toEditEndpoint, isEditEndpointModalOpen: true }),
 	closeEditEndpointModal: () => set({ isEditEndpointModalOpen: false }),
 	setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 	setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
@@ -71,7 +75,10 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	createEndpoint: async (params) => {
 		try {
 			const endpoint = await EndpointService.createEndpoint(params);
-			set((prev) => ({ endpoints: [endpoint, ...prev.endpoints] }));
+			set((prev) => ({
+				endpoints: [endpoint, ...prev.endpoints],
+				workSpaceEndpoints: [endpoint, ...prev.workSpaceEndpoints],
+			}));
 			if (params.onSuccess) params.onSuccess(endpoint);
 			useVersionStore.setState?.((state) => ({
 				dashboard: {
@@ -99,6 +106,12 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	getEndpoints: async (params) => {
 		try {
 			const endpoints = await EndpointService.getEndpoints(params);
+
+			if (params.workspace) {
+				set({ workSpaceEndpoints: endpoints });
+				return endpoints;
+			}
+
 			if (params.page === 0) {
 				set({ endpoints, lastFetchedPage: params.page });
 			} else {
@@ -117,6 +130,7 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			await EndpointService.deleteEndpoint(params);
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => e._id !== params.endpointId),
+				workSpaceEndpoints: prev.workSpaceEndpoints.filter((e) => e._id !== params.endpointId),
 			}));
 
 			useUtilsStore.setState((prev) => {
@@ -141,8 +155,10 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			await EndpointService.deleteMultipleEndpoints(params);
 			set((prev) => ({
 				endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
+				workSpaceEndpoints: prev.workSpaceEndpoints.filter(
+					(e) => !params.endpointIds.includes(e._id),
+				),
 			}));
-
 			useUtilsStore.setState?.((prev) => {
 				const { endpointLogs, endpointResponse, endpointRequest } = prev;
 				params.endpointIds.forEach((id) => {
@@ -166,9 +182,13 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		try {
 			const endpoint = await EndpointService.updateEndpoint(params);
 			set((prev) => ({
+				workSpaceEndpoints: prev.workSpaceEndpoints.map((e) =>
+					e._id === endpoint._id ? endpoint : e,
+				),
 				endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
-				endpoint,
+				endpoint: endpoint._id === prev.endpoint._id ? endpoint : prev.endpoint,
 			}));
+
 			if (params.onSuccess) params.onSuccess();
 			return endpoint;
 		} catch (error) {
@@ -180,6 +200,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		try {
 			const endpoint = await EndpointService.saveEndpointLogic(params);
 			set((prev) => ({
+				workSpaceEndpoints: prev.workSpaceEndpoints.map((e) =>
+					e._id === endpoint._id ? endpoint : e,
+				),
 				endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 				endpoint,
 			}));

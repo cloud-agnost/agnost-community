@@ -125,10 +125,9 @@ export default class EndpointService {
 		body,
 		formData,
 		consoleLogId,
+		signal,
 	}: TestEndpointParams): Promise<any> {
 		const formDataObj = new FormData();
-		const abortController = new AbortController();
-		window.controller = abortController;
 		if (formData) {
 			formData.forEach((data) => {
 				if (data.file) {
@@ -155,9 +154,14 @@ export default class EndpointService {
 		} else {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}
-		return await test[method](`${useEnvironmentStore.getState().environment?.iid}${path}`, opt, {
-			...options,
-			signal: abortController.signal,
-		});
+		const response = await test[method](
+			`${useEnvironmentStore.getState().environment?.iid}${path}`,
+			opt,
+			{
+				...options,
+				signal,
+			},
+		);
+		return response;
 	}
 }

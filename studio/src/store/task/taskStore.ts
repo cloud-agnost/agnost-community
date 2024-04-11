@@ -19,6 +19,8 @@ import useUtilsStore from '../version/utilsStore';
 import useVersionStore from '../version/versionStore';
 export interface TaskStore {
 	task: Task;
+	toEditTask: Task;
+	workspaceTasks: Task[];
 	tasks: Task[];
 	lastFetchedPage: number | undefined;
 	isEditTaskModalOpen: boolean;
@@ -45,7 +47,9 @@ type Actions = {
 
 const initialState: TaskStore = {
 	task: {} as Task,
+	toEditTask: {} as Task,
 	tasks: [],
+	workspaceTasks: [],
 	lastFetchedPage: undefined,
 	isEditTaskModalOpen: false,
 	isCreateTaskModalOpen: false,
@@ -56,7 +60,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
 		openEditTaskModal: (task: Task) => {
-			set({ task, isEditTaskModalOpen: true });
+			set({ toEditTask: task, isEditTaskModalOpen: true });
 		},
 		closeEditTaskModal: () => {
 			set({ isEditTaskModalOpen: false });
@@ -74,6 +78,11 @@ const useTaskStore = create<TaskStore & Actions>()(
 		},
 		getTasks: async (params: GetTasksParams) => {
 			const tasks = await TaskService.getTasks(params);
+			if (params.workspace) {
+				set({ workspaceTasks: tasks });
+				return tasks;
+			}
+
 			if (params.page === 0) {
 				set({ tasks, lastFetchedPage: params.page });
 			} else {
@@ -85,7 +94,11 @@ const useTaskStore = create<TaskStore & Actions>()(
 		createTask: async (params: CreateTaskParams) => {
 			try {
 				const task = await TaskService.createTask(params);
-				set((prev) => ({ tasks: [task, ...prev.tasks] }));
+				set((prev) => ({
+					tasks: [task, ...prev.tasks],
+					workspaceTasks: [task, ...prev.workspaceTasks],
+					task,
+				}));
 				if (params.onSuccess) params.onSuccess(task);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -103,8 +116,9 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.updateTaskProperties(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
-					task,
+					task: task._id === prev.task._id ? task : prev.task,
 				}));
 
 				if (params.onSuccess) params.onSuccess();
@@ -118,6 +132,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.saveTaskLogic(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 					task,
 				}));
@@ -130,6 +145,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.deleteTask(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.filter((task) => task._id !== params.taskId),
 					tasks: prev.tasks.filter((task) => task._id !== params.taskId),
 				}));
 				useUtilsStore.setState((prev) => {
@@ -147,6 +163,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const tasks = await TaskService.deleteMultipleTasks(params);
 				set((prev) => ({
+					workspaceTasks: prev.workspaceTasks.filter((task) => !params.taskIds.includes(task._id)),
 					tasks: prev.tasks.filter((task) => !params.taskIds.includes(task._id)),
 				}));
 

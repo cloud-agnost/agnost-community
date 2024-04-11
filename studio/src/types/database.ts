@@ -19,7 +19,9 @@ export interface Database {
 	__v: number;
 }
 
-export type GetDatabasesOfAppParams = Omit<VersionParams, 'envId'>;
+export type GetDatabasesOfAppParams = Omit<VersionParams, 'envId'> & {
+	workspace?: boolean;
+};
 
 export type CreateDatabaseParams = GetDatabasesOfAppParams & {
 	name: string;

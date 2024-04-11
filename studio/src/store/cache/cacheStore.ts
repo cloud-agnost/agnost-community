@@ -15,6 +15,7 @@ import useVersionStore from '../version/versionStore';
 
 interface CacheStore {
 	caches: Cache[];
+	workspaceCaches: Cache[];
 	cache: Cache;
 	loading: boolean;
 	error: APIError | null;
@@ -45,6 +46,7 @@ const initialState: CacheStore = {
 	cache: {} as Cache,
 	loading: false,
 	error: null,
+	workspaceCaches: [],
 	isEditCacheModalOpen: false,
 	toDeleteCache: {} as Cache,
 	isDeleteCacheModalOpen: false,
@@ -59,6 +61,11 @@ const useCacheStore = create<CacheStore & Actions>()(
 			getCaches: async (params: GetCachesOfAppVersionParams) => {
 				try {
 					const caches = await CacheService.getCaches(params);
+					if (params.workspace) {
+						set({ workspaceCaches: caches });
+						return caches;
+					}
+
 					if (params.page === 0) {
 						set({ caches, lastFetchedPage: params.page });
 					} else {
@@ -80,7 +87,10 @@ const useCacheStore = create<CacheStore & Actions>()(
 			createCache: async (params: CreateCacheParams) => {
 				try {
 					const cache = await CacheService.createCache(params);
-					set({ caches: [cache, ...get().caches] });
+					set({
+						caches: [cache, ...get().caches],
+						workspaceCaches: [cache, ...get().workspaceCaches],
+					});
 					useVersionStore.setState?.((state) => ({
 						dashboard: {
 							...state.dashboard,
@@ -96,10 +106,11 @@ const useCacheStore = create<CacheStore & Actions>()(
 			updateCache: async (params: UpdateCacheParams) => {
 				try {
 					const cache = await CacheService.updateCache(params);
-					set({
-						caches: get().caches.map((c) => (c._id === cache._id ? cache : c)),
-						cache,
-					});
+					set((prev) => ({
+						caches: prev.caches.map((c) => (c._id === cache._id ? cache : c)),
+						workspaceCaches: prev.workspaceCaches.map((c) => (c._id === cache._id ? cache : c)),
+						cache: cache._id === prev.cache._id ? cache : prev.cache,
+					}));
 					if (params.onSuccess) params.onSuccess(cache);
 				} catch (error) {
 					if (params.onError) params.onError(error as APIError);
@@ -111,7 +122,9 @@ const useCacheStore = create<CacheStore & Actions>()(
 					await CacheService.deleteCache(params);
 					set({
 						caches: get().caches.filter((c) => c._id !== params.cacheId),
+						workspaceCaches: get().workspaceCaches.filter((c) => c._id !== params.cacheId),
 					});
+
 					if (params.onSuccess) params.onSuccess();
 				} catch (error) {
 					if (params.onError) params.onError(error as APIError);
@@ -123,6 +136,7 @@ const useCacheStore = create<CacheStore & Actions>()(
 					await CacheService.deleteMultipleCaches(params);
 					set({
 						caches: get().caches.filter((c) => !params.cacheIds.includes(c._id)),
+						workspaceCaches: get().workspaceCaches.filter((c) => !params.cacheIds.includes(c._id)),
 					});
 
 					if (params.onSuccess) params.onSuccess();

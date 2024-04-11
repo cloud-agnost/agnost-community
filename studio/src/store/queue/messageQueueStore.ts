@@ -19,7 +19,9 @@ import useVersionStore from '../version/versionStore';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
+	workspaceQueues: MessageQueue[];
 	queue: MessageQueue;
+	toEditQueue: MessageQueue;
 	lastFetchedPage: number | undefined;
 	isEditQueueModalOpen: boolean;
 	logics: Record<string, string>;
@@ -45,24 +47,30 @@ type Actions = {
 
 const initialState: MessageQueueStore = {
 	queues: [],
+	workspaceQueues: [],
 	queue: {} as MessageQueue,
 	lastFetchedPage: undefined,
 	isEditQueueModalOpen: false,
 	logics: {},
 	isCreateQueueModalOpen: false,
+	toEditQueue: {} as MessageQueue,
 };
 
 const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
 		openEditQueueModal: (queue: MessageQueue) => {
-			set({ queue, isEditQueueModalOpen: true });
+			set({ toEditQueue: queue, isEditQueueModalOpen: true });
 		},
 		closeEditQueueModal: () => {
 			set({ isEditQueueModalOpen: false });
 		},
 		getQueues: async (params: GetMessageQueuesParams) => {
 			const queues = await QueueService.getQueues(params);
+			if (params.workspace) {
+				set({ workspaceQueues: queues });
+				return queues;
+			}
 			if (params.page === 0) {
 				set({ queues, lastFetchedPage: params.page });
 			} else {
@@ -89,6 +97,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				await QueueService.deleteQueue(params);
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => queue._id !== params.queueId),
+					workspaceQueues: prev.workspaceQueues.filter((queue) => queue._id !== params.queueId),
 				}));
 
 				useUtilsStore.setState?.((prev) => {
@@ -107,6 +116,9 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.deleteMultipleQueues(params);
 				set((prev) => ({
 					queues: prev.queues.filter((queue) => !params.queueIds.includes(queue._id)),
+					workspaceQueues: prev.workspaceQueues.filter(
+						(queue) => !params.queueIds.includes(queue._id),
+					),
 				}));
 				useUtilsStore.setState?.((prev) => {
 					const testQueueLogs = prev.testQueueLogs;
@@ -124,7 +136,10 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 		createQueue: async (params: CreateMessageQueueParams) => {
 			try {
 				const queue = await QueueService.createQueue(params);
-				set((prev) => ({ queues: [queue, ...prev.queues] }));
+				set((prev) => ({
+					queues: [queue, ...prev.queues],
+					workspaceQueues: [queue, ...prev.workspaceQueues],
+				}));
 				if (params.onSuccess) params.onSuccess(queue);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -143,7 +158,8 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.updateQueue(params);
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
-					queue,
+					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
+					queue: queue._id === prev.queue._id ? queue : prev.queue,
 				}));
 				if (params.onSuccess) params.onSuccess();
 				return queue;
@@ -157,6 +173,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.updateQueueLogic(params);
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
+					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
 					queue,
 					editedLogic: queue.logic,
 				}));

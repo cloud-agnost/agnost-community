@@ -250,4 +250,12 @@ export default class StorageService {
 			await http.put(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`, data)
 		).data;
 	}
+
+	static async downloadFileFromBucket(fileId: string): Promise<void> {
+		return (
+			await http.get(`${this.getUrl()}/object/${fileId}?attachment=true`, {
+				responseType: 'blob',
+			})
+		).data;
+	}
 }

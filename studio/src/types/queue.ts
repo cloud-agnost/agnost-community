@@ -21,7 +21,11 @@ export interface MessageQueue {
 	delayedMessages: boolean;
 }
 
-export type GetMessageQueuesParams = BaseParams & BaseGetRequest;
+export type GetMessageQueuesParams = BaseParams &
+	BaseGetRequest & {
+		workspace?: boolean;
+	};
+
 export interface GetMessageQueueByIdParams extends BaseParams {
 	queueId: string;
 }

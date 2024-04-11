@@ -60,7 +60,7 @@ export default function SideBar() {
 
 	return (
 		<div
-			className='h-full w-full shadow-xl flex flex-col bg-subtle/50 dark:bg-[#171d2d]'
+			className='full-height-without-header w-full shadow-xl flex flex-col bg-subtle/50 dark:bg-[#171d2d]'
 			id='side-navigation'
 		>
 			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between'>

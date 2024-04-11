@@ -16,11 +16,12 @@ class Endpoint implements RealtimeActions<EndpointType> {
 	}
 	delete({ identifiers }: RealtimeActionParams<EndpointType>) {
 		const { removeTabByPath } = useTabStore.getState();
-		useEndpointStore.setState?.({
-			endpoints: useEndpointStore
-				.getState?.()
-				.endpoints.filter((ep) => ep._id !== identifiers.endpointId),
-		});
+		useEndpointStore.setState?.((state) => ({
+			endpoints: state.endpoints.filter((ep) => ep._id !== identifiers.endpointId),
+			workSpaceEndpoints: state.workSpaceEndpoints.filter(
+				(ep) => ep._id !== identifiers.endpointId,
+			),
+		}));
 
 		removeTabByPath(identifiers.versionId as string, identifiers.endpointId as string);
 		useVersionStore.setState?.((state) => ({
@@ -32,7 +33,6 @@ class Endpoint implements RealtimeActions<EndpointType> {
 	}
 	update({ data }: RealtimeActionParams<EndpointType>) {
 		const { updateTab } = useTabStore.getState();
-
 		updateTab({
 			versionId: data.versionId as string,
 			tab: {
@@ -40,23 +40,21 @@ class Endpoint implements RealtimeActions<EndpointType> {
 			},
 			filter: (tab) => tab.path.includes(data._id as string),
 		});
-		useEndpointStore.setState?.({
-			endpoints: useEndpointStore.getState?.().endpoints.map((ep) => {
-				if (ep._id === data._id) {
-					return data;
-				}
-				return ep;
-			}),
-			endpoint: data,
-		});
+		useEndpointStore.setState?.((state) => ({
+			endpoints: state.endpoints.map((ep) => (ep._id === data._id ? data : ep)),
+			workSpaceEndpoints: state.workSpaceEndpoints.map((ep) => (ep._id === data._id ? data : ep)),
+			endpoint: data._id === state.endpoint._id ? data : state.endpoint,
+		}));
+
 		if (data.logic) {
 			useEndpointStore.getState?.().setLogics(data._id, data.logic);
 		}
 	}
 	create({ data }: RealtimeActionParams<EndpointType>) {
-		useEndpointStore.setState?.({
-			endpoints: [...useEndpointStore.getState().endpoints, data],
-		});
+		useEndpointStore.setState?.((state) => ({
+			endpoints: [data, ...state.endpoints],
+			workSpaceEndpoints: [data, ...state.workSpaceEndpoints],
+		}));
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
 				...state.dashboard,

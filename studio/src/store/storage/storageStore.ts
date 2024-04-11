@@ -28,6 +28,7 @@ import { devtools } from 'zustand/middleware';
 import useVersionStore from '../version/versionStore';
 export interface StorageStore {
 	storages: Storage[];
+	workspaceStorages: Storage[];
 	storage: Storage;
 	bucket: Bucket;
 	buckets: Bucket[];
@@ -90,6 +91,7 @@ type Actions = {
 
 const initialState: StorageStore = {
 	storages: [],
+	workspaceStorages: [],
 	storage: {} as Storage,
 	bucket: {} as Bucket,
 	buckets: [],
@@ -127,7 +129,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 		createStorage: async (params: CreateStorageParams) => {
 			try {
 				const createdStorage = await StorageService.createStorage(params);
-				set({ storages: [createdStorage, ...get().storages] });
+				set({
+					storages: [createdStorage, ...get().storages],
+					workspaceStorages: [createdStorage, ...get().workspaceStorages],
+				});
 				params.onSuccess?.();
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -148,6 +153,11 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getStorages: async (params: GetStoragesParams) => {
 			const storages = await StorageService.getStorages(params);
+			if (params.workspace) {
+				set({ workspaceStorages: storages });
+				return storages;
+			}
+
 			if (params.page === 0) {
 				set({ storages, lastFetchedPage: params.page });
 			} else {
@@ -164,6 +174,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 				await StorageService.deleteStorage(params);
 				set({
 					storages: get().storages.filter((storage) => storage._id !== params.storageId),
+					workspaceStorages: get().workspaceStorages.filter(
+						(storage) => storage._id !== params.storageId,
+					),
 				});
 
 				params.onSuccess?.();
@@ -177,6 +190,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 				await StorageService.deleteMultipleStorage(params);
 				set({
 					storages: get().storages.filter((storage) => !params.storageIds.includes(storage._id)),
+					workspaceStorages: get().workspaceStorages.filter(
+						(storage) => !params.storageIds.includes(storage._id),
+					),
 				});
 
 				params.onSuccess?.();
@@ -188,12 +204,15 @@ const useStorageStore = create<StorageStore & Actions>()(
 		updateStorage: async (params: UpdateStorageParams) => {
 			try {
 				const updatedStorage = await StorageService.updateStorage(params);
-				set({
-					storages: get().storages.map((storage) => {
-						if (storage._id === updatedStorage._id) return updatedStorage;
-						return storage;
-					}),
-				});
+				set((state) => ({
+					storages: state.storages.map((storage) =>
+						storage._id === updatedStorage._id ? updatedStorage : storage,
+					),
+					workspaceStorages: state.workspaceStorages.map((storage) =>
+						storage._id === updatedStorage._id ? updatedStorage : storage,
+					),
+					storage: updatedStorage._id === state.storage._id ? updatedStorage : state.storage,
+				}));
 				params.onSuccess?.();
 				return updatedStorage;
 			} catch (error) {

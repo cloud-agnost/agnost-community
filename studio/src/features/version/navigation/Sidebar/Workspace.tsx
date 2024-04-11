@@ -137,11 +137,13 @@ export default function Workspace() {
 					versionId,
 					page: 0,
 					size: 250,
+					sortBy: 'name',
+					sortDir: 'asc',
+					workspace: true,
 				});
 			});
 		}
 	}, [appId, versionId]);
-
 	return (
 		<>
 			{NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
@@ -151,55 +153,51 @@ export default function Workspace() {
 					key={item.type}
 					trigger={<WorkspaceTrigger item={item} />}
 				>
-					{data[item.type]
-						.sort((a, b) => a.name.localeCompare(b.name))
-						?.map((data) => (
-							<SideBarButton
-								key={data._id}
-								id={data._id}
-								active={
-									window.location.pathname.includes(data._id) && item.type === currentTab?.type
-								}
-								onClick={() => handleDataClick(data, item.type)}
-								title={data.name}
-								type={item.type}
-								actions={
-									<div className='flex items-center justify-end'>
-										<Button
-											variant='icon'
-											size='sm'
-											rounded
-											className={cn(
-												window.location.pathname.includes(data._id) &&
-													item.type === currentTab?.type &&
-													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-												'!p-0 !h-5 hidden group-hover:inline-flex',
-											)}
-											onClick={(e) => {
-												e.stopPropagation();
-												openEditDialog(data, item.type);
-											}}
-										>
-											<PencilSimple size={14} />
-										</Button>
+					{data[item.type]?.map((data) => (
+						<SideBarButton
+							key={data._id}
+							id={data._id}
+							active={window.location.pathname.includes(data._id) && item.type === currentTab?.type}
+							onClick={() => handleDataClick(data, item.type)}
+							title={data.name}
+							type={item.type}
+							actions={
+								<div className='flex items-center justify-end'>
+									<Button
+										variant='icon'
+										size='sm'
+										rounded
+										className={cn(
+											window.location.pathname.includes(data._id) &&
+												item.type === currentTab?.type &&
+												'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
+											'!p-0 !h-5 hidden group-hover:inline-flex',
+										)}
+										onClick={(e) => {
+											e.stopPropagation();
+											openEditDialog(data, item.type);
+										}}
+									>
+										<PencilSimple size={14} />
+									</Button>
 
-										<Button
-											rounded
-											className={cn(
-												window.location.pathname.includes(data._id) &&
-													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-												'p-0 !h-5 hidden group-hover:inline-flex',
-											)}
-											variant='icon'
-											size='sm'
-											onClick={() => deleteHandler(data, item.type)}
-										>
-											<Trash size={14} />
-										</Button>
-									</div>
-								}
-							/>
-						))}
+									<Button
+										rounded
+										className={cn(
+											window.location.pathname.includes(data._id) &&
+												'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
+											'p-0 !h-5 hidden group-hover:inline-flex',
+										)}
+										variant='icon'
+										size='sm'
+										onClick={() => deleteHandler(data, item.type)}
+									>
+										<Trash size={14} />
+									</Button>
+								</div>
+							}
+						/>
+					))}
 				</ExplorerCollapsible>
 			))}
 			<InfoModal
@@ -240,7 +238,8 @@ function WorkspaceTrigger({ item }: { item: Omit<Tab, 'id'> }) {
 				page: 0,
 				size: 250,
 				sortBy: 'name',
-				sort: 'asc',
+				sortDir: 'asc',
+				workspace: true,
 			});
 		}
 	}

@@ -62,6 +62,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 			return <TabLink name={name} path={`${_id}`} type={TabTypes.Task} />;
@@ -85,12 +86,13 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		},
 	},
 	{
-		id: 'logExecution',
+		id: 'enabledText',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.enabled')}
-				field='logExecution'
+				field='enabledText'
 			/>
 		),
 		accessorKey: 'enabled',
@@ -105,6 +107,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	},
 	{
 		id: 'logExecution',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -139,6 +142,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		),
 		accessorKey: 'createdAt',
 		size: 200,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { createdAt, createdBy },
@@ -154,6 +158,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 
 	{
 		id: 'updatedAt',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'

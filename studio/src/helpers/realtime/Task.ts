@@ -1,9 +1,9 @@
 import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
+import useVersionStore from '@/store/version/versionStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-import useVersionStore from '@/store/version/versionStore';
 class Task implements RealtimeActions<TaskType> {
 	log({ message, timestamp, id, type }: RealtimeActionParams<TaskType>) {
 		setTimeout(() => {
@@ -16,9 +16,10 @@ class Task implements RealtimeActions<TaskType> {
 	}
 	delete({ identifiers }: RealtimeActionParams<TaskType>) {
 		const { removeTabByPath } = useTabStore.getState();
-		useTaskStore.setState?.({
-			tasks: useTaskStore.getState?.().tasks.filter((task) => task._id !== identifiers.taskId),
-		});
+		useTaskStore.setState?.((state) => ({
+			tasks: state.tasks.filter((task) => task._id !== identifiers.taskId),
+			workspaceTasks: state.workspaceTasks.filter((task) => task._id !== identifiers.taskId),
+		}));
 		removeTabByPath(identifiers.versionId as string, identifiers.taskId as string);
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
@@ -37,23 +38,20 @@ class Task implements RealtimeActions<TaskType> {
 			},
 			filter: (tab) => tab.path.includes(data._id as string),
 		});
-		useTaskStore.setState?.({
-			tasks: useTaskStore.getState?.().tasks.map((queue) => {
-				if (queue._id === data._id) {
-					return data;
-				}
-				return queue;
-			}),
-			task: data,
-		});
+		useTaskStore.setState?.((state) => ({
+			tasks: state.tasks.map((task) => (task._id === data._id ? data : task)),
+			workspaceTasks: state.workspaceTasks.map((task) => (task._id === data._id ? data : task)),
+			task: data._id === state.task._id ? data : state.task,
+		}));
 		if (data.logic) {
 			useTaskStore.getState?.().setLogics(data._id, data.logic);
 		}
 	}
 	create({ data }: RealtimeActionParams<TaskType>) {
-		useTaskStore.setState?.({
-			tasks: [...useTaskStore.getState().tasks, data],
-		});
+		useTaskStore.setState?.((state) => ({
+			tasks: [data, ...state.tasks],
+			workspaceTasks: [data, ...state.workspaceTasks],
+		}));
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
 				...state.dashboard,

@@ -51,7 +51,7 @@ export default function Files() {
 			url: bucketUrl,
 		},
 		{
-			name: bucket?.name as string,
+			name: bucket?.name,
 		},
 	];
 
@@ -64,6 +64,8 @@ export default function Files() {
 			searchParams.get('q'),
 			searchParams.get('page'),
 			searchParams.get('size'),
+			searchParams.get('f'),
+			searchParams.get('d'),
 		],
 		queryFn: () =>
 			getFilesOfBucket({
@@ -72,8 +74,11 @@ export default function Files() {
 				returnCountInfo: true,
 				search: searchParams.get('q') as string,
 				storageName: storage?.name,
-				bckId: bucket?.id as string,
-				bucketName: bucket?.name as string,
+				bckId: bucket?.id,
+				bucketName: bucket?.name,
+				sortBy: searchParams.get('f') as string,
+				sortDir: searchParams.get('d') as string,
+				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 			}),
 		refetchOnWindowFocus: false,
 		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
@@ -88,14 +93,18 @@ export default function Files() {
 				filePaths: gridRef.current?.api
 					.getSelectedNodes()
 					.map((node) => node.data.path) as string[],
-				storageName: storage?.name as string,
-				bucketName: bucket?.name as string,
-				bckId: bucket?.id as string,
+				storageName: storage?.name,
+				bucketName: bucket?.name,
+				bckId: bucket?.id,
 			}),
 		mutationKey: ['deleteMultipleFileFromBucket'],
 		onSuccess: () => {
+			const page = Number(searchParams.get('page'));
+			if (!!fileCountInfo?.pageSize && page > 1) {
+				searchParams.set('page', (page - 1).toPrecision());
+			} else refetch();
+
 			gridRef.current?.api.deselectAll();
-			refetch();
 			setSelectedRowCount(0);
 		},
 		onError: ({ details }: APIError) => {
@@ -157,7 +166,7 @@ export default function Files() {
 			<VersionTabLayout
 				searchable
 				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
-				isEmpty={files?.length === 0}
+				isEmpty={false}
 				type={TabTypes.File}
 				openCreateModal={uploadFileHandler}
 				onMultipleDelete={deleteMultipleFileMutation}
@@ -186,6 +195,7 @@ export default function Files() {
 						ensureDomOrder
 						suppressRowClickSelection
 						enableCellTextSelection
+						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 						overlayLoadingTemplate={
 							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 						}

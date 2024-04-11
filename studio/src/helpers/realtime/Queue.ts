@@ -16,11 +16,10 @@ class Queue implements RealtimeActions<MessageQueue> {
 	}
 	delete({ identifiers }: RealtimeActionParams<MessageQueue>) {
 		const { removeTabByPath } = useTabStore.getState();
-		useMessageQueueStore.setState?.({
-			queues: useMessageQueueStore
-				.getState?.()
-				.queues.filter((queue) => queue._id !== identifiers.queueId),
-		});
+		useMessageQueueStore.setState?.((state) => ({
+			queues: state.queues.filter((queue) => queue._id !== identifiers.queueId),
+			workspaceQueues: state.workspaceQueues.filter((queue) => queue._id !== identifiers.queueId),
+		}));
 		removeTabByPath(identifiers.versionId as string, identifiers.queueId as string);
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
@@ -38,23 +37,22 @@ class Queue implements RealtimeActions<MessageQueue> {
 			},
 			filter: (tab) => tab.path.includes(data._id as string),
 		});
-		useMessageQueueStore.setState?.({
-			queues: useMessageQueueStore.getState?.().queues.map((queue) => {
-				if (queue._id === data._id) {
-					return data;
-				}
-				return queue;
-			}),
-			queue: data,
-		});
+		useMessageQueueStore.setState?.((state) => ({
+			queues: state.queues.map((queue) => (queue._id === data._id ? data : queue)),
+			workspaceQueues: state.workspaceQueues.map((queue) =>
+				queue._id === data._id ? data : queue,
+			),
+			queue: data._id === state.queue._id ? data : state.queue,
+		}));
 		if (data.logic) {
 			useMessageQueueStore.getState?.().setLogics(data._id, data.logic);
 		}
 	}
 	create({ data }: RealtimeActionParams<MessageQueue>) {
-		useMessageQueueStore.setState?.({
-			queues: [...useMessageQueueStore.getState().queues, data],
-		});
+		useMessageQueueStore.setState?.((state) => ({
+			queues: [data, ...state.queues],
+			workspaceQueues: [data, ...state.workspaceQueues],
+		}));
 		useVersionStore.setState?.((state) => ({
 			dashboard: {
 				...state.dashboard,

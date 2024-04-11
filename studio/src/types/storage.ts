@@ -62,7 +62,10 @@ export interface CreateStorageParams extends BaseParams, BaseRequest {
 	resourceId: string;
 }
 
-export type GetStoragesParams = BaseParams & BaseGetRequest;
+export type GetStoragesParams = BaseParams &
+	BaseGetRequest & {
+		workspace?: string;
+	};
 
 export interface GetStorageByIdParams extends BaseParams {
 	storageId: string;
@@ -85,14 +88,12 @@ export interface GetStorageBuckets {
 	returnCountInfo: boolean;
 }
 
-export interface GetFilesParams {
+export interface GetFilesParams extends BaseGetRequest {
 	bckId: string;
 	storageName: string;
 	bucketName: string;
-	limit: number;
-	search?: string;
-	page: number;
 	returnCountInfo: boolean;
+	limit: number;
 }
 export interface DeleteBucketParams extends BaseRequest {
 	storageName: string;

@@ -8,24 +8,29 @@ export default function useEnvironmentStatus() {
 			const hasStatus = (statuses: string[]) =>
 				Object.values(environment).some((status) => statuses.includes(status));
 
-			const hasErrorResources = () =>
-				resources.some((resource) => resource.status === EnvironmentStatus.Error);
-
-			const hasIdleResources = () =>
-				resources.some((resource) => resource.status === EnvironmentStatus.Idle);
+			const hasSpecificResourcesStatus = (statusToCheck: EnvironmentStatus) =>
+				resources.some(({ status }) => status === statusToCheck);
 
 			const checksAndValues = [
 				{ check: environment.suspended, value: EnvironmentStatus.Suspended },
-				{ check: hasStatus(['Error']) || hasErrorResources(), value: EnvironmentStatus.Error },
+				{
+					check: hasStatus(['Error']) || hasSpecificResourcesStatus(EnvironmentStatus.Error),
+					value: EnvironmentStatus.Error,
+				},
 				{
 					check: hasStatus([EnvironmentStatus.Deploying, EnvironmentStatus.Redeploying]),
 					value: EnvironmentStatus.Deploying,
 				},
 				{
-					check: hasStatus([EnvironmentStatus.Updating]),
+					check:
+						hasStatus([EnvironmentStatus.Updating]) ||
+						hasSpecificResourcesStatus(EnvironmentStatus.Updating),
 					value: EnvironmentStatus.Updating,
 				},
-				{ check: hasIdleResources(), value: EnvironmentStatus.Idle },
+				{
+					check: hasSpecificResourcesStatus(EnvironmentStatus.Idle),
+					value: EnvironmentStatus.Idle,
+				},
 			];
 
 			const result = checksAndValues.find(({ check }) => check);

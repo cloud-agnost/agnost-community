@@ -58,6 +58,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -89,6 +90,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'updatedAt',
+		enableSorting: true,
 		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
 		accessorKey: 'updatedAt',
 		size: 200,

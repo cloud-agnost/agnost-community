@@ -91,7 +91,7 @@ export default function MainEndpoint() {
 				hasMore={hasNextPage}
 				loader={isFetchingNextPage && <TableLoading />}
 			>
-				<DataTable table={table} className='table-fixed' />
+				<DataTable table={table} />
 			</InfiniteScroll>
 		</VersionTabLayout>
 	);

@@ -9,14 +9,14 @@ import useTaskStore from '@/store/task/taskStore';
 import { TabTypes } from '@/types';
 
 export default function useStores() {
-	const { caches } = useCacheStore();
-	const { tasks } = useTaskStore();
-	const { databases } = useDatabaseStore();
-	const { endpoints } = useEndpointStore();
-	const { functions } = useFunctionStore();
-	const { queues } = useMessageQueueStore();
-	const { middlewares } = useMiddlewareStore();
-	const { storages } = useStorageStore();
+	const { workspaceCaches } = useCacheStore();
+	const { workspaceTasks } = useTaskStore();
+	const { workspaceDatabases } = useDatabaseStore();
+	const { workSpaceEndpoints } = useEndpointStore();
+	const { workspaceFunctions } = useFunctionStore();
+	const { workspaceQueues } = useMessageQueueStore();
+	const { workspaceMiddlewares } = useMiddlewareStore();
+	const { workspaceStorages } = useStorageStore();
 
 	const STORES: Record<string, any> = {
 		[TabTypes.Cache]: useCacheStore(),
@@ -30,19 +30,18 @@ export default function useStores() {
 	};
 
 	const data: Record<string, any[]> = {
-		[TabTypes.Cache]: structuredClone(caches),
-		[TabTypes.Task]: structuredClone(tasks),
-		[TabTypes.Database]: structuredClone(databases),
-		[TabTypes.Endpoint]: structuredClone(endpoints),
-		[TabTypes.Function]: structuredClone(functions),
-		[TabTypes.MessageQueue]: structuredClone(queues),
-		[TabTypes.Middleware]: structuredClone(middlewares),
-		[TabTypes.Storage]: structuredClone(storages),
+		[TabTypes.Cache]: structuredClone(workspaceCaches),
+		[TabTypes.Task]: structuredClone(workspaceTasks),
+		[TabTypes.Database]: structuredClone(workspaceDatabases),
+		[TabTypes.Endpoint]: structuredClone(workSpaceEndpoints),
+		[TabTypes.Function]: structuredClone(workspaceFunctions),
+		[TabTypes.MessageQueue]: structuredClone(workspaceQueues),
+		[TabTypes.Middleware]: structuredClone(workspaceMiddlewares),
+		[TabTypes.Storage]: structuredClone(workspaceStorages),
 	};
 
 	function getFunction(type: TabTypes, name: string) {
 		return STORES[type][name];
 	}
-
 	return { getFunction, data, STORES };
 }

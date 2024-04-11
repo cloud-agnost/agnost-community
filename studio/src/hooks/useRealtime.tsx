@@ -25,6 +25,8 @@ export default function useRealtime() {
 					actor: message.actor,
 				});
 				if (NOTIFICATION_ACTIONS.includes(action)) {
+					let currentNotf = useVersionStore.getState().notificationsPreview;
+					if (currentNotf.length >= 100) currentNotf.shift();
 					useVersionStore.setState({
 						notificationsPreview: [
 							{
@@ -41,7 +43,7 @@ export default function useRealtime() {
 								createdAt: new Date(timestamp).toISOString(),
 								__v: 0,
 							},
-							...useVersionStore.getState().notificationsPreview,
+							...currentNotf,
 						],
 					});
 				}

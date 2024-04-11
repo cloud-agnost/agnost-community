@@ -99,7 +99,7 @@ const Button = React.forwardRef<
 				type={type ?? 'button'}
 				{...props}
 			>
-				{loading && <CircleNotch size={14} className='loading' />}
+				{loading && <CircleNotch size={14} className='loading shrink-0' />}
 				{children}
 			</Comp>
 		);

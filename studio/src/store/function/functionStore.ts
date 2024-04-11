@@ -6,7 +6,9 @@ import { devtools } from 'zustand/middleware';
 import useVersionStore from '../version/versionStore';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
+	workspaceFunctions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
+	toEditFunction: funcTypes.HelperFunction;
 	isEditFunctionDrawerOpen: boolean;
 	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
@@ -32,10 +34,13 @@ type Actions = {
 
 const initialState: FunctionStore = {
 	functions: [],
+	workspaceFunctions: [],
 	function: {} as funcTypes.HelperFunction,
+	toEditFunction: {} as funcTypes.HelperFunction,
 	isEditFunctionDrawerOpen: false,
 	lastFetchedPage: undefined,
 	logics: {},
+
 	isCreateFunctionDrawerOpen: false,
 };
 
@@ -44,6 +49,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		...initialState,
 		getFunctions: async (params) => {
 			const functions = await FunctionService.getFunctions(params);
+			if (params.workspace) {
+				set({ workspaceFunctions: functions });
+				return functions;
+			}
 			if (params.page === 0) {
 				set({ functions });
 			} else {
@@ -68,6 +77,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				await FunctionService.deleteFunction(params);
 				set((prev) => ({
 					functions: prev.functions.filter((func) => func._id !== params.functionId),
+					workspaceFunctions: prev.workspaceFunctions.filter(
+						(func) => func._id !== params.functionId,
+					),
 				}));
 				params.onSuccess?.();
 			} catch (err) {
@@ -80,6 +92,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				await FunctionService.deleteMultipleFunctions(params);
 				set((prev) => ({
 					functions: prev.functions.filter((func) => !params.functionIds.includes(func._id)),
+					workspaceFunctions: prev.workspaceFunctions.filter(
+						(func) => !params.functionIds.includes(func._id),
+					),
 				}));
 				params.onSuccess?.();
 			} catch (err) {
@@ -90,7 +105,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		createFunction: async (params) => {
 			try {
 				const func = await FunctionService.createFunction(params);
-				set((prev) => ({ functions: [func, ...prev.functions] }));
+				set((prev) => ({
+					functions: [func, ...prev.functions],
+					workspaceFunctions: [func, ...prev.workspaceFunctions],
+				}));
 				params.onSuccess?.(func);
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -109,6 +127,8 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				const func = await FunctionService.updateFunction(params);
 				set((prev) => ({
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
+					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
+					function: func._id === prev.function._id ? func : prev.function,
 				}));
 				params.onSuccess?.();
 				return func;
@@ -121,6 +141,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			try {
 				const func = await FunctionService.saveFunctionCode(params);
 				set((prev) => ({
+					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
 					function: func,
 					editedLogic: func.logic,
@@ -134,7 +155,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 		},
 		closeEditFunctionModal: () => set({ isEditFunctionDrawerOpen: false }),
 		openEditFunctionModal: (func) => {
-			set({ function: func, isEditFunctionDrawerOpen: true });
+			set({ toEditFunction: func, isEditFunctionDrawerOpen: true });
 		},
 
 		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),

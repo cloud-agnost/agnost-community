@@ -60,6 +60,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 			return <TabLink name={name} path={`${_id}`} type={TabTypes.Function} />;
@@ -101,6 +102,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 		),
 		accessorKey: 'updatedAt',
 		size: 200,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { updatedAt, updatedBy },

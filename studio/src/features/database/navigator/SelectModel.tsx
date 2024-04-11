@@ -14,8 +14,8 @@ import useVersionStore from '@/store/version/versionStore';
 import { Model } from '@/types';
 import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 export default function SelectModel() {
 	const { versionId, modelId } = useParams() as { versionId: string; modelId: string };
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -27,6 +27,7 @@ export default function SelectModel() {
 	const { getVersionDashboardPath } = useVersionStore();
 	const models = getModelsOfSelectedDb(dbId);
 	const { dataCountInfo } = useNavigatorStore();
+
 	function onModelSelect(model: Model) {
 		resetNestedModels();
 		searchParams.delete('f');
@@ -38,9 +39,7 @@ export default function SelectModel() {
 		setModel(model);
 		const count = dataCountInfo?.[model._id];
 		const path = getVersionDashboardPath(
-			`database/${dbId}/navigator/${model._id}?page=${count?.currentPage ?? 1}&limit=${
-				count?.pageSize ?? MODULE_PAGE_SIZE
-			}`,
+			`database/${dbId}/navigator/${model._id}?page=1&limit=${count?.pageSize ?? MODULE_PAGE_SIZE}`,
 		);
 		updateCurrentTab(versionId, {
 			path,

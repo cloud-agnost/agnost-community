@@ -132,7 +132,7 @@ export default function Buckets() {
 		<>
 			<VersionTabLayout
 				searchable
-				isEmpty={buckets.length === 0}
+				isEmpty={false}
 				type={TabTypes.Bucket}
 				openCreateModal={() => setIsBucketCreateOpen(true)}
 				onMultipleDelete={deleteMultipleBucketsMutation}
@@ -166,6 +166,7 @@ export default function Buckets() {
 						overlayLoadingTemplate={
 							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 						}
+						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 						onRowSelected={(event) =>
 							setSelectedRowCount(event?.api.getSelectedNodes().length ?? 0)
 						}

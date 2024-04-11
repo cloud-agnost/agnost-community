@@ -1,22 +1,23 @@
 import { CodeEditor } from '@/components/CodeEditor';
+import { EmptyState } from '@/components/EmptyState';
 import { Logs } from '@/components/Log';
 import { TableCell, TableRow } from '@/components/Table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/Tabs';
 import { ENDPOINT_RESPONSE_TABS } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useUtilsStore from '@/store/version/utilsStore';
+import { Log, TabTypes } from '@/types';
 import { cn, objToArray } from '@/utils';
 import { TabsContent } from '@radix-ui/react-tabs';
+import { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import TestEndpointTable from './TestEndpointTable';
-import { CSSProperties } from 'react';
-import { Log, TabTypes } from '@/types';
-import { EmptyState } from '@/components/EmptyState';
-import useUtilsStore from '@/store/version/utilsStore';
 
 interface EndpointResponseProps {
 	className?: string;
 	style?: CSSProperties;
 	editorClassName?: string;
+	loading?: boolean;
 }
 
 export default function EndpointResponse(props: EndpointResponseProps) {
@@ -25,6 +26,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 	const { endpointResponse, endpointLogs } = useUtilsStore();
 	const response = endpointResponse?.[endpoint?._id];
 	const logs = endpointLogs?.[endpoint?._id];
+
 	function getStatusClass(status: number) {
 		if (status >= 200 && status < 300) return 'text-green-500';
 		if (status >= 300 && status < 400) return 'text-yellow-500';
@@ -43,7 +45,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 						</TabsTrigger>
 					))}
 				</TabsList>
-				{response && (
+				{response?.status && response?.duration && !props.loading && (
 					<div className='flex items-center gap-4'>
 						<div className='text-xs text-default'>
 							{t('endpoint.status')}

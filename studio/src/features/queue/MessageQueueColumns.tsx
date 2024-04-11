@@ -61,6 +61,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 			return <TabLink name={name} path={`${_id}`} type={TabTypes.MessageQueue} />;
@@ -70,11 +71,13 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		id: 'delay',
 		header: () => <SortButton text={translate('queue.delay')} field='delay' />,
 		accessorKey: 'delay',
+		enableSorting: true,
 	},
 	{
 		id: 'instance',
 		header: translate('general.instance'),
 		accessorKey: 'iid',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { iid },
@@ -85,6 +88,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	},
 	{
 		id: 'createdAt',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'

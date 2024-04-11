@@ -6,11 +6,12 @@ import { RealtimeActions } from './RealtimeActions';
 export default class Function implements RealtimeActions<HelperFunction> {
 	delete({ identifiers }: RealtimeActionParams<HelperFunction>): void {
 		const { removeTabByPath } = useTabStore.getState();
-		useFunctionStore.setState?.({
-			functions: useFunctionStore
-				.getState?.()
-				.functions.filter((ep) => ep._id !== identifiers.functionId),
-		});
+		useFunctionStore.setState?.((state) => ({
+			functions: state.functions.filter((ep) => ep._id !== identifiers.functionId),
+			workspaceFunctions: state.workspaceFunctions.filter(
+				(ep) => ep._id !== identifiers.functionId,
+			),
+		}));
 
 		removeTabByPath(identifiers.versionId as string, identifiers.functionId as string);
 		useVersionStore.setState?.((state) => ({
@@ -29,15 +30,11 @@ export default class Function implements RealtimeActions<HelperFunction> {
 			},
 			filter: (tab) => tab.path.includes(data._id),
 		});
-		useFunctionStore.setState?.({
-			functions: useFunctionStore.getState?.().functions.map((ep) => {
-				if (ep._id === data._id) {
-					return data;
-				}
-				return ep;
-			}),
-			function: data,
-		});
+		useFunctionStore.setState?.((state) => ({
+			functions: state.functions.map((ep) => (ep._id === data._id ? data : ep)),
+			workspaceFunctions: state.workspaceFunctions.map((ep) => (ep._id === data._id ? data : ep)),
+			function: data._id === state.function._id ? data : state.function,
+		}));
 		if (data.logic) {
 			useFunctionStore.getState?.().setLogics(data._id, data.logic);
 		}
@@ -45,6 +42,7 @@ export default class Function implements RealtimeActions<HelperFunction> {
 	create({ data }: RealtimeActionParams<HelperFunction>): void {
 		useFunctionStore.setState?.({
 			functions: [...useFunctionStore.getState().functions, data],
+			workspaceFunctions: [...useFunctionStore.getState().workspaceFunctions, data],
 		});
 		useVersionStore.setState?.((state) => ({
 			dashboard: {

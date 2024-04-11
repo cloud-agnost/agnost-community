@@ -14,7 +14,7 @@ import TaskForm from './TaskForm';
 
 export default function EditTask() {
 	const { t } = useTranslation();
-	const { updateTask, task, isEditTaskModalOpen, closeEditTaskModal } = useTaskStore();
+	const { updateTask, toEditTask, isEditTaskModalOpen, closeEditTaskModal } = useTaskStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -47,7 +47,7 @@ export default function EditTask() {
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			taskId: task._id,
+			taskId: toEditTask._id,
 			...data,
 		});
 	}
@@ -58,20 +58,20 @@ export default function EditTask() {
 	}
 
 	useEffect(() => {
-		if (task) {
+		if (toEditTask) {
 			form.reset({
-				...task,
-				enabled: task.enabled ?? true,
+				...toEditTask,
+				enabled: toEditTask.enabled ?? true,
 			});
 		}
-	}, [task]);
+	}, [toEditTask]);
 	return (
 		<Drawer open={isEditTaskModalOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>
 						{t('task.edit', {
-							name: task.name,
+							name: toEditTask.name,
 						})}
 					</DrawerTitle>
 				</DrawerHeader>

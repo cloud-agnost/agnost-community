@@ -1,29 +1,23 @@
 import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useTabStore from '@/store/version/tabStore';
 import { BucketCountInfo } from '@/types';
 import { CaretDoubleLeft, CaretDoubleRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { versionId } = useParams() as { versionId: string };
-	const { updateCurrentTab } = useTabStore();
-	// todo update tab path
+
 	function goToNextPage() {
-		const currentPage = countInfo?.currentPage;
+		const currentPage = paginationInfo?.currentPage;
 		const nextPage = currentPage + 1;
 		searchParams.set('page', nextPage.toString());
 		setSearchParams(searchParams);
-		updateCurrentTab(versionId, {
-			path: `${window.location.pathname}?${searchParams.toString()}`,
-		});
 	}
 
 	function goToPreviousPage() {
-		const currentPage = countInfo?.currentPage;
+		const currentPage = paginationInfo?.currentPage;
 		const previousPage = currentPage - 1;
 		searchParams.set('page', previousPage.toString());
 		setSearchParams(searchParams);
@@ -45,24 +39,32 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 		setSearchParams(searchParams);
 	}
 
-	const paginationInfo = useMemo(
-		() => ({
-			dataCount: countInfo?.pageSize * (countInfo?.currentPage - 1) + countInfo?.count,
-			pageIndex:
-				countInfo?.currentPage === 1 ? 1 : countInfo?.pageSize * (countInfo?.currentPage - 1) + 1,
-		}),
-		[countInfo],
-	);
+	const paginationInfo = useMemo(() => calculateIndex(), [countInfo]);
 
 	function formatNumber(number: number) {
 		if (_.isNil(number)) return;
-		const total = number === 0 ? number + 1 : number;
-		if (total < 1000) return total;
-		return total.toLocaleString('en-US', {
+		if (number < 1000) return number;
+		return number.toLocaleString('en-US', {
 			maximumFractionDigits: 2,
 			notation: 'standard',
 			compactDisplay: 'short',
 		});
+	}
+
+	function calculateIndex() {
+		const { currentPage, pageSize, totalCount } = countInfo;
+		if (totalCount === 0) {
+			return {
+				pageIndex: 0,
+				dataCount: 0,
+				currentPage: 0,
+			};
+		} else
+			return {
+				pageIndex: currentPage === 1 ? 1 : pageSize * (currentPage - 1) + 1,
+				dataCount: countInfo?.pageSize * (countInfo?.currentPage - 1) + countInfo?.count,
+				currentPage: currentPage,
+			};
 	}
 	return (
 		<div className='flex items-center justify-end mt-4 gap-2'>
@@ -94,7 +96,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='hidden h-8 w-8 p-0 lg:flex'
 					onClick={goToFirstPage}
-					disabled={countInfo?.currentPage === 1}
+					disabled={paginationInfo?.currentPage === 1}
 				>
 					<span className='sr-only'>Go to first page</span>
 					<CaretDoubleLeft className='h-4 w-4' />
@@ -105,14 +107,15 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='h-8 w-8 p-0'
 					onClick={goToPreviousPage}
-					disabled={countInfo?.currentPage === 1}
+					disabled={paginationInfo?.currentPage === 1}
 				>
 					<span className='sr-only'>Go to previous page</span>
 					<CaretLeft className='h-4 w-4' />
 				</Button>
 				{!_.isNil(countInfo) && (
 					<span className='text-xs'>
-						{countInfo?.currentPage} of {formatNumber(countInfo?.totalPages)}
+						{paginationInfo?.currentPage} of{' '}
+						{formatNumber(countInfo?.totalCount ? countInfo.totalPages : 0)}
 					</span>
 				)}
 				<Button
@@ -121,7 +124,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='h-8 w-8 p-0'
 					onClick={goToNextPage}
-					disabled={countInfo?.totalPages === countInfo?.currentPage}
+					disabled={countInfo?.totalPages === paginationInfo?.currentPage}
 				>
 					<span className='sr-only'>Go to next page</span>
 					<CaretRight className='h-4 w-4' />
@@ -132,7 +135,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='hidden h-8 w-8 p-0 lg:flex'
 					onClick={goToLastPage}
-					disabled={countInfo?.totalPages === countInfo?.currentPage}
+					disabled={countInfo?.totalPages === paginationInfo?.currentPage}
 				>
 					<span className='sr-only'>Go to last page</span>
 					<CaretDoubleRight className='h-4 w-4' />

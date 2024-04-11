@@ -72,7 +72,10 @@ export interface DeleteMultipleTasksParams extends BaseRequest, BaseParams {
 export interface GetTaskParams extends BaseParams {
 	taskId: string;
 }
-export type GetTasksParams = BaseGetRequest & BaseParams;
+export type GetTasksParams = BaseGetRequest &
+	BaseParams & {
+		workspace?: boolean;
+	};
 
 export interface SaveTaskLogicParams extends BaseParams, BaseRequest {
 	taskId: string;

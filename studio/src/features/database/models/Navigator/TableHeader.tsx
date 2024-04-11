@@ -37,11 +37,11 @@ export default function TableHeader({
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');
 		let newDirection = defaultDirection;
-		if (currentField === text) {
+		if (currentField === field) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
 
-		searchParams.set('f', text);
+		searchParams.set('f', field as string);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {

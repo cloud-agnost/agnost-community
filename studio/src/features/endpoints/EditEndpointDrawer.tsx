@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 export default function EditEndpointDrawer() {
-	const { endpoint, updateEndpoint, isEditEndpointModalOpen, closeEditEndpointModal } =
+	const { toEditEndpoint, updateEndpoint, isEditEndpointModalOpen, closeEditEndpointModal } =
 		useEndpointStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
@@ -47,26 +47,26 @@ export default function EditEndpointDrawer() {
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			epId: endpoint?._id as string,
+			epId: toEditEndpoint?._id as string,
 			...params,
 		});
 	}
 
 	useEffect(() => {
-		if (endpoint && isEditEndpointModalOpen) {
+		if (toEditEndpoint && isEditEndpointModalOpen) {
 			form.reset({
-				name: endpoint.name,
-				method: endpoint.method,
-				path: endpoint.path,
-				sessionRequired: endpoint.sessionRequired,
-				apiKeyRequired: endpoint.apiKeyRequired,
-				timeout: endpoint.timeout,
-				logExecution: endpoint.logExecution,
-				rateLimits: endpoint.rateLimits,
-				middlewares: endpoint?.middlewares,
+				name: toEditEndpoint.name,
+				method: toEditEndpoint.method,
+				path: toEditEndpoint.path,
+				sessionRequired: toEditEndpoint.sessionRequired,
+				apiKeyRequired: toEditEndpoint.apiKeyRequired,
+				timeout: toEditEndpoint.timeout,
+				logExecution: toEditEndpoint.logExecution,
+				rateLimits: toEditEndpoint.rateLimits,
+				middlewares: toEditEndpoint?.middlewares,
 			});
 		}
-	}, [endpoint, isEditEndpointModalOpen]);
+	}, [toEditEndpoint, isEditEndpointModalOpen]);
 
 	return (
 		<Drawer open={isEditEndpointModalOpen} onOpenChange={closeEditEndpointModal}>
@@ -74,7 +74,7 @@ export default function EditEndpointDrawer() {
 				<DrawerHeader>
 					<DrawerTitle>
 						{t('endpoint.edit', {
-							name: endpoint?.name,
+							name: toEditEndpoint?.name,
 						})}
 					</DrawerTitle>
 				</DrawerHeader>

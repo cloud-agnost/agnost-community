@@ -14,6 +14,7 @@ import useVersionStore from '../version/versionStore';
 
 interface DatabaseStore {
 	databases: Database[];
+	workspaceDatabases: Database[];
 	database: Database;
 	toDeleteDatabase: Database;
 	isDeleteDatabaseDialogOpen: boolean;
@@ -39,6 +40,7 @@ type Actions = {
 
 const initialState: DatabaseStore = {
 	databases: [],
+	workspaceDatabases: [],
 	database: {} as Database,
 	toDeleteDatabase: {} as Database,
 	isDeleteDatabaseDialogOpen: false,
@@ -73,6 +75,10 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				}),
 			getDatabases: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
 				const databases = await DatabaseService.getDatabases(params);
+				if (params.workspace) {
+					set({ workspaceDatabases: databases });
+					return databases;
+				}
 				set({ databases, isDatabaseFetched: true });
 				return databases;
 			},
@@ -88,6 +94,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.createDatabase(params);
 				set((prev) => ({
 					databases: [database, ...prev.databases],
+					workspaceDatabases: [database, ...prev.workspaceDatabases],
 				}));
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -101,6 +108,10 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.updateDatabaseName(params);
 				set((prev) => ({
 					databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
+					workspaceDatabases: prev.workspaceDatabases.map((db) =>
+						db._id === database._id ? database : db,
+					),
+					database: database._id === prev.database._id ? database : prev.database,
 				}));
 				return database;
 			},
@@ -108,6 +119,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				await DatabaseService.deleteDatabase(params);
 				set((prev) => ({
 					databases: prev.databases.filter((db) => db._id !== params.dbId),
+					workspaceDatabases: prev.workspaceDatabases.filter((db) => db._id !== params.dbId),
 				}));
 			},
 			toggleCreateModal: () =>
