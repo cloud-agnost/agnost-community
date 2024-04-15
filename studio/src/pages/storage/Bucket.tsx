@@ -63,7 +63,7 @@ export default function Buckets() {
 		queryFn: () =>
 			getBuckets({
 				page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
-				limit: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
+				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
 				returnCountInfo: true,
 				search: searchParams.get('q') as string,
 				storageName: storage?.name,

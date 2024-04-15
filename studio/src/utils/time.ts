@@ -6,7 +6,7 @@ import {
 	formatDistance,
 	formatISO,
 } from 'date-fns';
-import { enUS, tr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 export const DATE_FORMAT = 'yyyy/MM/dd';
 export const TIME_FORMAT_WITH_SECONDS = 'HH:mm:ss';
 export const DATE_TIME_FORMAT = 'yyyy/MM/dd HH:mm:ss';

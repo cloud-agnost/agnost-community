@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import TestEndpointTable from './TestEndpointTable';
-import { useUpdateEffect } from '@/hooks';
 
 export default function EndpointPathVariables() {
 	const {
