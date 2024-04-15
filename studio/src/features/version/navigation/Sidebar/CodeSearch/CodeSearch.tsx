@@ -70,7 +70,7 @@ export default function CodeSearch() {
 									<ExplorerCollapsibleTrigger
 										active={openCodeResultIndexes.includes(index)}
 										title={
-											<div className='w-full flex items-center justify-between'>
+											<div className='w-full grid grid-cols-2'>
 												<div className='flex items-center'>
 													<span className='mr-2' title={item.type}>
 														{getIcon(capitalize(item.type) as TabTypes)}
@@ -87,163 +87,10 @@ export default function CodeSearch() {
 													</div>
 												</div>
 												{item.meta?.method && (
-													<MethodBadge method={item.meta.method} className='p-0 mr-2' />
-												)}
-											</div>
-										}
-									/>
-								}
-							>
-								{item.matchingLines.map((line, index) => (
-									<SideBarButton
-										key={index}
-										active={false}
-										onClick={() => navigate(item, line.lineNumber)}
-										asChild
-									>
-										<p
-											className='truncate'
-											dangerouslySetInnerHTML={{
-												__html: line.lineText,
-											}}
-										/>
-									</SideBarButton>
-								))}
-							</ExplorerCollapsible>
-						))
-					: !_.isEmpty(searchTerm) && <p className='text-xs text-center'>No results found</p>}
-				{searchCodeResult.length
-					? searchCodeResult.map((item, index) => (
-							<ExplorerCollapsible
-								key={item._id}
-								open={openCodeResultIndexes.includes(index)}
-								onOpenChange={() => toggleCodeResult(index)}
-								trigger={
-									<ExplorerCollapsibleTrigger
-										active={openCodeResultIndexes.includes(index)}
-										title={
-											<div className='w-full flex items-center justify-between'>
-												<div className='flex items-center'>
-													<span className='mr-2' title={item.type}>
-														{getIcon(capitalize(item.type) as TabTypes)}
-													</span>
-													<h1
-														className={cn(
-															'flex-1 text-left font-normal text-xs truncate min-w-0 text-default',
-														)}
-													>
-														{item.name}
-													</h1>
-													<div className='rounded-full bg-subtle ml-1 w-3.5 h-3.5 text-xs flex items-center justify-center'>
-														<span>{item.matchingLines.length}</span>
-													</div>
-												</div>
-												{item.meta?.method && (
-													<MethodBadge method={item.meta.method} className='p-0 mr-2' />
-												)}
-											</div>
-										}
-									/>
-								}
-							>
-								{item.matchingLines.map((line, index) => (
-									<SideBarButton
-										key={index}
-										active={false}
-										onClick={() => navigate(item, line.lineNumber)}
-										asChild
-									>
-										<p
-											className='truncate'
-											dangerouslySetInnerHTML={{
-												__html: line.lineText,
-											}}
-										/>
-									</SideBarButton>
-								))}
-							</ExplorerCollapsible>
-						))
-					: !_.isEmpty(searchTerm) && <p className='text-xs text-center'>No results found</p>}
-				{searchCodeResult.length
-					? searchCodeResult.map((item, index) => (
-							<ExplorerCollapsible
-								key={item._id}
-								open={openCodeResultIndexes.includes(index)}
-								onOpenChange={() => toggleCodeResult(index)}
-								trigger={
-									<ExplorerCollapsibleTrigger
-										active={openCodeResultIndexes.includes(index)}
-										title={
-											<div className='w-full flex items-center justify-between'>
-												<div className='flex items-center'>
-													<span className='mr-2' title={item.type}>
-														{getIcon(capitalize(item.type) as TabTypes)}
-													</span>
-													<h1
-														className={cn(
-															'flex-1 text-left font-normal text-xs truncate min-w-0 text-default',
-														)}
-													>
-														{item.name}
-													</h1>
-													<div className='rounded-full bg-subtle ml-1 w-3.5 h-3.5 text-xs flex items-center justify-center'>
-														<span>{item.matchingLines.length}</span>
-													</div>
-												</div>
-												{item.meta?.method && (
-													<MethodBadge method={item.meta.method} className='p-0 mr-2' />
-												)}
-											</div>
-										}
-									/>
-								}
-							>
-								{item.matchingLines.map((line, index) => (
-									<SideBarButton
-										key={index}
-										active={false}
-										onClick={() => navigate(item, line.lineNumber)}
-										asChild
-									>
-										<p
-											className='truncate'
-											dangerouslySetInnerHTML={{
-												__html: line.lineText,
-											}}
-										/>
-									</SideBarButton>
-								))}
-							</ExplorerCollapsible>
-						))
-					: !_.isEmpty(searchTerm) && <p className='text-xs text-center'>No results found</p>}{' '}
-				{searchCodeResult.length
-					? searchCodeResult.map((item, index) => (
-							<ExplorerCollapsible
-								key={item._id}
-								open={openCodeResultIndexes.includes(index)}
-								onOpenChange={() => toggleCodeResult(index)}
-								trigger={
-									<ExplorerCollapsibleTrigger
-										active={openCodeResultIndexes.includes(index)}
-										title={
-											<div className='w-full flex items-center justify-between'>
-												<div className='flex items-center'>
-													<span className='mr-2' title={item.type}>
-														{getIcon(capitalize(item.type) as TabTypes)}
-													</span>
-													<h1
-														className={cn(
-															'flex-1 text-left font-normal text-xs truncate min-w-0 text-default',
-														)}
-													>
-														{item.name}
-													</h1>
-													<div className='rounded-full bg-subtle ml-1 w-3.5 h-3.5 text-xs flex items-center justify-center'>
-														<span>{item.matchingLines.length}</span>
-													</div>
-												</div>
-												{item.meta?.method && (
-													<MethodBadge method={item.meta.method} className='p-0 mr-2' />
+													<MethodBadge
+														method={item.meta.method}
+														className='p-0 mr-2 max-w-[20%] justify-self-end'
+													/>
 												)}
 											</div>
 										}

@@ -80,11 +80,8 @@ export interface DeleteStorageParams extends BaseRequest, BaseParams {
 export interface DeleteMultipleStoragesParams extends BaseRequest, BaseParams {
 	storageIds: string[];
 }
-export interface GetStorageBuckets {
+export interface GetStorageBuckets extends BaseGetRequest {
 	storageName: string;
-	limit: number;
-	search: string;
-	page: number;
 	returnCountInfo: boolean;
 }
 

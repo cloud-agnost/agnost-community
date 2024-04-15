@@ -150,9 +150,10 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 async function bucketLoader({ params }: LoaderFunctionArgs) {
 	const { removeTab, getCurrentTab } = useTabStore.getState();
 	const { storageId, appId, orgId, versionId } = params;
-	const { storages } = useStorageStore.getState();
-	let selectedStorage = storages.find((storage) => storage._id === storageId);
-	if (!selectedStorage) {
+	const { storages, storage } = useStorageStore.getState();
+	let selectedStorage =
+		storage._id === storageId ? storage : storages.find((storage) => storage._id === storageId);
+	if (_.isEmpty(selectedStorage)) {
 		selectedStorage = await useStorageStore.getState().getStorageById({
 			storageId: storageId as string,
 			appId: appId as string,

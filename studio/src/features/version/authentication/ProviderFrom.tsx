@@ -153,9 +153,11 @@ export default function ProviderFrom({ loading }: { loading: boolean }) {
 				{t('version.authentication.callback_url')}
 			</h4>
 			<p className='text-sm text-subtle font-sfCompact'>
-				{t('version.authentication.callback_url_desc', {
-					provider: capitalize(provider),
-				})}
+				<Trans
+					i18nKey='version.authentication.callback_url_desc'
+					values={{ provider: capitalize(provider), providerLowercase: provider }}
+					components={{ br: <br /> }}
+				/>
 			</p>
 			<CopyInput readOnly value={callbackUrl} />
 			<DrawerFooter>

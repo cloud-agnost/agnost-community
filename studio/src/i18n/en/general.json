@@ -140,5 +140,7 @@
 	"module_empty": "You do not have any {{module}}s for this app version",
 	"module_create": "Create {{module}}",
 	"uploadedAt": "Uploaded At",
-	"chooseOne": "Choose One"
+	"chooseOne": "Choose One",
+	"accessToken": "Access Token",
+	"session_token": "Session Token"
 }
