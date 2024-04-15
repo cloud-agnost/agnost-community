@@ -36,6 +36,7 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
+import TestEndpointSettings from './TestEndpoint/TestEndpointSettings';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -84,7 +85,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const { environment } = useEnvironmentStore();
-	const { endpoint, testEndpoint } = useEndpointStore();
+	const { endpoint, testEndpoint, tokens } = useEndpointStore();
 	const { endpointRequest } = useUtilsStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [debugChannel, setDebugChannel] = useState<string | null>('');
@@ -99,6 +100,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				},
 				{
 					key: 'Authorization',
+					value: '',
+				},
+				{
+					key: 'Session',
 					value: '',
 				},
 			],
@@ -126,6 +131,21 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		setDebugChannel(id);
 		joinChannel(id);
 		const controller = new AbortController();
+		const headers = data.headers?.map((h) => {
+			if (h.key === 'Authorization' && !h.value) {
+				return {
+					key: h.key,
+					value: tokens.accessToken,
+				};
+			}
+			if (h.key === 'Session' && !h.value) {
+				return {
+					key: h.key,
+					value: tokens.sessionToken,
+				};
+			}
+			return h;
+		});
 		testEndpointMutate({
 			epId: endpoint?._id,
 			envId: environment?.iid,
@@ -133,7 +153,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			consoleLogId: id,
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: data.params,
-			headers: data.headers?.filter((h) => h.key && h.value),
+			headers: headers?.filter((h) => h.key && h.value),
 			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
@@ -171,6 +191,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 
 	useEffect(() => {
 		const req = endpointRequest?.[endpoint?._id];
+		console.log('req', req);
 		if (req) {
 			form.reset({
 				params: {
@@ -200,6 +221,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						key: 'Authorization',
 						value: '',
 					},
+					{
+						key: 'Session',
+						value: '',
+					},
 				],
 				bodyType: 'json',
 				body: JSON.stringify({}),
@@ -223,7 +248,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				</DrawerHeader>
 				<div>
 					<APIServerAlert />
-					<div className='flex items-center px-5 my-6'>
+					<div className='flex items-center px-5 my-6 space-x-2'>
 						<div className='flex items-center flex-1'>
 							<div className='w-16 !h-[30px]'>
 								<Badge
@@ -267,6 +292,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 								{t('endpoint.test.send')}
 							</Button>
 						)}
+						<TestEndpointSettings ctx={form} />
 					</div>
 					<nav className='flex border-b'>
 						{TEST_ENDPOINTS_MENU_ITEMS.filter(

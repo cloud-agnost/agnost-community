@@ -59,6 +59,7 @@ type Actions = {
 	setColumnFilters: (columnName: string, filter: ColumnFilterType) => void;
 	clearAllColumnFilters: () => void;
 	clearColumnFilter: (columnName: string) => void;
+	clearEndpointsRequestHeaders: () => void;
 };
 
 const initialState: UtilsStore = {
@@ -253,6 +254,18 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 								[modelId]: state,
 							},
 						};
+					});
+				},
+				clearEndpointsRequestHeaders: () => {
+					set((prev) => {
+						const state = prev.endpointRequest;
+						Object.keys(state).forEach((key) => {
+							state[key].headers?.map((h) => {
+								if (h.key === 'Authorization' || h.key === 'Session') h.value = '';
+								return h;
+							});
+						});
+						return { endpointRequest: state };
 					});
 				},
 			}),

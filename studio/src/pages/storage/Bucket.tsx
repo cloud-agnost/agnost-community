@@ -57,6 +57,8 @@ export default function Buckets() {
 			searchParams.get('q'),
 			searchParams.get('page'),
 			searchParams.get('size'),
+			searchParams.get('d'),
+			searchParams.get('f'),
 		],
 		queryFn: () =>
 			getBuckets({
@@ -65,6 +67,8 @@ export default function Buckets() {
 				returnCountInfo: true,
 				search: searchParams.get('q') as string,
 				storageName: storage?.name,
+				sortBy: searchParams.get('f') as string,
+				sortDir: searchParams.get('d') as string,
 			}),
 		refetchOnWindowFocus: false,
 		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),

@@ -25,7 +25,7 @@ interface EndpointMiddlewaresProps {
 }
 export default function EndpointMiddlewares({ field }: EndpointMiddlewaresProps) {
 	const { t } = useTranslation();
-	const middlewares = useMiddlewareStore((state) => state.middlewares);
+	const middlewares = useMiddlewareStore((state) => state.workspaceMiddlewares);
 
 	function onDragEnd(result: DropResult) {
 		const ordered = reorder(

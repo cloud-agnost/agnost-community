@@ -36,11 +36,11 @@ router.get(
   async (req, res) => {
     try {
       const { storageName } = req.params;
-      const { page, limit, sortBy, sortDir, search } = req.query;
+      const { page, size, sortBy, sortDir, search } = req.query;
 
       const { data, info } = await agnost.storage(storageName).listBuckets({
         page: Number(page),
-        limit: Number(limit),
+        limit: Number(size),
         search,
         sort: { field: sortBy, order: sortDir },
         returnCountInfo: true,

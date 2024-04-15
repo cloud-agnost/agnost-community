@@ -70,7 +70,7 @@ export default function MainEndpoint() {
 		<VersionTabLayout
 			searchable
 			type={TabTypes.Endpoint}
-			title={t('endpoint.title') as string}
+			title={t('endpoint.title')}
 			isEmpty={!endpoints.length}
 			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleEndpointsHandler}

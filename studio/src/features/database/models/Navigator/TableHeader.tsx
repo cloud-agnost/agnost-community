@@ -75,7 +75,7 @@ export default function TableHeader({
 				className={cn('justify-start w-full h-full', className)}
 			>
 				<p className='truncate'>{text}</p>
-				{searchParams.get('f') === text && (
+				{searchParams.get('f') === field && (
 					<div className='ml-2'>
 						<CaretUp
 							size={14}

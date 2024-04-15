@@ -106,7 +106,7 @@ export const CellMaskMap: Record<string, { mask: string; replacement: Replacemen
 	},
 	[FieldTypes.TIME]: {
 		mask: TIME_FORMAT_WITH_SECONDS,
-		replacement: { h: /\d/, m: /\d/, s: /\d/ },
+		replacement: { H: /\d/, m: /\d/, s: /\d/ },
 	},
 	[FieldTypes.DATE]: {
 		mask: DATE_FORMAT,
@@ -114,15 +114,15 @@ export const CellMaskMap: Record<string, { mask: string; replacement: Replacemen
 	},
 	[FieldTypes.DATETIME]: {
 		mask: DATE_TIME_FORMAT,
-		replacement: { y: /\d/, M: /\d/, d: /\d/, h: /\d/, m: /\d/, s: /\d/ },
+		replacement: { y: /\d/, M: /\d/, d: /\d/, H: /\d/, m: /\d/, s: /\d/ },
 	},
 	[FieldTypes.CREATED_AT]: {
 		mask: DATE_TIME_FORMAT,
-		replacement: { y: /\d/, M: /\d/, d: /\d/, h: /\d/, m: /\d/, s: /\d/ },
+		replacement: { y: /\d/, M: /\d/, d: /\d/, H: /\d/, m: /\d/, s: /\d/ },
 	},
 	[FieldTypes.UPDATED_AT]: {
 		mask: DATE_TIME_FORMAT,
-		replacement: { y: /\d/, M: /\d/, d: /\d/, h: /\d/, m: /\d/, s: /\d/ },
+		replacement: { y: /\d/, M: /\d/, d: /\d/, H: /\d/, m: /\d/, s: /\d/ },
 	},
 };
 

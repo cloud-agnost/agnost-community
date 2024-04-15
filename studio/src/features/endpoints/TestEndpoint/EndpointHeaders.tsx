@@ -32,6 +32,7 @@ export default function EndpointHeaders() {
 								<FormItem className='flex-1'>
 									<FormControl>
 										<Input
+											key={f.id}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('resources.database.key'),
@@ -55,6 +56,7 @@ export default function EndpointHeaders() {
 								<FormItem className='flex-1'>
 									<FormControl>
 										<Input
+											key={f.id}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('resources.database.value'),

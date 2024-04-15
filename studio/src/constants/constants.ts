@@ -121,7 +121,7 @@ import { ElementType } from 'react';
 export const BASE_URL = `${window.location.protocol}//${window.location.hostname}`;
 export const BASE_URL_WITH_API = `${BASE_URL}/api`;
 export const PAGE_SIZE = 10;
-export const MODULE_PAGE_SIZE = 25;
+export const MODULE_PAGE_SIZE = 250;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
