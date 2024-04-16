@@ -1,7 +1,7 @@
 {
-   "release": "v1.2.23",
+   "release": "v1.2.22",
    "modules": {
-      "engine-core": "v1.2.20",
+      "engine-core": "v1.2.19",
       "engine-monitor": "v1.2.0",
       "engine-realtime": "v1.2.1",
       "engine-scheduler": "v1.2.0",
