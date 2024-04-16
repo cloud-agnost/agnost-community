@@ -1,5 +1,6 @@
 import useCacheStore from '@/store/cache/cacheStore';
 import useDatabaseStore from '@/store/database/databaseStore';
+import useModelStore from '@/store/database/modelStore';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useFunctionStore from '@/store/function/functionStore';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
@@ -17,7 +18,7 @@ export default function useStores() {
 	const { workspaceQueues } = useMessageQueueStore();
 	const { workspaceMiddlewares } = useMiddlewareStore();
 	const { workspaceStorages } = useStorageStore();
-
+	const { workspaceModels } = useModelStore();
 	const STORES: Record<string, any> = {
 		[TabTypes.Cache]: useCacheStore(),
 		[TabTypes.Task]: useTaskStore(),
@@ -27,9 +28,10 @@ export default function useStores() {
 		[TabTypes.MessageQueue]: useMessageQueueStore(),
 		[TabTypes.Middleware]: useMiddlewareStore(),
 		[TabTypes.Storage]: useStorageStore(),
+		[TabTypes.Model]: useModelStore(),
 	};
 
-	const data: Record<string, any[]> = {
+	const data: Record<string, any> = {
 		[TabTypes.Cache]: structuredClone(workspaceCaches),
 		[TabTypes.Task]: structuredClone(workspaceTasks),
 		[TabTypes.Database]: structuredClone(workspaceDatabases),
@@ -38,10 +40,11 @@ export default function useStores() {
 		[TabTypes.MessageQueue]: structuredClone(workspaceQueues),
 		[TabTypes.Middleware]: structuredClone(workspaceMiddlewares),
 		[TabTypes.Storage]: structuredClone(workspaceStorages),
+		[TabTypes.Model]: structuredClone(workspaceModels),
 	};
 
 	function getFunction(type: TabTypes, name: string) {
-		return STORES[type][name];
+		return STORES[type]?.[name];
 	}
 	return { getFunction, data, STORES };
 }

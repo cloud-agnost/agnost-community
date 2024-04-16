@@ -191,7 +191,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 
 	useEffect(() => {
 		const req = endpointRequest?.[endpoint?._id];
-		console.log('req', req);
 		if (req) {
 			form.reset({
 				params: {

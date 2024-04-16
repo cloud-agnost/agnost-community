@@ -2,6 +2,7 @@ import { CellTypeMap } from '@/constants';
 import useModelStore from '@/store/database/modelStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ColumnFilterType, FieldTypes, Filters } from '@/types';
+import { generateId } from '@/utils';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 export default function useColumnFilter(columnName: string, type: FieldTypes) {
@@ -18,7 +19,9 @@ export default function useColumnFilter(columnName: string, type: FieldTypes) {
 
 	function applyFilter(filter: ColumnFilterType) {
 		setColumnFilters(columnName, filter);
-		searchParams.set('page', '1');
+		const page = searchParams.get('page') ?? '1';
+		if (page === '1') searchParams.set('filtered', generateId());
+		else searchParams.set('page', '1');
 		setSearchParams(searchParams);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}

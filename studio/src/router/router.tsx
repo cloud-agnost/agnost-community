@@ -590,6 +590,30 @@ const router = createBrowserRouter(
 					element: <CompleteAccountSetupVerifyEmailLoadable />,
 				},
 				{
+					path: 'profile',
+					element: <ProfileSettings />,
+					children: [
+						{
+							index: true,
+							path: '',
+							element: <ProfileSettingsGeneral />,
+						},
+						{
+							path: 'cluster-management',
+							element: <ClusterManagement />,
+							loader: homeLoaders.clusterManagementLoader,
+						},
+						{
+							path: 'notifications',
+							element: <ProfileSettingsNotifications />,
+						},
+						{
+							path: 'cluster-management',
+							element: <ClusterManagement />,
+						},
+					],
+				},
+				{
 					path: '/organization',
 					element: <Organization />,
 					children: [
@@ -833,30 +857,6 @@ const router = createBrowserRouter(
 										{
 											path: 'members',
 											element: <OrganizationSettingsMembers />,
-										},
-									],
-								},
-								{
-									path: 'profile',
-									element: <ProfileSettings />,
-									children: [
-										{
-											index: true,
-											path: '',
-											element: <ProfileSettingsGeneral />,
-										},
-										{
-											path: 'cluster-management',
-											element: <ClusterManagement />,
-											loader: homeLoaders.clusterManagementLoader,
-										},
-										{
-											path: 'notifications',
-											element: <ProfileSettingsNotifications />,
-										},
-										{
-											path: 'cluster-management',
-											element: <ClusterManagement />,
 										},
 									],
 								},

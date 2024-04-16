@@ -1,9 +1,9 @@
+import { Button } from '@/components/Button';
 import { Sortable, SortableContainer, SortableItem } from '@/components/Sortable';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
-import { Middleware } from '@/types';
+import { CreateEndpointSchema, Middleware } from '@/types';
 import { reorder } from '@/utils';
 import { CaretDown, CaretUp, Plus } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,7 +18,6 @@ import { ControllerRenderProps } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { CreateMiddleware } from '../version/Middlewares';
-import { CreateEndpointSchema } from '@/types';
 
 interface EndpointMiddlewaresProps {
 	field: ControllerRenderProps<z.infer<typeof CreateEndpointSchema>, 'middlewares'>;
@@ -73,7 +72,7 @@ interface AddMiddlewareDropdownProps {
 
 function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) {
 	const [addMiddlewareDropDownIsOpen, setAddMiddlewareDropDownIsOpen] = useState(false);
-	const { middlewares, toggleCreateModal } = useMiddlewareStore();
+	const { workspaceMiddlewares: middlewares, toggleCreateModal } = useMiddlewareStore();
 	const { t } = useTranslation();
 	return (
 		<>

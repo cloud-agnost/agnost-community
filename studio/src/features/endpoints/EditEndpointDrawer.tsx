@@ -77,6 +77,7 @@ export default function EditEndpointDrawer() {
 				versionId: versionId as string,
 				page: 0,
 				size: 250,
+				workspace: true,
 			}),
 		queryKey: ['getMiddlewares'],
 		enabled: !workspaceMiddlewares.length,

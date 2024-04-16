@@ -1,11 +1,10 @@
 import { Button } from '@/components/Button';
-import React from 'react';
-
-import { cn } from '@/utils';
 import { useTabIcon } from '@/hooks';
-import { TabTypes } from '@/types';
-import useThemeStore from '@/store/theme/themeStore';
 import useAuthStore from '@/store/auth/authStore';
+import useThemeStore from '@/store/theme/themeStore';
+import { TabTypes } from '@/types';
+import { cn } from '@/utils';
+import React from 'react';
 
 interface SideBarButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 	active: boolean;
@@ -15,6 +14,8 @@ interface SideBarButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	type?: TabTypes;
 	title?: string;
+	caret?: boolean;
+	caretActive?: boolean;
 }
 
 export default function SideBarButton({
@@ -44,7 +45,7 @@ export default function SideBarButton({
 				variant='blank'
 				size='full'
 				className={cn(
-					'justify-start text-left gap-2 text-xs  font-normal cursor-pointer !h-6 !rounded-none whitespace-nowrap  pl-5 flex-1',
+					'justify-start text-left gap-2 text-xs font-normal cursor-pointer !h-6 !rounded-none whitespace-nowrap  pl-5 flex-1',
 					className,
 				)}
 			>

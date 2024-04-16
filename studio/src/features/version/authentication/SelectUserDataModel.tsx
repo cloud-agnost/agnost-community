@@ -36,7 +36,7 @@ export default function SelectUserDataModel() {
 	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { databases, getDatabases } = useDatabaseStore();
-	const { getModelsOfDatabase, models: dbModels } = useModelStore();
+	const { getModels, models: dbModels } = useModelStore();
 
 	const [error, setError] = useState<APIError>();
 	const { toast } = useToast();
@@ -62,7 +62,7 @@ export default function SelectUserDataModel() {
 	useEffect(() => {
 		const dbId = form.watch('databaseId');
 		if (version && dbId) {
-			getModelsOfDatabase({
+			getModels({
 				orgId: version.orgId,
 				versionId: version._id,
 				appId: version.appId,

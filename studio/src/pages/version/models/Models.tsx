@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { CreateModel, EditModel, ModelColumns } from '@/features/database/models';
+import { ModelColumns } from '@/features/database/models';
 import { useSearch, useTabNavigate, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -12,20 +12,13 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import _ from 'lodash';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 export default function Models() {
 	const { application } = useApplicationStore();
 	const { version } = useVersionStore();
-	const {
-		getModelsOfSelectedDb,
-		deleteMultipleModel,
-		isEditModelDialogOpen,
-		closeEditModelDialog,
-		getModelsOfDatabase,
-	} = useModelStore();
-	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
+	const { getModelsOfSelectedDb, deleteMultipleModel, getModels, toggleCreateModal } =
+		useModelStore();
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canCreateModel = useAuthorizeVersion('model.create');
@@ -46,21 +39,13 @@ export default function Models() {
 
 	const { isFetching, refetch } = useQuery({
 		queryFn: () =>
-			getModelsOfDatabase({
+			getModels({
 				dbId: database._id,
 				orgId,
 				appId: application?._id ?? appId,
 				versionId: version?._id ?? versionId,
 			}),
-		queryKey: [
-			'getModelsOfDatabase',
-			database._id,
-			orgId,
-			application?._id,
-			appId,
-			version?._id,
-			versionId,
-		],
+		queryKey: ['getModels', database._id, orgId, application?._id, appId, version?._id, versionId],
 		refetchOnWindowFocus: false,
 		enabled: !_.isNil(database) && models?.[0]?.dbId !== dbId,
 	});
@@ -114,31 +99,27 @@ export default function Models() {
 		refetch();
 	}, [dbId, orgId, appId, versionId]);
 	return (
-		<>
-			<VersionTabLayout
-				breadCrumb={<BreadCrumb items={breadcrumbItems} />}
-				isEmpty={!filteredModels.length}
-				type={TabTypes.Model}
-				openCreateModal={() => setIsCreateModelOpen(true)}
-				selectedRowCount={table.getSelectedRowModel().rows.length}
-				onClearSelected={() => table.toggleAllRowsSelected(false)}
-				disabled={!canCreateModel}
-				onMultipleDelete={deleteMultipleModelHandler}
-				loading={isFetching}
-				searchable
-				handlerButton={
-					models &&
-					models.length > 0 && (
-						<Button variant='secondary' onClick={handleViewDataClick}>
-							View Data
-						</Button>
-					)
-				}
-			>
-				<DataTable<Model> table={table} />
-			</VersionTabLayout>
-			<EditModel open={isEditModelDialogOpen} onOpenChange={closeEditModelDialog} />
-			<CreateModel open={isCreateModelOpen} onOpenChange={setIsCreateModelOpen} />
-		</>
+		<VersionTabLayout
+			breadCrumb={<BreadCrumb items={breadcrumbItems} />}
+			isEmpty={!filteredModels.length}
+			type={TabTypes.Model}
+			openCreateModal={toggleCreateModal}
+			selectedRowCount={table.getSelectedRowModel().rows.length}
+			onClearSelected={() => table.toggleAllRowsSelected(false)}
+			disabled={!canCreateModel}
+			onMultipleDelete={deleteMultipleModelHandler}
+			loading={isFetching}
+			searchable
+			handlerButton={
+				models &&
+				models.length > 0 && (
+					<Button variant='secondary' onClick={handleViewDataClick}>
+						View Data
+					</Button>
+				)
+			}
+		>
+			<DataTable<Model> table={table} />
+		</VersionTabLayout>
 	);
 }

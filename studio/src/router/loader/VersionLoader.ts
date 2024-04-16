@@ -276,7 +276,7 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
 
-	const { getModelsOfDatabase, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();
+	const { getModels, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();
 	const { database, getDatabaseOfAppById, databases } = useDatabaseStore.getState();
 
 	const apiParams = params as {
@@ -295,7 +295,7 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 
 	const models = getModelsOfSelectedDb(apiParams.dbId);
 	if (_.isEmpty(models)) {
-		const models = await getModelsOfDatabase(apiParams);
+		const models = await getModels(apiParams);
 		setModel(models.find((m) => m._id === apiParams.modelId) ?? models[0]);
 	}
 

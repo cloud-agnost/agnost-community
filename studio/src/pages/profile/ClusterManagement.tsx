@@ -3,7 +3,6 @@ import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/Tabs';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import useClusterStore from '@/store/cluster/clusterStore';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useEffect } from 'react';
@@ -16,8 +15,7 @@ import TransferClusterOwnership from './TransferClusterOwnership';
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();
 	const TabItems = ['General', 'Cluster Resources', 'SMTP', 'Custom Domains'];
-	const { organization } = useOrganizationStore();
-	const { getClusterInfo, checkDomainStatus, clusterDomainError } = useClusterStore();
+	const { getClusterInfo, checkDomainStatus, clusterDomainError, cluster } = useClusterStore();
 
 	useEffect(() => {
 		getClusterInfo();
@@ -29,7 +27,6 @@ export default function ProfileSettingsClusterManagement() {
 		retry: false,
 		enabled: _.isNil(clusterDomainError),
 	});
-
 	return (
 		<SettingsContainer pageTitle={t('profileSettings.clusters_title')}>
 			<Tabs defaultValue={TabItems[0]}>
@@ -55,7 +52,7 @@ export default function ProfileSettingsClusterManagement() {
 						title={t('cluster.yourClusterId')}
 						description={t('cluster.yourClusterIdDescription')}
 					>
-						<CopyInput readOnly value={organization?.iid} />
+						<CopyInput readOnly value={cluster._id} />
 					</SettingsFormItem>
 					<SettingsFormItem
 						className='space-y-0 py-0 pb-6'
