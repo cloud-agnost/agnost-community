@@ -1,7 +1,9 @@
+import { CopyInput } from '@/components/CopyInput';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import { RealtimeRateLimits } from '@/features/version/SettingsRealtime';
 import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, VersionRealtimeProperties } from '@/types';
@@ -13,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 export default function VersionSettingsRealTime() {
 	const realtime = useVersionStore((state) => state.version?.realtime);
 	const { version } = useVersionStore();
+	const { environment } = useEnvironmentStore();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const canEdit = useAuthorizeVersion('version.update');
 	const { toast } = useToast();
@@ -48,6 +51,14 @@ export default function VersionSettingsRealTime() {
 	return (
 		<SettingsContainer pageTitle='Real Time'>
 			<div className='divide-y'>
+				<SettingsFormItem
+					className='space-y-0 py-0 pb-6'
+					contentClassName='pt-6'
+					title={t('version.settings.realtime_url')}
+					description={t('version.settings.realtime_url_desc')}
+				>
+					<CopyInput readOnly value={`${window.location.origin}/${environment?.iid}`} />
+				</SettingsFormItem>
 				<SettingsFormItem
 					twoColumns
 					className='space-y-0 py-6 pt-0'

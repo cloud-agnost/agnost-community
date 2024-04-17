@@ -236,7 +236,8 @@ export default function Tabs() {
 						if (over && active.id !== over?.id) {
 							const activeIndex = tabs.findIndex(({ id }) => id === active.id);
 							const overIndex = tabs.findIndex(({ id }) => id === over.id);
-
+							if (activeIndex === -1 || overIndex === -1) return;
+							if (overIndex === 0) return;
 							setTabs(versionId, arrayMove(tabs, activeIndex, overIndex));
 						}
 						setActive(null);

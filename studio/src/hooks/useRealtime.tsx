@@ -3,7 +3,7 @@ import { realtimeObjectMapper } from '@/helpers/realtime';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
 import { NotificationActions } from '@/types';
-import { DATE_TIME_FORMAT, generateId, onChannelMessage, formatDate } from '@/utils';
+import { DATE_TIME_FORMAT_WITH_MS, formatDate, generateId, onChannelMessage } from '@/utils';
 import { useEffect } from 'react';
 
 export default function useRealtime() {
@@ -18,7 +18,7 @@ export default function useRealtime() {
 				fn[action]({
 					data,
 					identifiers,
-					timestamp: formatDate(timestamp, DATE_TIME_FORMAT),
+					timestamp: formatDate(timestamp, DATE_TIME_FORMAT_WITH_MS),
 					message: log,
 					...(id && { id }),
 					type,

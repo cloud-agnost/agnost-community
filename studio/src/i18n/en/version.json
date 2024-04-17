@@ -88,6 +88,8 @@
 		"manage_api_keys": "Manage API Keys",
 		"real_time": "Real Time",
 		"other": "Other Settings",
+		"realtime_url": "Realtime URL",
+		"realtime_url_desc": "You can use this URL when connecting to the realtime server using the Agnost client library.",
 		"version_id": "API Server Base URL",
 		"version_id_desc": "This is your base url of your API Server.",
 		"version_name": "Version Name",

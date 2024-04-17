@@ -64,24 +64,28 @@ export default function SideBar() {
 			id='side-navigation'
 		>
 			<div className='px-2 py-[0.22rem] border-b border-border group flex items-center justify-between'>
-				<h1 className='text-xs text-default'>{t('version.explorer')}</h1>
+				<h1 className='text-xs text-default'>
+					{isSearchViewOpen ? t('general.search') : t('version.explorer')}
+				</h1>
 				<div className='flex items-center'>
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									variant='icon'
-									size='sm'
-									rounded
-									className='!p-0 !h-6 invisible group-hover:visible'
-									onClick={collapseAll}
-								>
-									<MinusSquare size={16} />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>{t('version.collapse_all')}</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
+					{!isSearchViewOpen && (
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant='icon'
+										size='sm'
+										rounded
+										className='!p-0 !h-6 invisible group-hover:visible'
+										onClick={collapseAll}
+									>
+										<MinusSquare size={16} />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>{t('version.collapse_all')}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					)}
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>

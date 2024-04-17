@@ -175,6 +175,7 @@ export default function Buckets() {
 						onRowSelected={() =>
 							setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 						}
+						suppressMovableColumns
 						onFirstDataRendered={onFirstDataRendered}
 						onColumnResized={handleColumnStateChange}
 						onColumnValueChanged={handleColumnStateChange}

@@ -113,13 +113,7 @@ export default function NestedWorkspaceItem({
 			className={cn('w-full')}
 			onOpenChange={() => toggleWorkspaceTab(data._id)}
 			trigger={
-				<CollapsibleTrigger
-					asChild
-					className='px-4'
-					onClick={loadItems}
-					id={data._id}
-					key={data._id}
-				>
+				<CollapsibleTrigger asChild onClick={loadItems} id={data._id} key={data._id}>
 					<div
 						className={cn(
 							'flex items-center group',
@@ -136,23 +130,25 @@ export default function NestedWorkspaceItem({
 							size='sm'
 							onClick={handleTriggerClick}
 						>
-							<CaretRight
-								size={14}
-								className={cn(
-									'transition-transform duration-200 text-subtle group-hover:text-default',
-									sidebar[versionId]?.openedTabs?.includes(data._id) && 'rotate-90 text-default',
-								)}
-							/>
-							<div
-								className={cn(
-									'flex-1/2',
-									window.location.pathname.includes(data._id) &&
-										type === currentTab?.type &&
-										getTheme(user._id) === 'light' &&
-										'[&>svg]:text-white',
-								)}
-							>
-								{getIcon(type === TabTypes.Model ? TabTypes.Database : TabTypes.Storage)}
+							<div className='flex items-center gap-1'>
+								<CaretRight
+									size={14}
+									className={cn(
+										'transition-transform duration-200 text-subtle group-hover:text-default',
+										sidebar[versionId]?.openedTabs?.includes(data._id) && 'rotate-90 text-default',
+									)}
+								/>
+								<div
+									className={cn(
+										'flex-1/2',
+										window.location.pathname.includes(data._id) &&
+											type === currentTab?.type &&
+											getTheme(user._id) === 'light' &&
+											'[&>svg]:text-white',
+									)}
+								>
+									{getIcon(type === TabTypes.Model ? TabTypes.Database : TabTypes.Storage)}
+								</div>
 							</div>
 							<h1
 								title={data.name}
@@ -226,7 +222,7 @@ export default function NestedWorkspaceItem({
 						onClick={() => handleDataClick(sd)}
 						title={sd.name}
 						type={type}
-						className='px-8 ml-1'
+						className='px-8 ml-5'
 						actions={
 							<div className='flex items-center justify-end'>
 								<Button

@@ -25,16 +25,13 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
 interface AddOrEditAPIKeyGeneralProps {
-	endpoints: Endpoint[];
 	setEndpoints: Dispatch<SetStateAction<Endpoint[]>>;
 }
 
-export default function AddOrEditAPIKeyGeneral({
-	endpoints,
-	setEndpoints,
-}: AddOrEditAPIKeyGeneralProps) {
+export default function AddOrEditAPIKeyGeneral({ setEndpoints }: AddOrEditAPIKeyGeneralProps) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof Schema>>();
+	const eps = useEndpointStore((state) => state.endpoints);
 	const {
 		selectEndpointDialogOpen,
 		selectedEndpointIds,
@@ -74,6 +71,7 @@ export default function AddOrEditAPIKeyGeneral({
 	useUpdateEffect(() => {
 		form.clearErrors('general.endpoint');
 	}, [form.watch('general.endpoint.type')]);
+
 	return (
 		<>
 			<EndpointSelectModal
@@ -166,7 +164,11 @@ export default function AddOrEditAPIKeyGeneral({
 												{item === 'custom-allowed' &&
 													form.watch('general.endpoint.type') === 'custom-allowed' && (
 														<ListEndpoint
-															endpoints={endpoints ?? []}
+															endpoints={eps.filter((item) =>
+																form
+																	.getValues('general.endpoint.allowedEndpoints')
+																	.some((i) => i.url === item.iid),
+															)}
 															setEndpoints={setEndpoints}
 															type='custom-allowed'
 														>
@@ -182,7 +184,11 @@ export default function AddOrEditAPIKeyGeneral({
 												{item === 'custom-excluded' &&
 													form.watch('general.endpoint.type') === 'custom-excluded' && (
 														<ListEndpoint
-															endpoints={endpoints}
+															endpoints={eps.filter((item) =>
+																form
+																	.getValues('general.endpoint.excludedEndpoints')
+																	.some((i) => i.url === item.iid),
+															)}
 															setEndpoints={setEndpoints}
 															type='custom-excluded'
 														>
