@@ -953,3 +953,33 @@ curl -XDELETE http://localhost:3000/tektonPipeline -d '{
     "hookId": "463611028".
 }' -H "Content-type: application/json"
 ```
+
+## Git Repo Info
+
+### List Repos
+
+#### GitHub Repo List
+
+```bash
+curl -XGET 'http://localhost:3000/listGitRepos?gitRepoType=github&gitPat=YOUR_GITHUB_PAT'
+```
+
+#### GitLab Repo List
+
+```bash
+curl -XGET 'http://localhost:3000/listGitRepos?gitRepoType=gitlab&gitPat=YOUR_GITLAB_PAT'
+```
+
+### List Branches
+
+#### GitHub Branch List
+
+```bash
+curl -XGET 'http://localhost:3000/listGitBranches?gitRepoType=github&gitRepoName=OWNER/REPO&gitPat=YOUR_GITHUB_PAT'
+```
+
+#### GitLab Branch List
+
+```bash
+curl -XGET 'http://localhost:3000/listGitBranches?gitRepoType=gitlab&gitRepoName=NAMESPACE/PROJECTr&gitPat=YOUR_GITLAB_PAT'
+```
