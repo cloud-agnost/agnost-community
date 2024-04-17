@@ -10,6 +10,7 @@ import { VersionDropdown } from '@/features/version/VersionDropdown';
 import { useAuthorizeVersion } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { MagnifyingGlass } from '@phosphor-icons/react';
+import _ from 'lodash';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../Button';
 import { Separator } from '../Separator';
@@ -26,9 +27,14 @@ export function Header() {
 				<Link to='/'>
 					<Agnost width='36' height='36' />
 				</Link>
-				<Separator orientation='vertical' className='h-8 transform rotate-12' />
+
 				<div className='flex items-center gap-4'>
-					{orgId && <OrganizationDropdown />}
+					{!_.isEmpty(orgId) && (
+						<>
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
+							<OrganizationDropdown />
+						</>
+					)}
 					{appId && (
 						<>
 							<Separator orientation='vertical' className='h-8 transform rotate-12' />

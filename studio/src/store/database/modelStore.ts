@@ -25,6 +25,9 @@ interface ModelStore {
 	models: {
 		[dbId: string]: Model[];
 	};
+	workspaceModels: {
+		[dbId: string]: Model[];
+	};
 	model: Model;
 	field: Field;
 	subModel: Model;
@@ -35,16 +38,18 @@ interface ModelStore {
 	}[];
 	isEditModelDialogOpen: boolean;
 	isEditFieldDialogOpen: boolean;
+	isCreateModelDialogOpen: boolean;
 	selectedType: FieldType;
 	isModelsFetched: boolean;
 }
 
 type Actions = {
-	openEditModelDialog: (model: Model) => void;
-	closeEditModelDialog: () => void;
+	openEditModelModal: (model: Model) => void;
+	closeEditModelModal: () => void;
+	toggleCreateModal: () => void;
 	openEditFieldDialog: (field: Field) => void;
 	closeEditFieldDialog: () => void;
-	getModelsOfDatabase: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
+	getModels: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
 	getSpecificModelByIidOfDatabase: (params: GetSpecificModelByIidOfDatabase) => Promise<Model>;
 	getSpecificModelOfDatabase: (params: GetSpecificModelOfDatabase) => Promise<Model>;
 	createModel: (params: CreateModelParams) => Promise<Model>;
@@ -69,6 +74,7 @@ type Actions = {
 
 const initialState: ModelStore = {
 	models: {},
+	workspaceModels: {},
 	model: {} as Model,
 	subModel: {} as Model,
 	field: {} as Field,
@@ -78,6 +84,7 @@ const initialState: ModelStore = {
 	isEditFieldDialogOpen: false,
 	selectedType: {} as FieldType,
 	isModelsFetched: false,
+	isCreateModelDialogOpen: false,
 };
 
 const useModelStore = create<ModelStore & Actions>()(
@@ -85,12 +92,16 @@ const useModelStore = create<ModelStore & Actions>()(
 		persist(
 			(set, get) => ({
 				...initialState,
-				openEditModelDialog: (model: Model) =>
+				toggleCreateModal: () =>
+					set((prev) => ({
+						isCreateModelDialogOpen: !prev.isCreateModelDialogOpen,
+					})),
+				openEditModelModal: (model: Model) =>
 					set({
 						isEditModelDialogOpen: true,
 						model,
 					}),
-				closeEditModelDialog: () =>
+				closeEditModelModal: () =>
 					set({
 						isEditModelDialogOpen: false,
 						model: {} as Model,
@@ -106,8 +117,18 @@ const useModelStore = create<ModelStore & Actions>()(
 						field: {} as Field,
 					}),
 
-				getModelsOfDatabase: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
+				getModels: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 					const models = await ModelService.getModelsOfDatabase(params);
+
+					if (params.workspace) {
+						set((state) => ({
+							workspaceModels: {
+								...state.workspaceModels,
+								[params.dbId]: models,
+							},
+						}));
+						return models;
+					}
 					set((state) => ({
 						models: {
 							...state.models,
@@ -142,6 +163,10 @@ const useModelStore = create<ModelStore & Actions>()(
 							...state.models,
 							[params.dbId]: [...state.models[params.dbId], model],
 						},
+						workspaceModels: {
+							...state.workspaceModels,
+							[params.dbId]: [...state.models[params.dbId], model],
+						},
 					}));
 					return model;
 				},
@@ -153,6 +178,12 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						workspaceModels: {
+							...state.workspaceModels,
 							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
@@ -170,6 +201,12 @@ const useModelStore = create<ModelStore & Actions>()(
 								m._id === model._id ? model : m,
 							),
 						},
+						workspaceModels: {
+							...state.workspaceModels,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -179,6 +216,12 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						workspaceModels: {
+							...state.workspaceModels,
 							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
@@ -196,6 +239,12 @@ const useModelStore = create<ModelStore & Actions>()(
 								m._id === model._id ? model : m,
 							),
 						},
+						workspaceModels: {
+							...state.workspaceModels,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -205,6 +254,10 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
+							[params.dbId]: state.models[params.dbId].filter((m) => m._id !== params.modelId),
+						},
+						workspaceModels: {
+							...state.workspaceModels,
 							[params.dbId]: state.models[params.dbId].filter((m) => m._id !== params.modelId),
 						},
 					}));
@@ -218,6 +271,12 @@ const useModelStore = create<ModelStore & Actions>()(
 								(m) => !params.modelIds.includes(m._id),
 							),
 						},
+						workspaceModels: {
+							...state.workspaceModels,
+							[params.dbId]: state.models[params.dbId].filter(
+								(m) => !params.modelIds.includes(m._id),
+							),
+						},
 					}));
 				},
 				updateField: async (params: UpdateFieldParams): Promise<Model> => {
@@ -225,6 +284,12 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						workspaceModels: {
+							...state.workspaceModels,
 							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),
@@ -247,6 +312,12 @@ const useModelStore = create<ModelStore & Actions>()(
 								m._id === model._id ? model : m,
 							),
 						},
+						workspaceModels: {
+							...state.workspaceModels,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -256,6 +327,12 @@ const useModelStore = create<ModelStore & Actions>()(
 					set((state) => ({
 						models: {
 							...state.models,
+							[params.dbId]: state.models[params.dbId]?.map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						workspaceModels: {
+							...state.workspaceModels,
 							[params.dbId]: state.models[params.dbId]?.map((m) =>
 								m._id === model._id ? model : m,
 							),

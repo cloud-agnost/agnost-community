@@ -37,11 +37,10 @@ export default function TableHeader({
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');
 		let newDirection = defaultDirection;
-		if (currentField === field) {
+		if (currentField === text) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
-
-		searchParams.set('f', field as string);
+		searchParams.set('f', text as string);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {
@@ -75,7 +74,7 @@ export default function TableHeader({
 				className={cn('justify-start w-full h-full', className)}
 			>
 				<p className='truncate'>{text}</p>
-				{searchParams.get('f') === field && (
+				{searchParams.get('f') === text && (
 					<div className='ml-2'>
 						<CaretUp
 							size={14}

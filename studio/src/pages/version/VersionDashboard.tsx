@@ -35,7 +35,6 @@ export default function VersionDashboard() {
 		queryKey: ['getVersionDashboardInfo'],
 		queryFn: getVersionDashboardInfoHandler,
 		refetchOnWindowFocus: false,
-		enabled: _.isEmpty(dashboard),
 	});
 
 	function getVersionDashboardInfoHandler() {

@@ -105,17 +105,14 @@ export default function AuthUserDropdown() {
 
 				<DropdownMenuItemContainer>
 					<DropdownMenuItem asChild>
-						<Link className={cn('flex items-center gap-2')} to={`/organization/${orgId}/profile`}>
+						<Link className={cn('flex items-center gap-2')} to={'/profile'}>
 							<GearSix className='text-icon-base text-lg' />
 							{t('general.account_settings')}
 						</Link>
 					</DropdownMenuItem>
 					{user?.isClusterOwner && (
 						<DropdownMenuItem asChild>
-							<Link
-								className={cn('flex items-center gap-2')}
-								to={`/organization/${orgId}/profile/cluster-management`}
-							>
+							<Link className={cn('flex items-center gap-2')} to={'/profile/cluster-management'}>
 								<LineSegments className='text-icon-base text-lg' />
 								{t('profileSettings.clusters_title')}
 							</Link>

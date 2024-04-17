@@ -11,6 +11,9 @@
       "icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#929AB5=currentColor\" --replace-attr-values \"#fff=currentColor\" "
    },
    "dependencies": {
+     	"@dnd-kit/core": "^6.1.0",
+		"@dnd-kit/modifiers": "^7.0.0",
+		"@dnd-kit/sortable": "^8.0.0",
       "@hookform/resolvers": "^3.1.0",
       "@loadable/component": "^5.15.3",
       "@monaco-editor/react": "^4.6.0",

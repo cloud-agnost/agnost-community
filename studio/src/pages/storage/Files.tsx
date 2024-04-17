@@ -1,8 +1,8 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
+import { SortButton } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { MODULE_PAGE_SIZE } from '@/constants';
-import TableHeader from '@/features/database/models/Navigator/TableHeader';
 import { EditFile, FileColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Pagination } from '../version/navigator/Pagination';
+import useSaveColumnState from '@/hooks/useSaveColumnState';
 export default function Files() {
 	const [searchParams] = useSearchParams();
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
@@ -54,7 +55,9 @@ export default function Files() {
 			name: bucket?.name,
 		},
 	];
-
+	const { handleColumnStateChange, onFirstDataRendered } = useSaveColumnState(
+		bucket?.name as string,
+	);
 	const { refetch, isFetching } = useQuery({
 		queryKey: [
 			'getFilesOfBucket',
@@ -182,29 +185,33 @@ export default function Files() {
 			>
 				<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
 					<AgGridReact
-						ref={gridRef}
+						className='w-full h-full'
 						onGridReady={onGridReady}
-						key={storage._id}
-						className='flex-1 h-[500px]'
+						key={bucket.name}
+						ref={gridRef}
 						rowData={files}
 						columnDefs={FileColumns}
 						rowSelection='multiple'
 						components={{
-							agColumnHeader: TableHeader,
+							agColumnHeader: SortButton,
 						}}
+						readOnlyEdit={true}
 						ensureDomOrder
 						suppressRowClickSelection
 						enableCellTextSelection
-						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
 						overlayLoadingTemplate={
 							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 						}
-						onRowSelected={(event) =>
-							setSelectedRowCount(event?.api.getSelectedNodes().length ?? 0)
+						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
+						onRowSelected={() =>
+							setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 						}
+						onFirstDataRendered={onFirstDataRendered}
+						onColumnResized={handleColumnStateChange}
+						onColumnValueChanged={handleColumnStateChange}
+						onColumnMoved={handleColumnStateChange}
 						defaultColDef={{
 							resizable: true,
-							flex: 1,
 						}}
 					/>
 					<Pagination countInfo={fileCountInfo as BucketCountInfo} />

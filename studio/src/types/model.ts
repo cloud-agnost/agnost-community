@@ -109,6 +109,7 @@ export interface Field {
 
 export type GetModelsOfDatabaseParams = Omit<GetDatabasesOfAppParams, 'modelId'> & {
 	dbId: string;
+	workspace?: boolean;
 };
 export type GetSpecificModelByIidOfDatabase = GetModelsOfDatabaseParams &
 	BaseRequest & {

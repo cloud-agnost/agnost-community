@@ -1,9 +1,11 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
+import { SortButton } from '@/components/DataTable';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useToast } from '@/hooks';
+import useSaveColumnState from '@/hooks/useSaveColumnState';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, BucketCountInfo, TabTypes } from '@/types';
@@ -18,7 +20,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from '../version/navigator/Pagination';
-import { TableHeader } from '@/features/database/models/Navigator';
 export default function Buckets() {
 	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
 	const { toast } = useToast();
@@ -38,7 +39,7 @@ export default function Buckets() {
 		bucketCountInfo,
 		storage,
 	} = useStorageStore();
-
+	const { handleColumnStateChange, onFirstDataRendered } = useSaveColumnState(storageId as string);
 	const storageUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/storage`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -153,17 +154,17 @@ export default function Buckets() {
 			>
 				<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
 					<AgGridReact
-						ref={gridRef}
+						className='w-full h-full'
 						onGridReady={onGridReady}
-						key={storage._id}
-						className='flex-1 h-[500px]'
+						key={storage.name}
+						ref={gridRef}
 						rowData={buckets}
 						columnDefs={BucketColumns}
 						rowSelection='multiple'
 						components={{
-							agColumnHeader: TableHeader,
+							agColumnHeader: SortButton,
 						}}
-						autoSizePadding={20}
+						readOnlyEdit={true}
 						ensureDomOrder
 						suppressRowClickSelection
 						enableCellTextSelection
@@ -171,13 +172,15 @@ export default function Buckets() {
 							'<div class="flex space-x-6 justify-center items-center h-screen"><span class="sr-only">Loading...</span><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div><div class="size-5 bg-brand-primary rounded-full animate-bounce"></div></div>'
 						}
 						overlayNoRowsTemplate='<div class="flex justify-center items-center h-screen"><span class="text-lg text-gray-400">No Data Available</span></div>'
-						onRowSelected={(event) =>
-							setSelectedRowCount(event?.api.getSelectedNodes().length ?? 0)
+						onRowSelected={() =>
+							setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 						}
-						columnHoverHighlight={false}
+						onFirstDataRendered={onFirstDataRendered}
+						onColumnResized={handleColumnStateChange}
+						onColumnValueChanged={handleColumnStateChange}
+						onColumnMoved={handleColumnStateChange}
 						defaultColDef={{
 							resizable: true,
-							flex: 1,
 						}}
 					/>
 					<Pagination countInfo={bucketCountInfo as BucketCountInfo} />
