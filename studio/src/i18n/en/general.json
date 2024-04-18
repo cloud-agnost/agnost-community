@@ -142,5 +142,6 @@
 	"uploadedAt": "Uploaded At",
 	"chooseOne": "Choose One",
 	"accessToken": "Access Token",
-	"session_token": "Session Token"
+	"session_token": "Session Token",
+	"restart": "Restart"
 }

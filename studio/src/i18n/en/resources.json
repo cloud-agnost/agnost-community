@@ -115,5 +115,6 @@
 	"edit_success": "Resource updated successfully",
 	"update_size": "Update Size",
 	"update_version": "Update Version",
-	"update_replica_and_version": "Update Replica and Version"
+	"update_replica_and_version": "Update Replica and Version",
+	"restart_success": "Resource restarted successfully"
 }
