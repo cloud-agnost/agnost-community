@@ -57,15 +57,17 @@ export default function EditResourceDrawer() {
 					)}
 
 					{resourceToEdit.managed && (
-						<>
-							<Description title={`Restart ${resourceToEdit.instance} server`}>
-								Please be informed that if you restart your resource you might observe interruption
-								in resource services until it completes its restart.
-							</Description>
-							<Button loading={isPending} onClick={restartResource}>
-								{t('general.restart')}
-							</Button>
-						</>
+						<Description title={`Restart ${resourceToEdit.instance} server`}>
+							<div className='flex items-center justify-between'>
+								<p className='text-balance'>
+									Please be informed that if you restart your resource you might observe
+									interruption in resource services until it completes its restart.
+								</p>
+								<Button loading={isPending} onClick={restartResource}>
+									{t('general.restart')}
+								</Button>
+							</div>
+						</Description>
 					)}
 				</div>
 			</DrawerContent>
