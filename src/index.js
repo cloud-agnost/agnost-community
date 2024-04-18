@@ -39,7 +39,7 @@ app.use('/', listGitRepos);
 app.use('/', listGitBranches);
 
 // Call pipeline event watcher
-//watchPipelineEvents();
+watchPipelineEvents();
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));

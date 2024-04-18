@@ -35,10 +35,11 @@ function watchPipelineEvents() {
     } catch (err) {
       console.log('Watch error:', err);
       console.log('Attempting to restart watch...');
+      setTimeout(watchEvents, 30000); // Restart watch after a delay of 30s.
     }
-    setTimeout(watchEvents, 10000); // Restart watch after a delay of 10s.
+    console.log('Last event version:', lastResourceVersion);
+    setTimeout(watchEvents, 30000); // Restart watch after a delay of 30s.
   }
-
   watchEvents(); // Start watching events
 }
 
