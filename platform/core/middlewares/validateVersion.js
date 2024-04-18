@@ -196,3 +196,78 @@ export const validateVersionOauthProvider = async (req, res, next) => {
 		return handleError(req, res, err);
 	}
 };
+
+// Middleare the create the error message for failed request input validations
+export const validateTargetVersion = async (req, res, next) => {
+	try {
+		const { toVersionId } = req.params;
+
+		// Get the version object
+		let version = await versionCtrl.getOneById(toVersionId, {
+			cacheKey: toVersionId,
+		});
+
+		if (!version) {
+			return res.status(404).json({
+				error: t("Not Found"),
+				details: t(
+					"No such target version with the provided id '%s' exists.",
+					toVersionId
+				),
+				code: ERROR_CODES.notFound,
+			});
+		}
+
+		if (req.app._id.toString() !== version.appId.toString()) {
+			return res.status(401).json({
+				error: t("Not Authorized"),
+				details: t(
+					"App does not have a target version with the provided id '%s'",
+					toVersionId
+				),
+				code: ERROR_CODES.unauthorized,
+			});
+		}
+
+		// If this is a private version then only authorized people can view and update it
+		if (version.private && req.user) {
+			if (
+				version.createdBy.toString() !== req.user._id.toString() &&
+				req.appMember.role !== "Admin"
+			) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You do not have the authorization to work on the target private version '%s'",
+						version.name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+		}
+
+		// If this is a read-pnly version then only authorized people can view and update it
+		if (version.readOnly && req.user) {
+			if (
+				req.app.ownerUserId.toString() !== req.user._id.toString() &&
+				req.appMember.role !== "Admin"
+			) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You do not have the authorization to work on the target read-only version '%s'",
+						version.name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+		}
+
+		// Assign target version data
+		req.targetVersion = version;
+
+		next();
+	} catch (err) {
+		return handleError(req, res, err);
+	}
+};

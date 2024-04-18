@@ -78,26 +78,31 @@ export const authManageStorage = async (req, res, next) => {
 	if (user.isClusterOwner) {
 		role = "Admin";
 	} else {
-		// Check if the user is member of the app team
-		const appTeam = META.getAppTeam();
+		const appObj = META.getAppObj();
+		if (appObj.ownerUserId.toString() === user._id.toString()) {
+			role = "Admin";
+		} else {
+			// Check if the user is member of the app team
+			const appTeam = META.getAppTeam();
 
-		// Check if the user is a member of the app or not
-		let appMember = appTeam.find(
-			(entry) => entry.userId.toString() === user._id.toString()
-		);
+			// Check if the user is a member of the app or not
+			let appMember = appTeam.find(
+				(entry) => entry.userId.toString() === user._id.toString()
+			);
 
-		if (!appMember) {
-			return res.status(401).json({
-				error: t("Not Authorized"),
-				details: t(
-					"You are not a member of the application '%s'",
-					META.getAppObj().name
-				),
-				code: ERROR_CODES.unauthorized,
-			});
+			if (!appMember) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not a member of the application '%s'",
+						META.getAppObj().name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			role = appMember.role;
 		}
-
-		role = appMember.role;
 	}
 
 	// If the user has the role of viewer then the user does not have the authorization to perform actions on storage data

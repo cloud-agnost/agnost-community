@@ -2,6 +2,8 @@ import express from "express";
 import appCtrl from "../controllers/app.js";
 import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
+import deployCtrl from "../controllers/deployment.js";
+import versionCtrl from "../controllers/version.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -11,6 +13,7 @@ import { applyRules } from "../schemas/app.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import cache from "../controllers/cache.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -169,7 +172,7 @@ router.put(
 			}
 
 			// Update the role of the user
-			let result = await appCtrl.updateOneByQuery(
+			let updatedApp = await appCtrl.updateOneByQuery(
 				{ _id: app._id, "team._id": member._id },
 				{
 					"team.$.role": role,
@@ -179,7 +182,7 @@ router.put(
 				{ cacheKey: app._id }
 			);
 
-			result = {
+			let result = {
 				_id: member._id,
 				appId: app._id,
 				role: role,
@@ -221,6 +224,18 @@ router.put(
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
+
+			// Get application versions
+			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
+			for (const version of versions) {
+				// Deploy version updates to environments if auto-deployment is enabled
+				await deployCtrl.updateVersionInfo(
+					updatedApp,
+					version,
+					user,
+					"update-version"
+				);
+			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -290,7 +305,7 @@ router.delete(
 			}
 
 			// Remove user from the app team
-			await appCtrl.pullObjectById(
+			const updatedApp = await appCtrl.pullObjectById(
 				app._id,
 				"team",
 				member._id,
@@ -317,6 +332,18 @@ router.delete(
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
+
+			// Get application versions
+			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
+			for (const version of versions) {
+				// Deploy version updates to environments if auto-deployment is enabled
+				await deployCtrl.updateVersionInfo(
+					updatedApp,
+					version,
+					user,
+					"update-version"
+				);
+			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -366,7 +393,7 @@ router.post(
 			}
 
 			// Remove users from the app team
-			await appCtrl.pullObjectByQuery(
+			const updatedApp = await appCtrl.pullObjectByQuery(
 				app._id,
 				"team",
 				{ userId: { $in: userIds } },
@@ -393,6 +420,18 @@ router.post(
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
+
+			// Get application versions
+			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
+			for (const version of versions) {
+				// Deploy version updates to environments if auto-deployment is enabled
+				await deployCtrl.updateVersionInfo(
+					updatedApp,
+					version,
+					user,
+					"update-version"
+				);
+			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -440,7 +479,7 @@ router.delete(
 			}
 
 			// Leave the app team
-			await appCtrl.pullObjectById(
+			const updatedApp = await appCtrl.pullObjectById(
 				app._id,
 				"team",
 				member._id,
@@ -467,6 +506,18 @@ router.delete(
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
+
+			// Get application versions
+			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
+			for (const version of versions) {
+				// Deploy version updates to environments if auto-deployment is enabled
+				await deployCtrl.updateVersionInfo(
+					updatedApp,
+					version,
+					user,
+					"update-version"
+				);
+			}
 		} catch (error) {
 			handleError(req, res, error);
 		}

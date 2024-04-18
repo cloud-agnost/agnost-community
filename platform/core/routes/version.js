@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import versionCtrl from "../controllers/version.js";
 import envCtrl from "../controllers/environment.js";
+import envLogCtrl from "../controllers/environmentLog.js";
 import deployCtrl from "../controllers/deployment.js";
 import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
@@ -22,6 +23,7 @@ import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import {
 	validateVersion,
+	validateTargetVersion,
 	validateVersionParam,
 	validateVersionLimit,
 	validateVersionKey,
@@ -2795,6 +2797,113 @@ router.post(
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/push/:toVersionId
+@method     POST
+@desc       Pushes the contents of the source version (versionId) to the target version (toVersionId)
+@access     private
+*/
+router.post(
+	"/:versionId/push/:toVersionId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	validateTargetVersion,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await versionCtrl.startSession();
+		try {
+			const { org, app, user, version, targetVersion } = req;
+			const redeploy = req.body.redeploy ?? true;
+			const toEnv = await envCtrl.getOneByQuery({
+				versionId: targetVersion._id,
+			});
+			let updatedEnv = toEnv;
+
+			await versionCtrl.pushVersionContents(
+				session,
+				user,
+				org,
+				app,
+				version,
+				targetVersion,
+				redeploy
+			);
+
+			if (redeploy) {
+				// Update environment data
+				updatedEnv = await envCtrl.updateOneById(
+					toEnv._id,
+					{
+						dbStatus: "Redeploying",
+						serverStatus: "Deploying",
+						schedulerStatus: "Redeploying",
+						updatedBy: user._id,
+					},
+					{},
+					{ cacheKey: toEnv._id, session }
+				);
+
+				// Create environment logs entry, which will be updated when the deployment is completed
+				let envLog = await envLogCtrl.create(
+					{
+						orgId: org._id,
+						appId: app._id,
+						versionId: targetVersion._id,
+						envId: toEnv._id,
+						action: "deploy",
+						description: t("Redeploying app version"),
+						dbStatus: "Deploying",
+						serverStatus: "Deploying",
+						schedulerStatus: "Deploying",
+						dbLogs: [],
+						serverLogs: [],
+						schedulerLogs: [],
+						createdBy: user._id,
+					},
+					{ session }
+				);
+
+				// Redeploy application version to the environment
+				await deployCtrl.redeploy(envLog, app, targetVersion, updatedEnv, user);
+			}
+
+			// Commit transaction
+			await versionCtrl.commit(session);
+
+			res.json();
+
+			if (redeploy) {
+				// Log action
+				auditCtrl.logAndNotify(
+					targetVersion._id,
+					user,
+					"org.app.version.environment",
+					"redeploy",
+					t(
+						"Started re-deploying app version '%s' to environment '%s'",
+						targetVersion.name,
+						toEnv.name
+					),
+					updatedEnv,
+					{
+						orgId: org._id,
+						appId: app._id,
+						versionId: targetVersion._id,
+						envId: toEnv._id,
+					}
+				);
+			}
+		} catch (err) {
+			await versionCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}

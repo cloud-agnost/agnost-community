@@ -19,6 +19,7 @@ import storageCtrl from "../controllers/storage.js";
 import funcCtrl from "../controllers/function.js";
 import cacheCtrl from "../controllers/cache.js";
 import dmnCtrl from "../controllers/domain.js";
+import vBackupCtrl from "../controllers/versionBackup.js";
 import { OrganizationModel } from "../schemas/organization.js";
 
 class OrganizationController extends BaseController {
@@ -53,6 +54,7 @@ class OrganizationController extends BaseController {
 		await funcCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await cacheCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await dmnCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await vBackupCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 	}
 }
 

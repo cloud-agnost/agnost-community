@@ -16,6 +16,7 @@ import storageCtrl from "../controllers/storage.js";
 import funcCtrl from "../controllers/function.js";
 import cacheCtrl from "../controllers/cache.js";
 import dmnCtrl from "../controllers/domain.js";
+import vBackupCtrl from "../controllers/versionBackup.js";
 import { AppModel } from "../schemas/app.js";
 
 class AppController extends BaseController {
@@ -131,6 +132,10 @@ class AppController extends BaseController {
 			{ session }
 		);
 		await dmnCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await vBackupCtrl.deleteManyByQuery(
 			{ orgId: org._id, appId: app._id },
 			{ session }
 		);

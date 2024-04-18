@@ -9,6 +9,8 @@ import orgMemberCtrl from "../controllers/organizationMember.js";
 import appCtrl from "../controllers/app.js";
 import authCtrl from "../controllers/auth.js";
 import orgCtrl from "../controllers/organization.js";
+import deployCtrl from "../controllers/deployment.js";
+import versionCtrl from "../controllers/version.js";
 import { applyRules } from "../schemas/user.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
@@ -1227,7 +1229,7 @@ router.post(
 			}
 
 			// Add user to the app team
-			await appCtrl.pushObjectById(
+			const updatedApp = await appCtrl.pushObjectById(
 				invite.appId._id,
 				"team",
 				{
@@ -1270,6 +1272,20 @@ router.post(
 				appWithTeam,
 				{ orgId: invite.orgId, appId: invite.appId._id }
 			);
+
+			// Get application versions
+			const versions = await versionCtrl.getManyByQuery({
+				appId: invite.appId._id,
+			});
+			for (const version of versions) {
+				// Deploy version updates to environments if auto-deployment is enabled
+				await deployCtrl.updateVersionInfo(
+					updatedApp,
+					version,
+					user,
+					"update-version"
+				);
+			}
 		} catch (error) {
 			await userCtrl.rollback(session);
 			handleError(req, res, error);
