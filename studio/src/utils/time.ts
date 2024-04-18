@@ -10,6 +10,7 @@ import { enUS } from 'date-fns/locale';
 export const DATE_FORMAT = 'yyyy/MM/dd';
 export const TIME_FORMAT_WITH_SECONDS = 'HH:mm:ss';
 export const DATE_TIME_FORMAT = 'yyyy/MM/dd HH:mm:ss';
+export const DATE_TIME_FORMAT_WITH_MS = 'yyyy/MM/dd HH:mm:ss.SSS';
 export const DATE_FORMAT_MONTH_DAY_YEAR = 'MMM d, yyyy';
 export const TIME_FORMAT = 'HH:mm';
 export const DATETIME_MED_WITH_SECONDS = 'MMM d, yyyy, HH:mm:ss';

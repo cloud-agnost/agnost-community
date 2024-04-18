@@ -29,12 +29,13 @@ export default function EndpointPathVariables() {
 
 	useEffect(() => {
 		if (endpoint?.path) {
+			const values = pathParamFields;
 			removeParamFields();
 			const pathParams = getPathParams(endpoint.path);
 			pathParams.forEach((param) => {
 				appendPathParams({
 					key: param,
-					value: '',
+					value: values.find((v) => v.key === param)?.value ?? '',
 				});
 			});
 		}

@@ -38,7 +38,7 @@ export default function AddOrEditAPIKeyDrawer({
 	const { createAPIKey, editAPIKey, selectedAPIKey, setSelectedAPIKey } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { getEndpointsByIid } = useEndpointStore();
-	const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+	const [_, setEndpoints] = useState<Endpoint[]>([]);
 
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),
@@ -128,7 +128,7 @@ export default function AddOrEditAPIKeyDrawer({
 	const activeTab = searchParams.get('t') || 'general';
 
 	const tabs: Record<string, ReactNode> = {
-		general: <AddOrEditAPIKeyGeneral setEndpoints={setEndpoints} endpoints={endpoints} />,
+		general: <AddOrEditAPIKeyGeneral setEndpoints={setEndpoints} />,
 		'allowed-domains': <AddOrEditAPIKeyAllowedDomains />,
 		'allowed-ips': <AddOrEditAPIKeyAllowedIPs />,
 	};

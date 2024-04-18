@@ -44,7 +44,6 @@ export default function TabItem({ tab, ...props }: TabItemProps) {
 	};
 	const { removeTab, setCurrentTab, openDeleteTabModal } = useTabStore();
 	function close() {
-		console.log('close');
 		if (tab.isDirty) {
 			openDeleteTabModal(tab);
 		} else {

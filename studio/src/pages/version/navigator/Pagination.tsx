@@ -52,8 +52,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	}
 
 	function calculateIndex() {
-		const { currentPage, pageSize, totalCount } = countInfo;
-		if (totalCount === 0) {
+		if (countInfo?.totalCount === 0) {
 			return {
 				pageIndex: 0,
 				dataCount: 0,
@@ -61,9 +60,10 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 			};
 		} else
 			return {
-				pageIndex: currentPage === 1 ? 1 : pageSize * (currentPage - 1) + 1,
+				pageIndex:
+					countInfo?.currentPage === 1 ? 1 : countInfo?.pageSize * (countInfo?.currentPage - 1) + 1,
 				dataCount: countInfo?.pageSize * (countInfo?.currentPage - 1) + countInfo?.count,
-				currentPage: currentPage,
+				currentPage: countInfo?.currentPage,
 			};
 	}
 	return (

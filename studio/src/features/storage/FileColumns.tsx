@@ -129,7 +129,6 @@ const FileColumns: ColDef<BucketFile>[] = [
 	{
 		field: 'path',
 		headerComponentParams: { text: translate('storage.file.path'), field: 'path' },
-		width: 300,
 		cellRenderer: ({ value, data }: ICellRendererParams) => {
 			const environment = useEnvironmentStore.getState().environment;
 			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${data.id}`;

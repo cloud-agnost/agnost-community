@@ -171,6 +171,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		setDebugChannel(null);
 		onClose();
 		handleCancelRequest();
+		form.reset();
 	}
 
 	function handleCancelRequest() {

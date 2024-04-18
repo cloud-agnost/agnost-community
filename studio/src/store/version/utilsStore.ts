@@ -18,6 +18,7 @@ import { ColumnState } from 'ag-grid-community';
 import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
 import useModelStore from '../database/modelStore';
+import useEndpointStore from '../endpoint/endpointStore';
 import useVersionStore from './versionStore';
 
 interface UtilsStore {
@@ -38,6 +39,7 @@ interface UtilsStore {
 		[modelId: string]: ColumnState[] | undefined;
 	};
 	columnFilters: ModelColumnFilters | undefined;
+	isAppliedToAllEndpoints: boolean;
 }
 
 type Actions = {
@@ -60,6 +62,8 @@ type Actions = {
 	clearAllColumnFilters: () => void;
 	clearColumnFilter: (columnName: string) => void;
 	clearEndpointsRequestHeaders: () => void;
+	applyTokensToAllEndpoints: () => void;
+	clearTokens: () => void;
 };
 
 const initialState: UtilsStore = {
@@ -73,6 +77,7 @@ const initialState: UtilsStore = {
 	isSidebarOpen: true,
 	columnState: {} as UtilsStore['columnState'],
 	columnFilters: undefined,
+	isAppliedToAllEndpoints: true,
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(
@@ -257,6 +262,9 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 					});
 				},
 				clearEndpointsRequestHeaders: () => {
+					set({
+						isAppliedToAllEndpoints: false,
+					});
 					set((prev) => {
 						const state = prev.endpointRequest;
 						Object.keys(state).forEach((key) => {
@@ -267,6 +275,25 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 						});
 						return { endpointRequest: state };
 					});
+				},
+				applyTokensToAllEndpoints: () => {
+					const tokens = useEndpointStore.getState().tokens;
+					const requests = get().endpointRequest;
+					Object.keys(requests).forEach((key) => {
+						const req = requests[key].headers?.map((h) => {
+							if (h.key === 'Authorization') h.value = tokens.accessToken;
+							if (h.key === 'Session') h.value = tokens.sessionToken;
+							return h;
+						});
+						get().setEndpointRequest({
+							...requests[key],
+							headers: req,
+						});
+					});
+				},
+				clearTokens: () => {
+					useEndpointStore.getState().setTokens({ accessToken: '', sessionToken: '' });
+					get().clearEndpointsRequestHeaders();
 				},
 			}),
 

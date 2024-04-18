@@ -2,7 +2,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
-import { TextAa, TextAlignJustify } from '@phosphor-icons/react';
+import { TextAa, TextAlignJustify, X } from '@phosphor-icons/react';
 import { cn } from '@/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +16,12 @@ export default function CodeSearchInput() {
 		matchCase,
 		matchWholeWord,
 	} = useVersionStore();
+
+	function clearResults() {
+		setCodeSearchTerm('');
+		useVersionStore.setState({ searchCodeResult: [] });
+	}
+
 	return (
 		<div className='relative p-2'>
 			<Input
@@ -25,6 +31,24 @@ export default function CodeSearchInput() {
 				onChange={(e) => setCodeSearchTerm(e.target.value)}
 			/>
 			<div className='flex items-center absolute top-1/2 transform -translate-y-1/2 right-2 mr-1 gap-1'>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant={matchCase ? 'primary' : 'blank'}
+								className={cn(
+									'hover:bg-wrapper-background-hover dark:hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6',
+								)}
+								iconOnly
+								size='sm'
+								onClick={clearResults}
+							>
+								<X size={16} />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{t('general.clear')}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -56,7 +80,7 @@ export default function CodeSearchInput() {
 								<TextAlignJustify size={16} />
 							</Button>
 						</TooltipTrigger>
-						<TooltipContent>{t('version.match_whole_word')}</TooltipContent>
+						<TooltipContent align='end'>{t('version.match_whole_word')}</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
 			</div>

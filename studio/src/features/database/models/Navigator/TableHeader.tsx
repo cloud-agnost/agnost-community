@@ -53,6 +53,7 @@ export default function TableHeader({
 	function handleClearFilter() {
 		clearColumnFilter(text);
 		searchParams.set('page', '1');
+		searchParams.set('filtered', 'false');
 		setSearchParams(searchParams);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
