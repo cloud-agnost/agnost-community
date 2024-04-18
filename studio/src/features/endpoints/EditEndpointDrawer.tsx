@@ -10,11 +10,13 @@ import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import useMiddlewareStore from '@/store/middleware/middlewareStore';
 
 export default function EditEndpointDrawer() {
 	const { toEditEndpoint, updateEndpoint, isEditEndpointModalOpen, closeEditEndpointModal } =
 		useEndpointStore();
+	const { getMiddlewares, workspaceMiddlewares } = useMiddlewareStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -67,6 +69,19 @@ export default function EditEndpointDrawer() {
 			});
 		}
 	}, [toEditEndpoint, isEditEndpointModalOpen]);
+	useQuery({
+		queryFn: () =>
+			getMiddlewares({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				page: 0,
+				size: 250,
+				workspace: true,
+			}),
+		queryKey: ['getMiddlewares'],
+		enabled: !workspaceMiddlewares.length,
+	});
 
 	return (
 		<Drawer open={isEditEndpointModalOpen} onOpenChange={closeEditEndpointModal}>

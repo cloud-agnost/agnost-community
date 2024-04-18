@@ -18,22 +18,26 @@ export default function EndpointPathVariables() {
 	const { t } = useTranslation();
 	const { endpoint } = useEndpointStore();
 
-	const { fields: pathParamFields, append: appendPathParams } = useFieldArray({
+	const {
+		fields: pathParamFields,
+		append: appendPathParams,
+		remove: removeParamFields,
+	} = useFieldArray({
 		control,
 		name: 'params.pathVariables',
 	});
 
 	useEffect(() => {
 		if (endpoint?.path) {
-			const pathParams = getPathParams(endpoint?.path);
-			console.log(pathParams, pathParamFields);
-			if (pathParams.length > pathParamFields.length) {
-				console.log('appending path params', pathParams);
-				pathParams.forEach((p) => {
-					if (pathParamFields.some((param) => param.key === p)) return;
-					appendPathParams({ key: p, value: '' });
+			const values = pathParamFields;
+			removeParamFields();
+			const pathParams = getPathParams(endpoint.path);
+			pathParams.forEach((param) => {
+				appendPathParams({
+					key: param,
+					value: values.find((v) => v.key === param)?.value ?? '',
 				});
-			}
+			});
 		}
 	}, [endpoint?.path]);
 

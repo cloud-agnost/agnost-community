@@ -3,7 +3,7 @@ import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { ConditionsType, Filters } from '@/types';
+import { ConditionsType, FieldTypes, Filters } from '@/types';
 import { ICellEditorParams } from 'ag-grid-community';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 interface ReferenceProps extends ICellEditorParams {
@@ -46,7 +46,9 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 			updateCurrentTab(versionId, {
 				path,
 			});
-			setColumnFilters('id', {
+			const fieldName =
+				referenceModel.fields.find((field) => field.type === FieldTypes.ID)?.name ?? 'id';
+			setColumnFilters(fieldName, {
 				filterType: Filters.Text,
 				conditions: [
 					{

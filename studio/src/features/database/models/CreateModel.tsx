@@ -13,16 +13,11 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import ModelForm from './ModelForm';
 
-export default function CreateModel({
-	open,
-	onOpenChange,
-}: {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}) {
+export default function CreateModel() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const { database } = useDatabaseStore();
+	const { isCreateModelDialogOpen, toggleCreateModal } = useModelStore();
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
 		defaultValues: {
@@ -65,11 +60,11 @@ export default function CreateModel({
 			name: '',
 			description: '',
 		});
-		onOpenChange(false);
+		toggleCreateModal();
 	}
 
 	useEffect(() => {
-		if (open) {
+		if (isCreateModelDialogOpen) {
 			form.reset({
 				timestamps: {
 					createdAt: database.type === ResourceInstances.MongoDB ? 'createdAt' : 'created_at',
@@ -77,10 +72,10 @@ export default function CreateModel({
 				},
 			});
 		}
-	}, [open]);
+	}, [isCreateModelDialogOpen]);
 
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={isCreateModelDialogOpen} onOpenChange={onClose}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>{t('database.models.create')}</DrawerTitle>

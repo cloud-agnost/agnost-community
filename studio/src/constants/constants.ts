@@ -121,7 +121,7 @@ import { ElementType } from 'react';
 export const BASE_URL = `${window.location.protocol}//${window.location.hostname}`;
 export const BASE_URL_WITH_API = `${BASE_URL}/api`;
 export const PAGE_SIZE = 10;
-export const MODULE_PAGE_SIZE = 25;
+export const MODULE_PAGE_SIZE = 250;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
@@ -177,17 +177,17 @@ export const MENU_ITEMS = [
 export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 	{
 		title: translate('profileSettings.general_title'),
-		href: '/organization/:orgId/profile',
+		href: '/profile',
 		icon: GearSix,
 	},
 	{
 		title: translate('profileSettings.notifications_title'),
-		href: '/organization/:orgId/profile/notifications',
+		href: '/profile/notifications',
 		icon: Bell,
 	},
 	{
 		title: translate('profileSettings.clusters_title'),
-		href: '/organization/:orgId/profile/cluster-management',
+		href: '/profile/cluster-management',
 		icon: LineSegments,
 	},
 ];

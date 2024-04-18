@@ -1,9 +1,9 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
 import { TableHeader } from '@/features/database/models/Navigator';
 import { useNavigatorColumns, useToast, useUpdateData } from '@/hooks';
+import useSaveColumnState from '@/hooks/useSaveColumnState';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
@@ -20,16 +20,10 @@ import {
 import { queryBuilder } from '@/utils';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-	CellEditRequestEvent,
-	ColumnState,
-	FirstDataRenderedEvent,
-	GridReadyEvent,
-	ColumnResizedEvent,
-} from 'ag-grid-community';
+import { CellEditRequestEvent, GridReadyEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from './Pagination';
@@ -37,9 +31,9 @@ import { Pagination } from './Pagination';
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
-	const { saveColumnState, getColumnState, columnFilters, clearAllColumnFilters } = useUtilsStore();
+	const { columnFilters, clearAllColumnFilters } = useUtilsStore();
 	const {
 		getDataFromModel,
 		deleteMultipleDataFromModel,
@@ -53,9 +47,9 @@ export default function Navigator() {
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const columns = useNavigatorColumns();
-
 	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
 	const gridRef = useRef<AgGridReact<any>>(null);
+	const { handleColumnStateChange, onFirstDataRendered } = useSaveColumnState(modelId);
 
 	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
 	const modelColumnFilter = useMemo(
@@ -89,6 +83,12 @@ export default function Navigator() {
 		gridRef.current!.api.exportDataAsCsv();
 	}
 
+	function handleClearAllFilters() {
+		searchParams.set('filtered', 'false');
+		setSearchParams(searchParams);
+		clearAllColumnFilters();
+	}
+
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
 			name: database.name,
@@ -111,15 +111,15 @@ export default function Navigator() {
 			searchParams.get('d'),
 			searchParams.get('page'),
 			searchParams.get('size'),
+			searchParams.get('filtered'),
 			database.type,
-			modelColumnFilter,
 		],
 		queryFn: () =>
 			getDataFromModel({
 				sortBy: searchParams.get('f') as string,
 				sortDir: searchParams.get('d') as string,
 				page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
-				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
+				size: searchParams.get('size') ? Number(searchParams.get('size')) : 25,
 				dbType: database.type,
 				filter: queryBuilder(modelColumnFilter as ColumnFilters),
 			}),
@@ -190,36 +190,10 @@ export default function Navigator() {
 		}
 	}, [data, gridRef.current, isFetching]);
 
-	function onFirstDataRendered(event: FirstDataRenderedEvent) {
-		const columnState = getColumnState(modelId);
-		if (columnState) {
-			event.api.applyColumnState({
-				state: columnState,
-				applyOrder: true,
-			});
-		}
-		event.api.hideOverlay();
-	}
-
 	function onGridReady(event: GridReadyEvent) {
 		event.api.showLoadingOverlay();
 		if (model.fields.length <= 5) event.api.sizeColumnsToFit();
 	}
-
-	const saveColumnStateDebounced = useCallback(
-		_.debounce((columnState: ColumnState[]) => {
-			saveColumnState(modelId, columnState);
-		}, 1000),
-		[modelId, saveColumnState],
-	);
-
-	const handleColumnStateChange = useCallback(
-		(params: ColumnResizedEvent) => {
-			const columnState = params.api.getColumnState();
-			saveColumnStateDebounced(columnState);
-		},
-		[saveColumnStateDebounced],
-	);
 
 	return (
 		<VersionTabLayout
@@ -238,7 +212,7 @@ export default function Navigator() {
 						Export as CSV
 					</Button>
 					{!_.isEmpty(modelColumnFilter) && (
-						<Button variant='outline' onClick={clearAllColumnFilters} disabled={!canMultiDelete}>
+						<Button variant='outline' onClick={handleClearAllFilters} disabled={!canMultiDelete}>
 							Clear Filters
 						</Button>
 					)}
@@ -260,6 +234,7 @@ export default function Navigator() {
 					rowData={!_.isEmpty(subModel) ? subModelData : data}
 					columnDefs={columns}
 					rowSelection='multiple'
+					stopEditingWhenCellsLoseFocus
 					components={{
 						agColumnHeader: TableHeader,
 					}}
@@ -275,6 +250,7 @@ export default function Navigator() {
 					onRowSelected={() =>
 						setSelectedRowCount(gridRef.current?.api.getSelectedNodes().length ?? 0)
 					}
+					suppressMovableColumns
 					onFirstDataRendered={onFirstDataRendered}
 					onColumnResized={handleColumnStateChange}
 					onColumnValueChanged={handleColumnStateChange}

@@ -28,17 +28,18 @@ export default function BooleanFilter({ type, columnName }: FilterProps) {
 
 	return (
 		<>
-			<Select onValueChange={onFilterChange}>
+			<Select
+				defaultValue={filter?.conditions[0]?.filter?.toString()}
+				onValueChange={onFilterChange}
+			>
 				<SelectTrigger className='w-full text-xs'>
-					<SelectValue placeholder='Choose One'>
-						{BOOLEAN_FILTERS.find((f) => f.value === filter?.conditions[0]?.type)?.label}
-					</SelectValue>
+					<SelectValue placeholder='Choose One' />
 				</SelectTrigger>
 
 				<SelectContent>
 					{BOOLEAN_FILTERS?.map((filter) => (
-						<SelectItem key={filter.value} value={filter.value}>
-							<p className='text-xs'>{filter.label}</p>
+						<SelectItem key={filter.value} value={filter.value} className='text-xs'>
+							{filter.label}
 						</SelectItem>
 					))}
 				</SelectContent>

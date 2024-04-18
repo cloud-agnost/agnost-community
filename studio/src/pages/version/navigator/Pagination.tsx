@@ -52,8 +52,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 	}
 
 	function calculateIndex() {
-		const { currentPage, pageSize, totalCount } = countInfo;
-		if (totalCount === 0) {
+		if (countInfo?.totalCount === 0) {
 			return {
 				pageIndex: 0,
 				dataCount: 0,
@@ -61,9 +60,10 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 			};
 		} else
 			return {
-				pageIndex: currentPage === 1 ? 1 : pageSize * (currentPage - 1) + 1,
+				pageIndex:
+					countInfo?.currentPage === 1 ? 1 : countInfo?.pageSize * (countInfo?.currentPage - 1) + 1,
 				dataCount: countInfo?.pageSize * (countInfo?.currentPage - 1) + countInfo?.count,
-				currentPage: currentPage,
+				currentPage: countInfo?.currentPage,
 			};
 	}
 	return (
@@ -96,7 +96,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='hidden h-8 w-8 p-0 lg:flex'
 					onClick={goToFirstPage}
-					disabled={paginationInfo?.currentPage === 1}
+					disabled={!paginationInfo?.currentPage}
 				>
 					<span className='sr-only'>Go to first page</span>
 					<CaretDoubleLeft className='h-4 w-4' />
@@ -107,7 +107,7 @@ export function Pagination({ countInfo }: { countInfo: BucketCountInfo }) {
 					rounded
 					className='h-8 w-8 p-0'
 					onClick={goToPreviousPage}
-					disabled={paginationInfo?.currentPage === 1}
+					disabled={!paginationInfo?.currentPage}
 				>
 					<span className='sr-only'>Go to previous page</span>
 					<CaretLeft className='h-4 w-4' />

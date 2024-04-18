@@ -24,6 +24,7 @@ export default function EndpointParams() {
 		control,
 		name: 'params.queryParams',
 	});
+
 	return (
 		<TestEndpointTable>
 			{queryParamsFields.map((f, index) => (

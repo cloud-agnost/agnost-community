@@ -37,6 +37,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
+		enableSorting: true,
 		// cell: ({ row: { original } }) => {
 		// 	const { name, _id } = original;
 		// 	return (
@@ -54,7 +55,8 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	},
 	{
 		id: 'instance',
-		header: translate('general.instance'),
+		header: () => <SortButton text={translate('general.instance')} field='instance' />,
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { iid },
@@ -65,6 +67,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	},
 	{
 		id: 'assignUniqueName',
+		enableSorting: true,
 		header: () => (
 			<SortButton text={translate('cache.assignUniqueName')} field='assignUniqueName' />
 		),
@@ -86,6 +89,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	},
 	{
 		id: 'created_at',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -111,6 +115,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 
 	{
 		id: 'updatedAt',
+		enableSorting: true,
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'

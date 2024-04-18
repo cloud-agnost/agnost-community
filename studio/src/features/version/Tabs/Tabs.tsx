@@ -1,25 +1,44 @@
 import { Button } from '@/components/Button';
 import { InfoModal } from '@/components/InfoModal';
-import { TabItem } from '@/features/version/Tabs/index.ts';
 import { useStores, useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab, TabTypes } from '@/types';
-import { formatCode, generateId, isWithinParentBounds, reorder } from '@/utils';
-import { NEW_TAB_ITEMS } from 'constants/constants.ts';
-import { useEffect, useRef, useState } from 'react';
+import { formatCode, generateId, isWithinParentBounds } from '@/utils';
+import type { Active, DropAnimation } from '@dnd-kit/core';
 import {
-	DragDropContext,
-	Draggable,
-	DraggableProvided,
-	DropResult,
-	Droppable,
-	DroppableProvided,
-} from 'react-beautiful-dnd';
+	DndContext,
+	DragOverlay,
+	KeyboardSensor,
+	PointerSensor,
+	defaultDropAnimationSideEffects,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
+import {
+	SortableContext,
+	arrayMove,
+	horizontalListSortingStrategy,
+	sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
+import { NEW_TAB_ITEMS } from 'constants/constants.ts';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
 import TabControls from './TabControls';
+import TabItem from './TabItem';
 import './tabs.scss';
+
+const dropAnimationConfig: DropAnimation = {
+	sideEffects: defaultDropAnimationSideEffects({
+		styles: {
+			active: {
+				opacity: '0.4',
+			},
+		},
+	}),
+};
 
 export default function Tabs() {
 	const scrollContainer = useRef<HTMLDivElement>(null);
@@ -48,9 +67,20 @@ export default function Tabs() {
 		orgId: string;
 		appId: string;
 	};
-
+	const [active, setActive] = useState<Active | null>(null);
 	const tabs = getTabsByVersionId(versionId);
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: {
+				distance: 8,
+			},
+		}),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+	);
 
+	const activeItem = useMemo(() => tabs.find((item) => item.id === active?.id), [active, tabs]);
 	useEffect(() => {
 		if (!scrollContainer.current) return;
 		setTimeout(() => {
@@ -121,12 +151,20 @@ export default function Tabs() {
 		return `/organization/${orgId}/apps/${appId}/version/${versionId}`;
 	}
 
-	function onDragEnd(result: DropResult) {
-		if (!result.destination) return;
-		const tabs = getTabsByVersionId(versionId);
-		const newTabs = reorder(tabs, result.source.index, result.destination.index);
-		setTabs(versionId, newTabs);
-	}
+	// function onDragEnd(result: DropResult) {
+	// 	const { destination, source, draggableId } = result;
+	// 	if (!destination) {
+	// 		return;
+	// 	}
+	// 	if (destination.index === source.index) {
+	// 		return;
+	// 	}
+
+	// 	const newTabs = Array.from(tabs);
+	// 	const [removed] = newTabs.splice(source.index, 1);
+	// 	newTabs.splice(destination.index, 0, removed);
+	// 	setTabs(versionId, newTabs);
+	// }
 
 	async function handleSaveLogic(tab: Tab) {
 		setLoading(true);
@@ -163,54 +201,65 @@ export default function Tabs() {
 		dirtyTabs.forEach((tab) => {
 			handleResetEditorState(tab);
 		});
-		removeMultipleTabs(versionId as string, toDeleteTabs);
+		removeMultipleTabs(versionId, toDeleteTabs);
 		closeMultipleDeleteTabModal();
 	}
 
 	async function closeAndSaveMultipleTab() {
 		const dirtyTabs = toDeleteTabs.filter((tab) => tab.isDirty);
 		await Promise.all(dirtyTabs.map(async (tab) => handleSaveLogic(tab)));
-		removeMultipleTabs(versionId as string, toDeleteTabs);
+		removeMultipleTabs(versionId, toDeleteTabs);
 		closeMultipleDeleteTabModal();
 	}
 
 	function closeTab() {
 		handleResetEditorState(toDeleteTab);
-		removeTab(versionId as string, toDeleteTab.id);
+		removeTab(versionId, toDeleteTab.id);
 		closeDeleteTabModal();
 	}
 
 	async function closeAndSaveTab() {
 		await handleSaveLogic(toDeleteTab);
-		removeTab(versionId as string, toDeleteTab.id);
+		removeTab(versionId, toDeleteTab.id);
 		closeDeleteTabModal();
 	}
+
 	return (
 		<div className='navigation-tab-container'>
 			<div className='max-w-full overflow-auto'>
-				<DragDropContext onDragEnd={onDragEnd}>
-					<Droppable droppableId='TAB' direction='horizontal'>
-						{(dropProvided: DroppableProvided) => (
-							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='h-full'>
-								<div ref={scrollContainer} className='tab'>
-									{tabs.map((tab: Tab, index: number) => (
-										<Draggable
-											key={tab.id}
-											draggableId={tab.id}
-											index={index}
-											isDragDisabled={tab.isDashboard}
-										>
-											{(dragProvided: DraggableProvided) => (
-												<TabItem tab={tab} provided={dragProvided} key={tab.id} />
-											)}
-										</Draggable>
-									))}
-									{dropProvided.placeholder}
-								</div>
+				<DndContext
+					sensors={sensors}
+					onDragStart={({ active }) => {
+						setActive(active);
+					}}
+					onDragEnd={({ active, over }) => {
+						if (over && active.id !== over?.id) {
+							const activeIndex = tabs.findIndex(({ id }) => id === active.id);
+							const overIndex = tabs.findIndex(({ id }) => id === over.id);
+							if (activeIndex === -1 || overIndex === -1) return;
+							if (overIndex === 0) return;
+							setTabs(versionId, arrayMove(tabs, activeIndex, overIndex));
+						}
+						setActive(null);
+					}}
+					onDragCancel={() => {
+						setActive(null);
+					}}
+					modifiers={[restrictToHorizontalAxis]}
+				>
+					<SortableContext items={tabs} strategy={horizontalListSortingStrategy}>
+						<div className='h-full' role='application'>
+							<div ref={scrollContainer} className='tab'>
+								{tabs.map((tab: Tab) => (
+									<TabItem tab={tab} key={tab.id} />
+								))}
 							</div>
-						)}
-					</Droppable>
-				</DragDropContext>
+						</div>
+					</SortableContext>
+					<DragOverlay dropAnimation={dropAnimationConfig}>
+						<div className='tab'>{activeItem ? <TabItem tab={activeItem} /> : null}</div>
+					</DragOverlay>
+				</DndContext>
 			</div>
 			<TabControls scrollContainer={scrollContainer} />
 			<InfoModal

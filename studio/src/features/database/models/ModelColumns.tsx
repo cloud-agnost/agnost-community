@@ -11,7 +11,7 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const { openEditModelDialog, deleteModel } = useModelStore.getState();
+const { openEditModelModal, deleteModel } = useModelStore.getState();
 const queryClient = new QueryClient();
 async function deleteHandler(model: Model) {
 	return queryClient
@@ -127,7 +127,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			const canDeleteModel = getVersionPermission('model.delete');
 			return (
 				<div className='flex items-center justify-end'>
-					<ActionsCell original={original} onEdit={openEditModelDialog} canEdit={canEditModel}>
+					<ActionsCell original={original} onEdit={openEditModelModal} canEdit={canEditModel}>
 						<TableConfirmation
 							align='end'
 							title={translate('database.models.delete.title')}

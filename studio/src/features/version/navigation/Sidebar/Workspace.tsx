@@ -3,16 +3,19 @@ import { InfoModal } from '@/components/InfoModal';
 import { NEW_TAB_ITEMS } from '@/constants';
 import { useStores, useTabNavigate, useToast } from '@/hooks';
 import useCacheStore from '@/store/cache/cacheStore';
+import useDatabaseStore from '@/store/database/databaseStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import {
+	Bucket,
 	Cache,
 	Database,
 	Endpoint,
 	HelperFunction,
 	MessageQueue,
 	Middleware,
+	Model,
 	Storage,
 	Tab,
 	TabTypes,
@@ -26,9 +29,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
+import NestedWorkspaceItem from './NestedWorkspaceItem';
 import SideBarButton from './SideBarButton';
 
-type WorkspaceDataType =
+export type WorkspaceDataType =
 	| Endpoint
 	| HelperFunction
 	| Middleware
@@ -36,10 +40,13 @@ type WorkspaceDataType =
 	| Database
 	| MessageQueue
 	| Task
-	| Cache;
+	| Cache
+	| Model
+	| Bucket;
 
 export default function Workspace() {
 	const navigate = useTabNavigate();
+	const { database } = useDatabaseStore();
 	const { sidebar, toggleWorkspaceTab } = useUtilsStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	const { getCurrentTab } = useTabStore();
@@ -90,9 +97,10 @@ export default function Workspace() {
 		const fn = getFunction(toDeleteData.type, `delete${toDeleteData?.type}`);
 		return fn({
 			[`${toDeleteData?.type.toLowerCase()}Id`]: toDeleteData?.data._id,
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			...(toDeleteData.type === TabTypes.Model && { dbId: database._id }),
 		});
 	}
 
@@ -117,12 +125,14 @@ export default function Workspace() {
 
 		if (toDeleteData.type === TabTypes.Middleware)
 			return t(`version.${toDeleteData.type.toLowerCase()}.delete.title`);
+		if (toDeleteData.type === TabTypes.Model) return t(`database.models.delete.title`);
 		return t(`${toDeleteData.type.toLowerCase()}.delete.title`);
 	}
 	function getDeleteMessage() {
 		if (!toDeleteData) return '';
 		if (toDeleteData.type === TabTypes.Middleware)
 			return t(`version.${toDeleteData.type.toLowerCase()}.delete.message`);
+		if (toDeleteData.type === TabTypes.Model) return t(`database.models.delete.description`);
 		return t(`${toDeleteData.type.toLowerCase()}.delete.message`);
 	}
 
@@ -131,6 +141,7 @@ export default function Workspace() {
 			sidebar[versionId]?.openedTabs?.forEach(async (item) => {
 				if (item === TabTypes.Settings) return;
 				const getItems = getFunction(item as TabTypes, `get${item}s`);
+				if (!getItems) return;
 				await getItems({
 					orgId,
 					appId,
@@ -153,51 +164,63 @@ export default function Workspace() {
 					key={item.type}
 					trigger={<WorkspaceTrigger item={item} />}
 				>
-					{data[item.type]?.map((data) => (
-						<SideBarButton
-							key={data._id}
-							id={data._id}
-							active={window.location.pathname.includes(data._id) && item.type === currentTab?.type}
-							onClick={() => handleDataClick(data, item.type)}
-							title={data.name}
-							type={item.type}
-							actions={
-								<div className='flex items-center justify-end'>
-									<Button
-										variant='icon'
-										size='sm'
-										rounded
-										className={cn(
-											window.location.pathname.includes(data._id) &&
-												item.type === currentTab?.type &&
-												'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-											'!p-0 !h-5 hidden group-hover:inline-flex',
-										)}
-										onClick={(e) => {
-											e.stopPropagation();
-											openEditDialog(data, item.type);
-										}}
-									>
-										<PencilSimple size={14} />
-									</Button>
+					{data[item.type]?.map((data: any) =>
+						item.type === TabTypes.Database ? (
+							<NestedWorkspaceItem
+								data={data}
+								key={data._id}
+								type={item.type === TabTypes.Database ? TabTypes.Model : TabTypes.Bucket}
+								setToDeleteData={setToDeleteData}
+								openDeleteModal={setOpenInfoModal}
+							/>
+						) : (
+							<SideBarButton
+								key={data._id}
+								id={data._id}
+								active={
+									window.location.pathname.includes(data._id) && item.type === currentTab?.type
+								}
+								onClick={() => handleDataClick(data, item.type)}
+								title={data.name}
+								type={item.type}
+								actions={
+									<div className='flex items-center justify-end'>
+										<Button
+											variant='icon'
+											size='sm'
+											rounded
+											className={cn(
+												window.location.pathname.includes(data._id) &&
+													item.type === currentTab?.type &&
+													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
+												'!p-0 !h-5 hidden group-hover:inline-flex',
+											)}
+											onClick={(e) => {
+												e.stopPropagation();
+												openEditDialog(data, item.type);
+											}}
+										>
+											<PencilSimple size={14} />
+										</Button>
 
-									<Button
-										rounded
-										className={cn(
-											window.location.pathname.includes(data._id) &&
-												'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-											'p-0 !h-5 hidden group-hover:inline-flex',
-										)}
-										variant='icon'
-										size='sm'
-										onClick={() => deleteHandler(data, item.type)}
-									>
-										<Trash size={14} />
-									</Button>
-								</div>
-							}
-						/>
-					))}
+										<Button
+											rounded
+											className={cn(
+												window.location.pathname.includes(data._id) &&
+													'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
+												'p-0 !h-5 hidden group-hover:inline-flex',
+											)}
+											variant='icon'
+											size='sm'
+											onClick={() => deleteHandler(data, item.type)}
+										>
+											<Trash size={14} />
+										</Button>
+									</div>
+								}
+							/>
+						),
+					)}
 				</ExplorerCollapsible>
 			))}
 			<InfoModal

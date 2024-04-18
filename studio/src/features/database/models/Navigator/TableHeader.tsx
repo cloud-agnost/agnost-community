@@ -37,11 +37,10 @@ export default function TableHeader({
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');
 		let newDirection = defaultDirection;
-		if (currentField === field) {
+		if (currentField === text) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
-
-		searchParams.set('f', field as string);
+		searchParams.set('f', text as string);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {
@@ -54,6 +53,7 @@ export default function TableHeader({
 	function handleClearFilter() {
 		clearColumnFilter(text);
 		searchParams.set('page', '1');
+		searchParams.set('filtered', 'false');
 		setSearchParams(searchParams);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}

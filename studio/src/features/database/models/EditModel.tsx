@@ -12,14 +12,9 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import ModelForm from './ModelForm';
 
-export default function EditModel({
-	open,
-	onOpenChange,
-}: {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}) {
+export default function EditModel() {
 	const { t } = useTranslation();
+	const { isEditModelDialogOpen, closeEditModelModal } = useModelStore();
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
 	});
@@ -36,7 +31,7 @@ export default function EditModel({
 		mutationKey: ['createModel'],
 		onSuccess: () => {
 			form.reset();
-			onOpenChange(false);
+			closeEditModelModal();
 			toast({
 				title: t('database.models.edit_success') as string,
 				action: 'success',
@@ -78,7 +73,7 @@ export default function EditModel({
 	}
 
 	useEffect(() => {
-		if (open && model) {
+		if (isEditModelDialogOpen && model) {
 			form.reset({
 				name: model.name,
 				description: model.description,
@@ -89,14 +84,14 @@ export default function EditModel({
 				},
 			});
 		}
-	}, [open, model]);
+	}, [isEditModelDialogOpen, model]);
 
 	useEffect(() => {
 		form.clearErrors('timestamps');
 	}, [form.getValues('timestamps.enabled')]);
 
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={isEditModelDialogOpen} onOpenChange={closeEditModelModal}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>{t('database.models.create')}</DrawerTitle>

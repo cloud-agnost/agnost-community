@@ -128,8 +128,7 @@ const FileColumns: ColDef<BucketFile>[] = [
 	},
 	{
 		field: 'path',
-		headerComponentParams: { text: translate('storage.file.path'), field: 'id' },
-		width: 300,
+		headerComponentParams: { text: translate('storage.file.path'), field: 'path' },
 		cellRenderer: ({ value, data }: ICellRendererParams) => {
 			const environment = useEnvironmentStore.getState().environment;
 			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${data.id}`;
@@ -162,7 +161,7 @@ const FileColumns: ColDef<BucketFile>[] = [
 		field: 'size',
 		headerComponentParams: {
 			text: translate('storage.file.size'),
-			field: 'isPublic',
+			field: 'size',
 		},
 		valueFormatter: ({ value }: ValueFormatterParams) => formatFileSize(value),
 	},
@@ -193,7 +192,7 @@ const FileColumns: ColDef<BucketFile>[] = [
 		field: 'uploadedAt',
 		headerComponentParams: {
 			text: translate('general.uploadedAt'),
-			field: 'createdAt',
+			field: 'uploadedAt',
 		},
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},

@@ -8,7 +8,7 @@ import {
 import { useColumnFilter } from '@/hooks';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ConditionsType, FilterProps } from '@/types';
-import { cn } from '@/utils';
+import { cn, generateId } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -45,9 +45,11 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 		} else {
 			setColumnFilters(columnName, filter);
 		}
-		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-		searchParams.set('page', '1');
+		const page = searchParams.get('page') ?? '1';
+		if (page === '1') searchParams.set('filtered', generateId());
+		else searchParams.set('page', '1');
 		setSearchParams(searchParams);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	useEffect(() => {

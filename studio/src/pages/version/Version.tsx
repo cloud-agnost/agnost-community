@@ -1,6 +1,7 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { CreateCache, EditCache } from '@/features/cache';
 import { CreateDatabase, EditDatabase } from '@/features/database';
+import { CreateModel, EditModel } from '@/features/database/models';
 import { CreateEndpoint, EditEndpointDrawer } from '@/features/endpoints';
 import { CreateFunction, EditFunction } from '@/features/function';
 import { CreateMessageQueue, EditMessageQueue } from '@/features/queue';
@@ -141,6 +142,8 @@ export default function Version() {
 			<CreateStorage />
 			<CreateMiddleware />
 			<EditCache />
+			<EditModel />
+			<CreateModel />
 			<EditTask />
 			<EditDatabase />
 			<EditEndpointDrawer />

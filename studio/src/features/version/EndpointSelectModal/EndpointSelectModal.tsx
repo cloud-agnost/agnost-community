@@ -1,12 +1,13 @@
 import { Button } from '@/components/Button';
 import { MethodBadge } from '@/components/Endpoint';
-import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS } from '@/constants';
+import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, MODULE_PAGE_SIZE } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Endpoint, HttpMethod, SortOption, TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
 import { CheckedState } from '@radix-ui/react-checkbox';
+import { useQuery } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from 'components/Drawer';
 import {
@@ -17,24 +18,14 @@ import {
 } from 'components/Dropdown';
 import { EmptyState } from 'components/EmptyState';
 import { SearchInput } from 'components/SearchInput';
-import { TableLoading } from 'components/Table/Table.tsx';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface EndpointSelectModalProps {
 	open: boolean;
 	onOpenChange?: (open: boolean) => void;
 	defaultSelected?: string[];
 	onSelect?: (selected: string[], lastSelected?: Endpoint) => void;
-}
-const LIMIT = 20;
-
-interface FetchEndpoints {
-	defaultPage?: number;
-	init?: boolean;
-	search?: string;
-	sort?: SortOption;
 }
 
 export default function EndpointSelectModal({
@@ -44,52 +35,34 @@ export default function EndpointSelectModal({
 	defaultSelected,
 }: EndpointSelectModalProps) {
 	const { getEndpoints } = useEndpointStore();
-	const [loading, setLoading] = useState(false);
-	const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-	const [page, setPage] = useState(0);
-	const [lastDataCount, setLastDataCount] = useState(endpoints.length);
 	const [selected, setSelected] = useState<string[]>(defaultSelected ?? []);
 	const [methods, setMethods] = useState<HttpMethod[]>([]);
 	const [sortOption, setSortOption] = useState<SortOption>(ENDPOINT_OPTIONS[0]);
 	const { version } = useVersionStore();
+	const endpoints = useEndpointStore((state) => state.endpoints);
+	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
-
-	useEffect(() => {
-		if (!open) return;
-		fetchEndpoints({ init: true });
-	}, [open]);
 
 	const filtered = useMemo(() => {
 		if (methods.length === 0) return endpoints;
 		return endpoints.filter((e) => methods.includes(e.method));
 	}, [methods, endpoints]);
 
-	async function fetchEndpoints({ defaultPage, search, init, sort }: FetchEndpoints) {
-		if (!version) return;
-		if (init) setLoading(true);
-		const endpoints = await getEndpoints({
-			orgId: version.orgId,
-			appId: version.appId,
-			versionId: version._id,
-			page: defaultPage ?? page,
-			search: search ?? undefined,
-			sortDir: (sort ?? sortOption).sortDir,
-			sortBy: (sort ?? sortOption).value,
-			size: LIMIT,
-		});
-		setLastDataCount(endpoints.length);
-		if (init) {
-			setEndpoints(endpoints);
-		} else setEndpoints((prev) => [...prev, ...endpoints]);
-		setLoading(false);
-	}
-
-	function next() {
-		setPage((page) => {
-			fetchEndpoints({ defaultPage: page + 1 });
-			return page + 1;
-		});
-	}
+	const { isPending } = useQuery({
+		queryKey: ['endpoints', search, sortOption.sortDir, sortOption.value, methods, version._id],
+		queryFn: () =>
+			getEndpoints({
+				orgId: version.orgId,
+				appId: version.appId,
+				versionId: version._id,
+				page: 0,
+				search,
+				sortDir: sortOption.sortDir,
+				sortBy: sortOption.value,
+				size: MODULE_PAGE_SIZE,
+			}),
+		enabled: open,
+	});
 
 	function addList(endpoint: Endpoint, checked: CheckedState) {
 		setSelected((prev) => {
@@ -100,7 +73,7 @@ export default function EndpointSelectModal({
 	}
 
 	function onSearch(value: string) {
-		fetchEndpoints({ init: true, search: value });
+		setSearch(value);
 	}
 
 	function onMethodSelect(method: HttpMethod) {
@@ -111,7 +84,6 @@ export default function EndpointSelectModal({
 
 	function onSortChanged(sort: SortOption) {
 		setSortOption(sort);
-		fetchEndpoints({ sort, init: true });
 	}
 
 	return (
@@ -170,40 +142,32 @@ export default function EndpointSelectModal({
 							filtered.length === 0 && 'flex items-center justify-center',
 						)}
 					>
-						{!loading && filtered.length === 0 ? (
+						{!isPending && filtered.length === 0 ? (
 							<EmptyState title='No endpoints found' type={TabTypes.Endpoint} />
 						) : (
-							<InfiniteScroll
-								scrollableTarget='endpoint-list-container'
-								next={next}
-								hasMore={lastDataCount >= LIMIT}
-								loader={<TableLoading />}
-								dataLength={filtered.length}
-							>
-								{filtered.map((endpoint, index) => {
-									const checked = selected.includes(endpoint.iid);
-									const id = `endpoint-${endpoint._id}`;
-									return (
-										<div
-											className={cn(
-												'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid items-center  grid-cols-[24px_1fr] gap-2',
-												checked && 'bg-wrapper-background-light',
-											)}
-											key={index}
-										>
-											<Checkbox
-												id={id}
-												checked={checked}
-												onCheckedChange={(checked) => addList(endpoint, checked)}
-											/>
-											<label htmlFor={id}>
-												<MethodBadge method={endpoint.method} />
-												<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
-											</label>
-										</div>
-									);
-								})}
-							</InfiniteScroll>
+							filtered.map((endpoint, index) => {
+								const checked = selected.includes(endpoint.iid);
+								const id = `endpoint-${endpoint._id}`;
+								return (
+									<div
+										className={cn(
+											'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid items-center  grid-cols-[24px_1fr] gap-2',
+											checked && 'bg-wrapper-background-light',
+										)}
+										key={index}
+									>
+										<Checkbox
+											id={id}
+											checked={checked}
+											onCheckedChange={(checked) => addList(endpoint, checked)}
+										/>
+										<label htmlFor={id}>
+											<MethodBadge method={endpoint.method} className='w-14' />
+											<span className='text-xs ml-2 text-default'>{endpoint.name}</span>
+										</label>
+									</div>
+								);
+							})
 						)}
 					</div>
 				</div>
