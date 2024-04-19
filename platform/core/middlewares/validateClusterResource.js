@@ -59,6 +59,8 @@ export const validateClusterResource = async (req, res, next) => {
 			},
 		};
 
+		req.resInfo = resInfo;
+
 		next();
 	} catch (err) {
 		return handleError(req, res, err);

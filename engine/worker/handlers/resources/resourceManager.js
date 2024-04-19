@@ -56,7 +56,7 @@ export class ResourceManager {
     }
 
     /**
-     * Returns true if the resouce is managed by the Agnost cluster, false otherwise
+     * Returns true if the resource is managed by the Agnost cluster, false otherwise
      */
     isManaged() {
         return this.resourceObj.managed;
@@ -139,7 +139,7 @@ export class ResourceManager {
     }
 
     /**
-     * Binds the resouce to an existing cluster asset (e.g., messageq queue, cron job scheduler)
+     * Binds the resource to an existing cluster asset (e.g., messageq queue, cron job scheduler)
      */
     async bindResource() {
         try {

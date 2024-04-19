@@ -350,7 +350,7 @@ router.put(
 	validate,
 	async (req, res) => {
 		try {
-			const { user, resource } = req;
+			const { user, resource, resInfo } = req;
 			if (!user.isClusterOwner) {
 				return res.status(401).json({
 					error: t("Not Authorized"),
@@ -393,7 +393,7 @@ router.put(
 				);
 			} catch (err) {}
 
-			res.json({ body: req.body, resouce: req.resource });
+			res.json({ ...resInfo, config: req.body.config });
 		} catch (error) {
 			console.log(error);
 			handleError(req, res, error);
@@ -836,6 +836,105 @@ router.put(
 			});
 
 			res.json(updatedCluster);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/cicd/enable
+@method     POST
+@desc       Enables the CI/CD pipeline for the cluster
+@access     public
+*/
+router.post("/cicd/enable", checkContentType, authSession, async (req, res) => {
+	try {
+		const { user } = req;
+		if (!user.isClusterOwner) {
+			return res.status(401).json({
+				error: t("Not Authorized"),
+				details: t(
+					"You are not authorized to manage CI/CD pipeline for the cluster. Only the cluster owner can enable/disabled cluster CI/CD pipeline infrastructure."
+				),
+				code: ERROR_CODES.unauthorized,
+			});
+		}
+
+		await axios.post(
+			helper.getWorkerUrl() + "/v1/cicd/enable",
+			{},
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		// Update cluster configuration
+		let updatedCluster = await clsCtrl.updateOneByQuery(
+			{
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			},
+			{ cicdEnabled: true }
+		);
+
+		res.json({
+			...updatedCluster,
+			smtp: helper.decryptSensitiveData(cluster.smtp),
+		});
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
+@route      /v1/cluster/cicd/disable
+@method     POST
+@desc       Disables the CI/CD pipeline for the cluster
+@access     public
+*/
+router.post(
+	"/cicd/disable",
+	checkContentType,
+	authSession,
+	async (req, res) => {
+		try {
+			const { user } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to manage CI/CD pipeline for the cluster. Only the cluster owner can enable/disabled cluster CI/CD pipeline infrastructure."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/disable",
+				{},
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			// Update cluster configuration
+			let updatedCluster = await clsCtrl.updateOneByQuery(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+				},
+				{ cicdEnabled: false }
+			);
+
+			res.json({
+				...updatedCluster,
+				smtp: helper.decryptSensitiveData(cluster.smtp),
+			});
 		} catch (error) {
 			handleError(req, res, error);
 		}

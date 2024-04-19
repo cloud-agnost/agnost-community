@@ -654,7 +654,7 @@ export const addInstanceTypes = {
 	queue: ["RabbitMQ", "Kafka"],
 };
 
-export const clusterResouceInstanceTypes = {
+export const clusterResourceInstanceTypes = {
 	database: ["MongoDB"],
 	cache: ["Redis"],
 	storage: ["Minio"],

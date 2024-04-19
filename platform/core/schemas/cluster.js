@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { body } from "express-validator";
 import {
 	clusterOtherResourceTypes,
-	clusterResouceInstanceTypes,
+	clusterResourceInstanceTypes,
 	clusterComponents,
 	clusterComponentsAll,
 	clusterComponentStatus,
@@ -116,6 +116,10 @@ export const ClusterModel = mongoose.model(
 			ips: {
 				type: [String],
 				index: true,
+			},
+			cicdEnabled: {
+				type: Boolean,
+				default: false,
 			},
 		},
 		{ timestamps: true }
@@ -241,7 +245,7 @@ export const applyRules = (type) => {
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
 					.custom((value, { req }) => {
-						let instanceList = clusterResouceInstanceTypes[req.body.type];
+						let instanceList = clusterResourceInstanceTypes[req.body.type];
 						if (!instanceList)
 							throw new AgnostError(
 								t(

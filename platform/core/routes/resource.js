@@ -505,7 +505,7 @@ router.put(
 				});
 			}
 
-			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
+			// If the resource is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
 				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
@@ -663,7 +663,7 @@ router.put(
 				});
 			}
 
-			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
+			// If the resource is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
 				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
@@ -786,7 +786,7 @@ router.post(
 				});
 			}
 
-			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
+			// If the resource is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
 				["Creating", "Updating", "Deleting", "Binding", "Restarting"].includes(
@@ -866,7 +866,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/resource/:resourceId
 @method     DELETE
-@desc       Delete organization resource. Organization resouces can only be deleted if they are not used by any version environment.
+@desc       Delete organization resource. Organization resources can only be deleted if they are not used by any version environment.
 @access     private
 */
 router.delete(

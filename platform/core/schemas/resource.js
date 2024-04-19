@@ -103,7 +103,7 @@ export const ResourceModel = mongoose.model(
 			config: {
 				type: mongoose.Schema.Types.Mixed,
 			},
-			// For each resouce we need to have the relevant connection information to acccess the resource
+			// For each resource we need to have the relevant connection information to acccess the resource
 			access: {
 				type: mongoose.Schema.Types.Mixed,
 			},

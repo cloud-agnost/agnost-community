@@ -102,6 +102,7 @@ async function initExpress(i18n) {
     app.use("/v1/env", (await import("./routes/environment.js")).default);
     app.use("/v1/resource", (await import("./routes/resource.js")).default);
     app.use("/v1/domain", (await import("./routes/domain.js")).default);
+    app.use("/v1/cicd", (await import("./routes/cicd.js")).default);
 
     // Middleware to handle undefined paths or posts
     app.use(handleUndefinedPaths);

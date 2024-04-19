@@ -47,7 +47,7 @@ export const ResourceLogModel = mongoose.model(
 			enum: resourceStatuses,
 			required: true,
 		},
-		// Resouce operation logs
+		// Resource operation logs
 		logs: [
 			{
 				startedAt: { type: Date },

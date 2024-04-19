@@ -210,7 +210,7 @@ router.put(
 			);
 
 			if (db.name !== name) {
-				// Update the resouce mapping name info in environments if there is any
+				// Update the resource mapping name info in environments if there is any
 				let env = await envCtrl.getOneByQuery(
 					{
 						orgId: org._id,
