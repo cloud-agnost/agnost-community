@@ -290,6 +290,41 @@ async function deleteManifest(localRegistryEnabled) {
   return "success";
 }
 
+/**
+ * @swagger
+ * /tektonInfra:
+ *   post:
+ *     summary: Deploy tekton pipeline infrastructure
+ *     description: Deploys tekton pipelines
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               localRegistryEnabled:
+ *                 type: boolean
+ *                 description: Enables deployment of zot-registry to the cluster.
+ *             required:
+ *               - localRegistryEnabled
+ *     responses:
+ *       200:
+ *         description: Deployed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   description: success message.
+ *       400:
+ *         description: Bad request. Invalid input data.
+ *       500:
+ *         description: Internal server error.
+ */
+
 router.post('/tektonInfra', async (req, res) => {
   const { localRegistryEnabled } = req.body;
 
@@ -302,6 +337,42 @@ router.post('/tektonInfra', async (req, res) => {
 });
 
 // Delete tekton operator
+
+/**
+ * @swagger
+ * /tektonInfra:
+ *   delete:
+ *     summary: Uninstall tekton pipeline infrastructure
+ *     description: uninstall tekton pipelines
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               localRegistryEnabled:
+ *                 type: boolean
+ *                 description: Enables uninstallation of zot-registry from the cluster.
+ *             required:
+ *               - localRegistryEnabled
+ *     responses:
+ *       200:
+ *         description: Uninstalled successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   description: success message.
+ *       400:
+ *         description: Bad request. Invalid input data.
+ *       500:
+ *         description: Internal server error.
+ */
+
 router.delete('/tektonInfra', async (req, res) => {
   const { localRegistryEnabled } = req.body;
   try {

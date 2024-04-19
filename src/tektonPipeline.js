@@ -314,10 +314,10 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
   switch(gitRepoType) {
     case('github'):
       const githubhookid = await createGithubWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken);
-      return { "githubHookId": githubhookid };
+      return { "webHookId": githubhookid };
     case('gitlab'):
       const gitlabhookid = await createGitlabWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, gitBranch);
-      return { "gitlabHookId": gitlabhookid} ;
+      return { "webHookId": gitlabhookid} ;
     default:
       console.log('Unknown repo type:', gitRepoType);
       return { "result": "success" };
@@ -394,6 +394,93 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
   return "success";
 }
 
+/**
+ * @swagger
+ * /tektonPipeline:
+ *   post:
+ *     summary: Creates build and deployment pipeline
+ *     description: Creates a build and deployment pipeline on tekton for a GitHub or GitLab repository
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gitRepoId:
+ *                 type: string
+ *                 description: Generated unique repo Id
+ *                 example: abcdef1234
+ *               gitRepoType:
+ *                 type: string
+ *                 description: github | gitlab
+ *                 example: github
+ *               gitRepoUrl:
+ *                 type: string
+ *                 description: Repo url
+ *                 example: https://github.com/koksay/monorepo
+ *               gitBranch:
+ *                 type: string
+ *                 description: Branch name to work on
+ *                 example: main
+ *               gitSubPath:
+ *                 type: string
+ *                 description: Sub path to the Dockerfile (by default /Dockerfile is used)
+ *                 example: app1
+ *               gitPat:
+ *                 type: string
+ *                 description: Personal access token from GitHub or GitLab
+ *               containerRegistryType:
+ *                 type: string
+ *                 description: local | docker | gcr | gar | quay | ghcr | acr | ecr | generic
+ *                 example: ghcr
+ *               containerRegistry:
+ *                 type: string
+ *                 description: Container registry URL (not needed for local type)
+ *                 example: ghcr.io/koksay
+ *               containerRegistryId:
+ *                 type: string
+ *                 description: Generated unique registry Id
+ *                 example: ab12cd34ef
+ *               containerImageName:
+ *                 type: string
+ *                 description: Name of the container image
+ *                 example: my-image-1
+ *               appKind:
+ *                 type: string
+ *                 description: Deployment | StatefulSet | CronJob | KnativeService
+ *                 example: Deployment
+ *               appName:
+ *                 type: string
+ *                 description: Name of the application kubernetes object
+ *                 example: my-app-deployment
+ *             required:
+ *               - gitRepoId
+ *               - gitRepoType
+ *               - gitRepoUrl
+ *               - gitBranch
+ *               - gitPat
+ *               - containerRegistryType
+ *               - containerImageName
+ *               - appKind
+ *               - appName
+ *     responses:
+ *       200:
+ *         description: Pipeline created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 webHookId:
+ *                   type: number
+ *                   description: WebhookId returned from GitHub or GitLab. It will be required for deletion
+ *                   example: 473456232
+ *       400:
+ *         description: Bad request. Invalid input data.
+ *       500:
+ *         description: Internal server error.
+ */
 
 router.post('/tektonPipeline', async (req, res) => {
   const { gitRepoId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName } = req.body;
@@ -405,6 +492,61 @@ router.post('/tektonPipeline', async (req, res) => {
     res.status(500).json(JSON.parse(err.message));
   }
 });
+
+/**
+ * @swagger
+ * /tektonPipeline:
+ *   delete:
+ *     summary: Deletes the tekton pipeline
+ *     description: Deletes build and deployment pipeline and the created webhook on GitHub or GitLab
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gitRepoId:
+ *                 type: string
+ *                 description: Generated unique repo Id
+ *                 example: abcdef1234
+ *               gitRepoType:
+ *                 type: string
+ *                 description: github | gitlab
+ *                 example: github
+ *               gitRepoUrl:
+ *                 type: string
+ *                 description: Repo url
+ *                 example: https://github.com/koksay/monorepo
+ *               gitPat:
+ *                 type: string
+ *                 description: Personal access token from GitHub or GitLab
+ *               hookId:
+ *                 type: string
+ *                 description: Webhook Id from GitHub or GitLab
+ *                 example: 473456232
+ *             required:
+ *               - gitRepoId
+ *               - gitRepoType
+ *               - gitRepoUrl
+ *               - gitPat
+ *               - hookId
+ *     responses:
+ *       200:
+ *         description: Pipeline deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   description: success message
+ *       400:
+ *         description: Bad request. Invalid input data.
+ *       500:
+ *         description: Internal server error.
+ */
 
 router.delete('/tektonPipeline', async (req, res) => {
   const { gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId} = req.body;

@@ -19,6 +19,8 @@ const tektonPipeline = require('./tektonPipeline');
 const listGitRepos = require('./listGitRepos');
 const listGitBranches = require('./listGitBranches');
 const { watchPipelineEvents } = require('./pipelineEvents');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swaggerDef');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -37,9 +39,10 @@ app.use('/', tektonInfra);
 app.use('/', tektonPipeline);
 app.use('/', listGitRepos);
 app.use('/', listGitBranches);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Call pipeline event watcher
-watchPipelineEvents();
+//watchPipelineEvents();
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));
