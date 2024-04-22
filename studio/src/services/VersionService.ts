@@ -34,6 +34,7 @@ import {
 	GetVersionNotificationParams,
 	GetVersionRequest,
 	Notification,
+	PushVersionParams,
 	ResLog,
 	Resource,
 	SaveEmailAuthParams,
@@ -565,6 +566,16 @@ export default class VersionService {
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/search-code`, {
 				params,
 			})
+		).data;
+	}
+	static async pushVersion(req: PushVersionParams): Promise<void> {
+		return (
+			await axios.post(
+				`${this.url}/${req.orgId}/app/${req.appId}/version/${req.versionId}/push/${req.targetVersionId}`,
+				{
+					redeploy: true,
+				},
+			)
 		).data;
 	}
 }
