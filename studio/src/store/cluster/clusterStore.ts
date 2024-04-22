@@ -12,6 +12,7 @@ import {
 	SetupCluster,
 	TransferRequest,
 	UpdateClusterComponentParams,
+	UpdateRemainingClusterComponentsParams,
 } from '@/types';
 import { BaseGetRequest, BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
 import { create } from 'zustand';
@@ -55,6 +56,9 @@ type Actions = {
 	enforceSSL: (data: EnforceSSLAccessParams) => Promise<Cluster>;
 	checkDomainStatus: () => Promise<void>;
 	getActiveUsers: (params: BaseGetRequest) => Promise<User[]>;
+	updateRemainingClusterComponents: (
+		data: UpdateRemainingClusterComponentsParams,
+	) => Promise<ClusterComponent>;
 	reset: () => void;
 };
 
@@ -145,6 +149,30 @@ const useClusterStore = create<ClusterStore & Actions>()(
 				if (data.onSuccess) data.onSuccess();
 			} catch (error) {
 				if (data.onError) data.onError(error as APIError);
+				throw error;
+			}
+		},
+		updateRemainingClusterComponents: async (data: UpdateRemainingClusterComponentsParams) => {
+			try {
+				const clusterComponent = await ClusterService.updateRemainingClusterComponents(data);
+				set((state) => ({
+					clusterComponents: state.clusterComponents.map((item) =>
+						item.name === data.componentName
+							? {
+									...item,
+									info: {
+										...item.info,
+										pvcSize: data.config.size,
+										version: data.config.version,
+										configuredReplicas: data.config.replicas,
+									},
+								}
+							: item,
+					),
+				}));
+				return clusterComponent;
+			} catch (error) {
+				set({ error: error as APIError });
 				throw error;
 			}
 		},

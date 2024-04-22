@@ -14,6 +14,7 @@ export type ClusterComponentsType =
 export type ClusterK8sType = 'Deployment' | 'StatefulSet';
 
 export interface ClusterComponent {
+	name: string;
 	hpaName: string;
 	deploymentName: string;
 	title: string;
@@ -28,7 +29,7 @@ export interface ClusterComponent {
 		runningReplicas: number;
 		minReplicas: number;
 		maxReplicas: number;
-		pvcSize: string;
+		pvcSize?: string;
 	};
 }
 
@@ -124,3 +125,14 @@ export type DomainParams = {
 export type EnforceSSLAccessParams = {
 	enforceSSLAccess: boolean;
 };
+
+export interface UpdateRemainingClusterComponentsParams {
+	componentName: string;
+	updateType: string;
+	config: {
+		size: string;
+		replicas: number;
+		version: string;
+		readReplica: boolean;
+	};
+}
