@@ -540,4 +540,5 @@ export interface SearchCodeResult {
 
 export interface PushVersionParams extends BaseParams {
 	targetVersionId: string;
+	redeploy: boolean;
 }

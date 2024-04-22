@@ -37,7 +37,7 @@ const Alert = React.forwardRef<
 		className={cn(alertVariants({ variant, size }), className)}
 		{...props}
 	>
-		<div className='alert-icon'>
+		<div className='alert-icon self-start'>
 			{variant === 'success' && <SuccessCheck />}
 			{variant === 'warning' && <Warning />}
 			{variant === 'error' && <Error />}
