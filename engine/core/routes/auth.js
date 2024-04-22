@@ -73,8 +73,6 @@ router.post(
 		const version = META.getVersion();
 		const { authentication } = version;
 		let createdUser = null;
-		const baseURLCalculated = getBaseURL(req);
-		console.log("*****here", baseURLCalculated);
 		try {
 			if (!authentication.email.enabled) {
 				return res
