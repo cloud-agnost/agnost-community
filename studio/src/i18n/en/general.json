@@ -144,6 +144,6 @@
 	"accessToken": "Access Token",
 	"session_token": "Session Token",
 	"confirm": "Confirm",
-	"warning": "Warning"
+	"warning": "Warning",
 	"restart": "Restart"
 }
