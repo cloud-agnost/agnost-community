@@ -6,6 +6,7 @@ import {
 	GetResourceRequest,
 	GetResourcesRequest,
 	Resource,
+	RestartManagedResourceRequest,
 	UpdateManagedResourceConfigurationRequest,
 	UpdateResourceAccessSettingsRequest,
 	UpdateResourceAllowedRolesRequest,
@@ -76,5 +77,9 @@ export default class ResourceService {
 				params,
 			})
 		).data;
+	}
+
+	static async restartManagedResource(req: RestartManagedResourceRequest): Promise<Resource> {
+		return (await axios.post(`${this.getUrl(req.orgId)}/${req.resourceId}/restart`, {})).data;
 	}
 }
