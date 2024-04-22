@@ -5,6 +5,7 @@ import { EditorSettings } from '@/features/auth/EditorSettings';
 import ReleaseHistory from '@/features/cluster/ReleaseHistory';
 import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
+import PushVersion from '@/features/version/PushVersion/PushVersion';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -98,6 +99,7 @@ export default function Root() {
 			<ApplicationVersions />
 			<EditApplication />
 			<CreateCopyVersionDrawer />
+			<PushVersion />
 			<AddResourceDrawer />
 			<AppInviteMember />
 			<ReleaseHistory />

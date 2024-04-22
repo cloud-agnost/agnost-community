@@ -537,3 +537,7 @@ export interface SearchCodeResult {
 		lineText: string;
 	}[];
 }
+
+export interface PushVersionParams extends BaseParams {
+	targetVersionId: string;
+}

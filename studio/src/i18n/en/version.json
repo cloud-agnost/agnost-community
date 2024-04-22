@@ -54,6 +54,7 @@
 	"view_logs": "View Deployment Logs",
 	"logs": "Deployment Logs",
 	"open_version": "Open Version",
+	"push_to_version": "Push to Version",
 	"create_a_copy": "Create a Copy",
 	"copied": "Version copied successfully",
 	"merge": "Merge",
@@ -382,5 +383,6 @@
 		"function": "Function",
 		"queue": "Message Queue",
 		"task": "Cron Job"
-	}
+	},
+	"pushed_successfully": "Version pushed successfully"
 }
