@@ -3,6 +3,8 @@ import crypto from "crypto";
 import * as minio from "minio";
 import bcrypt from "bcrypt";
 import k8s from "@kubernetes/client-node";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Kubernetes client configuration
 const kc = new k8s.KubeConfig();
@@ -16,6 +18,8 @@ const k8sAdmissionApi = kc.makeApiClient(k8s.AdmissionregistrationV1Api);
 const k8sAutoscalingApi = kc.makeApiClient(k8s.AutoscalingV2Api);
 
 const namespace = process.env.NAMESPACE;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class CICDManager {
     constructor() {}
@@ -30,11 +34,8 @@ export class CICDManager {
 }
 
 async function applyManifest(localRegistryEnabled) {
-    const manifestFilePath = "./manifests/tekton-infra.yaml";
-    const manifest = fs.readFileSync(manifestFilePath, "utf8");
+    const manifest = fs.readFileSync(`${__dirname}/manifests/tekton-infra.yaml`, "utf8");
     const resources = k8s.loadAllYaml(manifest);
-
-    return console.log(resources);
 
     for (const resource of resources) {
         try {
@@ -97,7 +98,7 @@ async function applyManifest(localRegistryEnabled) {
             }
             console.log(`${kind} ${resource.metadata.name} created...`);
         } catch (err) {
-            console.error("Error applying resource:", err);
+            console.error(`Error applying resource ${resource.kind} ${resource.metadata.name}:`, err);
             throw new AgnostError(err.body?.message);
         }
     }
@@ -110,20 +111,17 @@ async function applyManifest(localRegistryEnabled) {
 }
 
 async function deleteManifest(localRegistryEnabled) {
-    const manifestFilePath = "./manifests/tekton-infra.yaml";
-    const manifest = fs.readFileSync(manifestFilePath, "utf8");
+    const manifest = fs.readFileSync(`${__dirname}/manifests/tekton-infra.yaml`, "utf8");
     const resources = k8s.loadAllYaml(manifest);
 
-    return console.log(resources);
-
     for (const resource of resources.reverse()) {
+        const { kind, metadata } = resource;
+
+        if (metadata.namespace) {
+            var resourceNamespace = metadata.namespace;
+        }
+
         try {
-            const { kind, metadata } = resource;
-
-            if (metadata.namespace) {
-                var resourceNamespace = metadata.namespace;
-            }
-
             switch (kind) {
                 case "Namespace":
                     await k8sCoreApi.deleteNamespace(resource.metadata.name);
@@ -179,10 +177,7 @@ async function deleteManifest(localRegistryEnabled) {
                     console.log(`Skipping: ${kind}`);
             }
             console.log(`${kind} ${resource.metadata.name} deleted...`);
-        } catch (err) {
-            console.error("Error deleting resource:", err);
-            throw new AgnostError(err.body?.message);
-        }
+        } catch (err) {}
     }
 
     if (localRegistryEnabled) {
@@ -193,8 +188,7 @@ async function deleteManifest(localRegistryEnabled) {
 }
 
 async function deployLocalRegistry() {
-    const registryManifestPath = "./manifests/local-registry.yaml";
-    const manifest = fs.readFileSync(registryManifestPath, "utf8");
+    const manifest = fs.readFileSync(`${__dirname}/manifests/local-registry.yaml`, "utf8");
     const resources = k8s.loadAllYaml(manifest);
 
     for (const resource of resources) {
@@ -219,7 +213,7 @@ async function deployLocalRegistry() {
                     await k8sCoreApi.createNamespacedSecret(namespace, resource);
 
                     // this will create docker credentials for kaniko to push images
-                    auth = Buffer.from("admin:" + adminPassword);
+                    let auth = Buffer.from("admin:" + adminPassword);
                     const secretData = Buffer.from(
                         '{"auths":{"local-registry.default:5000":{"username":"admin","password":"' +
                             adminPassword +
@@ -244,7 +238,9 @@ async function deployLocalRegistry() {
             }
             console.log(`${kind} ${resource.metadata.name} created...`);
         } catch (err) {
+            console.error("Error applying resource:", resource);
             console.error("Error applying resource:", err);
+
             throw new AgnostError(err.body?.message);
         }
     }
@@ -258,20 +254,27 @@ async function removeLocalRegistry() {
     try {
         await k8sAppsApi.deleteNamespacedDeployment("local-registry", namespace);
         console.log("Deployment local-registry deleted...");
+    } catch (err) {}
+    try {
         await k8sCoreApi.deleteNamespacedService("local-registry", namespace);
         console.log("Service local-registry deleted...");
+    } catch (err) {}
+    try {
         await k8sCoreApi.deleteNamespacedSecret("local-registry-htpasswd", namespace);
         console.log("Secret local-registry-htpasswd deleted...");
+    } catch (err) {}
+    try {
         await k8sCoreApi.deleteNamespacedSecret("regcred-local-registry", namespace);
         console.log("Secret regcred-local-registry deleted...");
+    } catch (err) {}
+    try {
         await k8sCoreApi.deleteNamespacedConfigMap("local-registry-config", namespace);
         console.log("ConfigMap local-registry-config deleted...");
+    } catch (err) {}
+    try {
         await k8sCoreApi.deleteNamespacedServiceAccount("local-registry", namespace);
         console.log("ServiceAccount local-registry deleted...");
-    } catch (err) {
-        console.error("Error deleting resource:", err);
-        throw new AgnostError(err.body?.message);
-    }
+    } catch (err) {}
 
     await deleteS3Bucket();
 
@@ -315,7 +318,6 @@ async function deleteS3Bucket() {
         console.log("Bucket zot-storage is deleted from MinIO...");
     } catch (err) {
         console.error("Cannot delete the bucket:", err);
-        throw new AgnostError(err.body?.message ?? err.message);
     }
 }
 

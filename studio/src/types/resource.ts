@@ -647,3 +647,7 @@ export enum ResourceUpdateType {
 	Size = 'size',
 	Others = 'others',
 }
+export interface RestartManagedResourceRequest {
+	resourceId: string;
+	orgId: string;
+}

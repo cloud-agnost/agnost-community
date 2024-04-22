@@ -9,6 +9,7 @@ import {
 	Resource,
 	ResourceCreateType,
 	ResourceType,
+	RestartManagedResourceRequest,
 	UpdateManagedResourceConfigurationRequest,
 	UpdateResourceAccessSettingsRequest,
 	UpdateResourceAllowedRolesRequest,
@@ -55,6 +56,7 @@ type Actions = {
 	getOrgResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 	openSelectResourceTypeModal: (type: ResourceCreateType) => void;
 	closeSelectResourceTypeModal: () => void;
+	restartManagedResource: (req: RestartManagedResourceRequest) => Promise<Resource>;
 	reset: () => void;
 };
 const initialState: ResourceStore = {
@@ -273,6 +275,13 @@ const useResourceStore = create<ResourceStore & Actions>()(
 				selectedResourceCreateType: undefined,
 				isSelectResourceTypeModalOpen: false,
 			}),
+		restartManagedResource: async (req: RestartManagedResourceRequest) => {
+			const resource = await ResourceService.restartManagedResource(req);
+			set((state) => ({
+				resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+			}));
+			return resource;
+		},
 		reset: () => {
 			set(initialState);
 		},
