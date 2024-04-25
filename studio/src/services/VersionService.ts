@@ -573,7 +573,7 @@ export default class VersionService {
 			await axios.post(
 				`${this.url}/${req.orgId}/app/${req.appId}/version/${req.versionId}/push/${req.targetVersionId}`,
 				{
-					redeploy: true,
+					redeploy: req.redeploy,
 				},
 			)
 		).data;
