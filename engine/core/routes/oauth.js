@@ -21,8 +21,10 @@ import ERROR_CODES from "../config/errorCodes.js";
 const router = express.Router({ mergeParams: true });
 
 async function getBaseURL(req) {
-	if (req.query.base) return req.query.base;
-	else {
+	if (req.query.base) {
+		console.log("***1", req.query.base);
+		return req.query.base;
+	} else {
 		let origin = req.header("origin");
 		if (!origin) {
 			origin = req.header("x-forwarded-host");
@@ -30,9 +32,8 @@ async function getBaseURL(req) {
 				let culsterDomains = [];
 				//Make api call to the platform to get cluster domains
 				try {
-					let result = await axios.post(
+					let result = await axios.get(
 						helper.getPlatformUrl() + "/v1/cluster/domains",
-						entry,
 						{
 							headers: {
 								Authorization: process.env.MASTER_TOKEN,
@@ -43,32 +44,45 @@ async function getBaseURL(req) {
 					culsterDomains = result.data;
 				} catch (err) {}
 
+				console.log("***culsterDomains", culsterDomains);
 				// If this is a cluster domain then return the base URL with the environment id
 				if (culsterDomains.includes(origin)) {
 					let port = req.header("x-forwarded-port");
-					if (port === "80" || port === "443")
+					if (port === "80" || port === "443") {
+						console.log("***2", origin);
 						return `${req.header(
 							"x-forwarded-proto"
 						)}://${origin}/${META.getEnvId()}`;
-					else
+					} else {
+						console.log("***3", origin);
 						return `${req.header(
 							"x-forwarded-proto"
 						)}://${origin}:${port}/${META.getEnvId()}`;
+					}
 				} else {
 					let port = req.header("x-forwarded-port");
-					if (port === "80" || port === "443")
+					if (port === "80" || port === "443") {
+						console.log("***4", origin);
 						return `${req.header("x-forwarded-proto")}://${origin}`;
-					else return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+					} else {
+						console.log("***5", origin);
+						return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+					}
 				}
 			} else {
+				console.log("***6", req.hostname);
 				return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
 			}
-		} else return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
+		} else {
+			console.log("***7", req.hostname);
+			return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
+		}
 	}
 }
 
 const loginOauthProvider = async (req, res, next) => {
 	const baseURL = await getBaseURL(req);
+	console.log("***getBaseURL", baseURL);
 	let strategy = createStrategy(
 		req.provider,
 		`${baseURL}/agnost/oauth/${req.provider.name}/callback`,
