@@ -767,6 +767,26 @@ router.delete(
 );
 
 /*
+@route      /v1/cluster/domains
+@method     GET
+@desc       Returns the list of cluster domains
+@access     public
+*/
+router.get("/domains", authMasterToken, async (req, res) => {
+	try {
+		// Get the cluster object
+		const cluster = await clsCtrl.getOneByQuery({
+			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+		});
+
+		if (cluster?.domains) res.json(cluster?.domains);
+		else res.json([]);
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/cluster/domains/enforce-ssl
 @method     PUT
 @desc       Turns on or off enforce ssl access to the cluster

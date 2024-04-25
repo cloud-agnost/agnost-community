@@ -20,22 +20,46 @@ import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
-function getBaseURL(req) {
+async function getBaseURL(req) {
 	if (req.query.base) return req.query.base;
 	else {
 		let origin = req.header("origin");
 		if (!origin) {
 			origin = req.header("x-forwarded-host");
 			if (origin) {
-				let port = req.header("x-forwarded-port");
-				if (port === "80" || port === "443")
-					return `${req.header(
-						"x-forwarded-proto"
-					)}://${origin}/${META.getEnvId()}`;
-				else
-					return `${req.header(
-						"x-forwarded-proto"
-					)}://${origin}:${port}/${META.getEnvId()}`;
+				let culsterDomains = [];
+				//Make api call to the platform to get cluster domains
+				try {
+					let result = await axios.post(
+						helper.getPlatformUrl() + "/v1/cluster/domains",
+						entry,
+						{
+							headers: {
+								Authorization: process.env.MASTER_TOKEN,
+								"Content-Type": "application/json",
+							},
+						}
+					);
+					culsterDomains = result.data;
+				} catch (err) {}
+
+				// If this is a cluster domain then return the base URL with the environment id
+				if (culsterDomains.includes(origin)) {
+					let port = req.header("x-forwarded-port");
+					if (port === "80" || port === "443")
+						return `${req.header(
+							"x-forwarded-proto"
+						)}://${origin}/${META.getEnvId()}`;
+					else
+						return `${req.header(
+							"x-forwarded-proto"
+						)}://${origin}:${port}/${META.getEnvId()}`;
+				} else {
+					let port = req.header("x-forwarded-port");
+					if (port === "80" || port === "443")
+						return `${req.header("x-forwarded-proto")}://${origin}`;
+					else return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+				}
 			} else {
 				return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
 			}
@@ -44,10 +68,10 @@ function getBaseURL(req) {
 }
 
 const loginOauthProvider = async (req, res, next) => {
-	console.log("***getBaseURL", getBaseURL(req));
+	const baseURL = await getBaseURL(req);
 	let strategy = createStrategy(
 		req.provider,
-		`${getBaseURL(req)}/agnost/oauth/${req.provider.name}/callback`,
+		`${baseURL}/agnost/oauth/${req.provider.name}/callback`,
 		req
 	);
 
@@ -84,9 +108,6 @@ const loginOauthProvider = async (req, res, next) => {
 		// Custom error and success handling
 		function (err, user, info) {
 			if (err || !user) {
-				console.log("***err", err);
-				console.log("***user", user);
-				console.log("***info", info);
 				return processRedirect(
 					req,
 					res,
