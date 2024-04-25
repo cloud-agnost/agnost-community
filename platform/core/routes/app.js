@@ -70,8 +70,9 @@ router.post(
 			// Set app team member information
 			app.team[0].userId = {
 				...user,
-				loignProfiles: undefined,
+				loginProfiles: undefined,
 				notifications: undefined,
+				editorSettings: undefined,
 			};
 			res.json({
 				app,
@@ -132,7 +133,7 @@ router.get(
 					{
 						lookup: {
 							path: "team.userId",
-							select: "-loginProfiles -notifications",
+							select: "-loginProfiles -notifications -editorSettings",
 						},
 					}
 				);
@@ -146,7 +147,7 @@ router.get(
 					{
 						lookup: {
 							path: "team.userId",
-							select: "-loginProfiles -notifications",
+							select: "-loginProfiles -notifications -editorSettings",
 						},
 					}
 				);
@@ -180,7 +181,7 @@ router.get(
 				{
 					lookup: {
 						path: "team.userId",
-						select: "-loginProfiles -notifications",
+						select: "-loginProfiles -notifications -editorSettings",
 					},
 				}
 			);
@@ -223,7 +224,7 @@ router.put(
 			let appWithTeam = await appCtrl.getOneById(app._id, {
 				lookup: {
 					path: "team.userId",
-					select: "-loginProfiles -notifications",
+					select: "-loginProfiles -notifications -editorSettings",
 				},
 			});
 
@@ -309,7 +310,7 @@ router.put(
 			let appWithTeam = await appCtrl.getOneById(req.app._id, {
 				lookup: {
 					path: "team.userId",
-					select: "-loginProfiles -notifications",
+					select: "-loginProfiles -notifications -editorSettings",
 				},
 			});
 
@@ -334,7 +335,7 @@ router.put(
 /*
 @route      /v1/org/:orgId/app/:appId/picture
 @method     DELETE
-@desc       Removes the profile picture of the organization.
+@desc       Removes the profile picture of the app.
 @access     private
 */
 router.delete(
@@ -360,7 +361,7 @@ router.delete(
 			let appWithTeam = await appCtrl.getOneById(req.app._id, {
 				lookup: {
 					path: "team.userId",
-					select: "-loginProfiles -notifications",
+					select: "-loginProfiles -notifications -editorSettings",
 				},
 			});
 
@@ -401,7 +402,7 @@ router.get(
 			let appWithTeam = await appCtrl.getOneById(app._id, {
 				lookup: {
 					path: "team.userId",
-					select: "-loginProfiles -notifications",
+					select: "-loginProfiles -notifications -editorSettings",
 				},
 			});
 
@@ -536,7 +537,7 @@ router.post(
 			let appWithTeam = await appCtrl.getOneById(app._id, {
 				lookup: {
 					path: "team.userId",
-					select: "-loginProfiles -notifications",
+					select: "-loginProfiles -notifications -editorSettings",
 				},
 			});
 

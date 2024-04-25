@@ -508,6 +508,141 @@ function highlight(text, term, matchCase) {
 	return text.replace(regex, (matched) => `<mark>${matched}</mark>`);
 }
 
+async function isValidGitProviderAccessToken(accessToken, gitProvider) {
+	if (gitProvider === "github") {
+		try {
+			const result = await axios.get("https://api.github.com/user", {
+				headers: { Authorization: `token ${accessToken}` },
+			});
+
+			const email = await getGitHubUserEmail(accessToken);
+
+			return {
+				valid: true,
+				user: {
+					providerUserId: result.data.id.toString(),
+					username: result.data.login,
+					email: email,
+					avatar: result.data.avatar_url,
+				},
+			};
+		} catch (error) {
+			if (error.response && error.response.status === 401) {
+				return { valid: false, error: t("Invalid or expired token.") }; // Token is invalid
+			} else {
+				return { valid: false, error: error.message }; // Other errors
+			}
+		}
+	}
+	return { valid: false, error: t("Unsupported Git repository provider.") };
+}
+
+async function getGitHubUserEmail(accessToken) {
+	try {
+		let result = await axios.get("https://api.github.com/user/emails", {
+			headers: {
+				Accept: "application/vnd.github.v3+json",
+				"User-Agent": "OAuth App",
+				Authorization: `token ${accessToken}`,
+			},
+		});
+
+		if (result.data) {
+			for (let i = 0; i < result.data.length; i++) {
+				const emeilEntry = result.data[i];
+				if (emeilEntry && emeilEntry.primary && emeilEntry.email)
+					return emeilEntry.email;
+			}
+		}
+	} catch (err) {}
+
+	return null;
+}
+
+async function revokeGitProviderAccessToken(
+	provider,
+	accessToken,
+	refreshToken
+) {
+	try {
+		await axios.post(
+			`https://auth.agnost.dev/provider/${provider}/revoke`,
+			{ accessToken, refreshToken },
+			{
+				headers: {
+					Accept: "application/vnd.github.v3+json",
+					"User-Agent": "OAuth App",
+					Authorization: `token ${accessToken}`,
+				},
+			}
+		);
+	} catch (err) {}
+}
+
+async function getGitProviderRepos(gitProvider) {
+	if (gitProvider.provider === "github") {
+		try {
+			const result = await axios.get("https://api.github.com/user/repos", {
+				headers: { Authorization: `token ${gitProvider.accessToken}` },
+			});
+
+			return result.data.map((entry) => {
+				return {
+					repoId: entry.id,
+					owner: entry.owner.login,
+					repo: entry.name,
+					fullName: entry.full_name,
+					private: entry.private,
+				};
+			});
+		} catch (error) {
+			return [];
+		}
+	}
+}
+
+async function getGitProviderRepoBranches(
+	gitProvider,
+	owner,
+	repo,
+	maxPages = 100
+) {
+	if (gitProvider.provider === "github") {
+		try {
+			let url = `https://api.github.com/repos/${owner}/${repo}/branches?per_page=${maxPages}`;
+			const branches = [];
+			let pageCount = 0;
+
+			while (url && pageCount < maxPages) {
+				const response = await axios.get(url, {
+					headers: {
+						Authorization: `Bearer ${gitProvider.accessToken}`,
+						Accept: "application/vnd.github.v3+json",
+					},
+				});
+
+				response.data.forEach((branch) => {
+					branches.push({ name: branch.name, protected: branch.protected });
+				});
+
+				const linkHeader = response.headers.link;
+				if (linkHeader) {
+					const matches = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+					url = matches ? matches[1] : null;
+				} else {
+					url = null; // No more pages
+				}
+
+				pageCount++;
+			}
+
+			return branches;
+		} catch (error) {
+			return [];
+		}
+	}
+}
+
 export default {
 	constants,
 	isObject,
@@ -542,4 +677,9 @@ export default {
 	getWorkerUrl,
 	escapeStringRegexp,
 	highlight,
+	isValidGitProviderAccessToken,
+	getGitHubUserEmail,
+	revokeGitProviderAccessToken,
+	getGitProviderRepos,
+	getGitProviderRepoBranches,
 };

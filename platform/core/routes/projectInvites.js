@@ -1,14 +1,14 @@
 import express from "express";
 import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
-import appInvitationCtrl from "../controllers/appInvitation.js";
+import prjInvitationCtrl from "../controllers/projectInvitation.js";
 import clsCtrl from "../controllers/cluster.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
-import { validateApp } from "../middlewares/validateApp.js";
-import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
-import { applyRules as invitationApplyRules } from "../schemas/appInvitation.js";
+import { validateProject } from "../middlewares/validateProject.js";
+import { authorizeProjectAction } from "../middlewares/authorizeProjectAction.js";
+import { applyRules as invitationApplyRules } from "../schemas/projectInvitation.js";
 import { validate } from "../middlewares/validate.js";
 import { sendMessage } from "../init/queue.js";
 import { sendMessage as sendNotification } from "../init/sync.js";
@@ -18,9 +18,9 @@ import ERROR_CODES from "../config/errorCodes.js";
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite?uiBaseURL=http://...
+@route      /v1/org/:orgId/project/:projectId/invite?uiBaseURL=http://...
 @method     POST
-@desc       Invites user(s) to the app
+@desc       Invites user(s) to the project
 @access     private
 */
 router.post(
@@ -28,13 +28,13 @@ router.post(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.create"),
+	validateProject,
+	authorizeProjectAction("project.invite.create"),
 	invitationApplyRules("invite"),
 	validate,
 	async (req, res) => {
 		try {
-			const { user, org, app } = req;
+			const { user, org, project } = req;
 			const { uiBaseURL } = req.query;
 
 			// Get cluster configuration
@@ -58,7 +58,7 @@ router.post(
 			req.body.forEach((entry) => {
 				invitations.push({
 					orgId: org._id,
-					appId: app._id,
+					projectId: project._id,
 					email: entry.email,
 					token: helper.generateSlug("tkn", 36),
 					role: entry.role,
@@ -67,16 +67,16 @@ router.post(
 			});
 
 			// Create invitations
-			let result = await appInvitationCtrl.createMany(invitations);
+			let result = await prjInvitationCtrl.createMany(invitations);
 
 			// Send invitation emails
 			invitations.forEach((entry) => {
-				sendMessage("send-app-inivation", {
+				sendMessage("send-project-inivation", {
 					to: entry.email,
 					role: entry.role,
 					organization: org.name,
-					app: app.name,
-					url: `${uiBaseURL}/studio/redirect-handle?token=${entry.token}&type=app-invite`,
+					project: project.name,
+					url: `${uiBaseURL}/studio/redirect-handle?token=${entry.token}&type=project-invite`,
 				});
 			});
 
@@ -103,10 +103,10 @@ router.post(
 						contactEmail: user.contactEmail,
 					},
 					action: "invite",
-					object: "org.app.invite",
+					object: "org.project.invite",
 					description: t(
-						"Invited you to join app '%s' in organization '%s' with '%s' permissions",
-						app.name,
+						"Invited you to join project '%s' in organization '%s' with '%s' permissions",
+						project.name,
 						org.name,
 						invite.role
 					),
@@ -114,7 +114,7 @@ router.post(
 					data: {
 						token: invite.token,
 					},
-					identifiers: { orgId: org._id, appId: app._id },
+					identifiers: { orgId: org._id, projectId: project._id },
 				});
 			});
 
@@ -123,11 +123,15 @@ router.post(
 			// Log action
 			auditCtrl.log(
 				user,
-				"org.app.invite",
+				"org.project.invite",
 				"create",
-				t("Invited users to app '%s' in organization '%s'", app.name, org.name),
+				t(
+					"Invited users to project '%s' in organization '%s'",
+					project.name,
+					org.name
+				),
 				result,
-				{ orgId: org._id, appId: app._id }
+				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -136,9 +140,9 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite?token=tkn_...
+@route      /v1/org/:orgId/project/:projectId/invite?token=tkn_...
 @method     PUT
-@desc       Updates the app invitation role
+@desc       Updates the project invitation role
 @access     private
 */
 router.put(
@@ -146,21 +150,21 @@ router.put(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.update"),
+	validateProject,
+	authorizeProjectAction("project.invite.update"),
 	invitationApplyRules("update-invite"),
 	validate,
 	async (req, res) => {
 		try {
 			const { role } = req.body;
 			const { token } = req.query;
-			const { user, org, app } = req;
+			const { user, org, project } = req;
 
-			let invite = await appInvitationCtrl.getOneByQuery({ token });
+			let invite = await prjInvitationCtrl.getOneByQuery({ token });
 			if (!invite) {
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such app invitation exists."),
+					details: t("No such project invitation exists."),
 					code: ERROR_CODES.notFound,
 				});
 			}
@@ -176,7 +180,7 @@ router.put(
 			}
 
 			// All good, update the invitation
-			let updatedInvite = await appInvitationCtrl.updateOneByQuery(
+			let updatedInvite = await prjInvitationCtrl.updateOneByQuery(
 				{ token },
 				{ role }
 			);
@@ -197,10 +201,10 @@ router.put(
 						contactEmail: user.contactEmail,
 					},
 					action: "invite",
-					object: "org.app.invite",
+					object: "org.project.invite",
 					description: t(
-						"Invited you to join app '%s' in organization '%s' with '%s' permissions",
-						app.name,
+						"Invited you to join project '%s' in organization '%s' with '%s' permissions",
+						project.name,
 						org.name,
 						role
 					),
@@ -208,7 +212,7 @@ router.put(
 					data: {
 						token: invite.token,
 					},
-					identifiers: { orgId: org._id, appId: app._id },
+					identifiers: { orgId: org._id, projectId: project._id },
 				});
 			}
 
@@ -217,16 +221,16 @@ router.put(
 			// Log action
 			auditCtrl.log(
 				user,
-				"org.app.invite",
+				"org.project.invite",
 				"update",
 				t(
-					"Updated app invitation role of '%s' from '%s' to '%s'",
+					"Updated project invitation role of '%s' from '%s' to '%s'",
 					invite.email,
 					invite.role,
 					role
 				),
 				updatedInvite,
-				{ orgId: org._id, appId: app._id }
+				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -235,9 +239,9 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite/resend?token=tkn_...&uiBaseURL=http://...
+@route      /v1/org/:orgId/project/:projectId/invite/resend?token=tkn_...&uiBaseURL=http://...
 @method     POST
-@desc       Resends the app invitation to the user email
+@desc       Resends the project invitation to the user email
 @access     private
 */
 router.post(
@@ -245,14 +249,14 @@ router.post(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.resend"),
+	validateProject,
+	authorizeProjectAction("project.invite.resend"),
 	invitationApplyRules("resend-invite"),
 	validate,
 	async (req, res) => {
 		try {
 			const { token, uiBaseURL } = req.query;
-			const { user, org, app } = req;
+			const { user, org, project } = req;
 
 			// Get cluster configuration
 			let cluster = await clsCtrl.getOneByQuery({
@@ -270,11 +274,11 @@ router.post(
 				});
 			}
 
-			let invite = await appInvitationCtrl.getOneByQuery({ token });
+			let invite = await prjInvitationCtrl.getOneByQuery({ token });
 			if (!invite) {
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such app invitation exists."),
+					details: t("No such project invitation exists."),
 					code: ERROR_CODES.notFound,
 				});
 			}
@@ -288,12 +292,12 @@ router.post(
 			}
 
 			// Send invitation email
-			sendMessage("send-app-inivation", {
+			sendMessage("send-project-inivation", {
 				to: invite.email,
 				role: invite.role,
 				organization: org.name,
-				app: app.name,
-				url: `${uiBaseURL}/studio/redirect-handle?token=${invite.token}&type=app-invite`,
+				project: project.name,
+				url: `${uiBaseURL}/studio/redirect-handle?token=${invite.token}&type=project-invite`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications
@@ -313,10 +317,10 @@ router.post(
 						contactEmail: user.contactEmail,
 					},
 					action: "invite",
-					object: "org.app.invite",
+					object: "org.project.invite",
 					description: t(
-						"Invited you to join app '%s' in organization '%s' with '%s' permissions",
-						app.name,
+						"Invited you to join project '%s' in organization '%s' with '%s' permissions",
+						project.name,
 						org.name,
 						invite.role
 					),
@@ -324,7 +328,7 @@ router.post(
 					data: {
 						token: invite.token,
 					},
-					identifiers: { orgId: org._id, appId: app._id },
+					identifiers: { orgId: org._id, projectId: project._id },
 				});
 			}
 			res.json(invite);
@@ -332,11 +336,11 @@ router.post(
 			// Log action
 			auditCtrl.log(
 				user,
-				"org.app.invite",
+				"org.project.invite",
 				"resend",
-				t("Resent app invitation to '%s'", invite.email),
+				t("Resent project invitation to '%s'", invite.email),
 				invite,
-				{ orgId: org._id, appId: app._id }
+				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -345,9 +349,9 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite?token=tkn_...
+@route      /v1/org/:orgId/project/:projectId/invite?token=tkn_...
 @method     DELETE
-@desc       Deletes the app invitation to the user
+@desc       Deletes the project invitation to the user
 @access     private
 */
 router.delete(
@@ -355,37 +359,37 @@ router.delete(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.delete"),
+	validateProject,
+	authorizeProjectAction("project.invite.delete"),
 	invitationApplyRules("delete-invite"),
 	validate,
 	async (req, res) => {
 		try {
 			const { token } = req.query;
-			const { user, org, app } = req;
+			const { user, org, project } = req;
 
-			let invite = await appInvitationCtrl.getOneByQuery({ token });
+			let invite = await prjInvitationCtrl.getOneByQuery({ token });
 			if (!invite) {
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such app invitation exists."),
+					details: t("No such project invitation exists."),
 					code: ERROR_CODES.notFound,
 				});
 			}
 
 			// Delete the organization invitation
-			await appInvitationCtrl.deleteOneById(invite._id);
+			await prjInvitationCtrl.deleteOneById(invite._id);
 
 			res.json();
 
 			// Log action
 			auditCtrl.log(
 				user,
-				"org.app.invite",
+				"org.project.invite",
 				"delete",
-				t("Deleted app invitation to '%s'", invite.email),
+				t("Deleted project invitation to '%s'", invite.email),
 				invite,
-				{ orgId: org._id, appId: app._id }
+				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -394,9 +398,9 @@ router.delete(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite/multi
+@route      /v1/org/:orgId/project/:projectId/invite/multi
 @method     DELETE
-@desc       Deletes multiple app invitations
+@desc       Deletes multiple project invitations
 @access     private
 */
 router.delete(
@@ -404,28 +408,28 @@ router.delete(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.delete"),
+	validateProject,
+	authorizeProjectAction("project.invite.delete"),
 	invitationApplyRules("delete-invite-multi"),
 	validate,
 	async (req, res) => {
 		try {
 			const { tokens } = req.body;
-			const { user, org, app } = req;
+			const { user, org, project } = req;
 
-			// Delete the app invitations
-			await appInvitationCtrl.deleteManyByQuery({ token: { $in: tokens } });
+			// Delete the project invitations
+			await prjInvitationCtrl.deleteManyByQuery({ token: { $in: tokens } });
 
 			res.json();
 
 			// Log action
 			auditCtrl.log(
 				user,
-				"org.app.invite",
+				"org.project.invite",
 				"delete",
-				t("Deleted multiple app invitations"),
+				t("Deleted multiple project invitations"),
 				{ tokens },
-				{ orgId: org._id, appId: app._id }
+				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -434,26 +438,26 @@ router.delete(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite?page=0&size=10&status=&email=&role=&start=&end&sortBy=email&sortDir=asc
+@route      /v1/org/:orgId/project/:projectId/invite?page=0&size=10&status=&email=&role=&start=&end&sortBy=email&sortDir=asc
 @method     GET
-@desc       Get app invitations
+@desc       Get project invitations
 @access     private
 */
 router.get(
 	"/",
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.invite.view"),
+	validateProject,
+	authorizeProjectAction("project.invite.view"),
 	invitationApplyRules("get-invites"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app } = req;
+			const { org, project } = req;
 			const { page, size, status, email, role, start, end, sortBy, sortDir } =
 				req.query;
 
-			let query = { orgId: org._id, appId: app._id };
+			let query = { orgId: org._id, projectId: project._id };
 			if (email && email !== "null")
 				query.email = {
 					$regex: helper.escapeStringRegexp(email),
@@ -479,7 +483,7 @@ router.get(
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
 
-			let invites = await appInvitationCtrl.getManyByQuery(query, {
+			let invites = await prjInvitationCtrl.getManyByQuery(query, {
 				sort,
 				skip: size * page,
 				limit: size,
@@ -493,30 +497,32 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite/list-eligible?page=0&size=10&email=&sortBy=email&sortDir=asc
+@route      /v1/org/:orgId/project/:projectId/invite/list-eligible?page=0&size=10&email=&sortBy=email&sortDir=asc
 @method     GET
-@desc       Get eligible cluster members to invite to the app
+@desc       Get eligible cluster members to invite to the project
 @access     private
 */
 router.get(
 	"/list-eligible",
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.view"),
+	validateProject,
+	authorizeProjectAction("project.team.view"),
 	invitationApplyRules("list-eligible"),
 	validate,
 	async (req, res) => {
 		try {
-			const { user, app } = req;
+			const { user, project } = req;
 			const { page, size, search, sortBy, sortDir } = req.query;
 
-			// We just need to get the cluster members that are not already a team member of the app
-			let appTeam = app.team.map((entry) => helper.objectId(entry.userId));
+			// We just need to get the project members that are not already a team member of the project
+			let projectTeam = project.team.map((entry) =>
+				helper.objectId(entry.userId)
+			);
 			// The current user is also not eligible for invitation
-			appTeam.push(helper.objectId(user._id));
+			projectTeam.push(helper.objectId(user._id));
 
-			let query = { _id: { $nin: appTeam }, status: "Active" };
+			let query = { _id: { $nin: projectTeam }, status: "Active" };
 			if (search && search !== "null") {
 				query.$or = [
 					{

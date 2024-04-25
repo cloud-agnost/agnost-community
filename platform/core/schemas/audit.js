@@ -25,6 +25,16 @@ export const AuditModel = mongoose.model(
 			ref: "app",
 			index: true,
 		},
+		projectId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "project",
+			index: true,
+		},
+		environmentId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "project_environment",
+			index: true,
+		},
 		versionId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "version",

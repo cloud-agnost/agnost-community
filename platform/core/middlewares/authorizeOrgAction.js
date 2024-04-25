@@ -27,6 +27,12 @@ export const orgAuthorization = {
 				create: true,
 				update: true,
 			},
+			project: {
+				view: true,
+				viewAll: true,
+				create: true,
+				update: true,
+			},
 			resource: {
 				view: true,
 				add: true,
@@ -55,6 +61,12 @@ export const orgAuthorization = {
 				delete: false,
 			},
 			app: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
+			project: {
 				view: true,
 				viewAll: true,
 				create: false,
@@ -93,6 +105,12 @@ export const orgAuthorization = {
 				create: false,
 				update: false,
 			},
+			project: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
 			resource: {
 				view: true,
 				add: true,
@@ -121,6 +139,12 @@ export const orgAuthorization = {
 				delete: false,
 			},
 			app: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
+			project: {
 				view: true,
 				viewAll: true,
 				create: false,

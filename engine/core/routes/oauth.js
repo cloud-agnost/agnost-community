@@ -39,6 +39,7 @@ function getBaseURL(req) {
 }
 
 const loginOauthProvider = async (req, res, next) => {
+	console.log("***getBaseURL", getBaseURL(req));
 	let strategy = createStrategy(
 		req.provider,
 		`${getBaseURL(req)}/agnost/oauth/${req.provider.name}/callback`,
@@ -78,6 +79,9 @@ const loginOauthProvider = async (req, res, next) => {
 		// Custom error and success handling
 		function (err, user, info) {
 			if (err || !user) {
+				console.log("***err", err);
+				console.log("***user", user);
+				console.log("***info", info);
 				return processRedirect(
 					req,
 					res,

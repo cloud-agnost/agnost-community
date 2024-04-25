@@ -36,21 +36,6 @@ import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
-function getBaseURL(req) {
-	let origin = req.header("origin");
-	if (!origin) {
-		origin = req.header("x-forwarded-host");
-		if (origin) {
-			let port = req.header("x-forwarded-port");
-			if (port === "80" || port === "443")
-				return `${req.header("x-forwarded-proto")}://${origin}`;
-			else return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
-		} else {
-			return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
-		}
-	} else return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
-}
-
 /*
 @route      /auth/signup-email
 @method     POST

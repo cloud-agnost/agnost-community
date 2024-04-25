@@ -2,6 +2,8 @@
 // later on we can support , "github", "bitbucket", "gitlab" etc.
 export const providerTypes = ["agnost"];
 
+export const appTypes = ["nodejs", "project"];
+
 // Notification types
 export const notificationTypes = [
 	"org",
@@ -50,10 +52,25 @@ export const appRoleDesc = {
 		"Full control over the app, its design elements and team members. Can manage all app versions even the ones marked as private and even edit the ones marked as read-only."
 	),
 	Developer: t(
-		"Has read-write access over the design elements of his app version. Can view versions marked as public by other team membes but cannot manage app team."
+		"Has read-write access over the design elements of his app version. Can view versions marked as public by other team members but cannot manage app team."
 	),
 	Viewer: t("Read-only access to public app versions and app properties."),
 };
+
+// Project team member roles
+export const projectRoles = ["Admin", "Developer", "Viewer"];
+export const projectRoleDesc = {
+	Admin: t(
+		"Full control over the project, its environments, containers and team members. Can manage all project environments even the ones marked as private and even edit the ones marked as read-only."
+	),
+	Developer: t(
+		"Has read-write access over the containers of his project environment. Can view environments marked as public by other project members but cannot manage project team."
+	),
+	Viewer: t(
+		"Read-only access to public project environments and project properties."
+	),
+};
+
 // Invitation statuses
 export const invitationStatus = ["Pending", "Accepted", "Rejected"];
 

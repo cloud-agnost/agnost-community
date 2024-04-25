@@ -114,9 +114,14 @@ async function initExpress(i18n) {
 	app.use("/v1/types", (await import("./routes/types.js")).default);
 	app.use("/v1/auth", (await import("./routes/auth.js")).default);
 	app.use("/v1/user", (await import("./routes/user.js")).default);
+	app.use("/v1/user/git", (await import("./routes/git.js")).default);
 	app.use("/v1/log", (await import("./routes/log.js")).default);
 	app.use("/v1/org", (await import("./routes/organization.js")).default);
 	app.use("/v1/org/:orgId/app", (await import("./routes/app.js")).default);
+	app.use(
+		"/v1/org/:orgId/project",
+		(await import("./routes/project.js")).default
+	);
 	app.use(
 		"/v1/org/:orgId/resource",
 		(await import("./routes/resource.js")).default
@@ -126,8 +131,16 @@ async function initExpress(i18n) {
 		(await import("./routes/appInvites.js")).default
 	);
 	app.use(
+		"/v1/org/:orgId/project/:projectId/invite",
+		(await import("./routes/projectInvites.js")).default
+	);
+	app.use(
 		"/v1/org/:orgId/app/:appId/team",
 		(await import("./routes/appTeam.js")).default
+	);
+	app.use(
+		"/v1/org/:orgId/project/:projectId/team",
+		(await import("./routes/projectTeam.js")).default
 	);
 	app.use(
 		"/v1/org/:orgId/app/:appId/version",

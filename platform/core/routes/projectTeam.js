@@ -1,15 +1,13 @@
 import express from "express";
-import appCtrl from "../controllers/app.js";
+import prjCtrl from "../controllers/project.js";
 import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
-import deployCtrl from "../controllers/deployment.js";
-import versionCtrl from "../controllers/version.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
-import { validateApp } from "../middlewares/validateApp.js";
-import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
-import { applyRules } from "../schemas/app.js";
+import { validateProject } from "../middlewares/validateProject.js";
+import { authorizeProjectAction } from "../middlewares/authorizeProjectAction.js";
+import { applyRules } from "../schemas/project.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
@@ -17,30 +15,30 @@ import ERROR_CODES from "../config/errorCodes.js";
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/app/:appId/team
+@route      /v1/org/:orgId/project/:projectId/team
 @method     GET
-@desc       Get application team members
+@desc       Get project team members
 @access     private
 */
 router.get(
 	"/",
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.view"),
+	validateProject,
+	authorizeProjectAction("project.team.view"),
 	async (req, res) => {
 		try {
-			const { app } = req;
+			const { project } = req;
 
-			let appTeam = await appCtrl.getOneById(app._id, {
+			let projectTeam = await prjCtrl.getOneById(project._id, {
 				lookup: "team.userId",
 			});
 
 			res.json(
-				appTeam.team.map((entry) => {
+				projectTeam.team.map((entry) => {
 					return {
 						_id: entry._id,
-						appId: app._id,
+						projectId: project._id,
 						role: entry.role,
 						joinDate: entry.joinDate,
 						member: {
@@ -51,8 +49,8 @@ router.get(
 							name: entry.userId.name,
 							pictureUrl: entry.userId.pictureUrl,
 							loginEmail: entry.userId.loginProfiles[0].email,
-							isAppOwner:
-								app.ownerUserId.toString() === entry.userId._id.toString(),
+							isProjectOwner:
+								project.ownerUserId.toString() === entry.userId._id.toString(),
 						},
 					};
 				})
@@ -64,31 +62,31 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/team/me
+@route      /v1/org/:orgId/project/:projectId/team/me
 @method     GET
-@desc       Get current user's app team membership info
+@desc       Get current user's project team membership info
 @access     private
 */
 router.get(
 	"/me",
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.view"),
+	validateProject,
+	authorizeProjectAction("project.team.view"),
 	async (req, res) => {
 		try {
-			const { user, app } = req;
+			const { user, project } = req;
 
-			let appTeam = await appCtrl.getOneById(app._id, {
+			let projectTeam = await prjCtrl.getOneById(project._id, {
 				lookup: "team.userId",
 			});
 
-			let processedList = appTeam.team
+			let processedList = projectTeam.team
 				.filter((entry) => entry.userId._id.toString() === user._id.toString())
 				.map((entry) => {
 					return {
 						_id: entry._id,
-						appId: app._id,
+						projectId: project._id,
 						role: entry.role,
 						joinDate: entry.joinDate,
 						member: {
@@ -98,8 +96,8 @@ router.get(
 							contactEmail: entry.userId.contactEmail,
 							name: entry.userId.name,
 							pictureUrl: entry.userId.pictureUrl,
-							isAppOwner:
-								app.ownerUserId.toString() === entry.userId._id.toString(),
+							isProjectOwner:
+								project.ownerUserId.toString() === entry.userId._id.toString(),
 						},
 					};
 				});
@@ -112,7 +110,7 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/team/:userId
+@route      /v1/org/:orgId/project/:projectId/team/:userId
 @method     PUT
 @desc       Update role of team member
 @access     private
@@ -122,13 +120,13 @@ router.put(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.update"),
+	validateProject,
+	authorizeProjectAction("project.team.update"),
 	applyRules("update-member-role"),
 	validate,
 	async (req, res) => {
 		try {
-			const { app, user, org } = req;
+			const { project, user, org } = req;
 			const { userId } = req.params;
 			const { role } = req.body;
 
@@ -142,12 +140,14 @@ router.put(
 				});
 			}
 
-			// Check if the user is a member of the app or not
-			let member = app.team.find((entry) => entry.userId.toString() === userId);
+			// Check if the user is a member of the project or not
+			let member = project.team.find(
+				(entry) => entry.userId.toString() === userId
+			);
 			if (!member) {
 				return res.status(404).json({
 					error: t("Not a Member"),
-					details: t("User is not a member of the app '%s'.", app.name),
+					details: t("User is not a member of the project '%s'.", project.name),
 					code: ERROR_CODES.notFound,
 				});
 			}
@@ -156,34 +156,34 @@ router.put(
 			if (targetUser._id.toString() === user._id.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t("You cannot change your own app role."),
+					details: t("You cannot change your own project role."),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Check if the target user is the app owner. The role of app owner cannot be changed.
-			if (targetUser._id.toString() === app.ownerUserId.toString()) {
+			// Check if the target user is the project owner. The role of project owner cannot be changed.
+			if (targetUser._id.toString() === project.ownerUserId.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t("You cannot change the role of the app owner."),
+					details: t("You cannot change the role of the project owner."),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
 			// Update the role of the user
-			let updatedApp = await appCtrl.updateOneByQuery(
-				{ _id: app._id, "team._id": member._id },
+			await prjCtrl.updateOneByQuery(
+				{ _id: project._id, "team._id": member._id },
 				{
 					"team.$.role": role,
 					updatedBy: user._id,
 				},
 				{},
-				{ cacheKey: app._id }
+				{ cacheKey: project._id }
 			);
 
 			let result = {
 				_id: member._id,
-				appId: app._id,
+				projectId: project._id,
 				role: role,
 				joinDate: member.joinDate,
 				member: {
@@ -194,13 +194,14 @@ router.put(
 					name: targetUser.name,
 					pictureUrl: targetUser.pictureUrl,
 					loginEmail: targetUser.loginProfiles[0].email,
-					isAppOwner: app.ownerUserId.toString() === targetUser._id.toString(),
+					isProjectOwner:
+						project.ownerUserId.toString() === targetUser._id.toString(),
 				},
 			};
 
 			res.json(result);
 
-			let appWithTeam = await appCtrl.getOneById(app._id, {
+			let projectWithTeam = await prjCtrl.getOneById(project._id, {
 				lookup: {
 					path: "team.userId",
 					select: "-loginProfiles -notifications -editorSettings",
@@ -209,32 +210,20 @@ router.put(
 
 			// Log action
 			auditCtrl.logAndNotify(
-				app._id,
+				project._id,
 				req.user,
-				"org.app.team",
+				"org.project.team",
 				"update",
 				t(
-					"Updated app member role of user '%s' (%s) from '%s' to '%s'",
+					"Updated project member role of user '%s' (%s) from '%s' to '%s'",
 					targetUser.name,
 					targetUser.contactEmail,
 					member.role,
 					role
 				),
-				appWithTeam,
-				{ orgId: org._id, appId: app._id }
+				projectWithTeam,
+				{ orgId: org._id, projectId: project._id }
 			);
-
-			// Get application versions
-			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
-			for (const version of versions) {
-				// Deploy version updates to environments if auto-deployment is enabled
-				await deployCtrl.updateVersionInfo(
-					updatedApp,
-					version,
-					user,
-					"update-version"
-				);
-			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -242,9 +231,9 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/team/:userId
+@route      /v1/org/:orgId/project/:projectId/team/:userId
 @method     DELETE
-@desc       Remove member from app team
+@desc       Remove member from project team
 @access     private
 */
 router.delete(
@@ -252,13 +241,13 @@ router.delete(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.delete"),
+	validateProject,
+	authorizeProjectAction("project.team.delete"),
 	applyRules("remove-member"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app } = req;
+			const { org, project } = req;
 			const { userId } = req.params;
 
 			// Check if there is such a user
@@ -271,50 +260,52 @@ router.delete(
 				});
 			}
 
-			// Check if the user is a member of the app or not
-			let member = app.team.find((entry) => entry.userId.toString() === userId);
+			// Check if the user is a member of the project or not
+			let member = project.team.find(
+				(entry) => entry.userId.toString() === userId
+			);
 			if (!member) {
 				return res.status(404).json({
 					error: t("Not a Member"),
-					details: t("User is not a member of the app '%s'.", app.name),
+					details: t("User is not a member of the project '%s'.", project.name),
 					code: ERROR_CODES.notFound,
 				});
 			}
 
-			// Check if the target user is the current user or not. Users cannot delete themselves from the org team, they need to leave from org team.
+			// Check if the target user is the current user or not. Users cannot delete themselves from the project team, they need to leave from project team.
 			if (req.user._id.toString() === user._id.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You cannot remove yourself from the app team. Try to leave the app team."
+						"You cannot remove yourself from the project team. Try to leave the project team."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Check if the user is the creator of the app or not
-			if (app.ownerUserId.toString() === userId) {
+			// Check if the user is the creator of the project or not
+			if (project.ownerUserId.toString() === userId) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"The app owner cannot be removed from the app team. If you would like to remove the current app owner from the app team then the app ownership needs to be transferred to another team member with 'Admin' role"
+						"The project owner cannot be removed from the project team. If you would like to remove the current project owner from the project team then the project ownership needs to be transferred to another team member with 'Admin' role"
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Remove user from the app team
-			const updatedApp = await appCtrl.pullObjectById(
-				app._id,
+			// Remove user from the project team
+			await prjCtrl.pullObjectById(
+				project._id,
 				"team",
 				member._id,
 				{ updatedBy: user._id },
-				{ cacheKey: app._id }
+				{ cacheKey: project._id }
 			);
 
 			res.json();
 
-			let appWithTeam = await appCtrl.getOneById(app._id, {
+			let projectWithTeam = await prjCtrl.getOneById(project._id, {
 				lookup: {
 					path: "team.userId",
 					select: "-loginProfiles -notifications -editorSettings",
@@ -323,26 +314,18 @@ router.delete(
 
 			// Log action
 			auditCtrl.logAndNotify(
-				app._id,
+				project._id,
 				req.user,
-				"org.app.team",
+				"org.project.team",
 				"delete",
-				t("Removed user '%s' (%s) from app team", user.name, user.contactEmail),
-				appWithTeam,
-				{ orgId: org._id, appId: app._id }
+				t(
+					"Removed user '%s' (%s) from project team",
+					user.name,
+					user.contactEmail
+				),
+				projectWithTeam,
+				{ orgId: org._id, projectId: project._id }
 			);
-
-			// Get application versions
-			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
-			for (const version of versions) {
-				// Deploy version updates to environments if auto-deployment is enabled
-				await deployCtrl.updateVersionInfo(
-					updatedApp,
-					version,
-					user,
-					"update-version"
-				);
-			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -350,9 +333,9 @@ router.delete(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/team/delete-multi
+@route      /v1/org/:orgId/project/:projectId/team/delete-multi
 @method     POST
-@desc       Remove multiple members from app team
+@desc       Remove multiple members from project team
 @access     private
 */
 router.post(
@@ -360,49 +343,49 @@ router.post(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
-	authorizeAppAction("app.team.delete"),
+	validateProject,
+	authorizeProjectAction("project.team.delete"),
 	applyRules("remove-members"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app } = req;
+			const { org, project } = req;
 			const { userIds } = req.body;
 
-			// Users cannot remove themselves from the app team, they need to leave from org team.
+			// Users cannot remove themselves from the project team, they need to leave from org team.
 			if (userIds.includes(req.user._id.toString())) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You cannot remove yourself from the app team. Try to leave the app team."
+						"You cannot remove yourself from the project team. Try to leave the project team."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Check if one of the deleted user is the owner of the app or not
-			if (userIds.includes(app.ownerUserId.toString())) {
+			// Check if one of the deleted user is the owner of the project or not
+			if (userIds.includes(project.ownerUserId.toString())) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"The app owner cannot be removed from the app team. If you would like to remove the current app owner from the app team, then the app ownership needs to be transferred to another team member with 'Admin' role"
+						"The project owner cannot be removed from the project team. If you would like to remove the current project owner from the project team, then the project ownership needs to be transferred to another team member with 'Admin' role"
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Remove users from the app team
-			const updatedApp = await appCtrl.pullObjectByQuery(
-				app._id,
+			// Remove users from the project team
+			await prjCtrl.pullObjectByQuery(
+				project._id,
 				"team",
 				{ userId: { $in: userIds } },
 				{ updatedBy: req.user._id },
-				{ cacheKey: app._id }
+				{ cacheKey: project._id }
 			);
 
 			res.json();
 
-			let appWithTeam = await appCtrl.getOneById(app._id, {
+			let projectWithTeam = await prjCtrl.getOneById(project._id, {
 				lookup: {
 					path: "team.userId",
 					select: "-loginProfiles -notifications -editorSettings",
@@ -411,26 +394,14 @@ router.post(
 
 			// Log action
 			auditCtrl.logAndNotify(
-				app._id,
+				project._id,
 				req.user,
-				"org.app.team",
+				"org.project.team",
 				"delete",
-				t("Removed users from app team"),
-				appWithTeam,
-				{ orgId: org._id, appId: app._id }
+				t("Removed users from project team"),
+				projectWithTeam,
+				{ orgId: org._id, projectId: project._id }
 			);
-
-			// Get application versions
-			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
-			for (const version of versions) {
-				// Deploy version updates to environments if auto-deployment is enabled
-				await deployCtrl.updateVersionInfo(
-					updatedApp,
-					version,
-					user,
-					"update-version"
-				);
-			}
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -438,9 +409,9 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/team
+@route      /v1/org/:orgId/project/:projectId/team
 @method     DELETE
-@desc       Leave the app team
+@desc       Leave the project team
 @access     private
 */
 router.delete(
@@ -448,47 +419,50 @@ router.delete(
 	checkContentType,
 	authSession,
 	validateOrg,
-	validateApp,
+	validateProject,
 	async (req, res) => {
 		try {
-			const { org, app, user } = req;
+			const { org, project, user } = req;
 
-			// Check if the user is a member of the app or not
-			let member = app.team.find(
+			// Check if the user is a member of the project or not
+			let member = project.team.find(
 				(entry) => entry.userId.toString() === user._id.toString()
 			);
 
 			if (!member) {
 				return res.status(404).json({
 					error: t("Not a Member"),
-					details: t("You are not a member of the app '%s' team.", app.name),
+					details: t(
+						"You are not a member of the project '%s' team.",
+						project.name
+					),
 					code: ERROR_CODES.notFound,
 				});
 			}
 
-			// Check if the user is the creator of the app or not
-			if (app.ownerUserId.toString() === user._id) {
+			// Check if the user is the creator of the project or not
+			if (project.ownerUserId.toString() === user._id) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You are the owner of the app. The app owner cannot leave the app team. You first need to transfer app ownership to another team member with 'Admin' role"
+						"You are the owner of the project. The project owner cannot leave the project team. You first need to transfer project ownership to another team member with 'Admin' role."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Leave the app team
-			const updatedApp = await appCtrl.pullObjectById(
-				app._id,
+			// Leave the project team
+			await prjCtrl.pullObjectById(
+				project._id,
 				"team",
 				member._id,
 				{ updatedBy: user._id },
-				{ cacheKey: app._id }
+				{ cacheKey: project._id }
 			);
 
 			res.json();
 
-			let appWithTeam = await appCtrl.getOneById(app._id, {
+			let projectWithTeam = await prjCtrl.getOneById(project._id, {
 				lookup: {
 					path: "team.userId",
 					select: "-loginProfiles -notifications -editorSettings",
@@ -497,26 +471,18 @@ router.delete(
 
 			// Log action
 			auditCtrl.logAndNotify(
-				app._id,
+				project._id,
 				user,
-				"org.app.team",
+				"org.project.team",
 				"delete",
-				t("User '%s' (%s) has left the app team", user.name, user.contactEmail),
-				appWithTeam,
-				{ orgId: org._id, appId: app._id }
+				t(
+					"User '%s' (%s) has left the project team",
+					user.name,
+					user.contactEmail
+				),
+				projectWithTeam,
+				{ orgId: org._id, projectId: project._id }
 			);
-
-			// Get application versions
-			const versions = await versionCtrl.getManyByQuery({ appId: app._id });
-			for (const version of versions) {
-				// Deploy version updates to environments if auto-deployment is enabled
-				await deployCtrl.updateVersionInfo(
-					updatedApp,
-					version,
-					user,
-					"update-version"
-				);
-			}
 		} catch (error) {
 			handleError(req, res, error);
 		}

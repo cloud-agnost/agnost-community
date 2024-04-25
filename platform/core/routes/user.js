@@ -5,8 +5,10 @@ import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
 import orgInvitationCtrl from "../controllers/orgInvitation.js";
 import appInvitationCtrl from "../controllers/appInvitation.js";
+import prjInvitationCtrl from "../controllers/projectInvitation.js";
 import orgMemberCtrl from "../controllers/organizationMember.js";
 import appCtrl from "../controllers/app.js";
+import prjCtrl from "../controllers/project.js";
 import authCtrl from "../controllers/auth.js";
 import orgCtrl from "../controllers/organization.js";
 import deployCtrl from "../controllers/deployment.js";
@@ -279,6 +281,7 @@ router.put(
 			auditCtrl.updateActorName(userObj._id, req.body.name);
 			orgInvitationCtrl.updateHostName(userObj._id, req.body.name);
 			appInvitationCtrl.updateHostName(userObj._id, req.body.name);
+			prjInvitationCtrl.updateHostName(userObj._id, req.body.name);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -425,6 +428,7 @@ router.put(
 			auditCtrl.updateActorPicture(userObj._id, filePath);
 			orgInvitationCtrl.updateHostPicture(userObj._id, filePath);
 			appInvitationCtrl.updateHostPicture(userObj._id, filePath);
+			prjInvitationCtrl.updateHostPicture(userObj._id, filePath);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -466,6 +470,7 @@ router.delete("/picture", authSession, async (req, res) => {
 		auditCtrl.removeActorPicture(userObj._id);
 		orgInvitationCtrl.removeHostPicture(userObj._id);
 		appInvitationCtrl.removeHostPicture(userObj._id);
+		prjInvitationCtrl.removeHostPicture(userObj._id);
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -637,6 +642,7 @@ router.post(
 			auditCtrl.updateActorContactEmail(userObj._id, info.email);
 			orgInvitationCtrl.updateHostContactEmail(userObj._id, info.email);
 			appInvitationCtrl.updateHostContactEmail(userObj._id, info.email);
+			prjInvitationCtrl.updateHostContactEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -805,6 +811,7 @@ router.post(
 			auditCtrl.updateActorLoginEmail(userObj._id, info.email);
 			orgInvitationCtrl.updateHostLoginEmail(userObj._id, info.email);
 			appInvitationCtrl.updateHostLoginEmail(userObj._id, info.email);
+			prjInvitationCtrl.updateHostLoginEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -973,6 +980,30 @@ router.get("/app-invite", authSession, async (req, res) => {
 });
 
 /*
+@route      /v1/user/project-invite
+@method     GET
+@desc       Get pending project invitations of user
+@access     private
+*/
+router.get("/project-invite", authSession, async (req, res) => {
+	try {
+		const { user } = req;
+		let emails = user.loginProfiles.map((entry) => entry.email);
+		let invites = await prjInvitationCtrl.getManyByQuery(
+			{
+				email: { $in: emails },
+				status: "Pending",
+			},
+			{ lookup: "projectId" }
+		);
+
+		res.json(invites);
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/user/org-invite-accept?token
 @method     POST
 @desc       Accept organization invitation
@@ -1008,7 +1039,7 @@ router.post(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"Invitations only in 'pending' status can be accepted. It seems you have already accepted this invitation."
+						"Invitations only in 'pending' status can be accepted. It seems you have already accepted/rejected this invitation."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -1143,7 +1174,7 @@ router.post(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"Invitations only in 'pending' status can be accepted. It seems you have already accepted this invitation."
+						"Invitations only in 'pending' status can be accepted. It seems you have already accepted/rejected this invitation."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -1294,6 +1325,178 @@ router.post(
 );
 
 /*
+@route      /v1/user/project-invite-accept?token
+@method     POST
+@desc       Accept project invitation
+@access     private
+*/
+router.post(
+	"/project-invite-accept",
+	checkContentType,
+	applyRules("accept-project-invite"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await userCtrl.startSession();
+		try {
+			const { token } = req.query;
+
+			let invite = await prjInvitationCtrl.getOneByQuery(
+				{ token },
+				{ lookup: "projectId" }
+			);
+
+			if (!invite || !invite.projectId) {
+				await userCtrl.endSession(session);
+				return res.status(404).json({
+					error: t("Not Found"),
+					details: t("No such invitation exists for the project."),
+					code: ERROR_CODES.notFound,
+				});
+			}
+
+			if (invite.status !== "Pending") {
+				await userCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"Invitations only in 'pending' status can be accepted. It seems you have already accepted/rejected this invitation."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check if the user is already a cluster user
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.email": invite.email,
+			});
+
+			if (user) {
+				// Check whether the user is already a member of the app team or not
+				let projectMember = invite.projectId.team.find(
+					(entry) => entry.userId.toString() === user._id.toString()
+				);
+
+				if (projectMember) {
+					await userCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Already Member"),
+						details: t(
+							"You are already a member of the project '%s' team.",
+							invite.projectId.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+
+				// Check whether the user is already a member of the organization or not
+				let orgMember = await orgMemberCtrl.getOneByQuery(
+					{
+						orgId: invite.orgId,
+						userId: user._id,
+					},
+					{ cacheKey: `${invite.orgId}.${user._id}` }
+				);
+
+				if (!orgMember) {
+					// Add user to the organization as a member
+					await orgMemberCtrl.create(
+						{
+							orgId: invite.orgId,
+							userId: user._id,
+							role: invite.orgRole,
+						},
+						{ session, cacheKey: `${invite.orgId}.${user._id}` }
+					);
+				}
+			} else {
+				// Create a new cluster user
+				let userId = helper.generateId();
+				user = await userCtrl.create(
+					{
+						_id: userId,
+						iid: helper.generateSlug("usr"),
+						color: helper.generateColor("dark"),
+						contactEmail: invite.email,
+						status: "Pending",
+						canCreateOrg: invite.orgRole === "Admin" ? true : false,
+						isClusterOwner: false,
+						loginProfiles: [
+							{
+								provider: "agnost",
+								id: userId,
+								email: invite.email,
+								emailVerified: true,
+							},
+						],
+						notifications: notificationTypes,
+					},
+					{ session }
+				);
+
+				// Add user to the organization as a member
+				await orgMemberCtrl.create(
+					{
+						orgId: invite.orgId,
+						userId: user._id,
+						role: invite.orgRole,
+					},
+					{ session, cacheKey: `${invite.orgId}.${user._id}` }
+				);
+			}
+
+			// Add user to the project team
+			const updatedProject = await prjCtrl.pushObjectById(
+				invite.projectId._id,
+				"team",
+				{
+					userId: user._id,
+					role: invite.role,
+				},
+				{},
+				{ session, cacheKey: `${invite.projectId._id}` }
+			);
+
+			// Accept invitation
+			await prjInvitationCtrl.updateOneById(
+				invite._id,
+				{ status: "Accepted" },
+				{},
+				{ session }
+			);
+
+			let projectWithTeam = await prjCtrl.getOneById(invite.projectId._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+				session,
+			});
+
+			// Commit transaction
+			await userCtrl.commit(session);
+
+			// Return the project object the user is added as a mamber
+			res.json({ project: projectWithTeam, role: invite.role, user });
+
+			// Log action
+			auditCtrl.logAndNotify(
+				invite.projectId._id,
+				user,
+				"org.project",
+				"accept",
+				t("Accepted the invitation to join to the project"),
+				projectWithTeam,
+				{ orgId: invite.orgId, projectId: invite.projectId._id }
+			);
+		} catch (error) {
+			await userCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/user/org-invite-reject?token
 @method     POST
 @desc       Reject organization invitation
@@ -1376,6 +1579,50 @@ router.post(
 
 			// Reject invitation
 			await appInvitationCtrl.updateOneById(invite._id, { status: "Rejected" });
+
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/user/project-invite-reject?token
+@method     POST
+@desc       Reject project invitation
+@access     private
+*/
+router.post(
+	"/project-invite-reject",
+	checkContentType,
+	applyRules("reject-project-invite"),
+	validate,
+	async (req, res) => {
+		try {
+			const { token } = req.query;
+
+			// Make sure that the invitation token is associated with the email of the user
+			let invite = await prjInvitationCtrl.getOneByQuery({ token });
+
+			if (!invite || !invite.projectId) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					details: t("No such invitation exists for the project."),
+					code: ERROR_CODES.notFound,
+				});
+			}
+
+			if (invite.status !== "Pending") {
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t("Invitations only in 'pending' status can be rejected."),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Reject invitation
+			await prjInvitationCtrl.updateOneById(invite._id, { status: "Rejected" });
 
 			res.json();
 		} catch (error) {

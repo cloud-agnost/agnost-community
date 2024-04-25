@@ -73,6 +73,7 @@ export const connectToQueue = () => {
 		sendEmail(amqpConnection, "send-reset-pwd-token", "reset-pwd");
 		sendEmail(amqpConnection, "send-organization-inivation", "org-invite");
 		sendEmail(amqpConnection, "send-app-inivation", "app-invite");
+		sendEmail(amqpConnection, "send-project-inivation", "project-invite");
 	});
 };
 

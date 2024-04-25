@@ -568,8 +568,10 @@ export const applyRules = (type) => {
 			];
 		case "accept-org-invite":
 		case "accept-app-invite":
+		case "accept-project-invite":
 		case "reject-org-invite":
 		case "reject-app-invite":
+		case "reject-project-invite":
 			return [
 				query("token")
 					.trim()
