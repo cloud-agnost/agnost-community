@@ -10,8 +10,11 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PushVersionTableColumns } from './PushVersionTableColumns';
 import { useParams } from 'react-router-dom';
+import { Switch } from '@/components/Switch';
+import { Label } from '@/components/Label';
 export default function PushVersion() {
 	const { t } = useTranslation();
+	const [redeploy, setRedeploy] = useState(true);
 	const { appId, orgId } = useParams();
 	const { isPushVersionDrawerOpen, togglePushVersionDrawer, versions, version, pushVersion } =
 		useVersionStore();
@@ -35,6 +38,7 @@ export default function PushVersion() {
 				appId: appId as string,
 				targetVersionId: table.getSelectedRowModel().rows[0].original._id,
 				versionId: version._id,
+				redeploy,
 			}),
 		mutationKey: ['pushVersion', version._id],
 		onSuccess: () => {
@@ -84,28 +88,27 @@ export default function PushVersion() {
 							<Alert variant='warning'>
 								<AlertTitle>{t('general.warning')}</AlertTitle>
 								<AlertDescription>
-									You are about to push from source version "dev" into target version "master".
+									You are about to push from source version <strong>{version.name}</strong> into
+									target version{' '}
+									<strong>{table.getSelectedRowModel().rows[0].original.name}</strong>
+									.
 									<br />
 									<br />
-									Please note that the following design entities will not be pushed to the target
-									version and you need to manually update these items.
-									<br />
-									<br />
-									<ul className=' list-disc'>
-										<li>Environment variables (a.k.a. params) of the version</li>
-										<li>API keys of the version</li>
-										<li>Authentication settings of the version</li>
-										<li>Environment settings of the version</li>
-									</ul>
-									<br />
-									We strongly suggest to disable auto-deploy before pushing source version to the
-									target version and perform a manual redeployment after the push operation.
-									<br />
-									<br />
-									Automatically redeploy the changes to the target version (on-off switch, default
-									on)
+									Please note that the following design entities{' '}
+									<strong>Environment Variables</strong>, <strong>API Keys</strong>,{' '}
+									<strong>Authentication Settings</strong>, <strong>Environment Settings</strong>{' '}
+									will not be pushed to the target version and you need to manually update these
+									items.
+									{/* Automatically redeploy the changes to the target version (on-off switch, default
+									on) */}
 								</AlertDescription>
 							</Alert>
+							<div className='flex items-center space-x-2'>
+								<Switch id='redeploy' checked={redeploy} onCheckedChange={setRedeploy} />
+								<Label htmlFor='redeploy'>
+									Redeploy target version after successful push operation
+								</Label>
+							</div>
 							<div className='flex items-center justify-between'>
 								<Button variant='secondary' onClick={() => setStep(0)} className='!ml-4'>
 									{t('general.cancel')}
