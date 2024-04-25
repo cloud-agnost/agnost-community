@@ -7,6 +7,7 @@ import {
 	EnforceSSLAccessParams,
 	TransferRequest,
 	UpdateClusterComponentParams,
+	UpdateRemainingClusterComponentsParams,
 } from '@/types';
 
 export default class ClusterService {
@@ -67,5 +68,10 @@ export default class ClusterService {
 	}
 	static async checkDomainStatus() {
 		return (await axios.get(`${this.url}/domain-status`)).data;
+	}
+	static async updateRemainingClusterComponents(
+		data: UpdateRemainingClusterComponentsParams,
+	): Promise<ClusterComponent> {
+		return (await axios.put(`${this.url}/${data.componentName}/update`, data)).data;
 	}
 }

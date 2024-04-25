@@ -12,6 +12,7 @@ import {
 	GetVersionNotificationParams,
 	GetVersionRequest,
 	Notification,
+	PushVersionParams,
 	SearchCodeParams,
 	SearchCodeResult,
 	SearchDesignElementParams,
@@ -68,6 +69,7 @@ interface VersionStore {
 	matchCase: boolean;
 	matchWholeWord: boolean;
 	codeSearchTerm: string;
+	isPushVersionDrawerOpen: boolean;
 }
 
 type Actions = {
@@ -99,6 +101,8 @@ type Actions = {
 	setCodeSearchTerm: (input: string) => void;
 	toggleMatchCase: () => void;
 	toggleMatchWholeWord: () => void;
+	togglePushVersionDrawer: () => void;
+	pushVersion: (params: PushVersionParams) => Promise<void>;
 	reset: () => void;
 };
 
@@ -130,6 +134,7 @@ const initialState: VersionStore = {
 	matchCase: false,
 	matchWholeWord: false,
 	codeSearchTerm: '',
+	isPushVersionDrawerOpen: false,
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -421,6 +426,15 @@ const useVersionStore = create<VersionStore & Actions>()(
 				setCodeSearchTerm: (input) => set({ codeSearchTerm: input }),
 				toggleMatchCase: () => set((prev) => ({ matchCase: !prev.matchCase })),
 				toggleMatchWholeWord: () => set((prev) => ({ matchWholeWord: !prev.matchWholeWord })),
+				togglePushVersionDrawer: () =>
+					set((prev) => ({ isPushVersionDrawerOpen: !prev.isPushVersionDrawerOpen })),
+				pushVersion: async (params) => {
+					try {
+						await VersionService.pushVersion(params);
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
 				reset: () => set(initialState),
 			}),
 			{

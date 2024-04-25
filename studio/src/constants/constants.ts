@@ -422,6 +422,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	MEMBER: 'yellow',
 	CREATING: 'blue',
 	UPDATING: 'yellow',
+	RESTARTING: 'orange',
 	DELETING: 'red',
 	BINDING: 'blue',
 	OPTIONAL: 'yellow',
