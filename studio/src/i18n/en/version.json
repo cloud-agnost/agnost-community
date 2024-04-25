@@ -336,7 +336,7 @@
 	"log": "Logs",
 	"hits": "Hits",
 	"hit": "Hit",
-	"timestamp": "TIMESTAMP",
+	"timestamp": "Timestamp",
 	"response_time": "Response Time",
 	"success_count": "Success",
 	"error_count": "Error",
@@ -384,5 +384,6 @@
 		"queue": "Message Queue",
 		"task": "Cron Job"
 	},
-	"pushed_successfully": "Version pushed successfully"
+	"pushed_successfully": "Version pushed successfully",
+	"debug": "Debug"
 }

@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { CellFilterMap } from '@/constants';
 import { useColumnFilter } from '@/hooks';
+import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -27,7 +28,8 @@ export default function TableHeader({
 	selectList,
 }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { selectedFilter } = useColumnFilter(text, field as FieldTypes);
+	const model = useModelStore((state) => state.model);
+	const { selectedFilter } = useColumnFilter(model._id, text, field as FieldTypes);
 	const { updateCurrentTab } = useTabStore();
 	const { version } = useVersionStore();
 	const { pathname } = useLocation();
@@ -51,7 +53,7 @@ export default function TableHeader({
 	};
 
 	function handleClearFilter() {
-		clearColumnFilter(text);
+		clearColumnFilter(model._id, text);
 		searchParams.set('page', '1');
 		searchParams.set('filtered', 'false');
 		setSearchParams(searchParams);

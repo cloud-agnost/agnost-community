@@ -206,3 +206,36 @@ export const QUERY_TEMPLATES = {
 		$gt: [],
 	},
 };
+export const MONGO_QUERY_TEMPLATES: Record<Partial<ConditionsType>, any> = {
+	[ConditionsType.Contains]: { $regex: 'value', $options: 'i' },
+	[ConditionsType.NotContains]: { $regex: '^((?!value).)*$', $options: 'i' },
+	[ConditionsType.BeginsWith]: { $regex: '^value', $options: 'i' },
+	[ConditionsType.EndsWith]: { $regex: 'value$', $options: 'i' },
+	[ConditionsType.DistanceGreaterThan]: undefined,
+	[ConditionsType.DistanceLessThan]: undefined,
+	[ConditionsType.GreaterThan]: { $gt: undefined },
+	[ConditionsType.GreaterThanOrEqual]: { $gte: undefined },
+	[ConditionsType.LessThan]: { $lt: undefined },
+	[ConditionsType.LessThanOrEqual]: { $lte: undefined },
+	[ConditionsType.Equals]: { $eq: undefined },
+	[ConditionsType.NotEquals]: { $ne: undefined },
+	[ConditionsType.IsEmpty]: {
+		$eq: [
+			{
+				$type: undefined,
+			},
+			'missing',
+		],
+	},
+	[ConditionsType.IsNotEmpty]: {
+		$ne: [
+			{
+				$type: undefined,
+			},
+			'missing',
+		],
+	},
+	[ConditionsType.IsNull]: { $eq: null },
+	[ConditionsType.IsNotNull]: { $ne: null },
+	[ConditionsType.Includes]: { $in: undefined },
+};

@@ -86,7 +86,7 @@ export default function Navigator() {
 	function handleClearAllFilters() {
 		searchParams.set('filtered', 'false');
 		setSearchParams(searchParams);
-		clearAllColumnFilters();
+		clearAllColumnFilters(model._id);
 	}
 
 	const breadcrumbItems: BreadCrumbItem[] = [

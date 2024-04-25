@@ -12,8 +12,13 @@ interface ReferenceProps extends ICellEditorParams {
 
 export default function Reference({ value, referenceModelIid }: ReferenceProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { getModelsOfSelectedDb, resetNestedModels, setModel, getSpecificModelByIidOfDatabase } =
-		useModelStore();
+	const {
+		getModelsOfSelectedDb,
+		resetNestedModels,
+		setModel,
+		getSpecificModelByIidOfDatabase,
+		model,
+	} = useModelStore();
 	const { setColumnFilters } = useUtilsStore();
 	const { dbId, versionId, appId, orgId } = useParams() as {
 		dbId: string;
@@ -48,15 +53,19 @@ export default function Reference({ value, referenceModelIid }: ReferenceProps) 
 			});
 			const fieldName =
 				referenceModel.fields.find((field) => field.type === FieldTypes.ID)?.name ?? 'id';
-			setColumnFilters(fieldName, {
-				filterType: Filters.Text,
-				conditions: [
-					{
-						filter: value,
-						type: ConditionsType.Equals,
-					},
-				],
-			});
+			setColumnFilters(
+				fieldName,
+				{
+					filterType: Filters.Text,
+					conditions: [
+						{
+							filter: value,
+							type: ConditionsType.Equals,
+						},
+					],
+				},
+				model._id,
+			);
 			navigate(path);
 		}
 	}

@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 import GeopointFilterItem from './GeopointFilterItem';
 import OperatorSelect from './OperatorSelect';
 import _ from 'lodash';
+import useModelStore from '@/store/database/modelStore';
 
 export default function GeopointFilter({ columnName, type }: FilterProps) {
-	const { selectedFilter, filterType, applyFilter } = useColumnFilter(columnName, type);
+	const model = useModelStore((state) => state.model);
+	const { selectedFilter, filterType, applyFilter } = useColumnFilter(model._id, columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
 	const updateFilterConditions = (conditionIndex: number, updates: Condition) => {
 		const initialConditions = filter?.conditions || [];

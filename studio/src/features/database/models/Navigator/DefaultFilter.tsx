@@ -6,8 +6,8 @@ import ColumnFilter from './ColumnFilter';
 import OperatorSelect from './OperatorSelect';
 import _ from 'lodash';
 
-export default function DefaultFilter({ type, columnName }: FilterProps) {
-	const { selectedFilter, filterType, applyFilter } = useColumnFilter(columnName, type);
+export default function DefaultFilter({ type, columnName, entityId }: FilterProps) {
+	const { selectedFilter, filterType, applyFilter } = useColumnFilter(entityId, columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
 	const updateFilterCondition = (conditionIndex: number, updates: Partial<Condition>) => {
 		const initialConditions = filter?.conditions || [];
