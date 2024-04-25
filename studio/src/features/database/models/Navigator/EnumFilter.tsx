@@ -6,6 +6,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/Dropdown';
 import { useColumnFilter } from '@/hooks';
+import useModelStore from '@/store/database/modelStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { ConditionsType, FilterProps } from '@/types';
 import { cn, generateId } from '@/utils';
@@ -20,7 +21,8 @@ interface EnumFilterProps extends FilterProps {
 export default function EnumFilter({ columnName, options, type }: EnumFilterProps) {
 	const { t } = useTranslation();
 	const { setColumnFilters, clearColumnFilter } = useUtilsStore();
-	const { selectedFilter, filterType } = useColumnFilter(columnName, type);
+	const { model } = useModelStore();
+	const { selectedFilter, filterType } = useColumnFilter(model._id, columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
 	const [searchParams, setSearchParams] = useSearchParams();
 	function onFilterChange(newFilter: string, checked: boolean) {
@@ -40,10 +42,10 @@ export default function EnumFilter({ columnName, options, type }: EnumFilterProp
 
 	function applyFilter() {
 		if ((filter?.conditions?.[0]?.filter as string[])?.length === 0) {
-			clearColumnFilter(columnName);
+			clearColumnFilter(model._id, columnName);
 			return;
 		} else {
-			setColumnFilters(columnName, filter);
+			setColumnFilters(columnName, filter, model._id);
 		}
 		const page = searchParams.get('page') ?? '1';
 		if (page === '1') searchParams.set('filtered', generateId());

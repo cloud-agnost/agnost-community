@@ -9,8 +9,9 @@ interface SortButtonProps {
 	text: string;
 	className?: string;
 	field: string;
+	children?: React.ReactNode;
 }
-export function SortButton({ text, className, field }: SortButtonProps) {
+export function SortButton({ text, className, field, children }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { updateCurrentTab } = useTabStore();
 	const { version } = useVersionStore();
@@ -35,24 +36,27 @@ export function SortButton({ text, className, field }: SortButtonProps) {
 	};
 
 	return (
-		<Button
-			variant='blank'
-			onClick={handleSortClick}
-			size='sm'
-			className={cn('justify-start w-full h-full text-subtle', className)}
-		>
-			{text}
-			{searchParams.get('f') === field && (
-				<div className='ml-2'>
-					<CaretUp
-						size={14}
-						className={cn(
-							'text-icon-base',
-							searchParams.get('d') === 'desc' && 'rotate-180 text-icon-secondary',
-						)}
-					/>
-				</div>
-			)}
-		</Button>
+		<div className='flex items-center justify-between'>
+			<Button
+				variant='blank'
+				onClick={handleSortClick}
+				size='sm'
+				className={cn('justify-start w-full h-full text-subtle', className)}
+			>
+				{text}
+				{searchParams.get('f') === field && (
+					<div className='ml-2'>
+						<CaretUp
+							size={14}
+							className={cn(
+								'text-icon-base',
+								searchParams.get('d') === 'desc' && 'rotate-180 text-icon-secondary',
+							)}
+						/>
+					</div>
+				)}
+			</Button>
+			{children}
+		</div>
 	);
 }

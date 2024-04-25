@@ -6,16 +6,28 @@ import { MethodBadge } from '@/components/Endpoint';
 import { BADGE_COLOR_MAP, BASE_URL } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
-import { ColumnDefWithClassName, VersionLog } from '@/types';
+import { ColumnDefWithClassName, FieldTypes, VersionLog } from '@/types';
 import { DATETIME_MED_WITH_SECONDS, capitalize, formatDate, translate } from '@/utils';
 import { Calendar, Clock, Files } from '@phosphor-icons/react';
+import DebugFilter from './DebugFilter';
+import DurationFilter from './DurationFilter';
+import EntityFilter from './EntityFilter';
+import MethodFilter from './MethodFilter';
+import StatusFilter from './StatusFilter';
+import TimestampFilter from './TimestampFilter';
+import { DefaultFilter } from '@/features/database/models/Navigator';
+import FilterLayout from './FilterLayout';
 
 const { openVersionLogDetails } = useVersionStore.getState();
 const env = useEnvironmentStore.getState().environment;
 export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	{
 		id: 'timestamp',
-		header: () => <SortButton text={translate('version.timestamp')} field='timestamp' />,
+		header: () => (
+			<SortButton text={translate('version.timestamp')} field='timestamp'>
+				<TimestampFilter />
+			</SortButton>
+		),
 		accessorKey: 'timestamp',
 		cell: ({
 			row: {
@@ -34,15 +46,23 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'name',
-		header: () => <SortButton text={translate('general.name')} field='name' />,
+		header: () => (
+			<SortButton text={translate('general.name')} field='name'>
+				<EntityFilter />
+			</SortButton>
+		),
 		accessorKey: 'name',
-		size: 100,
+		size: 150,
 	},
 	{
 		id: 'method',
-		header: () => <SortButton text={translate('endpoint.method')} field='method' />,
+		header: () => (
+			<SortButton text={translate('endpoint.method')} field='method'>
+				<MethodFilter />
+			</SortButton>
+		),
 		accessorKey: 'method',
-		size: 100,
+		size: 150,
 		cell: ({ row }) => {
 			const { method } = row.original;
 			return <MethodBadge method={method} />;
@@ -50,9 +70,19 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'path',
-		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
+		header: () => (
+			<SortButton text={translate('endpoint.path')} field='path'>
+				<FilterLayout columnName='path'>
+					<DefaultFilter
+						type={FieldTypes.TEXT}
+						columnName='path'
+						entityId={window.location.pathname.split('/')[8]}
+					/>
+				</FilterLayout>
+			</SortButton>
+		),
 		accessorKey: 'path',
-		size: 300,
+		size: 200,
 		cell: ({ row }) => {
 			const { path } = row.original;
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
@@ -66,7 +96,11 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'status',
-		header: () => <SortButton text={translate('general.status')} field='status' />,
+		header: () => (
+			<SortButton text={translate('general.status')} field='status'>
+				<StatusFilter />
+			</SortButton>
+		),
 		accessorKey: 'status',
 		size: 100,
 		cell: ({
@@ -89,9 +123,13 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'duration',
-		header: () => <SortButton text={translate('version.response_time')} field='duration' />,
+		header: () => (
+			<SortButton text={translate('version.response_time')} field='duration'>
+				<DurationFilter />
+			</SortButton>
+		),
 		accessorKey: 'duration',
-		size: 100,
+		size: 200,
 		cell: ({
 			row: {
 				original: { duration },
@@ -104,6 +142,27 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 				</div>
 			);
 		},
+	},
+	{
+		id: 'debug',
+		header: () => (
+			<SortButton text={translate('version.debug')} field='response'>
+				<DebugFilter />
+			</SortButton>
+		),
+
+		accessorKey: 'debug',
+		cell: ({
+			row: {
+				original: { debug },
+			},
+		}) => (
+			<Badge
+				variant={BADGE_COLOR_MAP[String(debug).toUpperCase()]}
+				text={capitalize(String(debug))}
+				rounded
+			/>
+		),
 	},
 	{
 		id: 'action',

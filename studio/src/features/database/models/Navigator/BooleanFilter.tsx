@@ -6,8 +6,8 @@ import { ConditionsType, FilterProps } from '@/types';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
-export default function BooleanFilter({ type, columnName }: FilterProps) {
-	const { filterType, selectedFilter, applyFilter } = useColumnFilter(columnName, type);
+export default function BooleanFilter({ type, columnName, entityId }: FilterProps) {
+	const { filterType, selectedFilter, applyFilter } = useColumnFilter(entityId, columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
 
 	const onFilterChange = (value: string) => {

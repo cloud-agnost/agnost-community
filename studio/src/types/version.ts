@@ -1,6 +1,6 @@
 import { translate } from '@/utils';
 import { z } from 'zod';
-import { HttpMethod } from '.';
+import { ColumnFilterType, HttpMethod } from '.';
 import { NameSchema } from './schema';
 import {
 	BaseGetRequest,
@@ -49,10 +49,12 @@ export interface VersionLog {
 	responseBody: object;
 	method: HttpMethod;
 	path: string;
+	debug: boolean;
 }
 
 export interface GetVersionLogsParams extends BaseGetRequest, BaseParams {
 	type: VersionLogTypes;
+	filter: ColumnFilterType;
 }
 export interface VersionLogBucket {
 	totalHits: number;
@@ -70,6 +72,7 @@ export interface GetVersionLogBucketsParams extends BaseParams {
 	type: VersionLogTypes;
 	start: string;
 	end: string;
+	filter: ColumnFilterType;
 }
 
 export interface RateLimit {

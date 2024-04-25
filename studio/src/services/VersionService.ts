@@ -297,12 +297,19 @@ export default class VersionService {
 		orgId,
 		appId,
 		versionId,
+		filter,
 		...params
 	}: GetVersionLogBucketsParams): Promise<VersionLogBucket> {
 		return (
-			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/log-buckets`, {
-				params,
-			})
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/log-buckets`,
+				{
+					filter,
+				},
+				{
+					params,
+				},
+			)
 		).data;
 	}
 
@@ -310,12 +317,19 @@ export default class VersionService {
 		orgId,
 		appId,
 		versionId,
+		filter,
 		...params
 	}: GetVersionLogsParams): Promise<VersionLog[]> {
 		return (
-			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/logs`, {
-				params,
-			})
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/logs`,
+				{
+					filter,
+				},
+				{
+					params,
+				},
+			)
 		).data;
 	}
 

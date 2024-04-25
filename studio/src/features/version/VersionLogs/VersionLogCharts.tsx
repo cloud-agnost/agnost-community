@@ -1,14 +1,15 @@
 import { Button } from '@/components/Button';
-import { DateRangePicker } from '@/components/DateRangePicker';
 import useAuthStore from '@/store/auth/authStore';
 import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { DATE_TIME_FORMAT, formatDate, toIsoString } from '@/utils';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { differenceInSeconds, endOfDay, startOfDay } from 'date-fns';
 import { t } from 'i18next';
-import { useEffect, useMemo, useState } from 'react';
+import _ from 'lodash';
+import { useMemo } from 'react';
 import { Range } from 'react-date-range';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
@@ -21,21 +22,14 @@ interface VersionLogChartsProps {
 }
 
 export default function VersionLogCharts({ type, refetch }: VersionLogChartsProps) {
-	const [searchParams, setSearchParams] = useSearchParams();
 	const userId = useAuthStore((state) => state.user?._id);
 	const version = useVersionStore((state) => state.version);
+
+	const [searchParams, setSearchParams] = useSearchParams();
 	const updateCurrentTab = useTabStore((state) => state.updateCurrentTab);
 	const { pathname } = useLocation();
-	const [date, setDate] = useState<Range[]>([
-		{
-			startDate: startOfDay(new Date()),
-			endDate: endOfDay(new Date()),
-			key: 'selection',
-		},
-	]);
-
+	const { clearColumnFilter, columnFilters } = useUtilsStore();
 	function selectDate(date: Range[]) {
-		setDate(date);
 		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
 		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
 		setSearchParams(searchParams);
@@ -78,19 +72,20 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 		[logBuckets?.[type]],
 	);
 
-	useEffect(() => {
-		const start = searchParams.get('start');
-		const end = searchParams.get('end');
-		if (start && end) {
-			setDate([
-				{
-					startDate: new Date(start),
-					endDate: new Date(end),
-					key: 'selection',
-				},
-			]);
-		}
-	}, [searchParams]);
+	function clearFilters() {
+		clearColumnFilter(type, 'name');
+		clearColumnFilter(type, 'method');
+		clearColumnFilter(type, 'path');
+		clearColumnFilter(type, 'status');
+		clearColumnFilter(type, 'duration');
+		clearColumnFilter(type, 'debug');
+		searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
+		searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
+		setSearchParams(searchParams);
+		updateCurrentTab(version._id, {
+			path: `${pathname}?${searchParams.toString()}`,
+		});
+	}
 
 	return (
 		<div className='max-h-[400px] border border-border rounded-lg'>
@@ -103,16 +98,20 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 						)}
 					</h1>
 					<p className='text-xs text-subtle'>
-						{formatDate(date[0].startDate as Date, DATE_TIME_FORMAT)} to{' '}
-						{formatDate(date[0].endDate as Date, DATE_TIME_FORMAT)}
+						{formatDate(searchParams.get('start') as string, DATE_TIME_FORMAT)} to{' '}
+						{formatDate(searchParams.get('end') as string, DATE_TIME_FORMAT)}
 					</p>
 				</div>
 				<div className='space-x-4'>
+					{!_.isEmpty(columnFilters?.[type]) && (
+						<Button variant='outline' onClick={clearFilters}>
+							Clear Filters
+						</Button>
+					)}
 					<Button variant='outline' onClick={() => refetch()} iconOnly>
 						<ArrowClockwise className='mr-1 text-sm' />
 						{t('general.refresh')}
 					</Button>
-					<DateRangePicker date={date} onChange={selectDate} />
 				</div>
 			</div>
 			<div className='p-4 w-full max-h-1/2'>

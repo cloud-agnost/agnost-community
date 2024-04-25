@@ -6,18 +6,17 @@ import {
 	EndpointRequest,
 	EndpointResponse,
 	Log,
-	ModelColumnFilters,
 	TabTypes,
 	TestEndpointParams,
 	TestQueueLogs,
 	TestResponse,
 	TestTaskLogs,
+	VersionColumnFilters,
 } from '@/types';
 import { filterMatchingKeys, getTypeWorker } from '@/utils';
 import { ColumnState } from 'ag-grid-community';
 import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
-import useModelStore from '../database/modelStore';
 import useEndpointStore from '../endpoint/endpointStore';
 import useVersionStore from './versionStore';
 
@@ -36,10 +35,10 @@ interface UtilsStore {
 	};
 	isSidebarOpen: boolean;
 	columnState: {
-		[modelId: string]: ColumnState[] | undefined;
+		[entityId: string]: ColumnState[] | undefined;
 	};
-	columnFilters: ModelColumnFilters | undefined;
 	isAppliedToAllEndpoints: boolean;
+	columnFilters: VersionColumnFilters | undefined;
 }
 
 type Actions = {
@@ -58,9 +57,9 @@ type Actions = {
 	getColumnState: (modelId: string) => ColumnState[] | undefined;
 	resetColumnState: (modelId: string) => void;
 	collapseAll: () => void;
-	setColumnFilters: (columnName: string, filter: ColumnFilterType) => void;
-	clearAllColumnFilters: () => void;
-	clearColumnFilter: (columnName: string) => void;
+	setColumnFilters: (columnName: string, filter: ColumnFilterType, entityId: string) => void;
+	clearAllColumnFilters: (entityId: string) => void;
+	clearColumnFilter: (entityId: string, columnName: string) => void;
 	clearEndpointsRequestHeaders: () => void;
 	applyTokensToAllEndpoints: () => void;
 	clearTokens: () => void;
@@ -226,37 +225,35 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 						return { columnState: state };
 					});
 				},
-				setColumnFilters: (columnName, filter) => {
-					const modelId = useModelStore.getState().model._id;
+				setColumnFilters: (columnName, filter, entityId) => {
+					console.log('setColumnFilters', columnName, filter, entityId);
 					set((prev) => {
 						return {
 							columnFilters: {
 								...prev.columnFilters,
-								[modelId]: {
-									...prev.columnFilters?.[modelId],
+								[entityId]: {
+									...prev.columnFilters?.[entityId],
 									[columnName]: filter,
 								},
 							},
 						};
 					});
 				},
-				clearAllColumnFilters: () => {
-					const modelId = useModelStore.getState().model._id;
+				clearAllColumnFilters: (entityId: string) => {
 					set((prev) => {
 						const state = prev.columnFilters;
-						delete state?.[modelId];
+						delete state?.[entityId];
 						return { columnFilters: state };
 					});
 				},
-				clearColumnFilter: (columnName) => {
-					const modelId = useModelStore.getState().model._id;
+				clearColumnFilter: (entityId, columnName) => {
 					set((prev) => {
-						const state = prev.columnFilters?.[modelId];
+						const state = prev.columnFilters?.[entityId];
 						delete state?.[columnName];
 						return {
 							columnFilters: {
 								...prev.columnFilters,
-								[modelId]: state,
+								[entityId]: state,
 							},
 						};
 					});

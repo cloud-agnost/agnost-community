@@ -608,3 +608,7 @@ button:focus-visible {
 .ag-root-wrapper {
 	border-radius: var(--radius);
 }
+
+[data-radix-popper-content-wrapper] {
+	z-index: 11 !important;
+}

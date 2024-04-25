@@ -1,4 +1,3 @@
-import { EmptyState } from '@/components/EmptyState';
 import { VersionLogDetails } from '@/features/version/VersionLogs';
 import useVersionStore from '@/store/version/versionStore';
 import { calculateRecommendedBuckets, toIsoString } from '@/utils';
@@ -8,16 +7,17 @@ import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-
+import { Loading } from '@/components/Loading';
+import { useColumnFilter, useInfiniteScroll } from '@/hooks';
+import useUtilsStore from '@/store/version/utilsStore';
+import { ColumnFilterType, ColumnFilters, ConditionsType, FieldTypes, Filters } from '@/types';
+import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
-import { Loading } from '@/components/Loading';
-import { useInfiniteScroll } from '@/hooks';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
 export default function VersionLogs({ type }: VersionLogsProps) {
-	const { t } = useTranslation();
 	const {
 		getVersionLogBuckets,
 		showLogDetails,
@@ -32,11 +32,11 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		orgId: string;
 		versionId: string;
 	}>();
-
+	const { columnFilters, setColumnFilters } = useUtilsStore();
+	const { selectedFilter } = useColumnFilter(type, 'timestamp', FieldTypes.DATE);
 	const [searchParams, setSearchParams] = useSearchParams();
-
 	const { refetch, isFetching } = useQuery({
-		queryKey: ['versionLogBuckets', appId, orgId, versionId, type],
+		queryKey: ['versionLogBuckets', appId, orgId, versionId, type, columnFilters?.[type]],
 		queryFn: () => {
 			const start = new Date(searchParams.get('start') as string);
 			const end = new Date(searchParams.get('end') as string);
@@ -45,15 +45,13 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				orgId: orgId as string,
 				versionId: versionId as string,
 				type,
-				start: searchParams.get('start') ?? '',
-				end: searchParams.get('end') ?? '',
+				start: selectedFilter?.conditions[0]?.filter as string,
+				end: selectedFilter?.conditions[1]?.filter as string,
 				buckets: calculateRecommendedBuckets(start, end as Date),
+				filter: mongoQueryConverter((columnFilters?.[type] as ColumnFilters) ?? {}),
 			});
 		},
-		enabled:
-			!_.isNil(searchParams.get('start')) &&
-			!_.isNil(searchParams.get('end')) &&
-			_.isNil(logBuckets),
+		enabled: !_.isNil(selectedFilter) && _.isNil(logBuckets),
 		refetchOnWindowFocus: false,
 	});
 
@@ -64,25 +62,37 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		queryKey: 'versionLogs',
 		params: {
 			type,
-			start: searchParams.get('start'),
-			end: searchParams.get('end'),
+			filter: mongoQueryConverter((columnFilters?.[type] as ColumnFilters) ?? {}),
 		},
+		enabled: !_.isNil(columnFilters?.[type]),
 	});
 
 	useEffect(() => {
-		if (!_.isNil(searchParams.get('start')) && !_.isNil(searchParams.get('end'))) refetch();
-	}, [searchParams]);
-
+		refetchLogs();
+	}, [columnFilters]);
 	useEffect(() => {
-		const start = searchParams.get('start');
-		const end = searchParams.get('end');
+		const start = selectedFilter?.conditions[0]?.filter;
+		const end = selectedFilter?.conditions[1]?.filter;
 		if (!start || !end) {
+			const filter: ColumnFilterType = {
+				conditions: [
+					{
+						filter: toIsoString(startOfDay(new Date())),
+						type: ConditionsType.GreaterThanOrEqual,
+					},
+					{
+						filter: toIsoString(endOfDay(new Date())),
+						type: ConditionsType.LessThanOrEqual,
+					},
+				],
+				filterType: Filters.Date,
+			};
+			setColumnFilters('timestamp', filter, type);
 			searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
 			searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
 			setSearchParams(searchParams);
 		}
 	}, []);
-
 	function refetchLogs() {
 		refetch();
 		versionLogResponse.refetch();
@@ -93,15 +103,11 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 			<VersionLogCharts type={type} refetch={refetchLogs} />
 			{isFetching ? (
 				<Loading loading={isFetching} />
-			) : logBuckets && logBuckets?.[type]?.totalHits > 0 ? (
+			) : (
 				<>
 					<VersionLogsTable type={type} {...versionLogResponse} />
 					<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
 				</>
-			) : (
-				<div className='flex flex-col h-1/2 items-center justify-center'>
-					<EmptyState type={_.capitalize(type) as any} title={t('version.no_logs')} />
-				</div>
 			)}
 		</div>
 	);

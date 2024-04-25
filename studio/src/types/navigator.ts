@@ -76,9 +76,11 @@ export enum Filters {
 export interface FilterProps {
 	type: FieldTypes;
 	columnName: string;
+	entityId: string;
+	log?: boolean;
 }
-export interface ModelColumnFilters {
-	[modelId: string]: ColumnFilters | undefined;
+export interface VersionColumnFilters {
+	[entityId: string]: ColumnFilters | undefined;
 }
 
 export interface ColumnFilters {
