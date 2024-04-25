@@ -29,8 +29,13 @@ function getBaseURL(req) {
 			if (origin) {
 				let port = req.header("x-forwarded-port");
 				if (port === "80" || port === "443")
-					return `${req.header("x-forwarded-proto")}://${origin}`;
-				else return `${req.header("x-forwarded-proto")}://${origin}:${port}`;
+					return `${req.header(
+						"x-forwarded-proto"
+					)}://${origin}/${META.getEnvId()}`;
+				else
+					return `${req.header(
+						"x-forwarded-proto"
+					)}://${origin}:${port}/${META.getEnvId()}`;
 			} else {
 				return `${req.protocol}://${req.hostname}/${META.getEnvId()}`;
 			}
