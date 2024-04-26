@@ -14,7 +14,6 @@ import {
 	phoneAuthSMSProviders,
 	oAuthProviderTypes,
 	authUserDataModel,
-	authUserDataModelSQL,
 	resourceVersions,
 	ftsIndexLanguages,
 } from "../config/constants.js";
@@ -42,7 +41,6 @@ router.get("/all", authSession, (req, res) => {
 		phoneAuthSMSProviders,
 		oAuthProviderTypes,
 		authUserDataModel,
-		authUserDataModelSQL,
 		resourceVersions,
 		ftsIndexLanguages,
 	});

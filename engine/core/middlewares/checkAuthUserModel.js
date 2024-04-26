@@ -42,7 +42,7 @@ export const checkAuthUserModel = async function (req, res, next) {
 			);
 	}
 
-	let isValid = isValidModel(userDb.type, userModel);
+	let isValid = isValidModel(userModel);
 	if (isValid.result === false) {
 		return res
 			.status(400)
@@ -54,7 +54,7 @@ export const checkAuthUserModel = async function (req, res, next) {
 						"The application version '%s' has a user data model named '%s' but the model is not valid. The user data model does not have the following fields with exact name and type: %s",
 						version.name,
 						userModel.name,
-						getMissingFieldsInfo(userDb.type, isValid).join(", ")
+						getMissingFieldsInfo(isValid).join(", ")
 					)
 				)
 			);
@@ -66,42 +66,18 @@ export const checkAuthUserModel = async function (req, res, next) {
 	next();
 };
 
-function isValidModel(type, model) {
+function isValidModel(model) {
 	let provider = getModelField(model, "provider", "text");
-	let providerUserId = getModelField(
-		model,
-		type === "MongoDB" ? "providerUserId" : "provider_user_id",
-		"text"
-	);
+	let providerUserId = getModelField(model, "providerUserId", "text");
 	let email = getModelField(model, "email", "email");
 	let phone = getModelField(model, "phone", "phone");
 	let password = getModelField(model, "password", "encrypted-text");
 	let name = getModelField(model, "name", "text");
-	let profilePicture = getModelField(
-		model,
-		type === "MongoDB" ? "profilePicture" : "profile_picture",
-		"link"
-	);
-	let signUpAt = getModelField(
-		model,
-		type === "MongoDB" ? "signUpAt" : "signup_at",
-		"datetime"
-	);
-	let lastLoginAt = getModelField(
-		model,
-		type === "MongoDB" ? "lastLoginAt" : "last_login_at",
-		"datetime"
-	);
-	let emailVerified = getModelField(
-		model,
-		type === "MongoDB" ? "emailVerified" : "email_verified",
-		"boolean"
-	);
-	let phoneVerified = getModelField(
-		model,
-		type === "MongoDB" ? "phoneVerified" : "phone_verified",
-		"boolean"
-	);
+	let profilePicture = getModelField(model, "profilePicture", "link");
+	let signUpAt = getModelField(model, "signUpAt", "datetime");
+	let lastLoginAt = getModelField(model, "lastLoginAt", "datetime");
+	let emailVerified = getModelField(model, "emailVerified", "boolean");
+	let phoneVerified = getModelField(model, "phoneVerified", "boolean");
 
 	let isValid = false;
 	if (
@@ -144,42 +120,25 @@ function getModelField(model, name, type) {
 	return null;
 }
 
-function getMissingFieldsInfo(type, isValid) {
+function getMissingFieldsInfo(isValid) {
 	let missingFields = [];
 	if (isValid.provider === false) missingFields.push("provider (text)");
 	if (isValid.providerUserId === false)
-		missingFields.push(
-			type === "MongoDB" ? "providerUserId (text)" : "provider_user_id (text)"
-		);
+		missingFields.push("providerUserId (text)");
 	if (isValid.email === false) missingFields.push("email (email)");
 	if (isValid.phone === false) missingFields.push("phone (phone)");
 	if (isValid.password === false)
 		missingFields.push("password (encrypted-text)");
 	if (isValid.name === false) missingFields.push("name (text)");
 	if (isValid.profilePicture === false)
-		missingFields.push(
-			type === "MongoDB" ? "profilePicture (link)" : "profile_picture (link)"
-		);
-	if (isValid.signUpAt === false)
-		missingFields.push(
-			type === "MongoDB" ? "signUpAt (datetime)" : "signup_at (datetime)"
-		);
+		missingFields.push("profilePicture (link)");
+	if (isValid.signUpAt === false) missingFields.push("signUpAt (datetime)");
 	if (isValid.lastLoginAt === false)
-		missingFields.push(
-			type === "MongoDB" ? "lastLoginAt (datetime)" : "last_login_at (datetime)"
-		);
+		missingFields.push("lastLoginAt (datetime)");
 	if (isValid.emailVerified === false)
-		missingFields.push(
-			type === "MongoDB"
-				? "emailVerified (boolean)"
-				: "email_verified (boolean)"
-		);
+		missingFields.push("emailVerified (boolean)");
 	if (isValid.phoneVerified === false)
-		missingFields.push(
-			type === "MongoDB"
-				? "phoneVerified (boolean)"
-				: "phone_verified (boolean)"
-		);
+		missingFields.push("phoneVerified (boolean)");
 
 	return missingFields;
 }

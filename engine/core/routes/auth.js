@@ -99,8 +99,8 @@ router.post(
 				provider: "agnost",
 				email: req.body.email,
 				password: req.body.password,
-				[userDb.type === "MongoDB" ? "signUpAt" : "signup_at"]: date,
-				[userDb.type === "MongoDB" ? "emailVerified" : "email_verified"]: false,
+				signUpAt: date,
+				emailVerified: false,
 			};
 
 			if (
@@ -113,33 +113,17 @@ router.post(
 					...userData,
 				};
 				// Delete phone related data in email-sign up
-				if (userDb.type === "MongoDB") delete userData.phoneVerified;
-				else delete userData.phone_verified;
+				delete userData.phoneVerified;
 				// Bypass email validation if specified
-				if (userDb.type === "MongoDB") {
-					if (req.body.userData.emailVerified === true)
-						userData.emailVerified = true;
-				} else {
-					if (req.body.userData.email_verified === true)
-						userData.email_verified = true;
-				}
+				if (req.body.userData.emailVerified === true)
+					userData.emailVerified = true;
 			}
 
 			// If no email verification is needed then set the last login date
 			if (
-				!(
-					userDb.type === "MongoDB" &&
-					authentication.email.confirmEmail &&
-					userData.emailVerified === false
-				) ||
-				!(
-					userDb.type !== "MongoDB" &&
-					authentication.email.confirmEmail &&
-					userData.email_verified === false
-				)
+				!(authentication.email.confirmEmail && userData.emailVerified === false)
 			)
-				userData[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"] =
-					date;
+				userData.lastLoginAt = date;
 
 			// Create the new user in the database
 			const newUser = await agnost
@@ -154,8 +138,7 @@ router.post(
 			// If email validation required then check the redirect URL. We need to make this check before creating the user object in the database to ensure transactional integrity.
 			if (
 				authentication.email.confirmEmail &&
-				((userDb.type === "MongoDB" && userData.emailVerified === false) ||
-					(userDb.type !== "MongoDB" && userData.email_verified === false))
+				userData.emailVerified === false
 			) {
 				if (!req.body.redirectURL) {
 					return res
@@ -231,7 +214,7 @@ router.post(
 					});
 			}
 		} catch (err) {
-			// Sign up unsuccessful if user created then delete it
+			// Sign up unsuccessful if use created then delete it
 			if (createdUser) {
 				await agnost
 					.db(userDb.name)
@@ -318,10 +301,7 @@ router.get(
 
 			// Everthing looks fine, we can perform the required action
 			if (req.token.obj.actionType === "email-confirm") {
-				if (
-					(userDb.type === "MongoDB" && existingUser.emailVerified) ||
-					(userDb.type !== "MongoDB" && existingUser.email_verified)
-				) {
+				if (existingUser.emailVerified) {
 					clearToken(req.token.key);
 
 					return processRedirect(req, res, req.token.obj.redirectURL, {
@@ -336,11 +316,7 @@ router.get(
 				await agnost
 					.db(userDb.name)
 					.model(userModel.name)
-					.updateById(req.token.obj.userId, {
-						[userDb.type === "MongoDB"
-							? "emailVerified"
-							: "email_verified"]: true,
-					});
+					.updateById(req.token.obj.userId, { emailVerified: true });
 
 				clearToken(req.token.key);
 
@@ -356,10 +332,7 @@ router.get(
 					action: req.token.obj.actionType,
 				});
 			} else if (req.token.obj.actionType === "magic-link") {
-				if (
-					(userDb.type === "MongoDB" && !existingUser.emailVerified) ||
-					(userDb.type !== "MongoDB" && !existingUser.email_verified)
-				) {
+				if (!existingUser.emailVerified) {
 					clearToken(req.token.key);
 
 					return processRedirect(req, res, req.token.obj.redirectURL, {
@@ -384,10 +357,7 @@ router.get(
 					action: req.token.obj.actionType,
 				});
 			} else if (req.token.obj.actionType === "reset-pwd") {
-				if (
-					(userDb.type === "MongoDB" && !existingUser.emailVerified) ||
-					(userDb.type !== "MongoDB" && !existingUser.email_verified)
-				) {
+				if (!existingUser.emailVerified) {
 					clearToken(req.token.key);
 
 					return processRedirect(req, res, req.token.obj.redirectURL, {
@@ -412,10 +382,7 @@ router.get(
 					action: req.token.obj.actionType,
 				});
 			} else if (req.token.obj.actionType === "change-email") {
-				if (
-					(userDb.type === "MongoDB" && !existingUser.emailVerified) ||
-					(userDb.type !== "MongoDB" && !existingUser.email_verified)
-				) {
+				if (!existingUser.emailVerified) {
 					clearToken(req.token.key);
 
 					return processRedirect(req, res, req.token.obj.redirectURL, {
@@ -567,10 +534,7 @@ router.get(
 			const updatedUser = await agnost
 				.db(userDb.name)
 				.model(userModel.name)
-				.updateById(req.token.obj.userId, {
-					[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"]:
-						new Date(),
-				});
+				.updateById(req.token.obj.userId, { lastLoginAt: new Date() });
 
 			// Clear the access token
 			clearToken(req.token.key);
@@ -686,14 +650,7 @@ router.post(
 			}
 
 			// Check if the email of the user has been verified and whether email verification is enabled
-			if (
-				(userDb.type === "MongoDB" &&
-					authentication.email.confirmEmail &&
-					!existingUser.emailVerified) ||
-				(userDb.type !== "MongoDB" &&
-					authentication.email.confirmEmail &&
-					!existingUser.email_verified)
-			) {
+			if (authentication.email.confirmEmail && !existingUser.emailVerified) {
 				return res
 					.status(401)
 					.json(
@@ -729,10 +686,7 @@ router.post(
 				.model(userModel.name)
 				.updateById(
 					userDb.type === "MongoDB" ? existingUser._id : existingUser.id,
-					{
-						[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"]:
-							new Date(),
-					}
+					{ lastLoginAt: new Date() }
 				);
 
 			// Do not return back the password value in response
@@ -848,10 +802,7 @@ router.post(
 			}
 
 			// Check if the email of the user has been verified and whether email verification is enabled
-			if (
-				(userDb.type === "MongoDB" && existingUser.emailVerified) ||
-				(userDb.type !== "MongoDB" && existingUser.email_verified)
-			) {
+			if (existingUser.emailVerified) {
 				return res
 					.status(401)
 					.json(
@@ -999,10 +950,7 @@ router.post(
 			}
 
 			// Check if the email of the user has been verified or not. We can send magic link to verified emails
-			if (
-				(userDb.type === "MongoDB" && !existingUser.emailVerified) ||
-				(userDb.type !== "MongoDB" && !existingUser.email_verified)
-			) {
+			if (!existingUser.emailVerified) {
 				return res
 					.status(401)
 					.json(
@@ -1150,10 +1098,7 @@ router.post(
 			}
 
 			// Check if the email of the user has been verified or not. We can send magic link to verified emails
-			if (
-				(userDb.type === "MongoDB" && !existingUser.emailVerified) ||
-				(userDb.type !== "MongoDB" && !existingUser.email_verified)
-			) {
+			if (!existingUser.emailVerified) {
 				return res
 					.status(401)
 					.json(
@@ -2004,8 +1949,8 @@ router.post(
 				provider: "agnost",
 				phone: req.body.phone,
 				password: req.body.password,
-				[userDb.type === "MongoDB" ? "signUpAt" : "signup_at"]: date,
-				[userDb.type === "MongoDB" ? "phoneVerified" : "phone_verified"]: false,
+				signUpAt: date,
+				phoneVerified: false,
 			};
 
 			if (
@@ -2018,35 +1963,17 @@ router.post(
 					...userData,
 				};
 				// Delete email related data in phone-sign up
-				if (userDb.type === "MongoDB") delete userData.emailVerified;
-				else delete userData.email_verified;
+				delete userData.emailVerified;
 				// Bypass phone number validation if specified
-				if (
-					(userDb.type === "MongoDB" &&
-						req.body.userData.phoneVerified === true) ||
-					(userDb.type !== "MongoDB" &&
-						req.body.userData.phone_verified === true)
-				)
-					userData[
-						userDb.type === "MongoDB" ? "phoneVerified" : "phone_verified"
-					] = true;
+				if (req.body.userData.phoneVerified === true)
+					userData.phoneVerified = true;
 			}
 
 			// If no phone number verification is needed then set the last login date
 			if (
-				!(
-					userDb.type === "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					userData.phoneVerified === false
-				) ||
-				!(
-					userDb.type !== "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					userData.phone_verified === false
-				)
+				!(authentication.phone.confirmPhone && userData.phoneVerified === false)
 			)
-				userData[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"] =
-					date;
+				userData.lastLoginAt = date;
 
 			// Create the new user in the database
 			const newUser = await agnost
@@ -2059,12 +1986,8 @@ router.post(
 			createdUser = newUser;
 
 			if (
-				(userDb.type === "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					userData.phoneVerified === false) ||
-				(userDb.type !== "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					userData.phone_verified === false)
+				authentication.phone.confirmPhone &&
+				userData.phoneVerified === false
 			) {
 				let token = createPhoneToken(
 					userDb.type === "MongoDB" ? newUser._id.toString() : newUser.id,
@@ -2226,10 +2149,7 @@ router.post(
 				}
 
 				// If phone already verified then return an error
-				if (
-					(userDb.type === "MongoDB" && existingUser.phoneVerified) ||
-					(userDb.type !== "MongoDB" && existingUser.phone_verified)
-				) {
+				if (existingUser.phoneVerified) {
 					clearToken(req.token.key);
 
 					return res
@@ -2248,11 +2168,8 @@ router.post(
 					.db(userDb.name)
 					.model(userModel.name)
 					.updateById(req.token.obj.userId, {
-						[userDb.type === "MongoDB"
-							? "phoneVerified"
-							: "phone_verified"]: true,
-						[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"]:
-							new Date(),
+						phoneVerified: true,
+						lastLoginAt: new Date(),
 					});
 
 				// Delete password field
@@ -2294,14 +2211,7 @@ router.post(
 						session: session,
 					});
 			} else if (req.token.obj.actionType === "change-phone") {
-				if (
-					(userDb.type === "MongoDB" &&
-						!existingUser.phoneVerified &&
-						authentication.phone.confirmPhone) ||
-					(userDb.type !== "MongoDB" &&
-						!existingUser.phone_verified &&
-						authentication.phone.confirmPhone)
-				) {
+				if (!existingUser.phoneVerified && authentication.phone.confirmPhone) {
 					clearToken(req.token.key);
 
 					return res
@@ -2454,10 +2364,7 @@ router.post(
 			}
 
 			//Check if the phone number of the user has been verified and whether phone number verification is enabled
-			if (
-				(userDb.type === "MongoDB" && existingUser.phoneVerified) ||
-				(userDb.type !== "MongoDB" && existingUser.phone_verified)
-			) {
+			if (existingUser.phoneVerified) {
 				return res
 					.status(401)
 					.json(
@@ -2586,14 +2493,7 @@ router.post(
 			}
 
 			//Check if the phone of the user has been verified and whether phone verification is enabled
-			if (
-				(userDb.type === "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phoneVerified) ||
-				(userDb.type !== "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phone_verified)
-			) {
+			if (authentication.phone.confirmPhone && !existingUser.phoneVerified) {
 				return res
 					.status(401)
 					.json(
@@ -2631,10 +2531,7 @@ router.post(
 				.model(userModel.name)
 				.updateById(
 					userDb.type === "MongoDB" ? existingUser._id : existingUser.id,
-					{
-						[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"]:
-							new Date(),
-					}
+					{ lastLoginAt: new Date() }
 				);
 
 			// Do not return back the password value in response
@@ -2751,14 +2648,7 @@ router.post(
 			}
 
 			// Check if the phone of the user has been verified and whether phone verification is enabled
-			if (
-				(userDb.type === "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phoneVerified) ||
-				(userDb.type !== "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phone_verified)
-			) {
+			if (authentication.phone.confirmPhone && !existingUser.phoneVerified) {
 				return res
 					.status(401)
 					.json(
@@ -2895,14 +2785,7 @@ router.post(
 			// Everthing looks fine, we can perform the required action
 			if (req.token.obj.actionType === "signin-code") {
 				// Check if the phone of the user has been verified and whether phone verification is enabled
-				if (
-					(userDb.type === "MongoDB" &&
-						authentication.phone.confirmPhone &&
-						!existingUser.phoneVerified) ||
-					(userDb.type !== "MongoDB" &&
-						authentication.phone.confirmPhone &&
-						!existingUser.phone_verified)
-				) {
+				if (authentication.phone.confirmPhone && !existingUser.phoneVerified) {
 					return res
 						.status(401)
 						.json(
@@ -2934,8 +2817,7 @@ router.post(
 					.db(userDb.name)
 					.model(userModel.name)
 					.updateById(req.token.obj.userId, {
-						[userDb.type === "MongoDB" ? "lastLoginAt" : "last_login_at"]:
-							new Date(),
+						lastLoginAt: new Date(),
 					});
 				// Clear the token which is used
 				clearToken(req.token.key);
@@ -3234,14 +3116,7 @@ router.post(
 			}
 
 			//Check if the phone of the user has been verified and whether phone verification is enabled
-			if (
-				(userDb.type === "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phoneVerified) ||
-				(userDb.type !== "MongoDB" &&
-					authentication.phone.confirmPhone &&
-					!existingUser.phone_verified)
-			) {
+			if (authentication.phone.confirmPhone && !existingUser.phoneVerified) {
 				return res
 					.status(401)
 					.json(

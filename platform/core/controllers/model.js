@@ -288,29 +288,23 @@ class ModelController extends BaseController {
 				type: newField.type,
 				dbType: newField.dbType,
 				order: (startingOrderNumber += 10000),
-				required: ["provider", "signUpAt", "signup_at"].includes(newField.name)
+				required: ["provider", "signUpAt"].includes(newField.name)
 					? true
 					: false,
 				unique: ["email", "phone"].includes(newField.name) ? true : false,
-				immutable: [
-					"provider",
-					"providerUserId",
-					"provider_user_id",
-					"2faSecret",
-				].includes(newField.name)
+				immutable: ["provider", "providerUserId", "2faSecret"].includes(
+					newField.name
+				)
 					? true
 					: false,
 				indexed: [
 					"provider",
 					"providerUserId",
-					"provider_user_id",
 					"email",
 					"phone",
 					"name",
 					"signUpAt",
-					"signup_at",
 					"lastLoginAt",
-					"last_login_at",
 				].includes(newField.name)
 					? true
 					: false,

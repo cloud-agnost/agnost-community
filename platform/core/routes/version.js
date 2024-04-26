@@ -37,7 +37,6 @@ import { handleError } from "../schemas/platformError.js";
 import { setKey } from "../init/cache.js";
 import {
 	authUserDataModel,
-	authUserDataModelSQL,
 	apiServerDefaultPackages,
 	dbTypeMappings,
 } from "../config/constants.js";
@@ -2122,12 +2121,9 @@ router.post(
 			const { org, app, user, version, database, model } = req;
 
 			// Check if the required fields are present in the user data model
-			let userDataModel = authUserDataModel;
-			if (database.type !== "MongoDB") userDataModel = authUserDataModelSQL;
-
 			const missingFields = [];
 			const conflictingFields = [];
-			for (const entry of userDataModel) {
+			for (const entry of authUserDataModel) {
 				// Check if entry exists in user data model
 				const fields = req.model.fields;
 				let fieldExists = false;

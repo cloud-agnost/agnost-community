@@ -205,7 +205,6 @@ const verifyCallback = (req) => {
 		const { userDb, userModel } = req;
 		// Get normalized user data
 		const userData = await getNormalizedUserData(
-			userDbtype,
 			req.provider.name,
 			profile,
 			accessToken
@@ -239,10 +238,7 @@ const verifyCallback = (req) => {
 			.db(userDb.name)
 			.model(userModel.name)
 			.findOne(
-				{
-					[userDb.type === "MongoDB" ? "providerUserId" : "provider_user_id"]:
-						userData.providerUserId,
-				},
+				{ providerUserId: userData.providerUserId },
 				{ useReadReplica: true }
 			);
 
@@ -264,8 +260,7 @@ const verifyCallback = (req) => {
 			return done(null, req.authResult);
 		} else {
 			// Create user authentication data in the database
-			userData[userDb.type === "MongoDB" ? "signUpAt" : "signup_at"] =
-				new Date();
+			userData.signUpAt = new Date();
 
 			// Create the new user in the database
 			const newUser = await agnost
@@ -298,7 +293,7 @@ const verifyAppleCallback = async (
 	done
 ) => verifyCallback(req)(accessToken, refreshToken, idToken, done);
 
-async function getNormalizedUserData(type, provider, profile, accessToken) {
+async function getNormalizedUserData(provider, profile, accessToken) {
 	let normlizedProfile = {};
 	switch (provider) {
 		case "google":
@@ -310,22 +305,16 @@ async function getNormalizedUserData(type, provider, profile, accessToken) {
 			normlizedProfile.name = profile.displayName;
 			if (profile.emails && profile.emails[0])
 				normlizedProfile.email = profile.emails[0].value;
-			if (profile.photos && profile.photos[0]) {
-				if (type === "MongoDB")
-					normlizedProfile.profilePicture = profile.photos[0].value;
-				else normlizedProfile.profile_picture = profile.photos[0].value;
-			}
+			if (profile.photos && profile.photos[0])
+				normlizedProfile.profilePicture = profile.photos[0].value;
 			break;
 		case "discord":
 			normlizedProfile.provider = provider;
 			normlizedProfile.providerUserId = profile.id;
 			normlizedProfile.name = profile.username;
 			if (profile.email) normlizedProfile.email = profile.email;
-			if (profile.photos && profile.photos[0]) {
-				if (type === "MongoDB")
-					normlizedProfile.profilePicture = profile.photos[0].value;
-				else normlizedProfile.profile_picture = profile.photos[0].value;
-			}
+			if (profile.photos && profile.photos[0])
+				normlizedProfile.profilePicture = profile.photos[0].value;
 			break;
 		case "apple":
 			{
