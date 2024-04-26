@@ -63,7 +63,14 @@ export default function TableHeader({
 	function getFilterComponent() {
 		const Comp = CellFilterMap[field as FieldTypes];
 		if (Comp) {
-			return <Comp type={field} columnName={text} options={selectList as string[]} />;
+			return (
+				<Comp
+					type={field}
+					columnName={text}
+					options={selectList as string[]}
+					entityId={model._id}
+				/>
+			);
 		}
 		return null;
 	}

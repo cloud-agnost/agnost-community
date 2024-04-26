@@ -226,7 +226,6 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 					});
 				},
 				setColumnFilters: (columnName, filter, entityId) => {
-					console.log('setColumnFilters', columnName, filter, entityId);
 					set((prev) => {
 						return {
 							columnFilters: {
