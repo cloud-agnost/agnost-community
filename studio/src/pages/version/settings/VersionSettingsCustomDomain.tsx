@@ -16,7 +16,7 @@ import { useParams } from 'react-router-dom';
 
 export default function VersionSettingsCustomDomain() {
 	const { t } = useTranslation();
-	const canCreate = useAuthorizeVersion('domain.create');
+	const canCreate = useAuthorizeVersion('version.domain.create');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { toast } = useToast();
 	const { versionId, orgId, appId } = useParams() as Record<string, string>;

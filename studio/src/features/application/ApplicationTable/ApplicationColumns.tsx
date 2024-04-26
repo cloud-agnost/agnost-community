@@ -10,6 +10,11 @@ import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
 import { getRelativeTime, translate } from '@/utils';
 import { ArrowClockwise } from '@phosphor-icons/react';
 const user = useAuthStore.getState().user;
+
+function isAppLoading(application: Application): boolean {
+	const { application: selectedApp, loading } = useApplicationStore.getState();
+	return loading && selectedApp?._id === application._id;
+}
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
 		id: 'name',
@@ -27,9 +32,9 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 					</Avatar>
 					<Button
 						variant='blank'
-						loading={useApplicationStore.getState().loading}
+						loading={isAppLoading(row.original)}
 						onClick={() => useApplicationStore.getState().onAppClick(row.original)}
-						className='ml-2 link'
+						className='ml-2 link justify-start'
 					>
 						{name}
 					</Button>

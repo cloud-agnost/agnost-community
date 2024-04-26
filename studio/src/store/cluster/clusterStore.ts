@@ -15,6 +15,7 @@ import {
 	UpdateRemainingClusterComponentsParams,
 } from '@/types';
 import { BaseGetRequest, BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
+import { sendMessageToChannel } from '@/utils';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
@@ -117,6 +118,8 @@ const useClusterStore = create<ClusterStore & Actions>()(
 			try {
 				const clusterSetupResponse = await AuthService.finalizeClusterSetup(params);
 				set({ isCompleted: true });
+				const user = useAuthStore.getState().user;
+				sendMessageToChannel('new_cluster', user);
 				useOrganizationStore.setState({
 					organization: {
 						...clusterSetupResponse.org,
