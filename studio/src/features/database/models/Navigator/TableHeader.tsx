@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { CellFilterMap } from '@/constants';
 import { useColumnFilter } from '@/hooks';
-import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -13,23 +12,26 @@ import { IHeaderParams } from 'ag-grid-community';
 import _ from 'lodash';
 import { useLocation, useSearchParams } from 'react-router-dom';
 interface SortButtonProps extends IHeaderParams {
+	entityId: string;
 	className?: string;
-	field?: FieldTypes;
-	text: string;
+	type?: FieldTypes;
+	label: string;
+	field: string;
 	filterable?: boolean;
 	selectList?: string[];
 }
 
 export default function TableHeader({
+	entityId,
 	className,
 	field,
-	text,
+	label,
 	filterable,
 	selectList,
+	type,
 }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const model = useModelStore((state) => state.model);
-	const { selectedFilter } = useColumnFilter(model._id, text, field as FieldTypes);
+	const { selectedFilter } = useColumnFilter(entityId, field, type as FieldTypes);
 	const { updateCurrentTab } = useTabStore();
 	const { version } = useVersionStore();
 	const { pathname } = useLocation();
@@ -39,10 +41,10 @@ export default function TableHeader({
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');
 		let newDirection = defaultDirection;
-		if (currentField === text) {
+		if (currentField === field) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
-		searchParams.set('f', text as string);
+		searchParams.set('f', field as string);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
 		if (version) {
@@ -53,7 +55,7 @@ export default function TableHeader({
 	};
 
 	function handleClearFilter() {
-		clearColumnFilter(model._id, text);
+		clearColumnFilter(entityId, field);
 		searchParams.set('page', '1');
 		searchParams.set('filtered', 'false');
 		setSearchParams(searchParams);
@@ -61,15 +63,10 @@ export default function TableHeader({
 	}
 
 	function getFilterComponent() {
-		const Comp = CellFilterMap[field as FieldTypes];
+		const Comp = CellFilterMap[type as FieldTypes];
 		if (Comp) {
 			return (
-				<Comp
-					type={field}
-					columnName={text}
-					options={selectList as string[]}
-					entityId={model._id}
-				/>
+				<Comp type={type} columnName={field} options={selectList as string[]} entityId={entityId} />
 			);
 		}
 		return null;
@@ -83,8 +80,8 @@ export default function TableHeader({
 				size='sm'
 				className={cn('justify-start w-full h-full', className)}
 			>
-				<p className='truncate'>{text}</p>
-				{searchParams.get('f') === text && (
+				<p className='truncate'>{label}</p>
+				{searchParams.get('f') === field && (
 					<div className='ml-2'>
 						<CaretUp
 							size={14}
@@ -97,7 +94,7 @@ export default function TableHeader({
 				)}
 			</Button>
 
-			{CellFilterMap[field as FieldTypes] && filterable && (
+			{CellFilterMap[type as FieldTypes] && filterable && (
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
