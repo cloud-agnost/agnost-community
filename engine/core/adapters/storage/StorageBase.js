@@ -124,6 +124,7 @@ export class StorageBase {
 	 * @param {string} options.returnCountInfo Flag to specify whether to return the count and pagination information such as total number of buckets, page number and page size
 	 */
 	async listBuckets(storage, options = {}) {
+		let filter = null;
 		let search = null;
 		let pageNumber = 1;
 		let pageSize = config.get("general.defaultPageSize");
@@ -132,6 +133,7 @@ export class StorageBase {
 
 		if (options) {
 			if (options.search) search = options.search;
+			if (options.filter) filter = options.filter;
 			if (options.limit) pageSize = options.limit;
 			if (options.page) pageNumber = options.page;
 			if (options.sort && options.sort.field)
@@ -146,6 +148,19 @@ export class StorageBase {
 		const query = { storageId: storage.iid };
 		if (search)
 			query.name = { $regex: helper.escapeStringRegexp(search), $options: "i" };
+		else if (filter) {
+			// Filtering through the storage navigator
+			function dateReviver(key, value) {
+				const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+				if (typeof value === "string" && dateRegex.test(value)) {
+					return new Date(value);
+				}
+				return value;
+			}
+
+			query = { $and: [{ storageId: { $eq: storage.iid } }, filter] };
+			query = JSON.parse(JSON.stringify(query), dateReviver);
+		}
 		const skip = pageSize * (pageNumber - 1);
 
 		// Get connection to storage metadata database
@@ -201,6 +216,7 @@ export class StorageBase {
 	 * @type {boolean}
 	 */
 	async listFiles(storage, options = {}) {
+		let filter = null;
 		let search = null;
 		let pageNumber = 1;
 		let pageSize = config.get("general.defaultPageSize");
@@ -208,6 +224,7 @@ export class StorageBase {
 		let returnCountInfo = false;
 
 		if (options) {
+			if (options.filter) filter = options.filter;
 			if (options.search) search = options.search;
 			if (options.limit) pageSize = options.limit;
 			if (options.page) pageNumber = options.page;
@@ -223,6 +240,19 @@ export class StorageBase {
 		const query = { storageId: storage.iid };
 		if (search)
 			query.path = { $regex: helper.escapeStringRegexp(search), $options: "i" };
+		else if (filter) {
+			// Filtering through the storage navigator
+			function dateReviver(key, value) {
+				const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+				if (typeof value === "string" && dateRegex.test(value)) {
+					return new Date(value);
+				}
+				return value;
+			}
+
+			query = { $and: [{ storageId: { $eq: storage.iid } }, filter] };
+			query = JSON.parse(JSON.stringify(query), dateReviver);
+		}
 		const skip = pageSize * (pageNumber - 1);
 
 		// Get connection to storage metadata database
@@ -682,6 +712,7 @@ export class StorageBase {
 		if (!bucketObj)
 			throw new AgnostError(t("The bucket '%s' cannot be found.", bucketName));
 
+		let filter = null;
 		let search = null;
 		let pageNumber = 1;
 		let pageSize = config.get("general.defaultPageSize");
@@ -689,6 +720,7 @@ export class StorageBase {
 		let returnCountInfo = false;
 
 		if (options) {
+			if (options.filter) filter = options.filter;
 			if (options.search) search = options.search;
 			if (options.limit) pageSize = options.limit;
 			if (options.page) pageNumber = options.page;
@@ -704,6 +736,19 @@ export class StorageBase {
 		const query = { bucketId: bucketObj.id };
 		if (search)
 			query.path = { $regex: helper.escapeStringRegexp(search), $options: "i" };
+		else if (filter) {
+			// Filtering through the storage navigator
+			function dateReviver(key, value) {
+				const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+				if (typeof value === "string" && dateRegex.test(value)) {
+					return new Date(value);
+				}
+				return value;
+			}
+
+			query = { $and: [{ bucketId: { $eq: bucketObj.id } }, filter] };
+			query = JSON.parse(JSON.stringify(query), dateReviver);
+		}
 		const skip = pageSize * (pageNumber - 1);
 
 		// Get connection to storage metadata database
