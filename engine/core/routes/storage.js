@@ -25,7 +25,7 @@ const router = express.Router({ mergeParams: true });
 @desc       Get list of bucket of the storage
 @access     private
 */
-router.post(
+router.get(
   "/:storageName/bucket",
   authManageStorage,
   getResponseBody,
@@ -33,19 +33,17 @@ router.post(
   applyDefaultRateLimiters(),
   checkServerStatus,
   checkStorage,
-  checkContentType,
   async (req, res) => {
     try {
       const { storageName } = req.params;
       const { page, size, sortBy, sortDir, search } = req.query;
-      console.log("page", req.body.filter);
+
       const { data, info } = await agnost.storage(storageName).listBuckets({
         page: Number(page),
         limit: Number(size),
         search,
         sort: { field: sortBy, order: sortDir },
         returnCountInfo: true,
-        filter: req.body.filter,
       });
       const countInfo = {
         ...info,
@@ -369,7 +367,7 @@ router.put(
 @access     private
 */
 
-router.post(
+router.get(
   "/:storageName/bucket/:bucketName/file",
   authManageStorage,
   getResponseBody,
@@ -378,12 +376,10 @@ router.post(
   checkServerStatus,
   checkStorage,
   checkBucket,
-  checkContentType,
   async (req, res) => {
     try {
       const { storageName, bucketName } = req.params;
       const { page, limit, sortBy, sortDir, search } = req.query;
-      console.log("page", req.body.filter);
       const { data, info } = await agnost
         .storage(storageName)
         .bucket(bucketName)
@@ -393,7 +389,6 @@ router.post(
           sort: { field: sortBy, order: sortDir },
           returnCountInfo: true,
           search,
-          filter: req.body.filter,
         });
       const countInfo = {
         ...info,
