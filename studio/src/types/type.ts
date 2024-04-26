@@ -17,15 +17,21 @@ export interface APIError {
 		name:
 			| 'provider'
 			| 'providerUserId'
+			| 'provider_user_id'
 			| 'email'
 			| 'phone'
 			| 'password'
 			| 'name'
 			| 'profilePicture'
+			| 'profile_picture'
 			| 'signUpAt'
+			| 'signup_at'
 			| 'lastLoginAt'
+			| 'last_login_at'
 			| 'emailVerified'
-			| 'phoneVerified';
+			| 'email_verified'
+			| 'phoneVerified'
+			| 'phone_verified';
 		type: 'text' | 'boolean' | 'datetime' | 'link' | 'encrypted-text' | 'array' | 'phone' | 'email';
 	}[];
 }

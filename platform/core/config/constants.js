@@ -960,6 +960,53 @@ export const authUserDataModel = [
 	},
 ];
 
+export const authUserDataModelSQL = [
+	{
+		name: "provider",
+		type: "text",
+	},
+	{
+		name: "provider_user_id",
+		type: "text",
+	},
+	{
+		name: "email",
+		type: "email",
+	},
+	{
+		name: "phone",
+		type: "phone",
+	},
+	{
+		name: "password",
+		type: "encrypted-text",
+	},
+	{
+		name: "name",
+		type: "text",
+	},
+	{
+		name: "profile_picture",
+		type: "link",
+	},
+	{
+		name: "signup_at",
+		type: "datetime",
+	},
+	{
+		name: "last_login_at",
+		type: "datetime",
+	},
+	{
+		name: "email_verified",
+		type: "boolean",
+	},
+	{
+		name: "phone_verified",
+		type: "boolean",
+	},
+];
+
 export const defaultEndpointCode = `import { agnost } from "@agnost/server";
 
 const endpointHandler = async (req, res) => {

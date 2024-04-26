@@ -24,7 +24,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-const USER_VARIABLES = ['name', 'email', 'phone', 'sigUpAt', 'lastLoginAt'];
+const USER_VARIABLES = ['name', 'email', 'phone'];
 const EMAIL_TOKEN_VARIABLES = [
 	'email',
 	'confirmationUrl',
