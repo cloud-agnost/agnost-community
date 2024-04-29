@@ -21,6 +21,7 @@ const listGitBranches = require('./listGitBranches');
 const { watchPipelineEvents } = require('./pipelineEvents');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swaggerDef');
+const exposeService = require('./exposeServices');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -39,6 +40,7 @@ app.use('/', tektonInfra);
 app.use('/', tektonPipeline);
 app.use('/', listGitRepos);
 app.use('/', listGitBranches);
+app.use('/', exposeService);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Call pipeline event watcher

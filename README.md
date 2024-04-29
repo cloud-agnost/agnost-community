@@ -983,3 +983,32 @@ curl -XGET 'http://localhost:3000/listGitBranches?gitRepoType=github&gitRepoName
 ```bash
 curl -XGET 'http://localhost:3000/listGitBranches?gitRepoType=gitlab&gitRepoName=NAMESPACE/PROJECTr&gitPat=YOUR_GITLAB_PAT'
 ```
+
+## Export Services via NGINX Ingress
+
+### Create expose
+
+```bash
+curl -XPOST http://localhost:3000/exposeService -d '{
+    "serviceName": "mongodb-svc",
+    "portNumber": 10001
+}' -H "Content-type: application/json"
+```
+
+### Update expose
+
+```bash
+curl -XPUT http://localhost:3000/exposeService -d '{
+    "serviceName": "mongodb-svc",
+    "oldPortNumber": 10001,
+    "newPortNumber": 10010
+}' -H "Content-type: application/json"
+```
+
+### Unexpose
+
+```bash
+curl -XDELETE http://localhost:3000/exposeService -d '{
+    "portNumber": 10010
+}' -H "Content-type: application/json"
+```
