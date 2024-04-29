@@ -64,6 +64,12 @@ async function exposeService(serviceName, portNumber) {
 
     // patch deployment/ingress-nginx-controller
     const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
+
+    const configmapArg = '--tcp-services-configmap=ingress-nginx/tcp-services';
+    if (!dply.body.spec.template.spec.containers[0].args.includes(configmapArg)) {
+      dply.body.spec.template.spec.containers[0].args.push(configmapArg);
+    }
+
     const newContainerPort = { containerPort: portNumber, hostPort: portNumber, protocol: protocol};
     dply.body.spec.template.spec.containers[0].ports.push(newContainerPort);
     await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
