@@ -256,7 +256,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
             resource.spec.triggers[0].interceptors[1].params[1].name = 'filter'
             // remove leading slash, if exists
             var path = gitSubPath.replace(/^\/+/, '')
-            resource.spec.triggers[0].interceptors[1].params[1].value = `extensions.changed_files.matches("${path}")`;
+            resource.spec.triggers[0].interceptors[1].params[1].value = `extensions.changed_files.matches("^${path}")`;
           } else {
             delete resource.spec.triggers[0].interceptors[1].params[1];
           }
