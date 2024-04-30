@@ -88,11 +88,14 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				filterType: Filters.Date,
 			};
 			setColumnFilters('timestamp', filter, type);
+		}
+		if (!searchParams.has('start') || !searchParams.has('end')) {
 			searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
 			searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
 			setSearchParams(searchParams);
 		}
 	}, []);
+
 	function refetchLogs() {
 		refetch();
 		versionLogResponse.refetch();
@@ -101,8 +104,8 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	return (
 		<div className='h-full space-y-6 p-4 relative'>
 			<VersionLogCharts type={type} refetch={refetchLogs} />
-			{isFetching ? (
-				<Loading loading={isFetching} />
+			{versionLogResponse.isFetching ? (
+				<Loading loading={versionLogResponse.isFetching} />
 			) : (
 				<>
 					<VersionLogsTable type={type} {...versionLogResponse} />

@@ -19,6 +19,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 		accessorKey: 'name',
 		size: 200,
+		enableSorting: true,
 	},
 	{
 		id: 'type',
@@ -27,6 +28,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 		accessorKey: 'instance',
 		size: 200,
+		enableSorting: true,
+
 		cell: ({ row }) => {
 			const { instance } = row.original;
 			const Icon = RESOURCE_ICON_MAP[instance];
@@ -45,6 +48,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 		accessorKey: 'status',
 		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { status } = row.original;
 			return <Badge text={status} variant={BADGE_COLOR_MAP[status?.toUpperCase()]} rounded />;
@@ -57,6 +61,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 		accessorKey: 'manage',
 		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { managed } = row.original;
 			const status = managed ? t('general.yes') : t('general.no');
@@ -70,6 +75,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 		accessorKey: 'allowedRoles',
 		size: 200,
+		enableSorting: true,
 		cell: ({ row }) => {
 			const { allowedRoles } = row.original;
 			return (
@@ -83,6 +89,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'createdAt',
+		enableSorting: true,
 		header: () => {
 			return <SortButton text={translate('resources.table.createdAt')} field='createdAt' />;
 		},

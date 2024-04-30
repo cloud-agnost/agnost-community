@@ -19,14 +19,12 @@ interface NestedWorkspaceItemProps {
 	data: any;
 	type: TabTypes;
 	setToDeleteData: (data: any) => void;
-	openDeleteModal: (open: boolean) => void;
 }
 
 export default function NestedWorkspaceItem({
 	data,
 	type,
 	setToDeleteData,
-	openDeleteModal,
 }: NestedWorkspaceItemProps) {
 	const getIcon = useTabIcon('w-3.5 h-3.5');
 	const { getTheme } = useThemeStore();
@@ -61,7 +59,8 @@ export default function NestedWorkspaceItem({
 			type,
 			data,
 		});
-		openDeleteModal(true);
+		const openDeleteModal = getFunction(type, `openDelete${type}Modal`);
+		openDeleteModal(data);
 	}
 
 	function openEditDialog(data: WorkspaceDataType, type: TabTypes) {
@@ -105,6 +104,11 @@ export default function NestedWorkspaceItem({
 			isDashboard: false,
 			type,
 		});
+	}
+
+	function handleOpenCreateModal(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+		e.stopPropagation();
+		STORES[type].toggleCreateModal();
 	}
 	return (
 		<ExplorerCollapsible
@@ -163,20 +167,23 @@ export default function NestedWorkspaceItem({
 							</h1>
 						</Button>
 						<div className='flex items-center justify-end'>
-							<Button
-								variant='icon'
-								size='sm'
-								rounded
-								className={cn(
-									window.location.pathname.includes(data._id) &&
-										type === currentTab?.type &&
-										'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-									'!p-0 !h-5 hidden group-hover:inline-flex',
-								)}
-								onClick={STORES[type].toggleCreateModal}
-							>
-								<Plus size={14} />
-							</Button>
+							{window.location.pathname.includes(data._id) && type && (
+								<Button
+									variant='icon'
+									size='sm'
+									rounded
+									className={cn(
+										window.location.pathname.includes(data._id) &&
+											type === currentTab?.type &&
+											'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
+										'!p-0 !h-5 hidden group-hover:inline-flex',
+									)}
+									onClick={handleOpenCreateModal}
+								>
+									<Plus size={14} />
+								</Button>
+							)}
+
 							<Button
 								variant='icon'
 								size='sm'

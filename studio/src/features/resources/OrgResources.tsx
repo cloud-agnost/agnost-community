@@ -31,14 +31,21 @@ export default function OrgResources() {
 	});
 
 	const { isPending, refetch } = useQuery({
-		queryKey: ['orgResources', orgId],
+		queryKey: [
+			'orgResources',
+			orgId,
+			searchParams.get('q'),
+			searchParams.get('f'),
+			searchParams.get('d'),
+		],
 		queryFn: () =>
 			getOrgResources({
 				search: searchParams.get('q') as string,
 				orgId,
+				sortBy: searchParams.get('f') ?? 'name',
+				sortDir: searchParams.get('d') ?? 'asc',
 			}),
 		refetchOnWindowFocus: false,
-		enabled: !resources.length,
 	});
 
 	const {

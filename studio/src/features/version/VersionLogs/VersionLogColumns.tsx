@@ -4,6 +4,7 @@ import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { MethodBadge } from '@/components/Endpoint';
 import { BADGE_COLOR_MAP, BASE_URL } from '@/constants';
+import { DefaultFilter } from '@/features/database/models/Navigator';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, FieldTypes, VersionLog } from '@/types';
@@ -11,12 +12,10 @@ import { DATETIME_MED_WITH_SECONDS, capitalize, formatDate, translate } from '@/
 import { Calendar, Clock, Files } from '@phosphor-icons/react';
 import DebugFilter from './DebugFilter';
 import DurationFilter from './DurationFilter';
-import EntityFilter from './EntityFilter';
+import FilterLayout from './FilterLayout';
 import MethodFilter from './MethodFilter';
 import StatusFilter from './StatusFilter';
 import TimestampFilter from './TimestampFilter';
-import { DefaultFilter } from '@/features/database/models/Navigator';
-import FilterLayout from './FilterLayout';
 
 const { openVersionLogDetails } = useVersionStore.getState();
 const env = useEnvironmentStore.getState().environment;
@@ -48,7 +47,13 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		id: 'name',
 		header: () => (
 			<SortButton text={translate('general.name')} field='name'>
-				<EntityFilter />
+				<FilterLayout columnName='name'>
+					<DefaultFilter
+						type={FieldTypes.TEXT}
+						columnName='name'
+						entityId={window.location.pathname.split('/')[8]}
+					/>
+				</FilterLayout>
 			</SortButton>
 		),
 		accessorKey: 'name',

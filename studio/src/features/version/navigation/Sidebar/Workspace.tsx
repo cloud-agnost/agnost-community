@@ -171,7 +171,6 @@ export default function Workspace() {
 								key={data._id}
 								type={item.type === TabTypes.Database ? TabTypes.Model : TabTypes.Bucket}
 								setToDeleteData={setToDeleteData}
-								openDeleteModal={setOpenInfoModal}
 							/>
 						) : (
 							<SideBarButton

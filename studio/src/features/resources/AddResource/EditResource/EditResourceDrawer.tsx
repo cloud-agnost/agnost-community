@@ -58,8 +58,8 @@ export default function EditResourceDrawer() {
 
 					{resourceToEdit.managed && (
 						<Description title={`Restart ${resourceToEdit.instance} server`}>
-							<div className='flex items-center justify-between'>
-								<p className='text-balance'>
+							<div className='flex items-center justify-between gap-6'>
+								<p>
 									Please be informed that if you restart your resource you might observe
 									interruption in resource services until it completes its restart.
 								</p>

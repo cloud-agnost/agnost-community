@@ -29,7 +29,7 @@ export default function StatusFilter() {
 		if (!selectedFilter) return;
 		const conditions = selectedFilter?.conditions;
 
-		setStatus(conditions[0].filter === 200 ? 'Success' : 'Error');
+		setStatus(conditions[0].type === ConditionsType.Equals ? 'Success' : 'Error');
 	}, [selectedFilter]);
 
 	return (
