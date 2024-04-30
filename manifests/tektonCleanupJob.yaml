@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-taskrun-cleaner
+  namespace: tekton-builds
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-taskrun-clean
+rules:
+  - apiGroups: ["tekton.dev"]
+    resources: ["taskruns"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tekton-taskrun-clean
+subjects:
+  - kind: ServiceAccount
+    name: tekton-taskrun-cleaner
+    namespace: tekton-builds
+roleRef:
+  kind: ClusterRole
+  name: tekton-taskrun-clean
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cleanup-taskrun
+  namespace: tekton-builds
+spec:
+  # will run everyday at 03:10 UTC
+  schedule: "10 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: tekton-taskrun-cleaner
+          containers:
+          - name: cleanup
+            image: bitnami/kubectl:1.29
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/bash
+            # Will delete taskruns older than 7 days
+            args:
+            - -c
+            - kubectl get taskruns -n tekton-builds -o go-template --template '{{range .items}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}' | awk '$2 <= "'$(date -d'now-7 days' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs --no-run-if-empty kubectl -n tekton-builds delete taskrun
+            resources:
+              limits:
+                cpu: 100m
+                memory: 200Mi
+          restartPolicy: Never
