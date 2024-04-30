@@ -23,7 +23,7 @@ function watchPipelineEvents() {
         if (type === 'ADDED' && event.involvedObject.kind === 'TaskRun') {
           var key = event.involvedObject.name;
           if (!processedEvents[key]) {
-            console.log('Event: ', key, event.rgeason);
+            console.log('Event: ', key, event.reason);
             processedEvents[key] = event.reason;
             // Here we can call engine endpoint to create a db entry for the taskrun!
 
@@ -34,6 +34,14 @@ function watchPipelineEvents() {
               // start following logs
               const podNamespace = event.involvedObject.namespace;
               const podName = event.involvedObject.name + '-pod';
+
+              const podManifest = k8sApi.readNamespacedPod(podName, podNamespace);
+              // e.g. triggers.tekton.dev/eventlistener: github-listener-abcdef002
+              const listenerName = podManifest.body.metadata.labels['triggers.tekton.dev/eventlistener'];
+              pipelineIdMatch = listenerName.match(/-([a-zA-Z0-9]+)$/);
+              const pipelineId = match ? match[1] : null;
+              // Now pipelineId can also be saved
+              console.log('PIpeline started for:', pipelineId);
 
               containerNames.forEach((containerName =>
                 childProcess = fork('./followLogs.js', [podNamespace, podName, containerName], {
