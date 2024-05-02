@@ -1,14 +1,17 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { SortButton } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { MODULE_PAGE_SIZE } from '@/constants';
+import { TableHeader } from '@/features/database/models/Navigator';
 import { EditFile, FileColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
+import useSaveColumnState from '@/hooks/useSaveColumnState';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, BucketCountInfo, TabTypes } from '@/types';
+import { APIError, BucketCountInfo, ColumnFilters, TabTypes } from '@/types';
+import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GridReadyEvent } from 'ag-grid-community';
@@ -18,9 +21,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Pagination } from '../version/navigator/Pagination';
-import useSaveColumnState from '@/hooks/useSaveColumnState';
 export default function Files() {
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
 	const gridRef = useRef<AgGridReact<any>>(null);
 	const { toast } = useToast();
@@ -38,8 +40,13 @@ export default function Files() {
 		uploadProgress,
 		fileCountInfo: stateInfo,
 	} = useStorageStore();
+	const { columnFilters, clearAllColumnFilters } = useUtilsStore();
 	const files = useMemo(() => stateFiles[bucket.id] ?? [], [bucket.id, stateFiles]);
 	const fileCountInfo = useMemo(() => stateInfo?.[bucket.id], [bucket.id, stateInfo]);
+	const fileColumnFilter = useMemo(
+		() => columnFilters?.[bucket?.id] ?? [],
+		[bucket?.id, , columnFilters?.[bucket?.id]],
+	);
 	const storageUrl = getVersionDashboardPath('/storage');
 	const bucketUrl = `${storageUrl}/${storage._id}`;
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -69,6 +76,7 @@ export default function Files() {
 			searchParams.get('size'),
 			searchParams.get('f'),
 			searchParams.get('d'),
+			searchParams.get('filtered'),
 		],
 		queryFn: () =>
 			getFilesOfBucket({
@@ -82,12 +90,9 @@ export default function Files() {
 				sortBy: searchParams.get('f') as string,
 				sortDir: searchParams.get('d') as string,
 				size: searchParams.get('size') ? Number(searchParams.get('size')) : MODULE_PAGE_SIZE,
+				filter: mongoQueryConverter(fileColumnFilter as ColumnFilters),
 			}),
 		refetchOnWindowFocus: false,
-		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
-		// &&
-		// (dataCountInfo?.[modelId]?.currentPage === undefined ||
-		// 	Math.ceil(data.length / MODULE_PAGE_SIZE) < (dataCountInfo?.[modelId]?.currentPage ?? 0)),
 	});
 
 	const { mutateAsync: deleteMultipleFileMutation } = useMutation({
@@ -152,6 +157,12 @@ export default function Files() {
 		event.api.sizeColumnsToFit();
 	}
 
+	function handleClearAllFilters() {
+		searchParams.set('filtered', 'false');
+		setSearchParams(searchParams);
+		clearAllColumnFilters(bucket?.id);
+	}
+
 	useEffect(() => {
 		if (!_.isNil(gridRef.current?.api)) {
 			if (isFetching) {
@@ -177,10 +188,17 @@ export default function Files() {
 				selectedRowCount={selectedRowCount}
 				onClearSelected={() => gridRef.current?.api.deselectAll()}
 				handlerButton={
-					<Button variant='secondary' onClick={() => refetch()} iconOnly>
-						<ArrowClockwise className='mr-1 w-3.5 h-3.5' />
-						{t('general.refresh')}
-					</Button>
+					<>
+						<Button variant='secondary' onClick={() => refetch()} iconOnly>
+							<ArrowClockwise className='mr-1 w-3.5 h-3.5' />
+							{t('general.refresh')}
+						</Button>
+						{!_.isEmpty(fileColumnFilter) && (
+							<Button variant='outline' onClick={handleClearAllFilters}>
+								Clear Filters
+							</Button>
+						)}
+					</>
 				}
 			>
 				<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
@@ -193,7 +211,7 @@ export default function Files() {
 						columnDefs={FileColumns}
 						rowSelection='multiple'
 						components={{
-							agColumnHeader: SortButton,
+							agColumnHeader: TableHeader,
 						}}
 						readOnlyEdit={true}
 						ensureDomOrder

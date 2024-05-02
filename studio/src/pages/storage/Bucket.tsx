@@ -1,14 +1,16 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
-import { SortButton } from '@/components/DataTable';
 import { MODULE_PAGE_SIZE } from '@/constants';
+import { TableHeader } from '@/features/database/models/Navigator';
 import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useToast } from '@/hooks';
 import useSaveColumnState from '@/hooks/useSaveColumnState';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, BucketCountInfo, TabTypes } from '@/types';
+import useUtilsStore from '@/store/version/utilsStore';
+import { APIError, BucketCountInfo, ColumnFilters, TabTypes } from '@/types';
+import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GridReadyEvent } from 'ag-grid-community';
@@ -16,7 +18,7 @@ import 'ag-grid-community/styles/ag-grid.css'; // Core CSS
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Theme
 import { AgGridReact } from 'ag-grid-react'; // React Grid Logic
 import _ from 'lodash';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Pagination } from '../version/navigator/Pagination';
@@ -24,10 +26,15 @@ export default function Buckets() {
 	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
 	const { toast } = useToast();
 	const { t } = useTranslation();
-	const { versionId, orgId, appId, storageId } = useParams();
-	const [searchParams] = useSearchParams();
+	const { versionId, orgId, appId, storageId } = useParams() as Record<string, string>;
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedRowCount, setSelectedRowCount] = useState(0);
 	const gridRef = useRef<AgGridReact<any>>(null);
+	const { columnFilters, clearAllColumnFilters } = useUtilsStore();
+	const bucketColumnFilter = useMemo(
+		() => columnFilters?.[storageId] ?? [],
+		[storageId, columnFilters?.[storageId]],
+	);
 	const {
 		getBuckets,
 		closeBucketDeleteDialog,
@@ -39,7 +46,7 @@ export default function Buckets() {
 		bucketCountInfo,
 		storage,
 	} = useStorageStore();
-	const { handleColumnStateChange, onFirstDataRendered } = useSaveColumnState(storageId as string);
+	const { handleColumnStateChange, onFirstDataRendered } = useSaveColumnState(storageId);
 	const storageUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/storage`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -60,6 +67,7 @@ export default function Buckets() {
 			searchParams.get('size'),
 			searchParams.get('d'),
 			searchParams.get('f'),
+			searchParams.get('filtered'),
 		],
 		queryFn: () =>
 			getBuckets({
@@ -70,12 +78,9 @@ export default function Buckets() {
 				storageName: storage?.name,
 				sortBy: searchParams.get('f') as string,
 				sortDir: searchParams.get('d') as string,
+				filter: mongoQueryConverter(bucketColumnFilter as ColumnFilters),
 			}),
 		refetchOnWindowFocus: false,
-		// enabled: isGridReady && modelId === model._id && window.location.pathname.includes(model._id),
-		// &&
-		// (dataCountInfo?.[modelId]?.currentPage === undefined ||
-		// 	Math.ceil(data.length / MODULE_PAGE_SIZE) < (dataCountInfo?.[modelId]?.currentPage ?? 0)),
 	});
 	const {
 		mutateAsync: deleteBucketMutation,
@@ -115,6 +120,12 @@ export default function Buckets() {
 		},
 	});
 
+	function handleClearAllFilters() {
+		searchParams.set('filtered', 'false');
+		setSearchParams(searchParams);
+		clearAllColumnFilters(storageId);
+	}
+
 	useEffect(() => {
 		refetch();
 	}, [versionId, orgId, appId, storageId]);
@@ -136,7 +147,6 @@ export default function Buckets() {
 	return (
 		<>
 			<VersionTabLayout
-				searchable
 				isEmpty={false}
 				type={TabTypes.Bucket}
 				openCreateModal={() => setIsBucketCreateOpen(true)}
@@ -146,10 +156,17 @@ export default function Buckets() {
 				selectedRowCount={selectedRowCount}
 				onClearSelected={() => gridRef.current?.api.deselectAll()}
 				handlerButton={
-					<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
-						{!isRefetching && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}
-						{t('general.refresh')}
-					</Button>
+					<>
+						<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
+							{!isRefetching && <ArrowClockwise className='mr-1 w-3.5 h-3.5' />}
+							{t('general.refresh')}
+						</Button>
+						{!_.isEmpty(bucketColumnFilter) && (
+							<Button variant='outline' onClick={handleClearAllFilters}>
+								Clear Filters
+							</Button>
+						)}
+					</>
 				}
 			>
 				<div className='ag-theme-alpine-dark h-full flex flex-col rounded'>
@@ -162,7 +179,7 @@ export default function Buckets() {
 						columnDefs={BucketColumns}
 						rowSelection='multiple'
 						components={{
-							agColumnHeader: SortButton,
+							agColumnHeader: TableHeader,
 						}}
 						readOnlyEdit={true}
 						ensureDomOrder

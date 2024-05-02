@@ -19,10 +19,12 @@ export default function ColumnFilter({
 	onFilterChange,
 	type,
 	condition,
+	description,
 }: {
 	onFilterChange: (filter: any) => void;
 	condition: Condition;
 	type: FieldTypes;
+	description?: string;
 }) {
 	const [filterCondition, setFilterCondition] = useState({
 		filter: condition?.filter ?? '',
@@ -116,18 +118,21 @@ export default function ColumnFilter({
 					ConditionsType.IsNull,
 					ConditionsType.IsNotNull,
 				].includes(filterCondition.type as ConditionsType) && (
-					<InputComp
-						{...inputProps}
-						type={
-							filterType === Filters.Number ||
-							(type === FieldTypes.ID && db.type !== ResourceInstances.MongoDB)
-								? 'number'
-								: 'text'
-						}
-						value={filterCondition.filter as string}
-						onChange={onChange}
-						placeholder='Filter'
-					/>
+					<div className='space-y-1'>
+						<InputComp
+							{...inputProps}
+							type={
+								filterType === Filters.Number ||
+								(type === FieldTypes.ID && db.type !== ResourceInstances.MongoDB)
+									? 'number'
+									: 'text'
+							}
+							value={filterCondition.filter as string}
+							onChange={onChange}
+							placeholder='Filter'
+						/>
+						{description && <p className='text-[10px] text-subtle text-balance'>{description}</p>}
+					</div>
 				)}
 		</>
 	);

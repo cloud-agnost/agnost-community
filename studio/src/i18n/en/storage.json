@@ -45,7 +45,8 @@
 		"copy_success": "File has been duplicated",
 		"replace": "Replace File",
 		"download": "Download File",
-		"replace_success": "File has been replaced"
+		"replace_success": "File has been replaced",
+		"size_description": "Size of the file in bytes"
 	},
 	"clear": {
 		"title": "Empty Bucket",

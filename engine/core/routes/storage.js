@@ -20,30 +20,32 @@ import helper from "../util/helper.js";
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /storage/:storageName/bucket?page=0&limit=10&search=&sortBy=email&sortDir=asc
-@method     GET
+@route      /storage/:storageName/get-buckets?page=0&limit=10&search=&sortBy=email&sortDir=asc
+@method     POST
 @desc       Get list of bucket of the storage
 @access     private
 */
-router.get(
-  "/:storageName/bucket",
+router.post(
+  "/:storageName/get-buckets",
   authManageStorage,
   getResponseBody,
   responseTime(logRequestToConsole),
   applyDefaultRateLimiters(),
   checkServerStatus,
   checkStorage,
+  checkContentType,
   async (req, res) => {
     try {
       const { storageName } = req.params;
       const { page, size, sortBy, sortDir, search } = req.query;
-
+      console.log("page", req.body.filter);
       const { data, info } = await agnost.storage(storageName).listBuckets({
         page: Number(page),
         limit: Number(size),
         search,
         sort: { field: sortBy, order: sortDir },
         returnCountInfo: true,
+        filter: req.body.filter,
       });
       const countInfo = {
         ...info,
@@ -361,14 +363,14 @@ router.put(
   }
 );
 /*
-@route      /storage/:storageName/bucket/:bucketName/file?page=0&limit=10&search=&sortBy=email&sortDir=asc&search=
+@route      /storage/:storageName/bucket/:bucketName/get-files?page=0&limit=10&search=&sortBy=email&sortDir=asc&search=
 @method     GET
 @desc       Get files in a bucket
 @access     private
 */
 
-router.get(
-  "/:storageName/bucket/:bucketName/file",
+router.post(
+  "/:storageName/bucket/:bucketName/get-files",
   authManageStorage,
   getResponseBody,
   responseTime(logRequestToConsole),
@@ -376,10 +378,12 @@ router.get(
   checkServerStatus,
   checkStorage,
   checkBucket,
+  checkContentType,
   async (req, res) => {
     try {
       const { storageName, bucketName } = req.params;
       const { page, limit, sortBy, sortDir, search } = req.query;
+      console.log("page", req.body.filter);
       const { data, info } = await agnost
         .storage(storageName)
         .bucket(bucketName)
@@ -389,6 +393,7 @@ router.get(
           sort: { field: sortBy, order: sortDir },
           returnCountInfo: true,
           search,
+          filter: req.body.filter,
         });
       const countInfo = {
         ...info,

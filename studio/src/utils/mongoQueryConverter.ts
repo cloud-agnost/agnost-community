@@ -51,7 +51,6 @@ function generateQuery({ condition, columnName }: { condition: Condition; column
 
 export function mongoQueryConverter(filters: ColumnFilters) {
 	const convertedQuery: any[] = [];
-
 	Object.entries(filters).forEach(([key, { conditions, operator }]) => {
 		if (conditions.length > 1) {
 			const compoundQuery = conditions.map((condition: Condition) =>

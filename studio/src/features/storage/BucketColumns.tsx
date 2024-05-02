@@ -4,7 +4,7 @@ import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
 import { toast } from '@/hooks/useToast';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, Bucket, TabTypes } from '@/types';
+import { APIError, Bucket, FieldTypes, TabTypes } from '@/types';
 import { DATE_TIME_FORMAT, convertUTC, getVersionPermission, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
@@ -55,7 +55,6 @@ const BucketColumns: ColDef<Bucket>[] = [
 	},
 	{
 		field: 'name',
-		headerComponentParams: { text: translate('general.name'), field: 'name' },
 		cellRenderer: ({ value, data }: ICellRendererParams) => (
 			<TabLink
 				name={value}
@@ -66,13 +65,23 @@ const BucketColumns: ColDef<Bucket>[] = [
 				}}
 			/>
 		),
+		headerComponentParams: {
+			type: FieldTypes.TEXT,
+			label: translate('general.name'),
+			field: 'name',
+			filterable: true,
+			entityId: useStorageStore.getState().storage._id,
+		},
 	},
 
 	{
 		field: 'isPublic',
 		headerComponentParams: {
-			text: translate('storage.bucket.visibility.title'),
+			type: FieldTypes.BOOLEAN,
+			label: translate('storage.bucket.visibility.title'),
 			field: 'isPublic',
+			filterable: true,
+			entityId: useStorageStore.getState().storage._id,
 		},
 		cellRenderer: ({ value }: ICellRendererParams) => (
 			<Badge
@@ -89,8 +98,11 @@ const BucketColumns: ColDef<Bucket>[] = [
 	{
 		field: 'tags',
 		headerComponentParams: {
-			text: translate('storage.bucket.tags'),
+			label: translate('storage.bucket.tags'),
 			field: 'tags',
+			type: FieldTypes.TEXT,
+			filterable: true,
+			entityId: useStorageStore.getState().storage._id,
 		},
 		cellRenderer: ({ value }: ICellRendererParams) => {
 			return (
@@ -105,16 +117,22 @@ const BucketColumns: ColDef<Bucket>[] = [
 	{
 		field: 'createdAt',
 		headerComponentParams: {
-			text: translate('general.created_at'),
+			label: translate('general.created_at'),
 			field: 'createdAt',
+			type: FieldTypes.DATETIME,
+			filterable: true,
+			entityId: useStorageStore.getState().storage._id,
 		},
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
 	{
 		field: 'updatedAt',
 		headerComponentParams: {
-			text: translate('general.updated_at'),
+			label: translate('general.updated_at'),
 			field: 'updatedAt',
+			type: FieldTypes.DATETIME,
+			filterable: true,
+			entityId: useStorageStore.getState().storage._id,
 		},
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},

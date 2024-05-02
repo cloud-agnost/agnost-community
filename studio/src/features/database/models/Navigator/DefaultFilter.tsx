@@ -6,7 +6,7 @@ import ColumnFilter from './ColumnFilter';
 import OperatorSelect from './OperatorSelect';
 import _ from 'lodash';
 
-export default function DefaultFilter({ type, columnName, entityId }: FilterProps) {
+export default function DefaultFilter({ type, columnName, entityId, description }: FilterProps) {
 	const { selectedFilter, filterType, applyFilter } = useColumnFilter(entityId, columnName, type);
 	const [filter, setFilter] = useState(selectedFilter);
 	const updateFilterCondition = (conditionIndex: number, updates: Partial<Condition>) => {
@@ -52,6 +52,7 @@ export default function DefaultFilter({ type, columnName, entityId }: FilterProp
 				onFilterChange={(filter) => updateFilterCondition(0, filter)}
 				type={type}
 				condition={filter?.conditions[0]}
+				description={description}
 			/>
 			{!_.isNil(filter?.conditions[0]?.filter) && (
 				<OperatorSelect
@@ -65,6 +66,7 @@ export default function DefaultFilter({ type, columnName, entityId }: FilterProp
 					onFilterChange={(filter) => updateFilterCondition(1, filter)}
 					type={type}
 					condition={filter?.conditions[1]}
+					description={description}
 				/>
 			)}
 
