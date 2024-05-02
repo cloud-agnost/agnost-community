@@ -5,7 +5,8 @@ import { TableConfirmation } from '@/components/Table';
 import { toast } from '@/hooks/useToast';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, BucketFile } from '@/types';
+import useUtilsStore from '@/store/version/utilsStore';
+import { APIError, BucketFile, ColumnFilters, FieldTypes } from '@/types';
 import {
 	DATE_TIME_FORMAT,
 	convertUTC,
@@ -13,6 +14,7 @@ import {
 	getVersionPermission,
 	translate,
 } from '@/utils';
+import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import { Copy, Download, Swap } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
 import { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
@@ -25,6 +27,7 @@ const { copyFileInBucket, replaceFileInBucket, openFileEditDialog, deleteFileFro
 const queryClient = new QueryClient();
 async function deleteFileHandler(toDeleteFile: BucketFile) {
 	const { bucket, storage, getFilesOfBucket, fileCountInfo } = useStorageStore.getState();
+	const { columnFilters } = useUtilsStore.getState();
 	const info = fileCountInfo?.[bucket.id];
 	return queryClient
 		.getMutationCache()
@@ -44,6 +47,7 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 					size: info?.pageSize ?? 25,
 					page: info?.currentPage ?? 1,
 					returnCountInfo: true,
+					filter: mongoQueryConverter(columnFilters?.[bucket.id] as ColumnFilters),
 				});
 			},
 		})
@@ -124,11 +128,23 @@ const FileColumns: ColDef<BucketFile>[] = [
 	},
 	{
 		field: 'id',
-		headerComponentParams: { text: translate('general.id'), field: 'id' },
+		headerComponentParams: {
+			label: translate('general.id'),
+			field: 'id',
+			type: FieldTypes.TEXT,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
+		},
 	},
 	{
 		field: 'path',
-		headerComponentParams: { text: translate('storage.file.path'), field: 'path' },
+		headerComponentParams: {
+			label: translate('storage.file.path'),
+			field: 'path',
+			type: FieldTypes.TEXT,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
+		},
 		cellRenderer: ({ value, data }: ICellRendererParams) => {
 			const environment = useEnvironmentStore.getState().environment;
 			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${data.id}`;
@@ -142,8 +158,11 @@ const FileColumns: ColDef<BucketFile>[] = [
 	{
 		field: 'isPublic',
 		headerComponentParams: {
-			text: translate('storage.bucket.visibility.title'),
+			label: translate('storage.bucket.visibility.title'),
 			field: 'isPublic',
+			type: FieldTypes.BOOLEAN,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
 		},
 		cellRenderer: ({ value }: ICellRendererParams) => (
 			<Badge
@@ -160,23 +179,33 @@ const FileColumns: ColDef<BucketFile>[] = [
 	{
 		field: 'size',
 		headerComponentParams: {
-			text: translate('storage.file.size'),
+			label: translate('storage.file.size'),
 			field: 'size',
+			type: FieldTypes.INTEGER,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
+			description: translate('storage.file.size_description'),
 		},
 		valueFormatter: ({ value }: ValueFormatterParams) => formatFileSize(value),
 	},
 	{
 		field: 'mimeType',
 		headerComponentParams: {
-			text: translate('storage.file.mimeType'),
+			label: translate('storage.file.mimeType'),
 			field: 'mimeType',
+			type: FieldTypes.TEXT,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
 		},
 	},
 	{
 		field: 'tags',
 		headerComponentParams: {
-			text: translate('storage.bucket.tags'),
+			label: translate('storage.bucket.tags'),
 			field: 'tags',
+			type: FieldTypes.TEXT,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
 		},
 		cellRenderer: ({ value }: ICellRendererParams) => {
 			return (
@@ -191,16 +220,22 @@ const FileColumns: ColDef<BucketFile>[] = [
 	{
 		field: 'uploadedAt',
 		headerComponentParams: {
-			text: translate('general.uploadedAt'),
+			label: translate('general.uploadedAt'),
 			field: 'uploadedAt',
+			type: FieldTypes.DATETIME,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
 		},
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},
 	{
 		field: 'updatedAt',
 		headerComponentParams: {
-			text: translate('general.updated_at'),
+			label: translate('general.updated_at'),
 			field: 'updatedAt',
+			type: FieldTypes.DATETIME,
+			filterable: true,
+			entityId: useStorageStore.getState().bucket.id,
 		},
 		valueFormatter: ({ value }) => convertUTC(value, DATE_TIME_FORMAT),
 	},

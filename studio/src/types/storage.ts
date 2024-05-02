@@ -83,6 +83,7 @@ export interface DeleteMultipleStoragesParams extends BaseRequest, BaseParams {
 export interface GetStorageBuckets extends BaseGetRequest {
 	storageName: string;
 	returnCountInfo: boolean;
+	filter: any;
 }
 
 export interface GetFilesParams extends BaseGetRequest {
@@ -91,6 +92,7 @@ export interface GetFilesParams extends BaseGetRequest {
 	bucketName: string;
 	returnCountInfo: boolean;
 	limit: number;
+	filter: any;
 }
 export interface DeleteBucketParams extends BaseRequest {
 	storageName: string;

@@ -82,12 +82,17 @@ export default class StorageService {
 
 	static async getStorageBuckets({
 		storageName,
+		filter,
 		...params
 	}: GetStorageBuckets): Promise<BucketWithCountInfo> {
 		return (
-			await http.get(`${this.getUrl()}/storage/${storageName}/bucket`, {
-				params,
-			})
+			await http.post(
+				`${this.getUrl()}/storage/${storageName}/get-buckets`,
+				{ filter },
+				{
+					params,
+				},
+			)
 		).data;
 	}
 
@@ -142,12 +147,17 @@ export default class StorageService {
 	static async getFilesOfBucket({
 		storageName,
 		bucketName,
+		filter,
 		...params
 	}: GetFilesParams): Promise<BucketFileWithCountInfo> {
 		return (
-			await http.get(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`, {
-				params,
-			})
+			await http.post(
+				`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/get-files`,
+				{ filter },
+				{
+					params,
+				},
+			)
 		).data;
 	}
 

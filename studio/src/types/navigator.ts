@@ -78,6 +78,7 @@ export interface FilterProps {
 	columnName: string;
 	entityId: string;
 	log?: boolean;
+	description?: string;
 }
 export interface VersionColumnFilters {
 	[entityId: string]: ColumnFilters | undefined;

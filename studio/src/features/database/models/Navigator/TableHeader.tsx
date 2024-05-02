@@ -19,6 +19,7 @@ interface SortButtonProps extends IHeaderParams {
 	field: string;
 	filterable?: boolean;
 	selectList?: string[];
+	description?: string;
 }
 
 export default function TableHeader({
@@ -29,6 +30,7 @@ export default function TableHeader({
 	filterable,
 	selectList,
 	type,
+	description,
 }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { selectedFilter } = useColumnFilter(entityId, field, type as FieldTypes);
@@ -66,7 +68,13 @@ export default function TableHeader({
 		const Comp = CellFilterMap[type as FieldTypes];
 		if (Comp) {
 			return (
-				<Comp type={type} columnName={field} options={selectList as string[]} entityId={entityId} />
+				<Comp
+					type={type}
+					columnName={field}
+					options={selectList as string[]}
+					entityId={entityId}
+					description={description}
+				/>
 			);
 		}
 		return null;
