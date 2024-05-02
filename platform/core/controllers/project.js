@@ -16,7 +16,7 @@ class ProjectController extends BaseController {
 	 * @param  {Object} org The organization object where the app will be created
 	 * @param  {Object} org The name of the app
 	 */
-	async createProject(session, user, org, name) {
+	async createProject(session, user, org, name, envName = "default") {
 		// Create the app
 		const projectId = helper.generateId();
 		const project = await this.create(
@@ -41,7 +41,7 @@ class ProjectController extends BaseController {
 				orgId: org._id,
 				projectId: project._id,
 				iid: helper.generateSlug("env"),
-				name: "Default",
+				name: envName,
 				private: false,
 				readOnly: true,
 				createdBy: user._id,

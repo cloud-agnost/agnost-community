@@ -611,6 +611,7 @@ export const resourceActions = [
 	"check",
 	"restart",
 	"restart-managed",
+	"manage-tcp-proxy",
 ];
 
 export const resourceStatuses = [

@@ -6,6 +6,8 @@ import { customAlphabet } from "nanoid";
 import cyripto from "crypto-js";
 import querystring from "querystring";
 import CIDR from "ip-cidr";
+import tcpProxyPortCtrl from "../controllers/tcpProxyPort.js";
+import { getKey, setKey, incrementKey, deleteKey } from "../init/cache.js";
 
 const constants = {
 	"1hour": 3600, // in seconds
@@ -643,6 +645,36 @@ async function getGitProviderRepoBranches(
 	}
 }
 
+async function getNewTCPPortNumber() {
+	// First check if we have key value
+	const latestPortNumber = await getKey("agnost_tcp_proxy_port_number");
+	// Ok we do not have it set it to the latest value
+	if (!latestPortNumber) {
+		// First check if we have a database entry
+		const entry = await tcpProxyPortCtrl.getOneByQuery(
+			{},
+			{ sort: { port: "desc" } }
+		);
+
+		if (entry) {
+			// Set the latest port number to the latest value
+			await setKey("agnost_tcp_proxy_port_number", entry.port);
+		} else {
+			// Set the latest port number to the latest value
+			await setKey(
+				"agnost_tcp_proxy_port_number",
+				config.get("general.tcpProxyPortStart")
+			);
+		}
+	}
+
+	const newPortNumber = await incrementKey("agnost_tcp_proxy_port_number", 1);
+	// Save new port number to database
+	await tcpProxyPortCtrl.create({ port: newPortNumber });
+	return newPortNumber;
+	x;
+}
+
 export default {
 	constants,
 	isObject,
@@ -682,4 +714,5 @@ export default {
 	revokeGitProviderAccessToken,
 	getGitProviderRepos,
 	getGitProviderRepoBranches,
+	getNewTCPPortNumber,
 };

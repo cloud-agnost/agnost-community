@@ -5,13 +5,23 @@ import { projectRoles } from "../config/constants.js";
 /**
  * An project is your workspace that packages all project environments and associated containers.
  */
-export const ProjectModel = mongoose.model(
-	"project",
+export const ContainerModel = mongoose.model(
+	"container",
 	new mongoose.Schema(
 		{
 			orgId: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "organization",
+				index: true,
+			},
+			projectId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "project",
+				index: true,
+			},
+			envId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "project_environment",
 				index: true,
 			},
 			iid: {
@@ -21,42 +31,264 @@ export const ProjectModel = mongoose.model(
 				index: true,
 				immutable: true,
 			},
-			ownerUserId: {
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "user",
-				index: true,
-			},
 			name: {
 				type: String,
 				required: true,
 				index: true,
 			},
-			pictureUrl: {
+			type: {
 				type: String,
+				required: true,
+				index: true,
+				immutable: true,
+				enum: ["deployment", "stateful_set", "cronjob", "knative_service"],
 			},
-			color: {
-				// If no picture provided then this will be the avatar background color of the project
-				type: String,
+			source: {
+				repoType: {
+					type: String,
+					enum: ["github", "gitlab", "bitbucket"],
+				},
+				repo: {
+					type: String,
+				},
+				branch: {
+					type: String,
+				},
+				// For monorepos the directory path to the container
+				rootDirectory: {
+					type: String,
+					default: "/",
+				},
 			},
-			team: [
-				{
-					userId: {
-						type: mongoose.Schema.Types.ObjectId,
-						ref: "user",
+			networking: {
+				// Flag specifies whether the container is accessible from the public internet or not
+				public: {
+					type: Boolean,
+					default: false,
+				},
+				// Flag specifies whether the container is accessible from the internal network or not
+				internal: {
+					type: Boolean,
+					default: false,
+				},
+				// The port number the container listens on
+				containerPort: {
+					type: Number,
+				},
+				// The port number the container is exposed on the host, populated only if the container is public
+				publicPort: {
+					type: Number,
+				},
+				// Whether an ingress is created for the container or not
+				ingress: {
+					type: Boolean,
+					default: false,
+				},
+			},
+			podConfig: {
+				restartPolicy: {
+					type: String,
+					enum: ["Always", "OnFailure", "Never"],
+					default: "Always",
+				},
+				cpuRequest: {
+					type: Number,
+					default: 100,
+				},
+				cpuRequestType: {
+					type: String,
+					enum: ["millicores", "cores"],
+					default: "millicores",
+				},
+				memoryRequest: {
+					type: Number,
+					default: 128,
+				},
+				memoryRequestType: {
+					type: String,
+					enum: ["mebibyte", "gibibyte"],
+					default: "mebibyte",
+				},
+				cpuLimit: {
+					type: Number,
+					default: 1,
+					default: "cores",
+				},
+				cpuLimitType: {
+					type: String,
+					enum: ["millicores", "cores"],
+				},
+				memoryLimit: {
+					type: Number,
+					default: 1024,
+				},
+				memoryLimitType: {
+					type: String,
+					enum: ["mebibyte", "gibibyte"],
+					default: "mebibyte",
+				},
+			},
+			deploymentConfig: {
+				desiredReplicas: {
+					type: Number,
+					default: 1,
+				},
+				minReplicas: {
+					type: Number,
+					default: 1,
+				},
+				maxReplicas: {
+					type: Number,
+					default: 1,
+				},
+				cpuAverageUtization: {
+					type: Number,
+				},
+				cpuAverageValue: {
+					type: Number,
+				},
+				cpuAverageValueType: {
+					type: String,
+					enum: ["millicores", "cores"],
+				},
+				memoryAverageUtization: {
+					type: Number,
+				},
+				memoryAverageValue: {
+					type: Number,
+				},
+				memoryAverageValueType: {
+					type: String,
+					enum: ["mebibyte", "gibibyte"],
+				},
+				strategy: {
+					type: String,
+					enum: ["RollingUpdate", "Recreate"],
+				},
+				rollingUpdate: {
+					maxSurge: {
+						type: Number,
+						default: 1,
 					},
-					role: {
+					maxSurgeType: {
 						type: String,
-						required: true,
-						index: true,
-						enum: projectRoles,
+						enum: ["number", "percentage"],
 					},
-					joinDate: {
-						type: Date,
-						default: Date.now,
-						immutable: true,
+					maxUnavailable: {
+						type: Number,
+						default: 0,
+					},
+					maxUnavailableType: {
+						type: String,
+						enum: ["number", "percentage"],
 					},
 				},
-			],
+				revisionHistoryLimit: {
+					type: Number,
+					default: 10,
+				},
+			},
+			statefulSetConfig: {
+				desiredReplicas: {
+					type: Number,
+					default: 1,
+				},
+				strategy: {
+					type: String,
+					enum: ["RollingUpdate", "Recreate"],
+				},
+				rollingUpdate: {
+					maxUnavailable: {
+						type: Number,
+						default: 1,
+					},
+					maxUnavailableType: {
+						type: String,
+						enum: ["number", "percentage"],
+					},
+					partition: {
+						type: Number,
+						default: 0,
+					},
+				},
+				revisionHistoryLimit: {
+					type: Number,
+					default: 10,
+				},
+				podManagementPolicy: {
+					type: String,
+					enum: ["OrderedReady", "Parallel"],
+					default: "OrderedReady",
+				},
+				persistentVolumeClaimRetentionPolicy: {
+					whenDeleted: {
+						type: String,
+						enum: ["Retain", "Delete"],
+						default: "Retain",
+					},
+					whenScaled: {
+						type: String,
+						enum: ["Retain", "Delete"],
+						default: "Retain",
+					},
+				},
+			},
+			cronJobConfig: {
+				schedule: {
+					type: String,
+				},
+				timeZone: {
+					type: String,
+				},
+				concurrencyPolicy: {
+					type: String,
+					enum: ["Allow", "Forbid", "Replace"],
+					default: "Allow",
+				},
+				suspend: {
+					type: Boolean,
+					default: false,
+				},
+				successfulJobsHistoryLimit: {
+					type: Number,
+					default: 10,
+				},
+				failedJobsHistoryLimit: {
+					type: Number,
+					default: 10,
+				},
+			},
+			knativeConfig: {
+				scalingMetric: {
+					type: String,
+					enum: ["concurrency", "rps", "cpu", "memory"],
+				},
+				scalingMetricTarget: {
+					// "Concurrency" specifies a percentage value, e.g. "70"
+					// "Requests per second" specifies an integer value,  e.g. "150"
+					// "CPU" specifies the integer value in millicore, e.g. "100m"
+					// "Memory" specifies the integer value in Mi, e.g. "75"
+					type: String,
+				},
+				maxScale: {
+					type: Number,
+					default: 1,
+				},
+				minScale: {
+					type: Number,
+					default: 0,
+				},
+				scaleDownDelay: {
+					type: String,
+				},
+				scaleToZeroPodRetentionPeriod: {
+					type: String,
+				},
+				revisionHistoryLimit: {
+					type: Number,
+					default: 10,
+				},
+			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "user",

@@ -105,6 +105,19 @@ async function applyManifest(localRegistryEnabled) {
 
     if (localRegistryEnabled) {
         await deployLocalRegistry();
+
+        // copy regcred secret from the app's namespace
+        try {
+            const secretName = "regcred-local-registry";
+            const resource_namespace = "tekton-builds";
+            const regcred = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
+            regcred.body.metadata.namespace = resource_namespace;
+            delete regcred.body.metadata.resourceVersion;
+            await k8sCoreApi.createNamespacedSecret(resource_namespace, regcred.body);
+            console.log("Regcred secret " + secretName + " is copied");
+        } catch (err) {
+            // do nothing, it might be a second time copy!
+        }
     }
 
     return "success";

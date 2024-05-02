@@ -2851,6 +2851,9 @@ router.post(
 				redeploy
 			);
 
+			// Commit transaction
+			await versionCtrl.commit(session);
+
 			if (redeploy) {
 				// Update environment data
 				updatedEnv = await envCtrl.updateOneById(
@@ -2862,35 +2865,29 @@ router.post(
 						updatedBy: user._id,
 					},
 					{},
-					{ cacheKey: toEnv._id, session }
+					{ cacheKey: toEnv._id }
 				);
 
 				// Create environment logs entry, which will be updated when the deployment is completed
-				let envLog = await envLogCtrl.create(
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: targetVersion._id,
-						envId: toEnv._id,
-						action: "deploy",
-						description: t("Redeploying app version"),
-						dbStatus: "Deploying",
-						serverStatus: "Deploying",
-						schedulerStatus: "Deploying",
-						dbLogs: [],
-						serverLogs: [],
-						schedulerLogs: [],
-						createdBy: user._id,
-					},
-					{ session }
-				);
+				let envLog = await envLogCtrl.create({
+					orgId: org._id,
+					appId: app._id,
+					versionId: targetVersion._id,
+					envId: toEnv._id,
+					action: "deploy",
+					description: t("Redeploying app version"),
+					dbStatus: "Deploying",
+					serverStatus: "Deploying",
+					schedulerStatus: "Deploying",
+					dbLogs: [],
+					serverLogs: [],
+					schedulerLogs: [],
+					createdBy: user._id,
+				});
 
 				// Redeploy application version to the environment
 				await deployCtrl.redeploy(envLog, app, targetVersion, updatedEnv, user);
 			}
-
-			// Commit transaction
-			await versionCtrl.commit(session);
 
 			res.json();
 

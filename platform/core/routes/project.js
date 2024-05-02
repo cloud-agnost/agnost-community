@@ -54,14 +54,15 @@ router.post(
 		const session = await prjCtrl.startSession();
 		try {
 			const { org, user } = req;
-			const { name } = req.body;
+			const { name, envName } = req.body;
 
 			// Create the new project and associated default environment
 			const { project, environment } = await prjCtrl.createProject(
 				session,
 				user,
 				org,
-				name
+				name,
+				envName
 			);
 
 			await prjCtrl.commit(session);

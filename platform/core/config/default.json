@@ -84,6 +84,7 @@
     "defaultDBPoolSize": 3,
     "maxDBPoolSize": 50,
     "maxClusterCustomDomains": 3,
+    "tcpProxyPortStart": 35000,
     "defaultEngineConfig": {
       "initialScale": 1,
       "minScale": 0,

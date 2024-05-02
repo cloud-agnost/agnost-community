@@ -115,6 +115,8 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
     const logPvcPatch = { spec: { resources: { requests: { storage: logStorageSize } } } };
     const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
 
+    console.log("****", size, logStorageSize);
+
     try {
         await k8sCustomApi.patchNamespacedCustomObject(
             group,
@@ -132,36 +134,38 @@ export async function updateMongoDBResource(mongoName, mongoVersion, size, repli
 
         const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
         pvcList.body.items.forEach(async (pvc) => {
-            var pvcName = pvc.metadata.name;
-            if (pvcName.includes("data-volume-" + mongoName + "-")) {
-                console.log("Updating data volume");
-                await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
-                    pvcName,
-                    namespace,
-                    dataPvcPatch,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    requestOptions
-                );
-                console.log("PersistentVolumeClaim " + pvcName + " updated...", size);
-            } else if (pvcName.includes("logs-volume-" + mongoName + "-")) {
-                console.log("Updating logs volume");
-                await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
-                    pvcName,
-                    namespace,
-                    logPvcPatch,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    requestOptions
-                );
-                console.log("PersistentVolumeClaim " + pvcName + " updated...", logStorageSize);
-            }
+            try {
+                var pvcName = pvc.metadata.name;
+                if (pvcName.includes("data-volume-" + mongoName + "-")) {
+                    console.log("Updating data volume");
+                    await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
+                        pvcName,
+                        namespace,
+                        dataPvcPatch,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        requestOptions
+                    );
+                    console.log("PersistentVolumeClaim " + pvcName + " updated...", size);
+                } else if (pvcName.includes("logs-volume-" + mongoName + "-")) {
+                    console.log("Updating logs volume");
+                    await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
+                        pvcName,
+                        namespace,
+                        logPvcPatch,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        requestOptions
+                    );
+                    console.log("PersistentVolumeClaim " + pvcName + " updated...", logStorageSize);
+                }
+            } catch (err) {}
         });
     } catch (error) {
         // console.error("Error updating MongoDB " + mongoName + " resources...", error.body);

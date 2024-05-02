@@ -54,6 +54,9 @@ export const manageResourceHandler = (connection, queue) => {
                     case "restart-managed":
                         result = await manager.restartManagedResource();
                         break;
+                    case "manage-tcp-proxy":
+                        result = await manager.manageTCPProxy();
+                        break;
                     default:
                         // Not a supported operation type
                         channel.ack(msg);

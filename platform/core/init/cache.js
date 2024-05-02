@@ -23,6 +23,7 @@ export const connectToRedisCache = async () => {
 			client.set = util.promisify(client.set);
 			client.del = util.promisify(client.del);
 			client.expire = util.promisify(client.expire);
+			client.incrby = util.promisify(client.incrby);
 
 			logger.info(
 				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
@@ -124,6 +125,15 @@ export const getKey = async (key) => {
 		}
 	}
 
+	return value;
+};
+
+/**
+ * Increments the key value by one
+ * @param  {string} key
+ */
+export const incrementKey = async (key, increment = 1) => {
+	let value = await client.incrby(key, increment);
 	return value;
 };
 

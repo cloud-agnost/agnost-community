@@ -126,6 +126,13 @@ export const ResourceModel = mongoose.model(
 			unavailableReplicas: {
 				type: Number,
 			},
+			tcpProxyEnabled: {
+				type: Boolean,
+				default: false,
+			},
+			tcpProxyPort: {
+				type: Number,
+			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "user",
@@ -535,14 +542,15 @@ export const applyRules = (type) => {
 					.bail()
 					.custom(async (value, { req }) => {
 						let resources = await ResourceModel.find({
-							orgId: req.org._id,
 							type: { $ne: "engine" },
 						});
 
 						resources.forEach((res) => {
 							if (res.name.toLowerCase() === value.toLowerCase())
 								throw new AgnostError(
-									t("Resource with the provided name already exists")
+									t(
+										"Resource with the provided name already exists within the cluster"
+									)
 								);
 						});
 
