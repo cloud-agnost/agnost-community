@@ -103,11 +103,11 @@ export default function PushVersion() {
 									on) */}
 								</AlertDescription>
 							</Alert>
-							<div className='flex items-center space-x-2'>
-								<Switch id='redeploy' checked={redeploy} onCheckedChange={setRedeploy} />
+							<div className='flex items-center justify-between space-x-2'>
 								<Label htmlFor='redeploy'>
 									Redeploy target version after successful push operation
 								</Label>
+								<Switch id='redeploy' checked={redeploy} onCheckedChange={setRedeploy} />
 							</div>
 							<div className='flex items-center justify-between'>
 								<Button variant='secondary' onClick={() => setStep(0)} className='!ml-4'>

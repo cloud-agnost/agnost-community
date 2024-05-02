@@ -30,30 +30,38 @@ export default function TimestampFilter() {
 	const { setColumnFilters } = useUtilsStore();
 
 	function selectDate(date: Range[]) {
-		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
-		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
-		setSearchParams(searchParams);
-		updateCurrentTab(version._id, {
-			path: `${pathname}?${searchParams.toString()}`,
-		});
+		const range = [
+			{
+				startDate: startOfDay(date[0].startDate as Date),
+				endDate: endOfDay(date[0].endDate as Date),
+				key: 'selection',
+			},
+		];
+		setDate(range);
 	}
 
 	function applyFilter() {
 		const filter: ColumnFilterType = {
 			conditions: [
 				{
-					filter: date[0].startDate?.toISOString() as string,
+					filter: startOfDay(date[0].startDate as Date).toISOString(),
 					type: ConditionsType.GreaterThanOrEqual,
 				},
 				{
-					filter: date[0].endDate?.toISOString() as string,
+					filter: endOfDay(date[0].endDate as Date).toISOString(),
 					type: ConditionsType.LessThanOrEqual,
 				},
 			],
 			filterType: Filters.Date,
 		};
 		setColumnFilters('timestamp', filter, logType);
-		selectDate(date);
+
+		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
+		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
+		setSearchParams(searchParams);
+		updateCurrentTab(version._id, {
+			path: `${pathname}?${searchParams.toString()}`,
+		});
 	}
 
 	function clearFilter() {
@@ -104,7 +112,7 @@ export default function TimestampFilter() {
 			</PopoverTrigger>
 			<PopoverContent align='start' className='bg-wrapper-background-light z=[99]'>
 				<DateRangePicker
-					onChange={(item: RangeKeyDict) => setDate([item.selection])}
+					onChange={(item: RangeKeyDict) => selectDate([item.selection])}
 					moveRangeOnFirstSelection={false}
 					months={1}
 					ranges={date}
@@ -120,7 +128,7 @@ export default function TimestampFilter() {
 					</PopoverClose>
 					<PopoverClose asChild>
 						<Button variant='secondary' className='mr-2' size='lg' onClick={clearFilter}>
-							Clear Filter
+							Reset Filter
 						</Button>
 					</PopoverClose>
 					<PopoverClose asChild>

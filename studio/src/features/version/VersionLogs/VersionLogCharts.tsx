@@ -15,6 +15,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
+import { ConditionsType, Filters } from '@/types';
 
 interface VersionLogChartsProps {
 	type: 'queue' | 'task' | 'endpoint';
@@ -28,8 +29,25 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 	const [searchParams, setSearchParams] = useSearchParams();
 	const updateCurrentTab = useTabStore((state) => state.updateCurrentTab);
 	const { pathname } = useLocation();
-	const { clearColumnFilter, columnFilters } = useUtilsStore();
+	const { columnFilters, clearLogColumnFilter, setColumnFilters } = useUtilsStore();
 	function selectDate(date: Range[]) {
+		setColumnFilters(
+			'timestamp',
+			{
+				conditions: [
+					{
+						filter: date[0].startDate?.toISOString() ?? '',
+						type: ConditionsType.GreaterThanOrEqual,
+					},
+					{
+						filter: date[0].endDate?.toISOString() ?? '',
+						type: ConditionsType.LessThanOrEqual,
+					},
+				],
+				filterType: Filters.Date,
+			},
+			type,
+		);
 		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
 		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
 		setSearchParams(searchParams);
@@ -73,12 +91,7 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 	);
 
 	function clearFilters() {
-		clearColumnFilter(type, 'name');
-		clearColumnFilter(type, 'method');
-		clearColumnFilter(type, 'path');
-		clearColumnFilter(type, 'status');
-		clearColumnFilter(type, 'duration');
-		clearColumnFilter(type, 'debug');
+		clearLogColumnFilter(type);
 		searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
 		searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
 		setSearchParams(searchParams);

@@ -2,9 +2,11 @@ import { CustomStateStorage } from '@/helpers/state';
 import { create } from '@/helpers/store';
 import {
 	ColumnFilterType,
+	ConditionsType,
 	EndpointLogs,
 	EndpointRequest,
 	EndpointResponse,
+	Filters,
 	Log,
 	TabTypes,
 	TestEndpointParams,
@@ -13,8 +15,9 @@ import {
 	TestTaskLogs,
 	VersionColumnFilters,
 } from '@/types';
-import { filterMatchingKeys, getTypeWorker } from '@/utils';
+import { filterMatchingKeys, getTypeWorker, toIsoString } from '@/utils';
 import { ColumnState } from 'ag-grid-community';
+import { endOfDay, startOfDay } from 'date-fns';
 import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
 import useEndpointStore from '../endpoint/endpointStore';
@@ -62,6 +65,7 @@ type Actions = {
 	clearColumnFilter: (entityId: string, columnName: string) => void;
 	clearEndpointsRequestHeaders: () => void;
 	applyTokensToAllEndpoints: () => void;
+	clearLogColumnFilter: (type: string) => void;
 	clearTokens: () => void;
 };
 
@@ -285,6 +289,32 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 							...requests[key],
 							headers: req,
 						});
+					});
+				},
+				clearLogColumnFilter: (type) => {
+					set((prev) => {
+						const state = prev.columnFilters;
+						delete state?.[type];
+						return {
+							columnFilters: {
+								...state,
+								[type]: {
+									timestamp: {
+										conditions: [
+											{
+												filter: toIsoString(startOfDay(new Date())),
+												type: ConditionsType.GreaterThanOrEqual,
+											},
+											{
+												filter: toIsoString(endOfDay(new Date())),
+												type: ConditionsType.LessThanOrEqual,
+											},
+										],
+										filterType: Filters.Date,
+									},
+								},
+							},
+						};
 					});
 				},
 				clearTokens: () => {

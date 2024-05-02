@@ -36,10 +36,7 @@ export default function VersionSettingsAuthentications() {
 	];
 
 	return (
-		<SettingsContainer
-			pageTitle={t('version.settings.authentications')}
-			contentClassName='!overflow-hidden !p-0 h-full'
-		>
+		<SettingsContainer pageTitle={t('version.settings.authentications')}>
 			<div className='h-full'>
 				<nav className='flex border-b'>
 					{AUTH_MENU_ITEMS.map((item) => (

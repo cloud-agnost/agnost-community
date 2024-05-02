@@ -431,6 +431,17 @@ const useVersionStore = create<VersionStore & Actions>()(
 				pushVersion: async (params) => {
 					try {
 						await VersionService.pushVersion(params);
+						useUtilsStore.setState((prev) => {
+							const sidebar = { ...prev.sidebar };
+							delete sidebar[params.targetVersionId];
+							return { sidebar, typings: {} };
+						});
+
+						useTabStore.setState((prev) => {
+							const tabs = { ...prev.tabs };
+							delete tabs[params.targetVersionId];
+							return { tabs };
+						});
 					} catch (error) {
 						throw error as APIError;
 					}

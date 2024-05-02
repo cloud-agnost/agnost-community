@@ -18,6 +18,7 @@ import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -61,6 +62,7 @@ export default function EditClusterConfig() {
 			},
 		},
 	});
+	console.log('clusterComponent', clusterComponent.info.version);
 	const { isPending, mutate } = useMutation({
 		mutationKey: ['updateClusterComponent'],
 		mutationFn: updateRemainingClusterComponents,
@@ -90,6 +92,12 @@ export default function EditClusterConfig() {
 		form.setValue('updateType', 'others');
 		form.handleSubmit(onSubmit)();
 	}
+
+	const versions = useMemo(() => {
+		return [
+			...new Set([...resourceVersions[clusterComponent.type], clusterComponent.info.version]),
+		];
+	}, [clusterComponent.type, clusterComponent.info.version, resourceVersions]);
 
 	return (
 		<Form {...form}>
@@ -164,10 +172,7 @@ export default function EditClusterConfig() {
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													{[
-														...resourceVersions[clusterComponent.type],
-														clusterComponent.info.version,
-													]?.map((version) => (
+													{versions?.map((version) => (
 														<SelectItem key={version} value={version} className='max-w-full'>
 															{version}
 														</SelectItem>

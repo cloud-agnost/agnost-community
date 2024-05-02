@@ -34,10 +34,7 @@ export default function DataTable<TData>({
 								return (
 									<TableHead
 										key={header.id}
-										className={cn(
-											header.column.columnDef.enableSorting && 'sortable',
-											columns[index].className,
-										)}
+										className={cn('sortable', columns[index].className)}
 										colSpan={header.colSpan}
 										style={{
 											width: header.getSize(),
