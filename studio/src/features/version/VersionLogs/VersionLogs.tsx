@@ -35,7 +35,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	const { columnFilters, setColumnFilters } = useUtilsStore();
 	const { selectedFilter } = useColumnFilter(type, 'timestamp', FieldTypes.DATE);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { refetch, isFetching } = useQuery({
+	const { refetch } = useQuery({
 		queryKey: ['versionLogBuckets', appId, orgId, versionId, type, columnFilters?.[type]],
 		queryFn: () => {
 			const start = new Date(searchParams.get('start') as string);
