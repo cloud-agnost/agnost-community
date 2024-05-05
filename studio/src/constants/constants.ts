@@ -694,6 +694,17 @@ export const ADD_API_KEYS_MENU_ITEMS = [
 	},
 ];
 
+export const ADD_RESOURCE_TABS = [
+	{
+		href: 'settings',
+		name: translate('general.settings'),
+	},
+	{
+		href: 'networking',
+		name: translate('resources.networking'),
+	},
+];
+
 export const ENDPOINT_OPTIONS: SortOption[] = [
 	{
 		name: translate('general.sortOptions.default'),

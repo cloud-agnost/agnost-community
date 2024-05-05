@@ -69,6 +69,22 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		},
 	},
 	{
+		id: 'tcpProxyEnabled',
+		header: () => {
+			return (
+				<SortButton text={translate('resources.table.tcpProxyEnabled')} field='tcpProxyEnabled' />
+			);
+		},
+		accessorKey: 'tcpProxyEnabled',
+		size: 200,
+		enableSorting: true,
+		cell: ({ row }) => {
+			const { tcpProxyEnabled } = row.original;
+			const status = tcpProxyEnabled ? t('general.yes') : t('general.no');
+			return <Badge text={status} variant={BADGE_COLOR_MAP[status.toUpperCase()]} rounded />;
+		},
+	},
+	{
 		id: 'allowedRoles',
 		header: () => {
 			return <SortButton text={translate('resources.table.allowedRoles')} field='allowedRoles' />;

@@ -10,7 +10,8 @@
 		"allowedRoles": "Allowed Roles",
 		"createdAt": "Date Created",
 		"actions": "Actions",
-		"managed": "Managed"
+		"managed": "Managed",
+		"tcpProxyEnabled": "TCP Proxy"
 	},
 	"delete": {
 		"title": "Delete Resource",
@@ -116,5 +117,16 @@
 	"update_size": "Update Size",
 	"update_version": "Update Version",
 	"update_replica_and_version": "Update Replica and Version",
-	"restart_success": "Resource restarted successfully"
+	"restart_success": "Resource restarted successfully",
+	"networking": "Networking",
+	"private_networking": "Private Networking",
+	"private_networking_description": "Communicate with this service from within the Agnost cluster network.",
+	"public_networking": "Public Networking",
+	"public_networking_description": "Connect to your primary service over TCP using a proxied domain and port.",
+	"disable_networking": "Disable Public Networking",
+	"enable_networking": "Enable Public Networking",
+	"primary": "Primary (read/write replica)",
+	"replicas": "Read replicas",
+	"disable_networking_success": "Public networking disabled successfully",
+	"enable_networking_success": "Public networking enabled successfully"
 }

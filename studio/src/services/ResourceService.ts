@@ -82,4 +82,13 @@ export default class ResourceService {
 	static async restartManagedResource(req: RestartManagedResourceRequest): Promise<Resource> {
 		return (await axios.post(`${this.getUrl(req.orgId)}/${req.resourceId}/restart`, {})).data;
 	}
+	static async enableTcpProxy(req: RestartManagedResourceRequest): Promise<Resource> {
+		return (await axios.post(`${this.getUrl(req.orgId)}/${req.resourceId}/enable-tcp-proxy`, {}))
+			.data;
+	}
+
+	static async disableTcpProxy(req: RestartManagedResourceRequest): Promise<Resource> {
+		return (await axios.post(`${this.getUrl(req.orgId)}/${req.resourceId}/disable-tcp-proxy`, {}))
+			.data;
+	}
 }
