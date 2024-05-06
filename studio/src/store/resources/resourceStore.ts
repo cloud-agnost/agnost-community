@@ -57,6 +57,8 @@ type Actions = {
 	openSelectResourceTypeModal: (type: ResourceCreateType) => void;
 	closeSelectResourceTypeModal: () => void;
 	restartManagedResource: (req: RestartManagedResourceRequest) => Promise<Resource>;
+	enableTcpProxy: (req: RestartManagedResourceRequest) => Promise<Resource>;
+	disableTcpProxy: (req: RestartManagedResourceRequest) => Promise<Resource>;
 	reset: () => void;
 };
 const initialState: ResourceStore = {
@@ -279,6 +281,23 @@ const useResourceStore = create<ResourceStore & Actions>()(
 			const resource = await ResourceService.restartManagedResource(req);
 			set((state) => ({
 				resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+				resourceToEdit: resource,
+			}));
+			return resource;
+		},
+		enableTcpProxy: async (req: RestartManagedResourceRequest) => {
+			const resource = await ResourceService.enableTcpProxy(req);
+			set((state) => ({
+				resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+				resourceToEdit: resource,
+			}));
+			return resource;
+		},
+		disableTcpProxy: async (req: RestartManagedResourceRequest) => {
+			const resource = await ResourceService.disableTcpProxy(req);
+			set((state) => ({
+				resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+				resourceToEdit: resource,
 			}));
 			return resource;
 		},

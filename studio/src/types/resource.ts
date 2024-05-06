@@ -91,6 +91,7 @@ export interface Resource {
 	managed: boolean;
 	deletable: boolean;
 	allowedRoles: AllowedRole[];
+	tcpProxyEnabled: boolean;
 	config: {
 		delayedMessages: boolean;
 		size: string;
