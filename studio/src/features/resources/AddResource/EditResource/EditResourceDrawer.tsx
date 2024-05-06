@@ -1,25 +1,25 @@
 import { Button } from '@/components/Button';
+import { CopyInput } from '@/components/CopyInput';
 import { Description } from '@/components/Description';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
+import { PasswordInput } from '@/components/PasswordInput';
+import { ADD_RESOURCE_TABS } from '@/constants';
+import { OrganizationMenuItem } from '@/features/organization';
 import { UpdateAllowedRoles, UpdateResourceAccessConf } from '@/features/resources';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ResourceCreateType, ResourceInstances } from '@/types';
+import { cn } from '@/utils';
+import { ArrowRight } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import EditSize from './EditSize';
 import EditVersionAndReplica from './EditVersionAndReplica';
-import { OrganizationMenuItem } from '@/features/organization';
-import { ADD_RESOURCE_TABS } from '@/constants';
-import { cn } from '@/utils';
-import { useEffect } from 'react';
-import { CopyInput } from '@/components/CopyInput';
-import _, { capitalize } from 'lodash';
-import { ArrowRight } from '@phosphor-icons/react';
-import { PasswordInput } from '@/components/PasswordInput';
 
 export default function EditResourceDrawer() {
 	const { t } = useTranslation();
@@ -86,7 +86,6 @@ export default function EditResourceDrawer() {
 			setSearchParams(searchParams);
 		}
 	}, [isEditResourceModalOpen]);
-
 	return (
 		<Drawer open={isEditResourceModalOpen} onOpenChange={closeDrawer}>
 			<DrawerContent position='right' size='lg'>

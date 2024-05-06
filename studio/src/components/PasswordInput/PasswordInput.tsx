@@ -11,11 +11,21 @@ export interface PasswordInputProps extends React.ComponentPropsWithoutRef<'inpu
 	error?: boolean;
 	disableShowPassword?: boolean;
 	copyable?: boolean;
+	readOnly?: boolean;
 }
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 	(
-		{ className, value, placeholder, error, disableShowPassword = false, copyable, ...props },
+		{
+			className,
+			value,
+			placeholder,
+			error,
+			readOnly,
+			disableShowPassword = false,
+			copyable,
+			...props
+		},
 		ref,
 	) => {
 		const [inputValue, setInputValue] = useState(value);
@@ -31,6 +41,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 					ref={ref}
 					defaultValue={inputValue}
 					value={inputValue}
+					readOnly={readOnly}
 					onChange={(e) => setInputValue(e.target.value)}
 					error={error}
 					type={showPassword ? 'text' : 'password'}
