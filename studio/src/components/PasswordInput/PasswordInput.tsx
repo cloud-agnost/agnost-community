@@ -58,7 +58,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 							size='sm'
 							rounded
 						>
-							<Copy size={20} />
+							<Copy size={14} />
 						</Button>
 					)}
 					<Button
@@ -69,7 +69,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 						rounded
 						disabled={disableShowPassword}
 					>
-						{showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
+						{showPassword ? <EyeSlash size={14} /> : <Eye size={14} />}
 					</Button>
 				</div>
 			</div>
