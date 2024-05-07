@@ -3,17 +3,20 @@ import { CopyInput } from '@/components/CopyInput';
 import { Description } from '@/components/Description';
 import { Label } from '@/components/Label';
 import { PasswordInput } from '@/components/PasswordInput';
-import { useToast } from '@/hooks';
+import { useToast, useUpdateEffect } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ResourceInstances } from '@/types';
 import { ArrowRight } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
+import { differenceInSeconds } from 'date-fns';
 import _ from 'lodash';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 export default function EditTcpProxy() {
 	const { enableTcpProxy, disableTcpProxy, resourceToEdit } = useResourceStore();
+	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { orgId } = useParams() as Record<string, string>;
@@ -38,6 +41,18 @@ export default function EditTcpProxy() {
 			});
 		},
 	});
+
+	useUpdateEffect(() => {
+		setIsButtonDisabled(true);
+		const timer = setTimeout(
+			() => {
+				setIsButtonDisabled(false);
+			},
+			Number(import.meta.env.VITE_EDIT_PROXY_TIMEOUT),
+		);
+		return () => clearTimeout(timer);
+	}, [resourceToEdit.updatedAt]);
+
 	return (
 		<div className='space-y-4'>
 			<Description title={t('resources.private_networking')}>
@@ -140,6 +155,7 @@ export default function EditTcpProxy() {
 				className='self-end'
 				onClick={resourceToEdit.tcpProxyEnabled ? disableTcpProxyMutate : enableTcpProxyMutate}
 				loading={enableLoading || disableLoading}
+				disabled={isButtonDisabled}
 			>
 				{t(`resources.${resourceToEdit.tcpProxyEnabled ? 'disable' : 'enable'}_networking`)}
 			</Button>

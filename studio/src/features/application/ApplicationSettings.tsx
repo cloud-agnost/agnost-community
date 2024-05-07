@@ -22,8 +22,8 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-				<div className='hover:bg-wrapper-background-hover p-1 rounded-full'>
-					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
+				<div className='size-7 hover:bg-wrapper-background-hover rounded-full flex items-center justify-center cursor-pointer'>
+					<DotsThreeVertical className='size-5 text-icon-secondary' />
 				</div>
 			</DropdownMenuTrigger>
 
