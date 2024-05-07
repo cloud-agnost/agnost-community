@@ -8,7 +8,6 @@ import useResourceStore from '@/store/resources/resourceStore';
 import { ResourceInstances } from '@/types';
 import { ArrowRight } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
-import { differenceInSeconds } from 'date-fns';
 import _ from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
