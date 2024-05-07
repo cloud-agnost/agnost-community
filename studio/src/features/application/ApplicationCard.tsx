@@ -24,7 +24,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 		: (application.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
 	return (
 		<button
-			className='application-card relative space-y-3'
+			className='application-card relative space-y-2.5'
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
@@ -48,7 +48,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 					<AvatarImage src={application.pictureUrl} />
 					<AvatarFallback name={application.name} color={application.color} />
 				</Avatar>
-				<p className='text-xl text-default font-semibold block truncate'>{application.name}</p>
+				<p className='text-default font-semibold block truncate'>{application.name}</p>
 			</div>
 
 			<ApplicationTeam team={application.team} />
