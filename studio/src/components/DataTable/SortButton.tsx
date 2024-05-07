@@ -17,6 +17,7 @@ export function SortButton({ text, className, field, children }: SortButtonProps
 	const { version } = useVersionStore();
 	const { pathname } = useLocation();
 	const defaultDirection = 'asc';
+
 	const handleSortClick = () => {
 		const currentField = searchParams.get('f');
 		const currentDirection = searchParams.get('d');

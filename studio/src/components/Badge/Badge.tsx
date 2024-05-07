@@ -44,7 +44,7 @@ interface BadgeProps {
 }
 export default function Badge({ text, variant, rounded, onClear, className }: BadgeProps) {
 	return (
-		<div className={cn(badgeVariants({ variant, rounded }), 'badge', className)}>
+		<div className={cn(badgeVariants({ variant, rounded }), className)}>
 			{rounded && variant !== 'gray' && <div className='badge-dot' />}
 			<span className={cn('badge-text')}>{text}</span>
 			{onClear && (

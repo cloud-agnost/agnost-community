@@ -97,7 +97,6 @@ export default function BucketForm({ loading }: { loading: boolean }) {
 						<Button
 							variant='icon'
 							size='sm'
-							disabled={fields.length === 1}
 							className={cn(
 								'rounded-full',
 								!index && 'self-end',

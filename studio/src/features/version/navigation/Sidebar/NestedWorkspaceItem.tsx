@@ -18,14 +18,10 @@ import useThemeStore from '@/store/theme/themeStore';
 interface NestedWorkspaceItemProps {
 	data: any;
 	type: TabTypes;
-	setToDeleteData: (data: any) => void;
+	onDelete: (data: WorkspaceDataType, type: TabTypes) => void;
 }
 
-export default function NestedWorkspaceItem({
-	data,
-	type,
-	setToDeleteData,
-}: NestedWorkspaceItemProps) {
+export default function NestedWorkspaceItem({ data, type, onDelete }: NestedWorkspaceItemProps) {
 	const getIcon = useTabIcon('w-3.5 h-3.5');
 	const { getTheme } = useThemeStore();
 	const user = useAuthStore((state) => state.user);
@@ -52,15 +48,6 @@ export default function NestedWorkspaceItem({
 				workspace: true,
 			});
 		}
-	}
-
-	function deleteHandler(data: WorkspaceDataType, type: TabTypes) {
-		setToDeleteData({
-			type,
-			data,
-		});
-		const openDeleteModal = getFunction(type, `openDelete${type}Modal`);
-		openDeleteModal(data);
 	}
 
 	function openEditDialog(data: WorkspaceDataType, type: TabTypes) {
@@ -91,7 +78,7 @@ export default function NestedWorkspaceItem({
 		let path = '';
 
 		if (type === TabTypes.Model) {
-			path = `database/${data._id}/models/`;
+			path = `database/${data._id}/models`;
 		}
 
 		if (type === TabTypes.Bucket) {
@@ -190,9 +177,8 @@ export default function NestedWorkspaceItem({
 								rounded
 								className={cn(
 									window.location.pathname.includes(data._id) &&
-										type === currentTab?.type &&
 										'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-									'!p-0 !h-5 hidden group-hover:inline-flex',
+									'p-0 !h-5 hidden group-hover:inline-flex',
 								)}
 								onClick={(e) => {
 									e.stopPropagation();
@@ -211,7 +197,10 @@ export default function NestedWorkspaceItem({
 								)}
 								variant='icon'
 								size='sm'
-								onClick={() => deleteHandler(data, TabTypes.Database)}
+								onClick={(e) => {
+									e.stopPropagation();
+									onDelete(data, TabTypes.Database);
+								}}
 							>
 								<Trash size={14} />
 							</Button>
@@ -238,9 +227,8 @@ export default function NestedWorkspaceItem({
 									rounded
 									className={cn(
 										window.location.pathname.includes(sd._id) &&
-											type === currentTab?.type &&
 											'hover:bg-brand-darker dark:hover:bg-button-primary !text-white dark:text-default',
-										'!p-0 !h-5 hidden group-hover:inline-flex',
+										'p-0 !h-5 hidden group-hover:inline-flex',
 									)}
 									onClick={(e) => {
 										e.stopPropagation();
@@ -259,7 +247,7 @@ export default function NestedWorkspaceItem({
 									)}
 									variant='icon'
 									size='sm'
-									onClick={() => deleteHandler(sd, type)}
+									onClick={() => onDelete(sd, type)}
 								>
 									<Trash size={14} />
 								</Button>

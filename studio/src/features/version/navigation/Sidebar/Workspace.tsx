@@ -170,7 +170,7 @@ export default function Workspace() {
 								data={data}
 								key={data._id}
 								type={item.type === TabTypes.Database ? TabTypes.Model : TabTypes.Bucket}
-								setToDeleteData={setToDeleteData}
+								onDelete={deleteHandler}
 							/>
 						) : (
 							<SideBarButton
@@ -211,7 +211,10 @@ export default function Workspace() {
 											)}
 											variant='icon'
 											size='sm'
-											onClick={() => deleteHandler(data, item.type)}
+											onClick={(e) => {
+												e.stopPropagation();
+												deleteHandler(data, item.type);
+											}}
 										>
 											<Trash size={14} />
 										</Button>

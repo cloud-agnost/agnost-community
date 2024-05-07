@@ -165,7 +165,9 @@ const useModelStore = create<ModelStore & Actions>()(
 						},
 						workspaceModels: {
 							...state.workspaceModels,
-							[params.dbId]: [...state.models[params.dbId], model],
+							[params.dbId]: [...state.models[params.dbId], model].sort((a, b) =>
+								a.name.localeCompare(b.name),
+							),
 						},
 					}));
 					return model;
@@ -184,9 +186,9 @@ const useModelStore = create<ModelStore & Actions>()(
 						},
 						workspaceModels: {
 							...state.workspaceModels,
-							[params.dbId]: state.models[params.dbId]?.map((m) =>
-								m._id === model._id ? model : m,
-							),
+							[params.dbId]: state.models[params.dbId]
+								?.map((m) => (m._id === model._id ? model : m))
+								.sort((a, b) => a.name.localeCompare(b.name)),
 						},
 						model,
 					}));

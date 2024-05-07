@@ -1,17 +1,17 @@
+import { Loading } from '@/components/Loading';
 import { VersionLogDetails } from '@/features/version/VersionLogs';
+import { useColumnFilter, useInfiniteScroll, useUpdateEffect } from '@/hooks';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { calculateRecommendedBuckets, toIsoString } from '@/utils';
+import { ColumnFilterType, ColumnFilters, ConditionsType, FieldTypes, Filters } from '@/types';
+import { calculateRecommendedBuckets } from '@/utils';
+import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import { useQuery } from '@tanstack/react-query';
 import { endOfDay, startOfDay } from 'date-fns';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Loading } from '@/components/Loading';
-import { useColumnFilter, useInfiniteScroll } from '@/hooks';
-import useUtilsStore from '@/store/version/utilsStore';
-import { ColumnFilterType, ColumnFilters, ConditionsType, FieldTypes, Filters } from '@/types';
-import { mongoQueryConverter } from '@/utils/mongoQueryConverter';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
 interface VersionLogsProps {
@@ -22,7 +22,6 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		getVersionLogBuckets,
 		showLogDetails,
 		closeVersionLogDetails,
-		logBuckets,
 		lastFetchedLogPage,
 		logs,
 		getVersionLogs,
@@ -51,7 +50,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				filter: mongoQueryConverter((columnFilters?.[type] as ColumnFilters) ?? {}),
 			});
 		},
-		enabled: !_.isNil(selectedFilter) && _.isNil(logBuckets),
+		enabled: !_.isNil(selectedFilter),
 		refetchOnWindowFocus: false,
 	});
 
@@ -67,7 +66,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		enabled: !_.isNil(columnFilters?.[type]),
 	});
 
-	useEffect(() => {
+	useUpdateEffect(() => {
 		refetchLogs();
 	}, [columnFilters]);
 	useEffect(() => {
@@ -77,11 +76,11 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 			const filter: ColumnFilterType = {
 				conditions: [
 					{
-						filter: toIsoString(startOfDay(new Date())),
+						filter: startOfDay(new Date()).toISOString(),
 						type: ConditionsType.GreaterThanOrEqual,
 					},
 					{
-						filter: toIsoString(endOfDay(new Date())),
+						filter: endOfDay(new Date()).toISOString(),
 						type: ConditionsType.LessThanOrEqual,
 					},
 				],
@@ -90,8 +89,8 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 			setColumnFilters('timestamp', filter, type);
 		}
 		if (!searchParams.has('start') || !searchParams.has('end')) {
-			searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
-			searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
+			searchParams.set('start', startOfDay(new Date()).toISOString() ?? '');
+			searchParams.set('end', endOfDay(new Date()).toISOString() ?? '');
 			setSearchParams(searchParams);
 		}
 	}, []);

@@ -62,7 +62,6 @@ export default function EditClusterConfig() {
 			},
 		},
 	});
-	console.log('clusterComponent', clusterComponent.info.version);
 	const { isPending, mutate } = useMutation({
 		mutationKey: ['updateClusterComponent'],
 		mutationFn: updateRemainingClusterComponents,
@@ -94,6 +93,7 @@ export default function EditClusterConfig() {
 	}
 
 	const versions = useMemo(() => {
+		if (clusterComponent.type === 'MinIO') return [];
 		return [
 			...new Set([...resourceVersions[clusterComponent.type], clusterComponent.info.version]),
 		];

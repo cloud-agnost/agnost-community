@@ -11,10 +11,12 @@ export default function useRealtime() {
 	useEffect(() => {
 		const cb = onChannelMessage('notification', (message) => {
 			const { data, object, action, identifiers, timestamp, message: log, id, type } = message;
+			console.log(message);
 			if (message?.actor?.userId !== user?._id || action !== 'create') {
 				const fn = realtimeObjectMapper(object);
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-ignore
+
+				if (!(action in fn)) return;
+				//@ts-expect-error - this is a valid call
 				fn[action]({
 					data,
 					identifiers,

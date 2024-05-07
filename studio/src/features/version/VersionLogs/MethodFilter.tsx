@@ -23,9 +23,13 @@ export default function MethodFilter() {
 	const { pathname } = useLocation();
 	const logType = pathname.split('/')[7];
 	const { selectedFilter } = useColumnFilter(logType, 'method', FieldTypes.TEXT);
-	const { setColumnFilters } = useUtilsStore();
+	const { setColumnFilters, clearColumnFilter } = useUtilsStore();
 
 	function applyFilter() {
+		if (selectedMethods.length === 0) {
+			clearColumnFilter(logType, 'method');
+			return;
+		}
 		const filter: ColumnFilterType = {
 			conditions: [
 				{
@@ -73,7 +77,7 @@ export default function MethodFilter() {
 						<CaretDown />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='w-full min-w-[100px] '>
+				<DropdownMenuContent className='w-full min-w-[195px]'>
 					{ALL_HTTP_METHODS.map((method) => (
 						<DropdownMenuCheckboxItem
 							className='bg-subtle p-2 rounded-md text-default hover:bg-subtle-hover dark:hover:bg-subtle-hover-dark'

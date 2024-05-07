@@ -107,7 +107,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				const func = await FunctionService.createFunction(params);
 				set((prev) => ({
 					functions: [func, ...prev.functions],
-					workspaceFunctions: [func, ...prev.workspaceFunctions],
+					workspaceFunctions: [func, ...prev.workspaceFunctions].sort((a, b) =>
+						a.name.localeCompare(b.name),
+					),
 				}));
 				params.onSuccess?.(func);
 				useVersionStore.setState?.((state) => ({
@@ -127,7 +129,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				const func = await FunctionService.updateFunction(params);
 				set((prev) => ({
 					functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
-					workspaceFunctions: prev.workspaceFunctions.map((f) => (f._id === func._id ? func : f)),
+					workspaceFunctions: prev.workspaceFunctions
+						.map((f) => (f._id === func._id ? func : f))
+						.sort((a, b) => a.name.localeCompare(b.name)),
 					function: func._id === prev.function._id ? func : prev.function,
 				}));
 				params.onSuccess?.();

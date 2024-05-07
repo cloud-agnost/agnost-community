@@ -89,7 +89,9 @@ const useCacheStore = create<CacheStore & Actions>()(
 					const cache = await CacheService.createCache(params);
 					set({
 						caches: [cache, ...get().caches],
-						workspaceCaches: [cache, ...get().workspaceCaches],
+						workspaceCaches: [cache, ...get().workspaceCaches].sort((a, b) =>
+							a.name.localeCompare(b.name),
+						),
 					});
 					useVersionStore.setState?.((state) => ({
 						dashboard: {
@@ -108,7 +110,9 @@ const useCacheStore = create<CacheStore & Actions>()(
 					const cache = await CacheService.updateCache(params);
 					set((prev) => ({
 						caches: prev.caches.map((c) => (c._id === cache._id ? cache : c)),
-						workspaceCaches: prev.workspaceCaches.map((c) => (c._id === cache._id ? cache : c)),
+						workspaceCaches: prev.workspaceCaches
+							.map((c) => (c._id === cache._id ? cache : c))
+							.sort((a, b) => a.name.localeCompare(b.name)),
 						cache: cache._id === prev.cache._id ? cache : prev.cache,
 					}));
 					if (params.onSuccess) params.onSuccess(cache);

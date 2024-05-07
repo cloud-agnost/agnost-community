@@ -28,8 +28,9 @@ export default function FilterLayout({
 		onClear?.();
 		clearColumnFilter(logType, columnName);
 	}
+
 	return (
-		<Popover modal>
+		<Popover>
 			<PopoverTrigger asChild>
 				<Button
 					variant='icon'

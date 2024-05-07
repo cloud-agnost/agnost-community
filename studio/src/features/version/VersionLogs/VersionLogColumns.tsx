@@ -57,48 +57,8 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 			</SortButton>
 		),
 		accessorKey: 'name',
-		size: 150,
 	},
-	{
-		id: 'method',
-		header: () => (
-			<SortButton text={translate('endpoint.method')} field='method'>
-				<MethodFilter />
-			</SortButton>
-		),
-		accessorKey: 'method',
-		size: 150,
-		cell: ({ row }) => {
-			const { method } = row.original;
-			return <MethodBadge method={method} />;
-		},
-	},
-	{
-		id: 'path',
-		header: () => (
-			<SortButton text={translate('endpoint.path')} field='path'>
-				<FilterLayout columnName='path'>
-					<DefaultFilter
-						type={FieldTypes.TEXT}
-						columnName='path'
-						entityId={window.location.pathname.split('/')[8]}
-					/>
-				</FilterLayout>
-			</SortButton>
-		),
-		accessorKey: 'path',
-		size: 200,
-		cell: ({ row }) => {
-			const { path } = row.original;
-			const copyText = `${BASE_URL}/${env?.iid}${path}`;
-			return (
-				<div className='flex items-center gap-8 group'>
-					<div className='truncate font-mono'>{path}</div>
-					<CopyButton text={copyText} className='hidden group-hover:block' />
-				</div>
-			);
-		},
-	},
+
 	{
 		id: 'status',
 		header: () => (
@@ -107,7 +67,6 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 			</SortButton>
 		),
 		accessorKey: 'status',
-		size: 100,
 		cell: ({
 			row: {
 				original: { status },
@@ -134,7 +93,6 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 			</SortButton>
 		),
 		accessorKey: 'duration',
-		size: 200,
 		cell: ({
 			row: {
 				original: { duration },
@@ -171,7 +129,6 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'action',
-		size: 100,
 		cell: ({ row: { original } }) => {
 			return (
 				<Button variant='secondary' onClick={() => openVersionLogDetails(original)}>
@@ -181,4 +138,49 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 			);
 		},
 	},
+];
+const EndpointColumns: ColumnDefWithClassName<VersionLog>[] = [
+	{
+		id: 'method',
+		header: () => (
+			<SortButton text={translate('endpoint.method')} field='method'>
+				<MethodFilter />
+			</SortButton>
+		),
+		accessorKey: 'method',
+		cell: ({ row }) => {
+			const { method } = row.original;
+			return <MethodBadge method={method} />;
+		},
+	},
+	{
+		id: 'path',
+		header: () => (
+			<SortButton text={translate('endpoint.path')} field='path'>
+				<FilterLayout columnName='path'>
+					<DefaultFilter
+						type={FieldTypes.TEXT}
+						columnName='path'
+						entityId={window.location.pathname.split('/')[8]}
+					/>
+				</FilterLayout>
+			</SortButton>
+		),
+		accessorKey: 'path',
+		cell: ({ row }) => {
+			const { path } = row.original;
+			const copyText = `${BASE_URL}/${env?.iid}${path}`;
+			return (
+				<div className='flex items-center gap-8 group'>
+					<div className='truncate font-mono'>{path}</div>
+					<CopyButton text={copyText} className='hidden group-hover:block' />
+				</div>
+			);
+		},
+	},
+];
+export const VersionEndpointLogColumns: ColumnDefWithClassName<VersionLog>[] = [
+	...VersionLogColumns.slice(0, 2),
+	...EndpointColumns,
+	...VersionLogColumns.slice(2),
 ];

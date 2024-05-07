@@ -138,7 +138,9 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.createQueue(params);
 				set((prev) => ({
 					queues: [queue, ...prev.queues],
-					workspaceQueues: [queue, ...prev.workspaceQueues],
+					workspaceQueues: [queue, ...prev.workspaceQueues].sort((a, b) =>
+						a.name.localeCompare(b.name),
+					),
 				}));
 				if (params.onSuccess) params.onSuccess(queue);
 				useVersionStore.setState?.((state) => ({
@@ -158,7 +160,9 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.updateQueue(params);
 				set((prev) => ({
 					queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
-					workspaceQueues: prev.workspaceQueues.map((q) => (q._id === queue._id ? queue : q)),
+					workspaceQueues: prev.workspaceQueues
+						.map((q) => (q._id === queue._id ? queue : q))
+						.sort((a, b) => a.name.localeCompare(b.name)),
 					queue: queue._id === prev.queue._id ? queue : prev.queue,
 				}));
 				if (params.onSuccess) params.onSuccess();
