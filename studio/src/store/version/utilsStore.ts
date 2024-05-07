@@ -15,7 +15,7 @@ import {
 	TestTaskLogs,
 	VersionColumnFilters,
 } from '@/types';
-import { filterMatchingKeys, getTypeWorker, toIsoString } from '@/utils';
+import { filterMatchingKeys, getTypeWorker } from '@/utils';
 import { ColumnState } from 'ag-grid-community';
 import { endOfDay, startOfDay } from 'date-fns';
 import _ from 'lodash';
@@ -302,11 +302,11 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 									timestamp: {
 										conditions: [
 											{
-												filter: toIsoString(startOfDay(new Date())),
+												filter: startOfDay(new Date()).toISOString(),
 												type: ConditionsType.GreaterThanOrEqual,
 											},
 											{
-												filter: toIsoString(endOfDay(new Date())),
+												filter: endOfDay(new Date()).toISOString(),
 												type: ConditionsType.LessThanOrEqual,
 											},
 										],

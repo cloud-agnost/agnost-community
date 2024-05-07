@@ -366,7 +366,8 @@
 }
 
 .rdrDefinedRangesWrapper,
-.rdrStaticRange {
+.rdrStaticRange,
+.rdrStaticRange:focus .rdrStaticRangeLabel {
 	background-color: rgb(var(--wrapper-background-light)) !important;
 }
 .rdrStaticRange {
@@ -375,10 +376,10 @@
 .rdrDefinedRangesWrapper {
 	border-right: solid 1px rgb(var(--theme-border)) !important;
 }
-.rdrStaticRange:hover .rdrStaticRangeLabel,
-.rdrStaticRange:focus .rdrStaticRangeLabel {
+.rdrStaticRange:hover .rdrStaticRangeLabel {
 	background: rgb(var(--wrapper-background-hover)) !important;
 }
+
 .rdrInputRangeInput,
 .rdrDateInput input {
 	background-color: rgb(var(--wrapper-background-base)) !important;

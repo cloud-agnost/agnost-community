@@ -23,16 +23,13 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 		? AppRoles.Admin
 		: (application.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
 	return (
-		<div
-			className='application-card relative'
+		<button
+			className='application-card relative space-y-3'
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
 				if (e.target.id === 'open-version' || !e.target.id) onAppClick(application);
 			}}
-			role='button'
-			tabIndex={0}
-			aria-hidden='true'
 		>
 			{loading && application._id === selectedApp?._id && (
 				<>
@@ -46,33 +43,22 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 				</>
 			)}
 
-			<div className='flex items-center gap-4'>
-				<Avatar size='2xl' square>
+			<div className='flex items-center gap-2'>
+				<Avatar size='md' square>
 					<AvatarImage src={application.pictureUrl} />
 					<AvatarFallback name={application.name} color={application.color} />
 				</Avatar>
-				<div className='flex flex-col justify-center gap-1 flex-1'>
-					<div className='flex items-center justify-between'>
-						<span className='text-xl text-default font-semibold block truncate max-w-[11ch]'>
-							{application.name}
-						</span>
-						<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} />
-					</div>
-					<div>
-						<ApplicationTeam team={application.team} />
-					</div>
-				</div>
+				<p className='text-xl text-default font-semibold block truncate'>{application.name}</p>
 			</div>
-			<div className=' flex items-center justify-between self-end'>
+
+			<ApplicationTeam team={application.team} />
+			<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} className='flex  w-1/6' />
+			<div className='flex items-center justify-between'>
 				<span className='text-subtle font-sfCompact text-xs'>
 					{t('general.created')} {getRelativeTime(application.createdAt)}
 				</span>
-				<ApplicationSettings
-					appId={application._id}
-					appName={application.name}
-					role={role as AppRoles}
-				/>
+				<ApplicationSettings appId={application._id} role={role as AppRoles} />
 			</div>
-		</div>
+		</button>
 	);
 }

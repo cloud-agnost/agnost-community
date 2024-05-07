@@ -61,7 +61,9 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				const middleware = await MiddlewareService.createMiddleware(params);
 				set((prev) => ({
 					middlewares: [middleware, ...prev.middlewares],
-					workspaceMiddlewares: [middleware, ...prev.workspaceMiddlewares],
+					workspaceMiddlewares: [middleware, ...prev.workspaceMiddlewares].sort((a, b) =>
+						a.name.localeCompare(b.name),
+					),
 				}));
 				if (params.onSuccess) {
 					params.onSuccess(middleware);
@@ -137,9 +139,9 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			const middleware = await MiddlewareService.updateMiddleware(params);
 			set((prev) => ({
 				middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
-				workspaceMiddlewares: prev.workspaceMiddlewares.map((mw) =>
-					mw._id === params.mwId ? middleware : mw,
-				),
+				workspaceMiddlewares: prev.workspaceMiddlewares
+					.map((mw) => (mw._id === params.mwId ? middleware : mw))
+					.sort((a, b) => a.name.localeCompare(b.name)),
 				middleware: middleware._id === prev.middleware._id ? middleware : prev.middleware,
 			}));
 			return middleware;

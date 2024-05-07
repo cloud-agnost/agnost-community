@@ -174,7 +174,6 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 										<Button
 											variant='icon'
 											size='sm'
-											disabled={fields.length === 1}
 											className={cn(
 												'rounded-full',
 												!index && 'self-end',

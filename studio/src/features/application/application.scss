@@ -1,6 +1,6 @@
 .application {
 	&-card {
-		@apply px-4 p-3 border border-border bg-subtle rounded hover:border-border-hover grid;
+		@apply px-4 py-3 border border-border bg-subtle rounded hover:border-border-hover;
 		width: 326px;
 		height: 164px;
 	}

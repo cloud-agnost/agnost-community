@@ -88,7 +88,9 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					const endpoint = await EndpointService.createEndpoint(params);
 					set((prev) => ({
 						endpoints: [endpoint, ...prev.endpoints],
-						workSpaceEndpoints: [endpoint, ...prev.workSpaceEndpoints],
+						workSpaceEndpoints: [endpoint, ...prev.workSpaceEndpoints].sort((a, b) =>
+							a.name.localeCompare(b.name),
+						),
 					}));
 					if (params.onSuccess) params.onSuccess(endpoint);
 					useVersionStore.setState?.((state) => ({
@@ -193,9 +195,9 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 				try {
 					const endpoint = await EndpointService.updateEndpoint(params);
 					set((prev) => ({
-						workSpaceEndpoints: prev.workSpaceEndpoints.map((e) =>
-							e._id === endpoint._id ? endpoint : e,
-						),
+						workSpaceEndpoints: prev.workSpaceEndpoints
+							.map((e) => (e._id === endpoint._id ? endpoint : e))
+							.sort((a, b) => a.name.localeCompare(b.name)),
 						endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 						endpoint: endpoint._id === prev.endpoint._id ? endpoint : prev.endpoint,
 					}));

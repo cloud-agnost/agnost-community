@@ -83,11 +83,11 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row }) => {
-			const { _id, name, team } = row.original;
+			const { _id, team } = row.original;
 			const me = team.find((member) => member.userId._id === user?._id);
 			return (
 				<div className='text-center action'>
-					<ApplicationSettings appId={_id} appName={name} role={me?.role as AppRoles} />
+					<ApplicationSettings appId={_id} role={me?.role as AppRoles} />
 				</div>
 			);
 		},

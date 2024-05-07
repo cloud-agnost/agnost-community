@@ -1,4 +1,3 @@
-import { Button } from '@/components/Button';
 import { APPLICATION_SETTINGS } from '@/constants';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import { AppRoles, Application } from '@/types';
@@ -14,7 +13,6 @@ import {
 
 interface ApplicationSettingsProps {
 	appId: string;
-	appName: string;
 	role: AppRoles;
 }
 
@@ -23,17 +21,10 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					variant='icon'
-					size='sm'
-					rounded
-					className='p-2'
-					onClick={(e) => e.stopPropagation()}
-				>
+			<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+				<div className='hover:bg-wrapper-background-hover p-1 rounded-full'>
 					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
-					<span className='sr-only'>Open popover</span>
-				</Button>
+				</div>
 			</DropdownMenuTrigger>
 
 			<DropdownMenuContent

@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { useTable, useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
@@ -110,9 +110,11 @@ export default function PushVersion() {
 								<Switch id='redeploy' checked={redeploy} onCheckedChange={setRedeploy} />
 							</div>
 							<div className='flex items-center justify-between'>
-								<Button variant='secondary' onClick={() => setStep(0)} className='!ml-4'>
-									{t('general.cancel')}
-								</Button>
+								<DrawerClose>
+									<Button variant='secondary' className='!ml-4'>
+										{t('general.cancel')}
+									</Button>
+								</DrawerClose>
 								<div className='flex items-center'>
 									<Button variant='outline' onClick={() => setStep(0)} className='!ml-4'>
 										{t('general.previous')}

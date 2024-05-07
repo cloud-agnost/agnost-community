@@ -4,7 +4,6 @@ import {
 	differenceInYears,
 	format,
 	formatDistance,
-	formatISO,
 } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 export const DATE_FORMAT = 'yyyy/MM/dd';
@@ -83,8 +82,4 @@ export function formatTime(timeInMilliseconds: number) {
 		const seconds = (timeInMilliseconds / 1000).toFixed(1);
 		return `${seconds} s`;
 	}
-}
-
-export function toIsoString(date: Date) {
-	return formatISO(date);
 }

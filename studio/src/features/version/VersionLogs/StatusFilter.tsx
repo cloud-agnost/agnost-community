@@ -13,13 +13,36 @@ export default function StatusFilter() {
 	const { setColumnFilters } = useUtilsStore();
 
 	function applyFilter() {
-		const filter: ColumnFilterType = {
-			conditions: [
+		let conditions: ColumnFilterType['conditions'];
+		if (logType === 'endpoint') {
+			conditions =
+				status === 'Success'
+					? [
+							{
+								filter: 200,
+								type: ConditionsType.GreaterThanOrEqual,
+							},
+							{
+								filter: 399,
+								type: ConditionsType.LessThanOrEqual,
+							},
+						]
+					: [
+							{
+								filter: 400,
+								type: ConditionsType.GreaterThanOrEqual,
+							},
+						];
+		} else {
+			conditions = [
 				{
-					filter: 200,
-					type: status === 'Success' ? ConditionsType.Equals : ConditionsType.NotEquals,
+					filter: status.toLowerCase(),
+					type: ConditionsType.Equals,
 				},
-			],
+			];
+		}
+		const filter: ColumnFilterType = {
+			conditions,
 			filterType: Filters.Text,
 		};
 		setColumnFilters('status', filter, logType);

@@ -94,7 +94,9 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.createDatabase(params);
 				set((prev) => ({
 					databases: [database, ...prev.databases],
-					workspaceDatabases: [database, ...prev.workspaceDatabases],
+					workspaceDatabases: [database, ...prev.workspaceDatabases].sort((a, b) =>
+						a.name.localeCompare(b.name),
+					),
 				}));
 				useVersionStore.setState?.((state) => ({
 					dashboard: {
@@ -108,9 +110,9 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				const database = await DatabaseService.updateDatabaseName(params);
 				set((prev) => ({
 					databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
-					workspaceDatabases: prev.workspaceDatabases.map((db) =>
-						db._id === database._id ? database : db,
-					),
+					workspaceDatabases: prev.workspaceDatabases
+						.map((db) => (db._id === database._id ? database : db))
+						.sort((a, b) => a.name.localeCompare(b.name)),
 					database: database._id === prev.database._id ? database : prev.database,
 				}));
 				return database;

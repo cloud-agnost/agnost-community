@@ -1,37 +1,28 @@
 import { Button } from '@/components/Button';
-import { CopyInput } from '@/components/CopyInput';
 import { Description } from '@/components/Description';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
-import { PasswordInput } from '@/components/PasswordInput';
 import { ADD_RESOURCE_TABS } from '@/constants';
 import { OrganizationMenuItem } from '@/features/organization';
 import { UpdateAllowedRoles, UpdateResourceAccessConf } from '@/features/resources';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
-import { ResourceCreateType, ResourceInstances } from '@/types';
+import { ResourceCreateType } from '@/types';
 import { cn } from '@/utils';
-import { ArrowRight } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
-import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import EditSize from './EditSize';
+import EditTcpProxy from './EditTcpProxy';
 import EditVersionAndReplica from './EditVersionAndReplica';
 
 export default function EditResourceDrawer() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { isEditResourceModalOpen, closeEditResourceModal } = useResourceStore();
-	const {
-		resourceToEdit,
-		resourceConfig,
-		restartManagedResource,
-		enableTcpProxy,
-		disableTcpProxy,
-	} = useResourceStore();
+	const { resourceToEdit, resourceConfig, restartManagedResource } = useResourceStore();
 	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;
 	const { isPending, mutateAsync: restartResource } = useMutation({
@@ -47,28 +38,6 @@ export default function EditResourceDrawer() {
 			toast({
 				title: err.details,
 				action: 'error',
-			});
-		},
-	});
-
-	const { isPending: enableLoading, mutate: enableTcpProxyMutate } = useMutation({
-		mutationFn: () => enableTcpProxy({ resourceId: resourceToEdit._id, orgId }),
-		mutationKey: ['enableTcpProxy'],
-		onSuccess: () => {
-			toast({
-				title: t('resources.enable_networking_success') as string,
-				action: 'success',
-			});
-		},
-	});
-
-	const { isPending: disableLoading, mutate: disableTcpProxyMutate } = useMutation({
-		mutationFn: () => disableTcpProxy({ resourceId: resourceToEdit._id, orgId }),
-		mutationKey: ['disableTcpProxy'],
-		onSuccess: () => {
-			toast({
-				title: t('resources.disable_networking_success') as string,
-				action: 'success',
 			});
 		},
 	});
@@ -136,115 +105,7 @@ export default function EditResourceDrawer() {
 							)}
 						</>
 					) : (
-						<div className='space-y-4'>
-							<Description title={t('resources.private_networking')}>
-								{t('resources.private_networking_description')}
-							</Description>
-							<div className='space-y-4'>
-								{!_.isEmpty(resourceToEdit?.accessReadOnly) && (
-									<Label className='description-title'>{t('resources.primary')}</Label>
-								)}
-								<div className='space-y-4'>
-									{resourceToEdit?.access && (
-										<div className='space-y-4'>
-											<div className='flex gap-6'>
-												<div className='flex-1'>
-													<Label>{t('resources.database.host')}</Label>
-													<CopyInput readOnly value={resourceToEdit?.access.host} />
-												</div>
-												<div>
-													<Label>{t('resources.database.port')}</Label>
-													<CopyInput readOnly value={resourceToEdit?.access.port} />
-												</div>
-											</div>
-											<div className='flex items-start gap-6'>
-												{resourceToEdit?.access.username && (
-													<div className='flex-1'>
-														<Label>{t('resources.database.username')}</Label>
-														<PasswordInput
-															readOnly
-															value={resourceToEdit?.access.username}
-															copyable
-														/>
-													</div>
-												)}
-												<div className='flex-1'>
-													<Label>{t('resources.database.password')}</Label>
-													<PasswordInput
-														readOnly
-														value={resourceToEdit?.access.password}
-														copyable
-													/>
-												</div>
-											</div>
-											{resourceToEdit.instance === ResourceInstances.RabbitMQ && (
-												<div className='flex items-start gap-6'>
-													<div className='flex-1'>
-														<Label>{t('resources.queue.scheme')}</Label>
-														<CopyInput readOnly value={resourceToEdit?.access.scheme} />
-													</div>
-
-													<div className='flex-1'>
-														<Label>{t('resources.queue.vhost')}</Label>
-														<CopyInput readOnly value={resourceToEdit?.access.vhost} />
-													</div>
-												</div>
-											)}
-										</div>
-									)}
-								</div>
-							</div>
-							{!_.isEmpty(resourceToEdit?.accessReadOnly) && (
-								<div className='space-y-4'>
-									<Label className='description-title'>{t('resources.replicas')}</Label>
-									{resourceToEdit.accessReadOnly?.map((replica) => (
-										<>
-											<div className='flex gap-6'>
-												<div className='flex-1'>
-													<Label>{t('resources.database.host')}</Label>
-													<CopyInput readOnly value={replica.host} />
-												</div>
-												<div>
-													<Label>{t('resources.database.port')}</Label>
-													<CopyInput readOnly value={replica.port} />
-												</div>
-											</div>
-											<div className='flex items-start gap-6'>
-												{replica.username && (
-													<div className='flex-1'>
-														<Label>{t('resources.database.username')}</Label>
-														<PasswordInput readOnly value={replica.username} copyable />
-													</div>
-												)}
-												<div className='flex-1'>
-													<Label>{t('resources.database.password')}</Label>
-													<PasswordInput readOnly value={replica.password} copyable />
-												</div>
-											</div>
-										</>
-									))}
-								</div>
-							)}
-							<div className='space-y-4'>
-								<Description title={t('resources.public_networking')}>
-									{t('resources.public_networking_description')}
-								</Description>
-								<div className='flex items-center gap-4'>
-									<CopyInput className='flex-1' readOnly value={window.location.origin} />
-									<ArrowRight />
-									<CopyInput className='flex-1' readOnly value={resourceToEdit?.access?.host} />
-								</div>
-							</div>
-							<Button
-								className='self-end'
-								onClick={
-									resourceToEdit.tcpProxyEnabled ? disableTcpProxyMutate : enableTcpProxyMutate
-								}
-								loading={enableLoading || disableLoading}
-							>
-								{t(`resources.${resourceToEdit.tcpProxyEnabled ? 'disable' : 'enable'}_networking`)}
-							</Button>
-						</div>
+						<EditTcpProxy />
 					)}
 				</div>
 			</DrawerContent>

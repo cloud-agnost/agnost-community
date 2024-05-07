@@ -252,7 +252,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				const createdBucket = await StorageService.createBucket(params);
 				set((state) => ({
-					buckets: [createdBucket, ...get().buckets],
+					buckets: [createdBucket, ...get().buckets].sort((a, b) => a.name.localeCompare(b.name)),
 					bucketCountInfo: {
 						...state.bucketCountInfo,
 						count: (state.bucketCountInfo?.count ?? 0) + 1,
@@ -314,7 +314,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				const bucket = await StorageService.updateBucket(params);
 				set((prev) => ({
-					buckets: prev.buckets.map((b) => (b.id === bucket.id ? bucket : b)),
+					buckets: prev.buckets
+						.map((b) => (b.id === bucket.id ? bucket : b))
+						.sort((a, b) => a.name.localeCompare(b.name)),
 					bucket,
 				}));
 				params.onSuccess?.();

@@ -22,6 +22,7 @@ import User from './User';
 import Version from './Version';
 import VersionProperties from './VersionProperties';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
+	console.log(type);
 	const keys = {
 		user: User,
 		org: Organization,
@@ -50,7 +51,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.storage.bucket': Bucket,
 		'org.app.version.cache': Cache,
 		'org.app.version.function': Function,
-		// TODO: "org.resource.log"
+		'org.resource.log': Resource,
 		'org.app.version.typings': Typings,
 		'org.app.version.middleware': Middleware,
 		'org.member': OrgMember,

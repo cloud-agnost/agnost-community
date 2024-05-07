@@ -96,7 +96,9 @@ const useTaskStore = create<TaskStore & Actions>()(
 				const task = await TaskService.createTask(params);
 				set((prev) => ({
 					tasks: [task, ...prev.tasks],
-					workspaceTasks: [task, ...prev.workspaceTasks],
+					workspaceTasks: [task, ...prev.workspaceTasks].sort((a, b) =>
+						a.name.localeCompare(b.name),
+					),
 					task,
 				}));
 				if (params.onSuccess) params.onSuccess(task);
@@ -116,7 +118,9 @@ const useTaskStore = create<TaskStore & Actions>()(
 			try {
 				const task = await TaskService.updateTaskProperties(params);
 				set((prev) => ({
-					workspaceTasks: prev.workspaceTasks.map((t) => (t._id === task._id ? task : t)),
+					workspaceTasks: prev.workspaceTasks
+						.map((t) => (t._id === task._id ? task : t))
+						.sort((a, b) => a.name.localeCompare(b.name)),
 					tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 					task: task._id === prev.task._id ? task : prev.task,
 				}));

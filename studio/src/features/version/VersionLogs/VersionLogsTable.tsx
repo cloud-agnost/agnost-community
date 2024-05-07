@@ -5,7 +5,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { VersionLogColumns } from './VersionLogColumns';
+import { VersionEndpointLogColumns, VersionLogColumns } from './VersionLogColumns';
 
 type VersionLogsTableProps = UseInfiniteQueryResult<InfiniteData<any, unknown>, APIError> & {
 	type: 'queue' | 'task' | 'endpoint';
@@ -21,13 +21,7 @@ export default function VersionLogsTable({
 
 	const table = useTable({
 		data: logs?.[type] ?? [],
-		columns: VersionLogColumns,
-		initialState: {
-			columnVisibility: {
-				path: type === 'endpoint',
-				method: type === 'endpoint',
-			},
-		},
+		columns: type !== 'endpoint' ? VersionLogColumns : VersionEndpointLogColumns,
 	});
 
 	return (

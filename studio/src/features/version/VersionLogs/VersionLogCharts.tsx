@@ -4,7 +4,8 @@ import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { DATE_TIME_FORMAT, formatDate, toIsoString } from '@/utils';
+import { ConditionsType, Filters } from '@/types';
+import { DATE_TIME_FORMAT, formatDate } from '@/utils';
 import { ArrowClockwise } from '@phosphor-icons/react';
 import { differenceInSeconds, endOfDay, startOfDay } from 'date-fns';
 import { t } from 'i18next';
@@ -15,7 +16,6 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
-import { ConditionsType, Filters } from '@/types';
 
 interface VersionLogChartsProps {
 	type: 'queue' | 'task' | 'endpoint';
@@ -48,8 +48,8 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 			},
 			type,
 		);
-		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
-		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
+		searchParams.set('start', (date[0].startDate as Date).toISOString() ?? '');
+		searchParams.set('end', (date[0].endDate as Date).toISOString() ?? '');
 		setSearchParams(searchParams);
 		updateCurrentTab(version._id, {
 			path: `${pathname}?${searchParams.toString()}`,
@@ -92,8 +92,8 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 
 	function clearFilters() {
 		clearLogColumnFilter(type);
-		searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
-		searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
+		searchParams.set('start', startOfDay(new Date()).toISOString() ?? '');
+		searchParams.set('end', endOfDay(new Date()).toISOString() ?? '');
 		setSearchParams(searchParams);
 		updateCurrentTab(version._id, {
 			path: `${pathname}?${searchParams.toString()}`,

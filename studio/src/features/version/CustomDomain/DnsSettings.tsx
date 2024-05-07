@@ -20,7 +20,7 @@ export default function DnsSettings() {
 					<p className='flex-1'>{t('cluster.ttl')}</p>
 				</div>
 				<Separator />
-				{cluster.ips.map((ip) => (
+				{cluster?.ips.map((ip) => (
 					<div className='flex justify-between' key={ip}>
 						<p className='flex-1'>A</p>
 						<p className='flex-1'>@</p>
