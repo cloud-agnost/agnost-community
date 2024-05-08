@@ -103,8 +103,10 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	return (
 		<div className='h-full space-y-6 p-4 relative'>
 			<VersionLogCharts type={type} refetch={refetchLogs} />
-			{versionLogResponse.isFetching ? (
-				<Loading loading={versionLogResponse.isFetching} />
+			{versionLogResponse.isFetching && !versionLogResponse.isFetchingNextPage ? (
+				<Loading
+					loading={versionLogResponse.isFetching && !versionLogResponse.isFetchingNextPage}
+				/>
 			) : (
 				<>
 					<VersionLogsTable type={type} {...versionLogResponse} />

@@ -5,11 +5,12 @@ import { ColumnFilterType, ConditionsType, FieldTypes, Filters } from '@/types';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import FilterLayout from './FilterLayout';
+import { capitalize } from 'lodash';
 export default function StatusFilter() {
-	const [status, setStatus] = useState<'Success' | 'Error'>('Success');
 	const { pathname } = useLocation();
 	const logType = pathname.split('/')[7];
 	const { selectedFilter } = useColumnFilter(logType, 'status', FieldTypes.TEXT);
+	const [status, setStatus] = useState(capitalize(selectedFilter?.conditions[0]?.filter as string));
 	const { setColumnFilters } = useUtilsStore();
 
 	function applyFilter() {
@@ -52,17 +53,17 @@ export default function StatusFilter() {
 		if (!selectedFilter) return;
 		const conditions = selectedFilter?.conditions;
 
-		setStatus(conditions[0].type === ConditionsType.Equals ? 'Success' : 'Error');
+		setStatus(capitalize(conditions[0].filter as string));
 	}, [selectedFilter]);
 
 	return (
 		<FilterLayout onApply={applyFilter} columnName='status'>
 			<Select
-				defaultValue={status}
-				onValueChange={(value) => setStatus(value as 'Success' | 'Error')}
+				defaultValue={capitalize(selectedFilter?.conditions[0]?.filter as string)}
+				onValueChange={(value) => setStatus(value)}
 			>
 				<SelectTrigger className='w-full text-xs'>
-					<SelectValue placeholder='Select Status'>{status}</SelectValue>
+					<SelectValue placeholder='Select Status' />
 				</SelectTrigger>
 
 				<SelectContent>

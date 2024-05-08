@@ -25,7 +25,7 @@
 
 	&-checkbox-item {
 		@apply relative flex justify-between cursor-pointer select-none items-center text-default;
-		@apply font-sfCompact py-1.5 pl-8 pr-2 text-xs outline-none transition-colors;
+		@apply font-sfCompact p-2 text-xs outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		> span {
 			@apply flex h-3.5 w-3.5 items-center justify-center;

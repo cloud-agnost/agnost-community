@@ -19,6 +19,7 @@ export default function CreateDatabase() {
 		resolver: zodResolver(CreateDatabaseSchema),
 		defaultValues: {
 			assignUniqueName: true,
+			poolSize: 1,
 		},
 	});
 	const { toast } = useToast();

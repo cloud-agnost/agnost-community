@@ -24,7 +24,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 		: (application.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
 	return (
 		<button
-			className='application-card relative space-y-2.5'
+			className='application-card relative'
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
@@ -36,28 +36,32 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 					<Loading loading={loading} />
 					<div
 						className={cn(
-							'absolute bg-base/50 w-full h-full z-40',
+							'absolute bg-base/50 w-full h-full z-40 top-0 left-0',
 							loading ? 'transition-all duration-100 fade-in' : 'animate-out fade-out',
 						)}
 					/>
 				</>
 			)}
+			<div className='space-y-4'>
+				<div className='flex items-center gap-2'>
+					<Avatar size='md' square>
+						<AvatarImage src={application.pictureUrl} />
+						<AvatarFallback name={application.name} color={application.color} />
+					</Avatar>
+					<p className='text-default font-semibold block truncate'>{application.name}</p>
+				</div>
 
-			<div className='flex items-center gap-2'>
-				<Avatar size='md' square>
-					<AvatarImage src={application.pictureUrl} />
-					<AvatarFallback name={application.name} color={application.color} />
-				</Avatar>
-				<p className='text-default font-semibold block truncate'>{application.name}</p>
-			</div>
+				<ApplicationTeam team={application.team} />
 
-			<ApplicationTeam team={application.team} />
-			<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} className='flex  w-1/6' />
-			<div className='flex items-center justify-between'>
-				<span className='text-subtle font-sfCompact text-xs'>
-					{t('general.created')} {getRelativeTime(application.createdAt)}
-				</span>
-				<ApplicationSettings appId={application._id} role={role as AppRoles} />
+				<div className='flex items-center justify-between'>
+					<span className='text-subtle font-sfCompact text-xs'>
+						{t('general.created')} {getRelativeTime(application.createdAt)}
+					</span>
+					<div className='flex items-center gap-2'>
+						<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} className='!h-5' />
+						<ApplicationSettings appId={application._id} role={role as AppRoles} />
+					</div>
+				</div>
 			</div>
 		</button>
 	);
