@@ -46,7 +46,7 @@ export default function ChangeAppName() {
 	return (
 		<SettingsFormItem
 			title={t('application.edit.name.title')}
-			description={t('organization.settings.name.desc')}
+			description={t('application.edit.name.desc')}
 		>
 			<Form {...form}>
 				<form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>

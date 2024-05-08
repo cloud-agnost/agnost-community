@@ -23,7 +23,7 @@ export default function CreateTask() {
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
 		defaultValues: {
-			logExecution: true,
+			logExecution: false,
 			enabled: true,
 		},
 	});

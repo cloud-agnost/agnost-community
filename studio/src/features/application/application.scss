@@ -1,8 +1,8 @@
 .application {
 	&-card {
-		@apply px-2 py-3 border border-border bg-subtle rounded hover:border-border-hover;
+		@apply p-3 border border-border bg-subtle rounded hover:border-border-hover;
 		width: 326px;
-		height: 164px;
+		height: 144px;
 	}
 	&-form {
 		@apply py-4;

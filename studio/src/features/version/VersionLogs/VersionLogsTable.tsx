@@ -14,7 +14,7 @@ type VersionLogsTableProps = UseInfiniteQueryResult<InfiniteData<any, unknown>, 
 export default function VersionLogsTable({
 	type,
 	hasNextPage,
-	isPending,
+	isFetchingNextPage,
 	fetchNextPage,
 }: VersionLogsTableProps) {
 	const { logs } = useVersionStore();
@@ -30,7 +30,7 @@ export default function VersionLogsTable({
 			dataLength={logs?.[type]?.length ?? 0}
 			next={fetchNextPage}
 			hasMore={hasNextPage}
-			loader={isPending && <TableLoading />}
+			loader={isFetchingNextPage && <TableLoading />}
 		>
 			<DataTable table={table} className='table-fixed' />
 		</InfiniteScroll>

@@ -28,7 +28,7 @@ export default function CreateMessageQueue() {
 	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
 		resolver: zodResolver(CreateMessageQueueSchema),
 		defaultValues: {
-			logExecution: true,
+			logExecution: false,
 		},
 	});
 

@@ -1,6 +1,6 @@
 {
 	"apps": "Apps",
-	"create": "Create Application",
+	"create": "Create App",
 	"create-new": "Create New Application",
 	"name": "Application Name",
 	"short_name": "App Name",
@@ -34,6 +34,7 @@
 		"invite": "Invite",
 		"name": {
 			"title": "App Name",
+			"desc": "This is your app's visible name within the platform. For example, the name of your product or service.",
 			"success": "App name has been updated successfully",
 			"successDesc": "The app name has been updated successfully."
 		},
@@ -56,7 +57,7 @@
 	"invite_member": {
 		"title": "Invite Members To App",
 		"subTitle": "Invite Application Members",
-		"description": "Each application member can have different role assigned to authorize certain actions within the organization itself. Organization members can also be added to app teams.",
+		"description": "Each application member can have different role assigned to authorize certain actions within the application itself.",
 		"success": "Invitation has been sent successfully",
 		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation.",
 		"delete": "Delete Invitation",
