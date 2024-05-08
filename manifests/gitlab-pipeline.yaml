@@ -189,6 +189,8 @@ spec:
           params:
             - name: "filter"
               value: "body.ref == 'refs/heads/master'"
+            - name: "filter"
+              value: "will be replaced or removed"
       bindings:
         - ref: gitlab-push-binding
       template:

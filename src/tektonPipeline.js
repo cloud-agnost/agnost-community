@@ -203,7 +203,7 @@ function sleep(ms) {
   });
 }
 
-async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/', gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName) {
+async function createPipeline(pipelineId, gitRepoType, gitRepoUrl, gitSubPath='/', gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName) {
   const manifestFilePath = '../manifests/' + gitRepoType + '-pipeline.yaml';
   const manifest = fs.readFileSync(manifestFilePath, 'utf8');
   const resources = k8s.loadAllYaml(manifest);
@@ -220,7 +220,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
         var resource_namespace = metadata.namespace;
       }
 
-      var resourceNameSuffix = '-' + gitRepoId;
+      var resourceNameSuffix = '-' + pipelineId;
       resource.metadata.name += resourceNameSuffix;
 
       switch(kind) {
@@ -242,7 +242,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
           break;
         case('Ingress'):
           var ingressName = resource.metadata.name;
-          resource.spec.rules[0].http.paths[0].path = '/tekton-' + gitRepoId + '(/|$)(.*)';
+          resource.spec.rules[0].http.paths[0].path = '/tekton-' + pipelineId + '(/|$)(.*)';
           resource.spec.rules[0].http.paths[0].backend.service.name += resourceNameSuffix;
           await k8sNetworkingApi.createNamespacedIngress(resource_namespace, resource);
           break;
@@ -252,11 +252,18 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
           resource.spec.triggers[0].bindings[0].ref += resourceNameSuffix;
           resource.spec.triggers[0].template.ref += resourceNameSuffix;
           resource.spec.resources.kubernetesResource.spec.template.spec.serviceAccountName += resourceNameSuffix;
-          if (gitSubPath != '/' && gitRepoType == 'github') {
+          if (gitSubPath != '/') {
             resource.spec.triggers[0].interceptors[1].params[1].name = 'filter'
             // remove leading slash, if exists
             var path = gitSubPath.replace(/^\/+/, '')
-            resource.spec.triggers[0].interceptors[1].params[1].value = `extensions.changed_files.matches("^${path}")`;
+            switch(gitRepoType) {
+              case('github'):
+                resource.spec.triggers[0].interceptors[1].params[1].value = `extensions.changed_files.startsWith("${path}")`;
+                break;
+              case('gitlab'):
+                resource.spec.triggers[0].interceptors[1].params[1].value = `body.commits.all(c, c.modified.exists(m, m.startsWith("${path}")) || c.added.exists(a, a.startsWith("${path}")) || c.removed.exists(r, r.startsWith("${path}")))`
+                break;
+            }
           } else {
             delete resource.spec.triggers[0].interceptors[1].params[1];
           }
@@ -309,7 +316,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
   }
 
   const ingressIp = await getIngressIp(ingressName);
-  var webhookUrl = "http://" + ingressIp + "/tekton-" + gitRepoId;
+  var webhookUrl = "http://" + ingressIp + "/tekton-" + pipelineId;
 
   switch(gitRepoType) {
     case('github'):
@@ -325,7 +332,7 @@ async function createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath='/'
 }
 
 
-async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId) {
+async function deletePipeline(pipelineId, gitRepoType, gitRepoUrl, gitPat, hookId) {
   const manifestFilePath = '../manifests/' + gitRepoType + '-pipeline.yaml';
   const manifest = fs.readFileSync(manifestFilePath, 'utf8');
   const resources = k8s.loadAllYaml(manifest);
@@ -342,7 +349,7 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
         var resource_namespace = metadata.namespace;
       }
 
-      var resourceNameSuffix = '-' + gitRepoId;
+      var resourceNameSuffix = '-' + pipelineId;
       resource.metadata.name += resourceNameSuffix;
 
       switch(kind) {
@@ -407,7 +414,7 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
  *           schema:
  *             type: object
  *             properties:
- *               gitRepoId:
+ *               pipelineId:
  *                 type: string
  *                 description: Generated unique repo Id
  *                 example: abcdef1234
@@ -455,7 +462,7 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
  *                 description: Name of the application kubernetes object
  *                 example: my-app-deployment
  *             required:
- *               - gitRepoId
+ *               - pipelineId
  *               - gitRepoType
  *               - gitRepoUrl
  *               - gitBranch
@@ -483,10 +490,10 @@ async function deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId
  */
 
 router.post('/tektonPipeline', async (req, res) => {
-  const { gitRepoId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName } = req.body;
+  const { pipelineId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName } = req.body;
 
   try {
-    const webhookConfig = await createPipeline(gitRepoId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName);
+    const webhookConfig = await createPipeline(pipelineId, gitRepoType, gitRepoUrl, gitSubPath, gitBranch, gitPat, containerRegistry, containerRegistryType, containerRegistryId, containerImageName, appKind, appName);
     res.json(webhookConfig);
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));
@@ -506,7 +513,7 @@ router.post('/tektonPipeline', async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               gitRepoId:
+ *               pipelineId:
  *                 type: string
  *                 description: Generated unique repo Id
  *                 example: abcdef1234
@@ -526,7 +533,7 @@ router.post('/tektonPipeline', async (req, res) => {
  *                 description: Webhook Id from GitHub or GitLab
  *                 example: 473456232
  *             required:
- *               - gitRepoId
+ *               - pipelineId
  *               - gitRepoType
  *               - gitRepoUrl
  *               - gitPat
@@ -549,10 +556,10 @@ router.post('/tektonPipeline', async (req, res) => {
  */
 
 router.delete('/tektonPipeline', async (req, res) => {
-  const { gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId} = req.body;
+  const { pipelineId, gitRepoType, gitRepoUrl, gitPat, hookId} = req.body;
 
   try {
-    await deletePipeline(gitRepoId, gitRepoType, gitRepoUrl, gitPat, hookId);
+    await deletePipeline(pipelineId, gitRepoType, gitRepoUrl, gitPat, hookId);
     res.json({ result: "tekton " + gitRepoType + " pipeline deleted" });
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));

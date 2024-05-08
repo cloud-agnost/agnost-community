@@ -913,7 +913,7 @@ curl -XDELETE http://localhost:3000/tektonInfra -d '{
 ```bash
 # Container Registry: GitHub/GHCR
 curl -XPOST http://localhost:3000/tektonPipeline -d '{
-    "gitRepoId": "4sfde896344",
+    "pipelineId": "4sfde896344",
     "gitRepoType": "github",
     "gitRepoUrl": "https://github.com/OWNER/REPO",
     "gitBranch": "main",
@@ -928,7 +928,7 @@ curl -XPOST http://localhost:3000/tektonPipeline -d '{
 
 # Container Registry: Local registry inside the cluster
 curl -XPOST http://localhost:3000/tektonPipeline -d '{
-    "gitRepoId": "4sfde896343",
+    "pipelineId": "4sfde896343",
     "gitRepoType": "github",
     "gitRepoUrl": "https://github.com/OWNER/REPO",
     "gitBranch": "main",
@@ -946,7 +946,7 @@ curl -XPOST http://localhost:3000/tektonPipeline -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/tektonPipeline -d '{
-    "gitRepoId": "4sfde896343",
+    "pipelineId": "4sfde896343",
     "gitRepoType": "github",
     "gitRepoUrl": "https://github.com/OWNER/REPO",
     "gitPat": "ghp_xxx",
