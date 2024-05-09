@@ -119,6 +119,7 @@ export const applyRules = (type) => {
 						return true;
 					}),
 				body("envName")
+					.if(() => type === "create")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))

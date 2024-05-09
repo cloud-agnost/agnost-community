@@ -235,6 +235,14 @@ async function deleteManifest(localRegistryEnabled) {
 
     if (localRegistryEnabled) {
         await removeLocalRegistry();
+
+        // Delete regcred secret
+        try {
+            const secretName = "regcred-local-registry";
+            const resource_namespace = "tekton-builds";
+            await k8sCoreApi.deleteNamespacedSecret(secretName, resource_namespace);
+            console.log("Deleted regcred secret " + secretName);
+        } catch (err) {}
     }
 
     return "success";

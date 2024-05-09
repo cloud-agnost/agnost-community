@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import { body, param, query } from "express-validator";
-import { projectRoles } from "../config/constants.js";
+import { body } from "express-validator";
 
 /**
- * An project is your workspace that packages all project environments and associated containers.
+ * A container is an entitiy created in the Kubernetes cluster this can be a deployment, stateful set, cron job or a knative service
  */
 export const ContainerModel = mongoose.model(
 	"container",
@@ -41,8 +40,18 @@ export const ContainerModel = mongoose.model(
 				required: true,
 				index: true,
 				immutable: true,
-				enum: ["deployment", "stateful_set", "cronjob", "knative_service"],
+				enum: ["deployment", "stateful set", "cron job", "knative service"],
 			},
+			variables: [
+				{
+					name: {
+						type: String,
+					},
+					value: {
+						type: String,
+					},
+				},
+			],
 			sourceOrRegistry: {
 				type: String,
 				required: true,
@@ -82,28 +91,42 @@ export const ContainerModel = mongoose.model(
 				},
 			},
 			networking: {
-				// Flag specifies whether the container is accessible from the public internet or not through a TCP proxy
-				public: {
-					type: Boolean,
-					default: false,
-				},
-				// Flag specifies whether the container is accessible from the internal network or not
-				internal: {
-					type: Boolean,
-					default: false,
-				},
 				// The port number the container listens on
 				containerPort: {
 					type: Number,
 				},
-				// The port number the container is exposed on the host, populated only if the container is public
-				publicPort: {
-					type: Number,
-				},
-				// Whether an ingress is created for the container or not
+				// Flag specifies whether the container is accessible from the public internet or not through a TCP proxy
 				ingress: {
-					type: Boolean,
-					default: false,
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					url: {
+						type: String,
+					},
+				},
+				customDomain: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					domainAdded: {
+						type: Boolean,
+						default: false,
+					},
+					domain: {
+						type: String,
+					},
+				},
+				tcpProxy: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					// The port number the container is exposed on the host, populated only if the container is public
+					publicPort: {
+						type: Number,
+					},
 				},
 			},
 			podConfig: {
@@ -162,43 +185,50 @@ export const ContainerModel = mongoose.model(
 					type: Number,
 					default: 1,
 				},
-				cpuMetricEnabled: {
-					type: Boolean,
-					default: false,
+				cpuMetric: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					metricType: {
+						type: String,
+						enum: [
+							"AverageUtilization",
+							"AverageValueMillicores",
+							"AverageValueCores",
+						],
+					},
+					metricValue: {
+						type: Number,
+					},
 				},
-				cpuAverageUtization: {
-					type: Number,
-				},
-				cpuAverageValue: {
-					type: Number,
-				},
-				cpuAverageValueType: {
-					type: String,
-					enum: ["millicores", "cores"],
-				},
-				memoryMetricEnabled: {
-					type: Boolean,
-					default: false,
-				},
-				memoryAverageValue: {
-					type: Number,
-				},
-				memoryAverageValueType: {
-					type: String,
-					enum: ["mebibyte", "gibibyte"],
+				memoryMetric: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					metricType: {
+						type: String,
+						enum: ["AverageValueMillicores", "AverageValueCores"],
+					},
+					metricValue: {
+						type: Number,
+					},
 				},
 				strategy: {
 					type: String,
 					enum: ["RollingUpdate", "Recreate"],
+					default: "RollingUpdate",
 				},
 				rollingUpdate: {
 					maxSurge: {
 						type: Number,
-						default: 1,
+						default: "30%",
 					},
 					maxSurgeType: {
 						type: String,
 						enum: ["number", "percentage"],
+						default: "percentage",
 					},
 					maxUnavailable: {
 						type: Number,
@@ -454,197 +484,8 @@ export const ContainerModel = mongoose.model(
 export const applyRules = (type) => {
 	switch (type) {
 		case "create":
-		case "update":
-			return [
-				body("name")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isLength({
-						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
-					})
-					.withMessage(
-						t(
-							"Name must be minimum %s and maximum %s characters long",
-							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
-						)
-					)
-					.bail()
-					.custom((value) => {
-						let regex = /^[A-Za-z0-9 _.-]+$/;
-						if (!regex.test(value)) {
-							throw new AgnostError(
-								t(
-									"Project names can include only numbers, letters, spaces, dash, dot and underscore characters"
-								)
-							);
-						}
-
-						let regex2 = /^[ _-].*$/;
-						if (regex2.test(value)) {
-							throw new AgnostError(
-								t(
-									"Project names cannot start with a dash or underscore character"
-								)
-							);
-						}
-
-						//Indicates the success of this synchronous custom validator
-						return true;
-					}),
-				body("envName")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isLength({
-						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
-					})
-					.withMessage(
-						t(
-							"Name must be minimum %s and maximum %s characters long",
-							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
-						)
-					)
-					.bail()
-					.custom((value) => {
-						let regex = /^[A-Za-z0-9 _.-]+$/;
-						if (!regex.test(value)) {
-							throw new AgnostError(
-								t(
-									"Project environment names can include only numbers, letters, spaces, dash, dot and underscore characters"
-								)
-							);
-						}
-
-						let regex2 = /^[ _-].*$/;
-						if (regex2.test(value)) {
-							throw new AgnostError(
-								t(
-									"Project environment names cannot start with a dash or underscore character"
-								)
-							);
-						}
-
-						//Indicates the success of this synchronous custom validator
-						return true;
-					}),
-			];
-		case "update-member-role":
-			return [
-				param("userId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
-
-						return true;
-					}),
-				body("role")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(projectRoles)
-					.withMessage(t("Unsupported team member role")),
-			];
-		case "remove-member":
-			return [
-				param("userId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
-
-						return true;
-					}),
-			];
-		case "remove-members":
-			return [
-				body("userIds")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.isArray()
-					.withMessage(t("User identifiers need to be an array of strings")),
-				body("userIds.*")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
-
-						return true;
-					}),
-			];
-		case "transfer":
-			return [
-				param("userId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
-
-						return true;
-					})
-					.bail()
-					.custom((value, { req }) => {
-						// Check whether email is unique or not
-						let projectMember = req.project.team.find(
-							(entry) => entry.userId.toString() === value
-						);
-
-						if (!projectMember) {
-							throw new AgnostError(
-								t(
-									"The user identified with id '%s' is not a member of project '%s'. Project ownership can only be transferred to an existing project member with 'Admin' role.",
-									value,
-									req.project.name
-								)
-							);
-						}
-
-						if (projectMember.role !== "Admin") {
-							throw new AgnostError(
-								t(
-									"Project ownership can only be transferred to an existing project member with 'Admin' role."
-								)
-							);
-						}
-
-						return true;
-					}),
-			];
-		case "upload-picture":
-			return [
-				query("width")
-					.trim()
-					.optional({ nullable: true })
-					.isInt({ min: 1 })
-					.withMessage(t("Width needs to be a positive integer"))
-					.toInt(),
-				query("height")
-					.trim()
-					.optional({ nullable: true })
-					.isInt({ min: 1 })
-					.withMessage(t("Height needs to be a positive integer"))
-					.toInt(),
-			];
+			const type = body("type");
+			return [];
 		default:
 			return [];
 	}
