@@ -4,6 +4,8 @@ import * as minio from "minio";
 import bcrypt from "bcrypt";
 import k8s from "@kubernetes/client-node";
 import path from "path";
+import yaml from "js-yaml";
+
 import { fileURLToPath } from "url";
 
 // Kubernetes client configuration
@@ -30,6 +32,44 @@ export class CICDManager {
 
     async disableCICDInfrastructure() {
         await deleteManifest(true);
+    }
+
+    async createNamespace(environment) {
+        try {
+            const manifest = fs.readFileSync(`${__dirname}/manifests/namespace.yaml`, "utf8");
+            const resource = yaml.load(manifest);
+            const { metadata } = resource;
+
+            metadata.name = environment.iid;
+            await k8sCoreApi.createNamespace(resource);
+
+            return { status: "success" };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot create the namespace of environment '${environment.name}'. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    async deleteNamespaces(iids) {
+        for (const iid of iids) {
+            k8sCoreApi.deleteNamespace(iid).then(
+                (response) => {
+                    console.log(`Namespace '${iid}' deleted successfully`);
+                },
+                (err) => {
+                    console.error(`Error deleting namespace '${iid}'. ${err.response?.body?.message}`);
+                }
+            );
+        }
+
+        return { status: "success" };
     }
 }
 

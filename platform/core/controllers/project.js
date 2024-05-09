@@ -1,3 +1,4 @@
+import axios from "axios";
 import BaseController from "./base.js";
 import prjEnvCtrl from "./projectEnv.js";
 import auditCtrl from "../controllers/audit.js";
@@ -49,6 +50,14 @@ class ProjectController extends BaseController {
 			{ session, cacheKey: environmentId }
 		);
 
+		// Create the Kubernetes namespace of the environment
+		await axios.post(helper.getWorkerUrl() + "/v1/cicd/env", environment, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
+
 		return { project, environment };
 	}
 
@@ -56,7 +65,7 @@ class ProjectController extends BaseController {
 	 * Delete all project related data
 	 * @param  {Object} session The database session object
 	 * @param  {Object} org The organization object
-	 * @param  {Object} app The app object that will be deleted
+	 * @param  {Object} project The project object that will be deleted
 	 */
 	async deleteProject(session, org, project) {
 		await this.deleteOneById(project._id, { session, cacheKey: project._id });

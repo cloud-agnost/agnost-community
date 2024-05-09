@@ -143,6 +143,10 @@ async function initExpress(i18n) {
 		(await import("./routes/projectTeam.js")).default
 	);
 	app.use(
+		"/v1/org/:orgId/project/:projectId/env",
+		(await import("./routes/projectEnv.js")).default
+	);
+	app.use(
 		"/v1/org/:orgId/app/:appId/version",
 		(await import("./routes/version.js")).default
 	);

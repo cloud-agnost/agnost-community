@@ -72,6 +72,15 @@ export const handleError = (req, res, error) => {
 	};
 
 	if (!res.headersSent) {
+		if (error?.response?.data?.status === "error") {
+			return res.status(500).json({
+				error: t("Internal Server Error"),
+				details: error.response.data.message,
+				code: ERROR_CODES.internalServerError,
+				stack: error.response.data.stack,
+			});
+		}
+
 		if (error.name === "CastError") {
 			entry.error = t("Not Found");
 			entry.details = t("The object identifier is not recognized.");

@@ -14,6 +14,7 @@ import {
 } from "../middlewares/authorizeProjectAction.js";
 import { applyRules } from "../schemas/project.js";
 import { validate } from "../middlewares/validate.js";
+import { validateGitOps } from "../middlewares/validateGitOps.js";
 import { handleError } from "../schemas/platformError.js";
 import { fileUploadMiddleware } from "../middlewares/handleFile.js";
 import { storage } from "../init/storage.js";
@@ -27,7 +28,7 @@ const router = express.Router({ mergeParams: true });
 @desc       Get project role definitions
 @access     private
 */
-router.get("/roles", authSession, async (req, res) => {
+router.get("/roles", authSession, validateGitOps, async (req, res) => {
 	try {
 		res.json(projectAuthorization);
 	} catch (error) {
@@ -45,6 +46,7 @@ router.post(
 	"/",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	authorizeOrgAction("org.project.create"),
 	applyRules("create"),
@@ -91,6 +93,7 @@ router.post(
 				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (err) {
+			console.log("***err", err);
 			await prjCtrl.rollback(session);
 			handleError(req, res, err);
 		}
@@ -106,6 +109,7 @@ router.post(
 router.get(
 	"/",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	authorizeOrgAction("org.project.view"),
 	async (req, res) => {
@@ -155,6 +159,7 @@ router.get(
 router.get(
 	"/all",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	authorizeOrgAction("org.project.viewAll"),
 	async (req, res) => {
@@ -190,6 +195,7 @@ router.put(
 	"/:projectId",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.update"),
@@ -243,6 +249,7 @@ router.put(
 	"/:projectId/picture",
 	fileUploadMiddleware,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.update"),
@@ -328,6 +335,7 @@ router.put(
 router.delete(
 	"/:projectId/picture",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.update"),
@@ -379,6 +387,7 @@ router.delete(
 router.get(
 	"/:projectId",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.view"),
@@ -410,6 +419,7 @@ router.delete(
 	"/:projectId",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.delete"),
@@ -466,6 +476,7 @@ router.post(
 	"/:projectId/transfer/:userId",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.transfer"),

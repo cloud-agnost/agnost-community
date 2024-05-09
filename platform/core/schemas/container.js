@@ -43,6 +43,13 @@ export const ContainerModel = mongoose.model(
 				immutable: true,
 				enum: ["deployment", "stateful_set", "cronjob", "knative_service"],
 			},
+			sourceOrRegistry: {
+				type: String,
+				required: true,
+				index: true,
+				immutable: true,
+				enum: ["source", "registry"],
+			},
 			source: {
 				repoType: {
 					type: String,
@@ -59,9 +66,23 @@ export const ContainerModel = mongoose.model(
 					type: String,
 					default: "/",
 				},
+				// The name of the docker file in the repository
+				dockerFile: {
+					type: String,
+					default: "Dockerfile",
+				},
+			},
+			registry: {
+				// Internal iid or the image registry
+				registryId: {
+					type: String,
+				},
+				image: {
+					type: String,
+				},
 			},
 			networking: {
-				// Flag specifies whether the container is accessible from the public internet or not
+				// Flag specifies whether the container is accessible from the public internet or not through a TCP proxy
 				public: {
 					type: Boolean,
 					default: false,
@@ -141,6 +162,10 @@ export const ContainerModel = mongoose.model(
 					type: Number,
 					default: 1,
 				},
+				cpuMetricEnabled: {
+					type: Boolean,
+					default: false,
+				},
 				cpuAverageUtization: {
 					type: Number,
 				},
@@ -151,8 +176,9 @@ export const ContainerModel = mongoose.model(
 					type: String,
 					enum: ["millicores", "cores"],
 				},
-				memoryAverageUtization: {
-					type: Number,
+				memoryMetricEnabled: {
+					type: Boolean,
+					default: false,
 				},
 				memoryAverageValue: {
 					type: Number,
@@ -287,6 +313,125 @@ export const ContainerModel = mongoose.model(
 				revisionHistoryLimit: {
 					type: Number,
 					default: 10,
+				},
+			},
+			probes: {
+				startup: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					checkMechanism: {
+						type: String,
+						enum: ["exec", "httpGet", "tcpSocket"],
+						defau: ["httpGet"],
+					},
+					execCommand: {
+						type: String,
+					},
+					httpPath: {
+						type: String,
+					},
+					httpPort: {
+						type: Number,
+					},
+					tcpPort: {
+						type: Number,
+					},
+					initialDelaySeconds: {
+						type: Number,
+						default: 0,
+					},
+					periodSeconds: {
+						type: Number,
+						default: 10,
+					},
+					timeoutSeconds: {
+						type: Number,
+						default: 1,
+					},
+					failureThreshold: {
+						type: Number,
+						default: 3,
+					},
+				},
+				readiness: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					checkMechanism: {
+						type: String,
+						enum: ["exec", "httpGet", "tcpSocket"],
+						defau: ["httpGet"],
+					},
+					execCommand: {
+						type: String,
+					},
+					httpPath: {
+						type: String,
+					},
+					httpPort: {
+						type: Number,
+					},
+					tcpPort: {
+						type: Number,
+					},
+					initialDelaySeconds: {
+						type: Number,
+						default: 0,
+					},
+					periodSeconds: {
+						type: Number,
+						default: 10,
+					},
+					timeoutSeconds: {
+						type: Number,
+						default: 1,
+					},
+					failureThreshold: {
+						type: Number,
+						default: 3,
+					},
+				},
+				liveness: {
+					enabled: {
+						type: Boolean,
+						default: false,
+					},
+					checkMechanism: {
+						type: String,
+						enum: ["exec", "httpGet", "tcpSocket"],
+						defau: ["httpGet"],
+					},
+					execCommand: {
+						type: String,
+					},
+					httpPath: {
+						type: String,
+					},
+					httpPort: {
+						type: Number,
+					},
+					tcpPort: {
+						type: Number,
+					},
+					initialDelaySeconds: {
+						type: Number,
+						default: 0,
+					},
+					periodSeconds: {
+						type: Number,
+						default: 10,
+					},
+					timeoutSeconds: {
+						type: Number,
+						default: 1,
+					},
+					failureThreshold: {
+						type: Number,
+						default: 3,
+					},
 				},
 			},
 			createdBy: {

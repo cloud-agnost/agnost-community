@@ -7,6 +7,7 @@ import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateProject } from "../middlewares/validateProject.js";
 import { authorizeProjectAction } from "../middlewares/authorizeProjectAction.js";
+import { validateGitOps } from "../middlewares/validateGitOps.js";
 import { applyRules } from "../schemas/project.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
@@ -23,6 +24,7 @@ const router = express.Router({ mergeParams: true });
 router.get(
 	"/",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.view"),
@@ -70,6 +72,7 @@ router.get(
 router.get(
 	"/me",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.view"),
@@ -119,6 +122,7 @@ router.put(
 	"/:userId",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.update"),
@@ -240,6 +244,7 @@ router.delete(
 	"/:userId",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.delete"),
@@ -342,6 +347,7 @@ router.post(
 	"/delete-multi",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.delete"),
@@ -418,6 +424,7 @@ router.delete(
 	"/",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	async (req, res) => {

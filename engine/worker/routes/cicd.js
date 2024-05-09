@@ -37,4 +37,38 @@ router.post("/disable", checkContentType, authAccessToken, async (req, res) => {
     }
 });
 
+/*
+@route      /v1/cicd/env
+@method     POST
+@desc       Create the namespace of the environment
+@access     public
+*/
+router.post("/env", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is and environment object
+        const result = await cicdManager.createNamespace(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /v1/cicd/env/delete
+@method     POST
+@desc       Deletes the namespaces of the environments
+@access     public
+*/
+router.post("/env/delete", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is an array of namespace names (environment iids) that will be deleted
+        const result = await cicdManager.deleteNamespaces(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
 export default router;

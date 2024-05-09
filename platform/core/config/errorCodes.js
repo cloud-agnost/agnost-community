@@ -33,5 +33,6 @@ const ERROR_CODES = {
 	invalidBucketSize: "invalid_bucket_size",
 	fileSizeTooLarge: "file_size_too_large",
 	fileUploadError: "file_upload_error",
+	badRequest: "bad_request",
 };
 export default ERROR_CODES;

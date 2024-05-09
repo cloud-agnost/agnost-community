@@ -8,6 +8,7 @@ import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateProject } from "../middlewares/validateProject.js";
 import { authorizeProjectAction } from "../middlewares/authorizeProjectAction.js";
+import { validateGitOps } from "../middlewares/validateGitOps.js";
 import { applyRules as invitationApplyRules } from "../schemas/projectInvitation.js";
 import { validate } from "../middlewares/validate.js";
 import { sendMessage } from "../init/queue.js";
@@ -27,6 +28,7 @@ router.post(
 	"/",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.create"),
@@ -149,6 +151,7 @@ router.put(
 	"/",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.update"),
@@ -248,6 +251,7 @@ router.post(
 	"/resend",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.resend"),
@@ -358,6 +362,7 @@ router.delete(
 	"/",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.delete"),
@@ -407,6 +412,7 @@ router.delete(
 	"/multi",
 	checkContentType,
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.delete"),
@@ -446,6 +452,7 @@ router.delete(
 router.get(
 	"/",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.invite.view"),
@@ -505,6 +512,7 @@ router.get(
 router.get(
 	"/list-eligible",
 	authSession,
+	validateGitOps,
 	validateOrg,
 	validateProject,
 	authorizeProjectAction("project.team.view"),
