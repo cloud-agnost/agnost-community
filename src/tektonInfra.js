@@ -17,6 +17,7 @@ const k8sAuthApi = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
 const k8sCustomObjectApi = kc.makeApiClient(k8s.CustomObjectsApi);
 const k8sAdmissionApi = kc.makeApiClient(k8s.AdmissionregistrationV1Api);
 const k8sAutoscalingApi = kc.makeApiClient(k8s.AutoscalingV2Api);
+const k8sBatchApi = kc.makeApiClient(k8s.BatchV1Api);
 
 const namespace = process.env.NAMESPACE;
 
@@ -199,6 +200,9 @@ async function applyManifest(localRegistryEnabled) {
         case('ClusterInterceptor'):
           await k8sCustomObjectApi.createClusterCustomObject('triggers.tekton.dev', 'v1alpha1', 'clusterinterceptors', resource);
           break;
+        case('CronJob'):
+          await k8sBatchApi.createNamespacedCronJob(resourceNamespace, resource);
+          break;
         default:
           console.log(`Skipping: ${kind}`);
       }
@@ -272,6 +276,9 @@ async function deleteManifest(localRegistryEnabled) {
           break;
         case('HorizontalPodAutoscaler'):
           await k8sAutoscalingApi.deleteNamespacedHorizontalPodAutoscaler(resource.metadata.name, resourceNamespace);
+          break;
+        case('CronJob'):
+          await k8sBatchApi.deleteNamespacedCronJob(resource.metadata.name, resourceNamespace);
           break;
         default:
           console.log(`Skipping: ${kind}`);
