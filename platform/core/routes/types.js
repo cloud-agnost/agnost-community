@@ -18,6 +18,8 @@ import {
 	ftsIndexLanguages,
 } from "../config/constants.js";
 
+import { timezones } from "../config/timezones.js";
+
 const router = express.Router({ mergeParams: true });
 
 /*
@@ -43,7 +45,18 @@ router.get("/all", authSession, (req, res) => {
 		authUserDataModel,
 		resourceVersions,
 		ftsIndexLanguages,
+		timezones,
 	});
+});
+
+/*
+@route      /timezones
+@method     GET
+@desc       Returns list of timezones
+@access     public
+*/
+router.get("/timezones", authSession, (req, res) => {
+	res.json(timezones);
 });
 
 /*

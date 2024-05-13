@@ -1,7 +1,9 @@
 import { body } from "express-validator";
+import parser from "cron-parser";
 import cntrCtrl from "../../controllers/container.js";
 import domainCtrl from "../../controllers/domain.js";
 import clsCtrl from "../../controllers/cluster.js";
+import { timezones } from "../../config/timezones.js";
 
 export const checkName = (containerType, actionType) => {
 	return [
@@ -386,6 +388,55 @@ function parseMemoryValue(memoryValue, unit) {
 	return undefined;
 }
 
+function checkStorage(value, unit) {
+	// First check if the value is a number
+	if (isNaN(value)) {
+		throw new AgnostError(t("Storage amount must be a number"));
+	}
+
+	if (unit === "mebibyte") {
+		const intValue = parseInt(value, 10);
+		if (intValue.toString() !== value.toString()) {
+			throw new AgnostError(
+				"Storage amount must be an integer when using mebibytes"
+			);
+		}
+
+		if (
+			intValue < config.get("general.containers.miStorageMiB") ||
+			intValue > config.get("general.containers.maxStorageMiB")
+		) {
+			throw new AgnostError(
+				t(
+					"Storage amount must be between %s and %s when using mebibytes",
+					config.get("general.containers.minStorageMiB"),
+					config.get("general.containers.maxStorageMiB")
+				)
+			);
+		}
+	} else if (unit === "gibibyte") {
+		const floatVal = parseFloat(value);
+		if (floatVal.toString() !== value.toString()) {
+			throw new AgnostError("Storage amount must be a valid number");
+		}
+
+		if (
+			floatVal < config.get("general.containers.minStorageGiB") ||
+			floatVal > config.get("general.containers.maxStorageGiB")
+		) {
+			throw new AgnostError(
+				t(
+					"Storage request must be between %s and %s when using gibibytes",
+					config.get("general.containers.minStorageGiB"),
+					config.get("general.containers.maxStorageGiB")
+				)
+			);
+		}
+	}
+
+	return true;
+}
+
 export const checkPodConfig = (containerType, actionType) => {
 	return [
 		body("podConfig.restartPolicy")
@@ -548,6 +599,88 @@ export const checkPodConfig = (containerType, actionType) => {
 	];
 };
 
+export const checkStorageConfig = (containerType, actionType) => {
+	return [
+		body("storageConfig.enabled")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isBoolean()
+			.withMessage(t("Not a valid boolean value"))
+			.toBoolean(),
+		body("storageConfig.mountPath")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.custom((value) => value.startsWith("/"))
+			.withMessage("Path must start with a '/' character")
+			.bail()
+			.matches(/^\/([\w\-\/]*)$/)
+			.withMessage(
+				"Not a valid mount path. Mount paths include alphanumeric characters, underscore, hyphens, and additional slashes."
+			) // Remove trailing slashes using custom sanitizer
+			.customSanitizer((value) => value.replace(/\/+$/, "")),
+		body("storageConfig.reclaimPolicy")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["retain", "delete"])
+			.withMessage(t("Unsupported storage reclaim policy")),
+		body("storageConfig.accessModes")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.isArray()
+			.withMessage(t("Access modes need to be an array of strings"))
+			.custom((value, { req }) => {
+				if (value.length === 0) {
+					throw new AgnostError(
+						t("At least one access mode needs to be specified.")
+					);
+				}
+
+				return true;
+			}),
+		body("storageConfig.accessModes.*")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"])
+			.withMessage(t("Unsupported storage access mode")),
+		body("storageConfig.sizeType")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["mebibyte", "gibibyte"])
+			.withMessage(t("Unsupported storage size unit")),
+		body("storageConfig.size")
+			.if((value, { req }) => req.body.storageConfig.enabled === true)
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.if((value, { req }) =>
+				["mebibyte", "gibibyte"].includes(req.body.storageConfig.sizeType)
+			)
+			.custom((value, { req }) => {
+				checkStorage(value, req.body.storageConfig.sizeType);
+
+				return true;
+			})
+			.bail()
+			.customSanitizer((value) => {
+				// Check if the number has a decimal to decide on int or float conversion
+				return value.includes(".") ? parseFloat(value) : parseInt(value, 10);
+			}),
+	];
+};
+
 export const checkDeploymentConfig = (containerType, actionType) => {
 	return [
 		body("deploymentConfig.desiredReplicas")
@@ -577,7 +710,7 @@ export const checkDeploymentConfig = (containerType, actionType) => {
 
 				if (maxReplicas < minReplicas) {
 					throw new AgnostError(
-						"Min replicass cannot be larger than max replicas"
+						"Min replicas cannot be larger than max replicas"
 					);
 				}
 
@@ -602,7 +735,7 @@ export const checkDeploymentConfig = (containerType, actionType) => {
 
 				if (maxReplicas < minReplicas) {
 					throw new AgnostError(
-						"Max replicass cannot be smaller than min replicas"
+						"Max replicas cannot be smaller than min replicas"
 					);
 				}
 
@@ -1037,5 +1170,177 @@ export const checkProbes = (containerType, actionType) => {
 			.isInt({ min: 1, max: 65535 })
 			.withMessage("Port must be an integer between 1 and 65535")
 			.toInt(), // Converts the port number to an integer
+	];
+};
+
+export const checkStatefulSetConfig = (containerType, actionType) => {
+	return [
+		body("statefulSetConfig.desiredReplicas")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 1, max: 100 })
+			.withMessage("Desired replicas must be an integer between 1 and 10")
+			.toInt(), // Converts the replica number to an integer
+	];
+};
+
+export const checkCronJobConfig = (containerType, actionType) => {
+	return [
+		body("cronJobConfig.schedule")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.custom((value) => {
+				try {
+					parser.parseExpression(value);
+					return true;
+				} catch (err) {
+					throw new AgnostError(
+						t("Not a valid cron expression. %s", err.message)
+					);
+				}
+			}),
+		body("cronJobConfig.timeZone")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(timezones.map((entry) => entry.tzCode))
+			.withMessage(t("Unsupported timezone")),
+		body("cronJobConfig.concurrencyPolicy")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["Allow", "Forbid", "Replace"])
+			.withMessage(t("Unsupported coucurrency policy")),
+		body("cronJobConfig.suspend")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isBoolean()
+			.withMessage(t("Not a valid boolean value"))
+			.toBoolean(),
+	];
+};
+
+export const checkKnativeServiceConfig = (containerType, actionType) => {
+	return [
+		body("knativeConfig.concurrency")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.bail()
+			.isInt({ min: 1, max: 1000 })
+			.withMessage("Concurrency must be an integer between 1 and 1000")
+			.toInt(),
+		body("knativeConfig.scalingMetric")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["concurrency", "rps", "cpu", "memory"])
+			.withMessage(t("Unsupported scaling metric")),
+		body("knativeConfig.scalingMetricTarget")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.custom((value, { req }) => {
+				if (req.body.knativeConfig.scalingMetric === "concurrency") {
+					// First check if the value is a number
+					if (isNaN(value)) {
+						throw new AgnostError(t("Concurrency target must be a number"));
+					}
+
+					const floatVal = parseFloat(value);
+					if (floatVal.toString() !== value.toString()) {
+						throw new AgnostError("Concurrency target must be a valid number");
+					}
+
+					if (floatVal < 0 || floatVal > 100) {
+						throw new AgnostError(
+							"Concurrency target must be between 0 and 100"
+						);
+					}
+				} else if (req.body.knativeConfig.scalingMetric === "rps") {
+					// First check if the value is a number
+					if (isNaN(value)) {
+						throw new AgnostError(t("RPS target must be a number"));
+					}
+
+					const intVal = parseInt(value);
+					if (intVal.toString() !== value.toString()) {
+						throw new AgnostError("RPS target must be a valid number");
+					}
+				} else if (req.body.knativeConfig.scalingMetric === "cpu") {
+					checkCPU(value, "millicores");
+				} else if (req.body.knativeConfig.scalingMetric === "memory") {
+					checkMemory(value, "mebibyte");
+				}
+
+				return true;
+			}),
+		body("knativeConfig.minScale")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 0, max: 100 })
+			.withMessage("Min scale must be a number between 0 and 100")
+			.toInt()
+			.custom((value, { req }) => {
+				const minReplicas = parseInt(value, 10);
+				const maxReplicas = parseInt(req.body.knativeConfig.maxScale, 10);
+
+				if (maxReplicas < minReplicas) {
+					throw new AgnostError("Min scale cannot be larger than max scale");
+				}
+
+				return true;
+			}),
+		body("knativeConfig.maxScale")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 1, max: 100 })
+			.withMessage("Max scale must be an integer between 1 and 100")
+			.toInt()
+			.custom((value, { req }) => {
+				const minReplicas = parseInt(req.body.knativeConfig.minScale, 10);
+				const maxReplicas = parseInt(value, 10);
+
+				if (maxReplicas < minReplicas) {
+					throw new AgnostError("Max scale cannot be smaller than min scale");
+				}
+
+				return true;
+			}),
+		body("knativeConfig.scaleDownDelay")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 0, max: 3600 })
+			.withMessage(
+				"Scale down delay period must be a number between 0 and 3600"
+			)
+			.toInt(),
+		body("knativeConfig.scaleToZeroPodRetentionPeriod")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 0, max: 3600 })
+			.withMessage(
+				"Scale to zero last pod retention period must be a number between 0 and 3600"
+			)
+			.toInt(),
 	];
 };

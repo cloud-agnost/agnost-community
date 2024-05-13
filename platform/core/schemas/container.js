@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
 import deploymentRules from "./containers/deployment.js";
+import statefulSetRules from "./containers/statefulSet.js";
+import cronJobRules from "./containers/cronJob.js";
+import knativeServiceRules from "./containers/knativeService.js";
 
 const containerTypes = [
 	"deployment",
@@ -185,6 +188,34 @@ export const ContainerModel = mongoose.model(
 					default: "mebibyte",
 				},
 			},
+			storageConfig: {
+				enabled: {
+					type: Boolean,
+					default: false,
+				},
+				mountPath: {
+					type: String,
+					default: "/",
+				},
+				size: {
+					type: Number,
+				},
+				sizeType: {
+					type: String,
+					enum: ["mebibyte", "gibibyte"],
+					default: "gibibyte",
+				},
+				reclaimPolicy: {
+					type: String,
+					enum: ["retain", "delete"],
+					default: "retain",
+				},
+				accessModes: {
+					type: [String],
+					enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"],
+					default: ["ReadWriteOnce"],
+				},
+			},
 			deploymentConfig: {
 				desiredReplicas: {
 					type: Number,
@@ -309,6 +340,7 @@ export const ContainerModel = mongoose.model(
 				},
 				timeZone: {
 					type: String,
+					defaykt: "UTC",
 				},
 				concurrencyPolicy: {
 					type: String,
@@ -329,16 +361,22 @@ export const ContainerModel = mongoose.model(
 				},
 			},
 			knativeConfig: {
+				concurrency: {
+					type: Number,
+					default: 100,
+				},
 				scalingMetric: {
 					type: String,
 					enum: ["concurrency", "rps", "cpu", "memory"],
+					default: "concurrency",
 				},
 				scalingMetricTarget: {
 					// "Concurrency" specifies a percentage value, e.g. "70"
 					// "Requests per second" specifies an integer value,  e.g. "150"
 					// "CPU" specifies the integer value in millicore, e.g. "100m"
 					// "Memory" specifies the integer value in Mi, e.g. "75"
-					type: String,
+					type: Number,
+					default: 70,
 				},
 				maxScale: {
 					type: Number,
@@ -512,11 +550,11 @@ export const applyRules = (actionType) => {
 		if (req.body.type === "deployment")
 			executeMiddlewareArray(deploymentRules(actionType), req, res, next);
 		else if (req.body.type === "stateful set")
-			executeMiddlewareArray([], req, res, next);
+			executeMiddlewareArray(statefulSetRules(actionType), req, res, next);
 		else if (req.body.type === "cron job")
-			executeMiddlewareArray([], req, res, next);
+			executeMiddlewareArray(cronJobRules(actionType), req, res, next);
 		else if (req.body.type === "knative service")
-			executeMiddlewareArray([], req, res, next);
+			executeMiddlewareArray(knativeServiceRules(actionType), req, res, next);
 		else
 			executeMiddlewareArray(
 				[

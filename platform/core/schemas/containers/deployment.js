@@ -1,10 +1,10 @@
-import { body } from "express-validator";
 import {
 	checkName,
 	checkRepoOrRegistry,
 	checkRepo,
 	checkVariables,
 	checkNetworking,
+	checkStorageConfig,
 	checkPodConfig,
 	checkDeploymentConfig,
 	checkProbes,
@@ -19,6 +19,7 @@ export default (actionType) => {
 				...checkRepoOrRegistry("deployment", actionType),
 				...checkRepo("deployment", actionType),
 				...checkVariables("deployment", actionType),
+				...checkStorageConfig("deployment", actionType),
 				...checkNetworking("deployment", actionType),
 				...checkPodConfig("deployment", actionType),
 				...checkDeploymentConfig("deployment", actionType),

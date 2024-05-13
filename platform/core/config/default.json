@@ -113,7 +113,11 @@
       "minMiB": 10,
       "maxMiB": 1024,
       "minGiB": 0.1,
-      "maxGiB": 16
+      "maxGiB": 16,
+      "minStorageMiB": 10,
+      "maxStorageMiB": 1024,
+      "minStorageGiB": 0.1,
+      "maxStorageGiB": 5000
     }
   }
 }
