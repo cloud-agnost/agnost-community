@@ -588,6 +588,8 @@ async function getGitProviderRepos(gitProvider) {
 				headers: { Authorization: `token ${gitProvider.accessToken}` },
 			});
 
+			console.log(result.data);
+
 			return result.data.map((entry) => {
 				return {
 					repoId: entry.id,
@@ -595,6 +597,7 @@ async function getGitProviderRepos(gitProvider) {
 					repo: entry.name,
 					fullName: entry.full_name,
 					private: entry.private,
+					url: entry.html_url,
 				};
 			});
 		} catch (error) {

@@ -104,6 +104,16 @@
         "request": "128Mi",
         "limit": "1024Mi"
       }
+    },
+    "containers": {
+      "minMillicores": 10,
+      "maxMillicores": 1000,
+      "minCPU": 0.1,
+      "maxCPU": 4,
+      "minMiB": 10,
+      "maxMiB": 1024,
+      "minGiB": 0.1,
+      "maxGiB": 16
     }
   }
 }

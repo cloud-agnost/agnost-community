@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
+import deploymentRules from "./containers/deployment.js";
+
+const containerTypes = [
+	"deployment",
+	"stateful set",
+	"cron job",
+	"knative service",
+];
 
 /**
  * A container is an entitiy created in the Kubernetes cluster this can be a deployment, stateful set, cron job or a knative service
@@ -18,7 +26,7 @@ export const ContainerModel = mongoose.model(
 				ref: "project",
 				index: true,
 			},
-			envId: {
+			environmentId: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "project_environment",
 				index: true,
@@ -40,7 +48,7 @@ export const ContainerModel = mongoose.model(
 				required: true,
 				index: true,
 				immutable: true,
-				enum: ["deployment", "stateful set", "cron job", "knative service"],
+				enum: containerTypes,
 			},
 			variables: [
 				{
@@ -52,38 +60,46 @@ export const ContainerModel = mongoose.model(
 					},
 				},
 			],
-			sourceOrRegistry: {
+			repoOrRegistry: {
 				type: String,
 				required: true,
 				index: true,
 				immutable: true,
-				enum: ["source", "registry"],
+				enum: ["repo", "registry"],
 			},
-			source: {
-				repoType: {
+			repo: {
+				type: {
 					type: String,
 					enum: ["github", "gitlab", "bitbucket"],
 				},
-				repo: {
+				// Whether the repo is connected or not
+				connected: {
+					type: Boolean,
+				},
+				// Full name of the repo
+				name: {
+					type: String,
+				},
+				url: {
 					type: String,
 				},
 				branch: {
 					type: String,
 				},
 				// For monorepos the directory path to the container
-				rootDirectory: {
+				path: {
 					type: String,
 					default: "/",
 				},
 				// The name of the docker file in the repository
-				dockerFile: {
+				dockerfile: {
 					type: String,
 					default: "Dockerfile",
 				},
 			},
 			registry: {
 				// Internal iid or the image registry
-				registryId: {
+				registryiid: {
 					type: String,
 				},
 				image: {
@@ -101,16 +117,13 @@ export const ContainerModel = mongoose.model(
 						type: Boolean,
 						default: false,
 					},
-					url: {
-						type: String,
-					},
 				},
 				customDomain: {
 					enabled: {
 						type: Boolean,
 						default: false,
 					},
-					domainAdded: {
+					added: {
 						type: Boolean,
 						default: false,
 					},
@@ -209,7 +222,7 @@ export const ContainerModel = mongoose.model(
 					},
 					metricType: {
 						type: String,
-						enum: ["AverageValueMillicores", "AverageValueCores"],
+						enum: ["AverageValueMebibyte", "AverageValueGibibyte"],
 					},
 					metricValue: {
 						type: Number,
@@ -223,7 +236,7 @@ export const ContainerModel = mongoose.model(
 				rollingUpdate: {
 					maxSurge: {
 						type: Number,
-						default: "30%",
+						default: 30,
 					},
 					maxSurgeType: {
 						type: String,
@@ -237,6 +250,7 @@ export const ContainerModel = mongoose.model(
 					maxUnavailableType: {
 						type: String,
 						enum: ["number", "percentage"],
+						default: "number",
 					},
 				},
 				revisionHistoryLimit: {
@@ -448,15 +462,15 @@ export const ContainerModel = mongoose.model(
 					},
 					initialDelaySeconds: {
 						type: Number,
-						default: 0,
+						default: 30,
 					},
 					periodSeconds: {
 						type: Number,
-						default: 10,
+						default: 30,
 					},
 					timeoutSeconds: {
 						type: Number,
-						default: 1,
+						default: 5,
 					},
 					failureThreshold: {
 						type: Number,
@@ -481,12 +495,42 @@ export const ContainerModel = mongoose.model(
 	)
 );
 
-export const applyRules = (type) => {
-	switch (type) {
-		case "create":
-			const type = body("type");
-			return [];
-		default:
-			return [];
-	}
+// Function to execute an array of middleware
+const executeMiddlewareArray = (middlewares, req, res, next) => {
+	const execute = (index) => {
+		if (index < middlewares.length) {
+			middlewares[index](req, res, () => execute(index + 1));
+		} else {
+			next();
+		}
+	};
+	execute(0);
+};
+
+export const applyRules = (actionType) => {
+	return function (req, res, next) {
+		if (req.body.type === "deployment")
+			executeMiddlewareArray(deploymentRules(actionType), req, res, next);
+		else if (req.body.type === "stateful set")
+			executeMiddlewareArray([], req, res, next);
+		else if (req.body.type === "cron job")
+			executeMiddlewareArray([], req, res, next);
+		else if (req.body.type === "knative service")
+			executeMiddlewareArray([], req, res, next);
+		else
+			executeMiddlewareArray(
+				[
+					body("type")
+						.trim()
+						.notEmpty()
+						.withMessage(t("Required field, cannot be left empty"))
+						.bail()
+						.isIn(containerTypes)
+						.withMessage(t("Unsupported resource type")),
+				],
+				req,
+				res,
+				next
+			);
+	};
 };

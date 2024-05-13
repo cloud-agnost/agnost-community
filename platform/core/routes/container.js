@@ -7,12 +7,12 @@ import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateProject } from "../middlewares/validateProject.js";
 import { validateProjectEnvironment } from "../middlewares/validateProjectEnvironment.js";
+import { validateContainer } from "../middlewares/validateContainer.js";
 import { authorizeProjectAction } from "../middlewares/authorizeProjectAction.js";
 import { validateGitOps } from "../middlewares/validateGitOps.js";
 import { applyRules } from "../schemas/container.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
-import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -35,7 +35,7 @@ router.get(
 			const { environment } = req;
 			const { search, sortBy, sortDir } = req.query;
 
-			let query = { envId: environment._id };
+			let query = { environmentId: environment._id };
 			if (search) {
 				query.name = {
 					$regex: helper.escapeStringRegexp(search),
@@ -47,6 +47,8 @@ router.get(
 			if (sortBy && sortDir) {
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
+
+			console.log(query, sort);
 
 			let containers = await cntrCtrl.getManyByQuery(query, {
 				sort,
@@ -65,7 +67,7 @@ router.get(
 @desc       Creates a new container in project environment
 @access     private
 */
-router.get(
+router.post(
 	"/",
 	checkContentType,
 	authSession,
@@ -80,13 +82,44 @@ router.get(
 		const session = await cntrCtrl.startSession();
 
 		try {
-			const { environment } = req;
-			const { name, type } = req.body;
+			let prefix = "cnt";
+			const { org, project, environment, body, user } = req;
+			// Sanitize values
+			switch (body.type) {
+				case "deployment":
+					prefix = "dpl";
+					break;
+				case "stateful set":
+					prefix = "sts";
+					break;
+				case "cron job":
+					prefix = "crj";
+					break;
+				case "knative service":
+					prefix = "kns";
+					break;
+				default:
+					break;
+			}
+
+			const containerId = helper.generateId();
+			const container = await cntrCtrl.create(
+				{
+					...body,
+					_id: containerId,
+					orgId: org._id,
+					projectId: project._id,
+					environmentId: environment._id,
+					iid: helper.generateSlug(prefix),
+					createdBy: user._id,
+				},
+				{ session, cacheKey: containerId }
+			);
 
 			// Commit the database transaction
 			await cntrCtrl.commit(session);
 
-			return res.json(containers);
+			res.json(container);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -94,8 +127,151 @@ router.get(
 				user,
 				"org.project.environment.container",
 				"create",
-				t("Created new '%s' named '%s'", type, name),
+				t("Created new '%s' named '%s'", body.type, body.name),
 				container,
+				{
+					orgId: org._id,
+					projectId: project._id,
+					environmentId: environment._id,
+					containerId: container._id,
+				}
+			);
+		} catch (err) {
+			await cntrCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId
+@method     GET
+@desc       Returns data about a specific container
+@access     private
+*/
+router.get(
+	"/:containerId",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			const { container } = req;
+
+			res.json(container);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId
+@method     PUT
+@desc       Updates the container properties
+@access     private
+*/
+router.put(
+	"/:containerId",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.update"),
+	applyRules("update"),
+	validate,
+	async (req, res) => {
+		const session = await cntrCtrl.startSession();
+
+		try {
+			const { org, project, environment, container, body, user } = req;
+			const updatedContainer = await cntrCtrl.updateOneById(
+				container._id,
+				{
+					...body,
+					updatedBy: user._id,
+				},
+				{},
+				{
+					session,
+					cacheKey: container._id,
+				}
+			);
+
+			// Commit the database transaction
+			await cntrCtrl.commit(session);
+
+			res.json(updatedContainer);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				environment._id,
+				user,
+				"org.project.environment.container",
+				"update",
+				t("Updated '%s' named '%s'", body.type, body.name),
+				container,
+				{
+					orgId: org._id,
+					projectId: project._id,
+					environmentId: environment._id,
+					containerId: container._id,
+				}
+			);
+		} catch (err) {
+			await cntrCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId
+@method     PIT
+@desc       Deletes the container
+@access     private
+*/
+router.delete(
+	"/:containerId",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.delete"),
+	async (req, res) => {
+		const session = await cntrCtrl.startSession();
+
+		try {
+			const { org, project, environment, container, body, user } = req;
+			const updatedContainer = await cntrCtrl.deleteOneById(container._id, {
+				session,
+				cacheKey: container._id,
+			});
+
+			// Commit the database transaction
+			await cntrCtrl.commit(session);
+
+			res.json();
+
+			// Log action
+			auditCtrl.logAndNotify(
+				environment._id,
+				user,
+				"org.project.environment.container",
+				"delete",
+				t("Deleted '%s' named '%s'", body.type, body.name),
+				{},
 				{
 					orgId: org._id,
 					projectId: project._id,
