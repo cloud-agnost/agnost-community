@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import useTypeStore from '@/store/types/typeStore';
 import { cn, isEmpty } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -53,7 +53,7 @@ export const InviteMemberSchema = z.object({
 		}),
 });
 interface InviteMemberFormProps {
-	type: 'app' | 'org';
+	type: 'app' | 'org' | 'project';
 	loading: boolean;
 	actions?: React.ReactNode;
 	title?: string;
@@ -69,15 +69,41 @@ export default function InviteMemberForm({
 	disabled,
 	loading,
 }: InviteMemberFormProps) {
-	const { appRoles, orgRoles, appRoleDesc, orgRoleDesc } = useTypeStore();
-	const roles = type === 'app' ? appRoles : orgRoles;
-	const desc = type === 'app' ? appRoleDesc : orgRoleDesc;
+	const { appRoles, orgRoles, appRoleDesc, orgRoleDesc, projectRoles, projectRoleDesc } =
+		useTypeStore();
+
 	const form = useFormContext<z.infer<typeof InviteMemberSchema>>();
 	const { t } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: 'member',
 	});
+
+	const roles = useMemo(() => {
+		if (type === 'app') {
+			return appRoles;
+		}
+		if (type === 'org') {
+			return orgRoles;
+		}
+		if (type === 'project') {
+			return projectRoles;
+		}
+		return [];
+	}, [type, appRoles, orgRoles]);
+
+	const desc = useMemo(() => {
+		if (type === 'app') {
+			return appRoleDesc;
+		}
+		if (type === 'org') {
+			return orgRoleDesc;
+		}
+		if (type === 'project') {
+			return projectRoleDesc;
+		}
+		return {};
+	}, [type, appRoleDesc, orgRoleDesc, projectRoleDesc]);
 
 	useEffect(() => {
 		if (fields.length === 0) {

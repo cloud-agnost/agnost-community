@@ -40,6 +40,7 @@ import {
 	Timestamp,
 	Twitter,
 } from '@/components/icons';
+import AppIcon from '@/features/organization/navbar/AppIcon';
 import {
 	ConnectAWS,
 	ConnectAzure,
@@ -50,6 +51,7 @@ import {
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
+import useProjectStore from '@/store/project/projectStore';
 import {
 	AppRoles,
 	Application,
@@ -65,9 +67,9 @@ import {
 	Tab,
 	TabTypes,
 } from '@/types';
-import { getAppPermission, translate } from '@/utils';
+import { Project } from '@/types/project';
+import { getAppPermission, getProjectPermission, translate } from '@/utils';
 import {
-	AppWindow,
 	ArchiveBox,
 	Bell,
 	BracketsCurly,
@@ -100,6 +102,7 @@ import {
 	Phone,
 	Plus,
 	PresentationChart,
+	ProjectorScreenChart,
 	Share,
 	ShareNetwork,
 	SignOut,
@@ -194,9 +197,14 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 
 export const ORGANIZATION_MENU_ITEMS = [
 	{
+		name: translate('organization.menu.projects'),
+		href: 'projects',
+		icon: ProjectorScreenChart,
+	},
+	{
 		name: translate('organization.menu.apps'),
 		href: 'apps',
-		icon: AppWindow,
+		icon: AppIcon,
 	},
 	{
 		name: translate('organization.menu.resources'),
@@ -265,6 +273,64 @@ export const APPLICATION_SETTINGS = [
 			useApplicationStore.getState().openDeleteModal(application);
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('delete', role),
+		icon: Trash,
+	},
+];
+export const PROJECT_SETTINGS = [
+	{
+		id: 'environment',
+		name: translate('project.settings.openEnv'),
+		onClick: (project: Project) => {
+			useProjectStore.getState().onProjectClick(project);
+		},
+		isDisabled: (role: AppRoles) => !getProjectPermission('version.view', role),
+		icon: GitBranch,
+	},
+	{
+		id: 'update',
+		name: translate('project.settings.editProject'),
+		onClick: (project: Project) => {
+			useProjectStore.getState().openEditProjectDrawer(project);
+			const searchParams = new URLSearchParams(window.location.search);
+			if (!searchParams.get('t')) {
+				searchParams.set('t', 'general');
+				window.history.replaceState(
+					null,
+					'',
+					`${window.location.pathname}?${searchParams.toString()}`,
+				);
+			}
+		},
+		isDisabled: (role: AppRoles) => !getProjectPermission('update', role),
+		icon: PencilSimple,
+	},
+	{
+		id: 'invite',
+		name: translate('general.addMembers'),
+		onClick: (project: Project) => {
+			useProjectStore.getState().openInviteMemberModal(project);
+		},
+		isDisabled: (role: AppRoles) => !getProjectPermission('invite.create', role),
+		icon: UserPlus,
+	},
+	{
+		id: 'leave-app',
+		name: translate('project.settings.leaveTeam'),
+		onClick: (project: Project) => {
+			useProjectStore.getState().openLeaveModal(project);
+		},
+		isDisabled: (_role: AppRoles, project: Project) => {
+			return useAuthStore.getState().user?._id === project.ownerUserId;
+		},
+		icon: SignOut,
+	},
+	{
+		id: 'delete-app',
+		name: translate('general.delete'),
+		onClick: (project: Project) => {
+			useProjectStore.getState().openDeleteModal(project);
+		},
+		isDisabled: (role: AppRoles) => !getProjectPermission('delete', role),
 		icon: Trash,
 	},
 ];
@@ -437,6 +503,12 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	IDLE: 'orange',
 	TRUE: 'green',
 	FALSE: 'red',
+	DEPLOYMENT: 'green',
+	'STATEFUL SET': 'orange',
+	'CRON JOB': 'purple',
+	'KNATIVE SERVICE': 'yellow',
+	SOURCE: 'blue',
+	REGISTRY: 'red',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -1394,3 +1466,10 @@ export const CRON_EXAMPLES = [
 	'23 0-20/2 * * *',
 	'5 4 * * SUN',
 ];
+
+export const CONTAINER_TYPES = [
+	'deployment',
+	'stateful set',
+	'knative service',
+	'cron job',
+] as const;

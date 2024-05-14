@@ -2,6 +2,7 @@ import { useTabIcon } from '@/hooks';
 import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { AppWindow, Bell, Envelope, HardDrive, Key, Users } from '@phosphor-icons/react';
+import { ProjectorScreenChart } from '@phosphor-icons/react/dist/ssr';
 import React, { ElementType } from 'react';
 
 export type Modules =
@@ -9,6 +10,7 @@ export type Modules =
 	| 'app'
 	| 'invitation'
 	| 'resource'
+	| 'project'
 	| TabTypes.Endpoint
 	| TabTypes.MessageQueue
 	| TabTypes.File
@@ -48,6 +50,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		resource: HardDrive,
 		org: Users,
 		notification: Bell,
+		project: ProjectorScreenChart,
 	};
 	const getTabIcon = useTabIcon('w-16 h-16');
 	const Icon = ICON_MAP[type];

@@ -3,13 +3,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 
 interface RoleSelectProps {
 	role: string;
-	type: 'app' | 'org';
+	type: 'app' | 'org' | 'project';
 	onSelect: (role: string) => void;
 	disabled?: boolean;
 }
 function RoleSelect({ role, type, disabled, onSelect }: RoleSelectProps) {
 	const { appRoles, orgRoles } = useTypeStore();
-	const roles = type === 'app' ? appRoles : orgRoles;
+	const roles = type === 'org' ? orgRoles : appRoles;
 	return (
 		<Select defaultValue={role} onValueChange={onSelect} disabled={disabled}>
 			<SelectTrigger className='w-[170px]'>

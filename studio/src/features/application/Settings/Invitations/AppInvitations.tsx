@@ -9,7 +9,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { PAGE_SIZE } from '@/constants';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { TableLoading } from '@/components/Table/Table';
-
 import { Loading } from '@/components/Loading';
 function AppInvitations() {
 	const { invitations, getAppInvitations, lastFetchedInvitationsPage, application } =

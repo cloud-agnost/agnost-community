@@ -8,32 +8,33 @@ import {
 	CommandSeparator,
 } from '@/components/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { MouseEvent, useMemo, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
-import { CaretUpDown, Check } from '@phosphor-icons/react';
-import { cn } from '@/utils';
-import { useTranslation } from 'react-i18next';
 import { Application, Organization } from '@/types';
+import { Project } from '@/types/project';
+import { cn } from '@/utils';
+import { CaretUpDown, Check } from '@phosphor-icons/react';
+import { MouseEvent, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
 interface SelectionLabelProps {
-	selectedData: Organization | Application;
+	selectedData: Organization | Application | Project;
 	onClick?: () => void;
 }
 
-interface SelectionDropdownProps {
-	selectedData: Organization | Application;
-	data: Organization[] | Application[];
-	onSelect: (data: Organization | Application) => void;
+interface SelectionDropdownProps<T extends Organization | Application | Project> {
+	selectedData: T;
+	data: T[];
+	onSelect: (data: T) => void;
 	onClick: () => void;
 	children: React.ReactNode;
 }
 
-export default function SelectionDropdown({
+export default function SelectionDropdown<T extends Organization | Application | Project>({
 	selectedData,
 	data,
 	onSelect,
 	onClick,
 	children,
-}: SelectionDropdownProps) {
+}: SelectionDropdownProps<T>) {
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
 	const filteredData = useMemo(() => {
@@ -41,7 +42,7 @@ export default function SelectionDropdown({
 		return data.filter((d) => RegExp(new RegExp(search, 'i')).exec(d.name));
 	}, [data, search]);
 
-	function handleSelect(data: Organization | Application) {
+	function handleSelect(data: T) {
 		onSelect(data);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}

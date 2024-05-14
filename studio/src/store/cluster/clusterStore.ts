@@ -60,6 +60,8 @@ type Actions = {
 	updateRemainingClusterComponents: (
 		data: UpdateRemainingClusterComponentsParams,
 	) => Promise<ClusterComponent>;
+	enabledCICD: () => Promise<Cluster>;
+	disabledCICD: () => Promise<Cluster>;
 	reset: () => void;
 };
 
@@ -273,6 +275,16 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		},
 		getActiveUsers: async (params) => {
 			return await UserService.getActiveUsers(params);
+		},
+		enabledCICD: async () => {
+			const cluster = await ClusterService.enabledCICD();
+			set({ cluster });
+			return cluster;
+		},
+		disabledCICD: async () => {
+			const cluster = await ClusterService.disabledCICD();
+			set({ cluster });
+			return cluster;
 		},
 		reset: () => set(initialState),
 	})),

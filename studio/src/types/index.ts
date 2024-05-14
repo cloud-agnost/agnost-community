@@ -19,6 +19,8 @@ export type * from './navigator.ts';
 export { ConditionsType, Filters, Operators } from './navigator.ts';
 export type * from './organization.ts';
 export { CreateOrganizationSchema } from './organization.ts';
+export type * from './project-environment.ts';
+export type * from './project.ts';
 export type * from './queue.ts';
 export { CreateMessageQueueSchema, MessageQueueSchema } from './queue.ts';
 export type * from './resource.ts';

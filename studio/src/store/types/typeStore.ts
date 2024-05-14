@@ -15,8 +15,10 @@ import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
 	orgRoles: string[];
 	appRoles: string[];
+	projectRoles: string[];
 	orgRoleDesc: Record<string, string>;
 	appRoleDesc: Record<string, string>;
+	projectRoleDesc: Record<string, string>;
 	bvlTypes: string[];
 	fieldTypes: FieldType[];
 	databaseTypes: string[];
@@ -84,8 +86,10 @@ const useTypeStore = create<TypesStore>()(
 			(set) => ({
 				orgRoles: [],
 				appRoles: [],
+				projectRoles: [],
 				orgRoleDesc: {},
 				appRoleDesc: {},
+				projectRoleDesc: {},
 				bvlTypes: [],
 				fieldTypes: [],
 				databaseTypes: [],

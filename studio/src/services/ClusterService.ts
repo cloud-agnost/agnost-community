@@ -74,4 +74,11 @@ export default class ClusterService {
 	): Promise<ClusterComponent> {
 		return (await axios.put(`${this.url}/${data.componentName}/update`, data)).data;
 	}
+
+	static async enabledCICD() {
+		return (await axios.post(`${this.url}/cicd/enable`, {})).data;
+	}
+	static async disabledCICD() {
+		return (await axios.post(`${this.url}/cicd/disable`, {})).data;
+	}
 }

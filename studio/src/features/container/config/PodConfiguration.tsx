@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { CreateContainerParams } from '@/types/container';
-import { GitBranch } from '@phosphor-icons/react';
+import { Cube } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +24,10 @@ export default function PodConfiguration() {
 				title={t('container.pod_config.title')}
 				description={t('container.pod_config.description') ?? ''}
 			>
-				<GitBranch size={20} />
+				<Cube size={20} />
 			</ContainerFormTitle>
-			<div className='grid grid-cols-2 gap-4'>
-				<FormFieldGroup label={t('container.pod_config.cpu_request')}>
+			<div className='grid grid-cols-2 gap-4 pl-12'>
+				<FormFieldGroup label={t('container.pod_config.cpu_request') ?? ''}>
 					<FormField
 						control={form.control}
 						name='podConfig.cpuRequest'
@@ -139,7 +139,7 @@ export default function PodConfiguration() {
 						)}
 					/>
 				</FormFieldGroup>
-				<FormFieldGroup label={t('container.pod_config.memory_request')}>
+				<FormFieldGroup label={t('container.pod_config.memory_request') ?? ''}>
 					<FormField
 						control={form.control}
 						name='podConfig.memoryRequest'
@@ -195,7 +195,7 @@ export default function PodConfiguration() {
 						)}
 					/>
 				</FormFieldGroup>
-				<FormFieldGroup label={t('container.pod_config.limit')}>
+				<FormFieldGroup label={t('container.pod_config.limit') ?? ''}>
 					<FormField
 						control={form.control}
 						name='podConfig.memoryLimit'
@@ -256,7 +256,7 @@ export default function PodConfiguration() {
 				control={form.control}
 				name='podConfig.restartPolicy'
 				render={({ field }) => (
-					<FormItem>
+					<FormItem className='pl-12'>
 						<FormLabel>{t('container.pod_config.restart_policy')}</FormLabel>
 						<Select onValueChange={field.onChange}>
 							<FormControl>

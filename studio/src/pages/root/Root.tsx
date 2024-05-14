@@ -3,6 +3,10 @@ import AppInviteMember from '@/features/application/AppInviteMember';
 import EditApplication from '@/features/application/EditApplication.tsx';
 import { EditorSettings } from '@/features/auth/EditorSettings';
 import ReleaseHistory from '@/features/cluster/ReleaseHistory';
+import CreateEnvironment from '@/features/projects/CreateEnvironment';
+import EditProject from '@/features/projects/EditProject';
+import ProjectEnvironments from '@/features/projects/ProjectEnvironments';
+import ProjectInviteMember from '@/features/projects/ProjectInviteMember';
 import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
 import PushVersion from '@/features/version/PushVersion/PushVersion';
@@ -97,11 +101,15 @@ export default function Root() {
 		<>
 			<Outlet />
 			<ApplicationVersions />
+			<ProjectEnvironments />
 			<EditApplication />
+			<EditProject />
 			<CreateCopyVersionDrawer />
+			<CreateEnvironment />
 			<PushVersion />
 			<AddResourceDrawer />
 			<AppInviteMember />
+			<ProjectInviteMember />
 			<ReleaseHistory />
 			<EditorSettings />
 		</>

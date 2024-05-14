@@ -7,4 +7,5 @@ export {
 	FormDescription,
 	FormMessage,
 	FormField,
+	FormFieldGroup,
 } from './Form';

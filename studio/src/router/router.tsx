@@ -104,6 +104,13 @@ const OrganizationApps = loadable(
 		resolveComponent: (mod: any) => mod.default,
 	},
 );
+const OrganizationProjects = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationProjects')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 
 const OrganizationResources = loadable(
 	() => componentLoader(() => import('../pages/organization/OrganizationResources')),
@@ -142,6 +149,20 @@ const OrganizationSettingsMembers = loadable(
 	},
 );
 
+const ProjectEnvironment = loadable(
+	() => componentLoader(() => import('../pages/project-environment/ProjectEnvironment')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+const ProjectEnvironmentDetail = loadable(
+	() => componentLoader(() => import('../pages/project-environment/ProjectEnvironmentContainers')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 const Version = loadable(() => componentLoader(() => import('../pages/version/Version')), {
 	fallback: <Fallback />,
 	resolveComponent: (mod: any) => mod.default,
@@ -626,6 +647,25 @@ const router = createBrowserRouter(
 							path: ':orgId',
 							element: <OrganizationDetailsLoadable />,
 							children: [
+								{
+									path: 'projects',
+									children: [
+										{
+											index: true,
+											element: <OrganizationProjects />,
+										},
+										{
+											path: ':projectId/env/:envId',
+											element: <ProjectEnvironment />,
+											children: [
+												{
+													path: '',
+													element: <ProjectEnvironmentDetail />,
+												},
+											],
+										},
+									],
+								},
 								{
 									path: 'apps',
 									children: [

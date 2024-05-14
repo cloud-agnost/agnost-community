@@ -48,7 +48,7 @@
 		"transfer": {
 			"title": "Transfer Application Ownership",
 			"description": "The application owner is the person who has created the application or the person to whom the application ownership has been transferred. The Owner has full control over the application and only application owners can delete the application or transfer its ownership to someone else.",
-			"subDesc": "Select the organization member with Admin role to transfer ownership",
+			"subDesc": "Select the application member with Admin role to transfer ownership",
 			"placeholder": "Select a member",
 			"success": "Ownership has been transferred successfully",
 			"successDesc": "You are no longer the owner of this organization. You can still access it as an admin."

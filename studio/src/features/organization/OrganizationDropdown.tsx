@@ -76,7 +76,7 @@ export function OrganizationDropdown() {
 
 	return (
 		<>
-			<SelectionDropdown
+			<SelectionDropdown<Organization>
 				data={organizations}
 				selectedData={organization}
 				onSelect={(org) => onSelect(org as Organization)}

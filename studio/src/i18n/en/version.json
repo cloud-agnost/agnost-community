@@ -1,7 +1,7 @@
 {
-	"delete_version": "Delete Version",
 	"update_version_success": "Version updated successfully",
 	"apiServer_updated": "API Server updated successfully",
+	"delete_version": "Delete Version",
 	"delete_alert_title": "Are you sure to delete this version?",
 	"delete_alert_desc": "This action cannot be undone",
 	"delete_confirm_description": "Confirm version delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",

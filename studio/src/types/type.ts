@@ -225,12 +225,14 @@ export interface GetInvitationRequest extends BaseGetRequest {
 	status?: string;
 	appId?: string;
 	orgId?: string;
+	projectId?: string;
 }
 export interface InvitationRequest extends BaseRequest {
 	token?: string;
 	tokens?: string[];
 	appId?: string;
 	orgId?: string;
+	projectId?: string;
 }
 export interface UpdateRoleRequest extends BaseRequest {
 	token?: string;
@@ -238,12 +240,14 @@ export interface UpdateRoleRequest extends BaseRequest {
 	role: string;
 	appId?: string;
 	orgId?: string;
+	projectId?: string;
 }
 export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 	appId?: string;
 	orgId?: string;
+	projectId?: string;
 }
 export type RealtimeActionTypes =
 	| 'update'
@@ -422,6 +426,7 @@ declare module '@tanstack/react-query' {
 }
 
 export interface TransferRequest {
+	projectId?: string;
 	appId?: string;
 	orgId?: string;
 	userId: string;

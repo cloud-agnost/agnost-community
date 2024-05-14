@@ -173,13 +173,13 @@ export const DeploymentConfigSchema = z.object({
 			metricType: z
 				.enum(['AverageUtilization', 'AverageValueMillicores', 'AverageValueCores'])
 				.optional(),
-			metricValue: z.number().optional(),
+			metricValue: z.number().positive().optional(),
 		})
 		.optional(),
 	memoryMetric: z
 		.object({
 			enabled: z.boolean().optional(),
-			metricType: z.enum(['AverageValueMillicores', 'AverageValueCores']).optional(),
+			metricType: z.enum(['AverageValueMebibyte', 'AverageValueGibibyte']).optional(),
 			metricValue: z.number().optional(),
 		})
 		.optional(),
@@ -308,6 +308,15 @@ export const PodConfigSchema = z.object({
 	memoryLimitType: z.enum(['mebibyte', 'gibibyte']).optional().default('gibibyte'),
 });
 
+export const StorageConfigSchema = z.object({
+	enabled: z.boolean().optional(),
+	mountPath: z.string().optional(),
+	size: z.number().optional(),
+	sizeType: z.enum(['mebibyte', 'gibibyte']).optional(),
+	reclaimPolicy: z.enum(['retain', 'delete']).optional(),
+	accessModes: z.array(z.enum(['ReadWriteOnce', 'ReadOnlyMany', 'ReadWriteMany'])).optional(),
+});
+
 export const ContainerSchema = z.object({
 	orgId: z.string(),
 	projectId: z.string(),
@@ -334,6 +343,7 @@ export const ContainerSchema = z.object({
 	networking: NetworkingSchema.optional(),
 	probes: ProbesSchema.optional(),
 	podConfig: PodConfigSchema.optional(),
+	storageConfig: StorageConfigSchema.optional(),
 });
 
 export type CreateContainerParams = z.infer<typeof ContainerSchema>;

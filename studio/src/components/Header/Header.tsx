@@ -4,6 +4,8 @@ import { ApplicationSelectDropdown } from '@/features/application';
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { ReleaseDropdown } from '@/features/cluster';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
+import ProjectEnvironmentDropdown from '@/features/projects/ProjectEnvironmentDropdown';
+import ProjectSelectDropdown from '@/features/projects/ProjectSelectDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { NotificationDropdown } from '@/features/version/Notification';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
@@ -18,7 +20,7 @@ import Feedback from './Feedback';
 import './header.scss';
 
 export function Header() {
-	const { versionId, appId, orgId } = useParams();
+	const { versionId, appId, orgId, projectId, envId } = useParams();
 	const { toggleSearchCommandMenu } = useVersionStore();
 	const canViewNotf = useAuthorizeVersion('viewLogs');
 	return (
@@ -33,6 +35,19 @@ export function Header() {
 						<>
 							<Separator orientation='vertical' className='h-8 transform rotate-12' />
 							<OrganizationDropdown />
+						</>
+					)}
+
+					{projectId && (
+						<>
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
+							<ProjectSelectDropdown />
+						</>
+					)}
+					{envId && (
+						<>
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
+							<ProjectEnvironmentDropdown />
 						</>
 					)}
 					{appId && (

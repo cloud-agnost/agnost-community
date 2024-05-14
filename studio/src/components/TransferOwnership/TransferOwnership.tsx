@@ -17,10 +17,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../Badge';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { useMemo } from 'react';
+import useProjectStore from '@/store/project/projectStore';
 interface TransferOwnershipProps {
 	disabled: boolean;
 	transferFn: (data: TransferRequest) => Promise<any>;
-	type: 'org' | 'app' | 'cluster';
+	type: 'org' | 'app' | 'cluster' | 'project';
 }
 
 const TransferOwnershipSchema = z.object({
@@ -32,10 +33,8 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	const { t } = useTranslation();
 	const { members } = useOrganizationStore();
 	const { applicationTeam, application } = useApplicationStore();
-	const team =
-		type === 'app'
-			? applicationTeam.filter(({ member }) => member._id !== user?._id)
-			: members.filter(({ member }) => member._id !== user?._id);
+	const { projectTeam, project } = useProjectStore();
+
 	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof TransferOwnershipSchema>>({
@@ -71,6 +70,21 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 			...(type === 'app' && { appId: application?._id }),
 		});
 	};
+
+	const team = useMemo(() => {
+		switch (type) {
+			case 'org':
+				return members.filter(({ member }) => member._id !== user?._id);
+			case 'app':
+				return applicationTeam.filter(({ member }) => member._id !== user?._id);
+			case 'cluster':
+				return members.filter(({ member }) => member._id !== user?._id);
+			case 'project':
+				return projectTeam.filter(({ member }) => member._id !== user?._id);
+			default:
+				return [];
+		}
+	}, [type]);
 
 	const selectedMember = useMemo(() => {
 		return team.find(({ member }) => member._id === form.watch('userId'))?.member;

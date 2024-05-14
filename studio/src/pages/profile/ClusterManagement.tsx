@@ -11,15 +11,18 @@ import ClusterResources from './ClusterComponents';
 import ClusterSmtpForm from './ClusterSmtpForm';
 import CustomDomains from './CustomDomains';
 import TransferClusterOwnership from './TransferClusterOwnership';
+import ClusterAddons from './ClusterAddons';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();
-	const TabItems = ['General', 'Cluster Resources', 'SMTP', 'Custom Domains'];
+	const TabItems = ['General', 'Cluster Resources', 'SMTP', 'Custom Domains', 'Addons'];
 	const { getClusterInfo, checkDomainStatus, clusterDomainError, cluster } = useClusterStore();
 
-	useEffect(() => {
-		getClusterInfo();
-	}, []);
+	useQuery({
+		queryFn: getClusterInfo,
+		queryKey: ['getClusterInfo'],
+		enabled: !_.isNil(cluster),
+	});
 
 	useQuery({
 		queryFn: checkDomainStatus,
@@ -71,6 +74,9 @@ export default function ProfileSettingsClusterManagement() {
 				</TabsContent>
 				<TabsContent value='Custom Domains' className='overflow-y-auto  h-[calc(100%-4rem)]'>
 					<CustomDomains />
+				</TabsContent>
+				<TabsContent value='Addons' className='overflow-y-auto  h-[calc(100%-4rem)]'>
+					<ClusterAddons />
 				</TabsContent>
 			</Tabs>
 		</SettingsContainer>
