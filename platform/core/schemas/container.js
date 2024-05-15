@@ -195,7 +195,6 @@ export const ContainerModel = mongoose.model(
 				},
 				mountPath: {
 					type: String,
-					default: "/",
 				},
 				size: {
 					type: Number,
@@ -204,11 +203,6 @@ export const ContainerModel = mongoose.model(
 					type: String,
 					enum: ["mebibyte", "gibibyte"],
 					default: "gibibyte",
-				},
-				reclaimPolicy: {
-					type: String,
-					enum: ["retain", "delete"],
-					default: "retain",
 				},
 				accessModes: {
 					type: [String],
@@ -422,15 +416,15 @@ export const ContainerModel = mongoose.model(
 					},
 					initialDelaySeconds: {
 						type: Number,
-						default: 0,
+						default: 30,
 					},
 					periodSeconds: {
 						type: Number,
-						default: 10,
+						default: 30,
 					},
 					timeoutSeconds: {
 						type: Number,
-						default: 1,
+						default: 60,
 					},
 					failureThreshold: {
 						type: Number,

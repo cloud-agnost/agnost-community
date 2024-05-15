@@ -2113,8 +2113,6 @@ export class ResourceManager {
         const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
         const namespace = process.env.NAMESPACE;
         const configMapName = "tcp-services";
-        const svcName = "ingress-nginx-controller";
-        const deployName = "ingress-nginx-controller";
         const resourceNamespace = "ingress-nginx";
 
         try {
@@ -2153,27 +2151,49 @@ export class ResourceManager {
         try {
             // patch service/ingress-nginx-controller
             const portName = "proxied-tcp-" + portNumber;
-            const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
-            const newPort = { name: portName, port: portNumber, targetPort: portNumber, protocol: protocol };
-            svc.body.spec.type = "LoadBalancer";
-            svc.body.spec.ports.push(newPort);
-            await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+            k8sCoreApi.listNamespacedService(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (service) => {
+                    if (service.metadata.name.includes("ingress-nginx-controller")) {
+                        const svcName = service.metadata.name;
+                        const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
+                        const newPort = {
+                            name: portName,
+                            port: portNumber,
+                            targetPort: portNumber,
+                            protocol: protocol,
+                        };
+                        svc.body.spec.ports.push(newPort);
+                        await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+                    }
+                });
+            });
 
             // patch deployment/ingress-nginx-controller
-            const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
+            k8sAppsApi.listNamespacedDeployment(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (deployment) => {
+                    if (deployment.metadata.name.includes("ingress-nginx-controller")) {
+                        const deployName = deployment.metadata.name;
+                        const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
 
-            const configmapArg = "--tcp-services-configmap=ingress-nginx/tcp-services";
-            const configmapArg2 = "--tcp-services-configmap=$(POD_NAMESPACE)/tcp-services";
-            if (
-                !dply.body.spec.template.spec.containers[0].args.includes(configmapArg) &&
-                !dply.body.spec.template.spec.containers[0].args.includes(configmapArg2)
-            ) {
-                dply.body.spec.template.spec.containers[0].args.push(configmapArg);
-            }
+                        const configmapArg = "--tcp-services-configmap=ingress-nginx/tcp-services";
+                        const configmapArg2 = "--tcp-services-configmap=$(POD_NAMESPACE)/tcp-services";
+                        if (
+                            !dply.body.spec.template.spec.containers[0].args.includes(configmapArg) &&
+                            !dply.body.spec.template.spec.containers[0].args.includes(configmapArg2)
+                        ) {
+                            dply.body.spec.template.spec.containers[0].args.push(configmapArg);
+                        }
 
-            const newContainerPort = { containerPort: portNumber, hostPort: portNumber, protocol: protocol };
-            dply.body.spec.template.spec.containers[0].ports.push(newContainerPort);
-            await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+                        const newContainerPort = {
+                            containerPort: portNumber,
+                            hostPort: portNumber,
+                            protocol: protocol,
+                        };
+                        dply.body.spec.template.spec.containers[0].ports.push(newContainerPort);
+                        await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+                    }
+                });
+            });
         } catch (error) {
             throw new AgnostError(error.body?.message);
         }
@@ -2185,8 +2205,6 @@ export class ResourceManager {
         const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
         const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
         const configMapName = "tcp-services";
-        const svcName = "ingress-nginx-controller";
-        const deployName = "ingress-nginx-controller";
         const resourceNamespace = "ingress-nginx";
 
         try {
@@ -2196,18 +2214,33 @@ export class ResourceManager {
             await k8sCoreApi.replaceNamespacedConfigMap(configMapName, resourceNamespace, cfgmap.body);
 
             // patch service/ingress-nginx-controller
-            const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
-            svc.body.spec.ports = svc.body.spec.ports.filter((svcPort) => svcPort.port !== portNumber);
-            await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+            k8sCoreApi.listNamespacedService(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (service) => {
+                    if (service.metadata.name.includes("ingress-nginx-controller")) {
+                        const svcName = service.metadata.name;
+                        const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
+                        svc.body.spec.ports = svc.body.spec.ports.filter((svcPort) => svcPort.port !== portNumber);
+                        await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+                    }
+                });
+            });
 
             // patch deployment/ingress-nginx-controller
-            const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
-            dply.body.spec.template.spec.containers[0].ports = dply.body.spec.template.spec.containers[0].ports.filter(
-                (contPort) => contPort.containerPort !== portNumber
-            );
-            await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+            k8sAppsApi.listNamespacedDeployment(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (deployment) => {
+                    if (deployment.metadata.name.includes("ingress-nginx-controller")) {
+                        const deployName = deployment.metadata.name;
+                        const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
+                        dply.body.spec.template.spec.containers[0].ports =
+                            dply.body.spec.template.spec.containers[0].ports.filter(
+                                (contPort) => contPort.containerPort !== portNumber
+                            );
+                        await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+                    }
+                });
+            });
         } catch (error) {
-            throw new Error(JSON.stringify(error.body));
+            throw new AgnostError(error.body?.message);
         }
     }
 }

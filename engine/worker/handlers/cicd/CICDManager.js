@@ -18,6 +18,8 @@ const k8sAuthApi = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
 const k8sCustomObjectApi = kc.makeApiClient(k8s.CustomObjectsApi);
 const k8sAdmissionApi = kc.makeApiClient(k8s.AdmissionregistrationV1Api);
 const k8sAutoscalingApi = kc.makeApiClient(k8s.AutoscalingV2Api);
+const k8sNetworkingApi = kc.makeApiClient(k8s.NetworkingV1Api);
+const k8sBatchApi = kc.makeApiClient(k8s.BatchV1Api);
 
 const namespace = process.env.NAMESPACE;
 const __filename = fileURLToPath(import.meta.url);
@@ -70,6 +72,358 @@ export class CICDManager {
         }
 
         return { status: "success" };
+    }
+
+    // Payload includes container info, environment info and action
+    async manageContainer(payload) {
+        try {
+            if (payload.container.type === "deployment") {
+                await this.manageDeployment(payload);
+            }
+
+            return { status: "success" };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot ${payload.action} the ${payload.container.type} named '${payload.container.name}''. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    async manageDeployment({ container, environment, action }) {
+        const name = container.iid;
+        const namespace = environment.iid;
+        if (action === "create") {
+            await this.createStorage(container.storageConfig, name, namespace);
+            await this.createService(container.networking, name, namespace);
+            await this.createDeployment(container, namespace);
+            await this.createTektonPipeline();
+        } else if (action === "update") {
+        } else if (action === "delete") {
+            await this.deleteDeployment(name, namespace);
+            await this.deletePVC(name, namespace);
+            await this.deleteService(name, namespace);
+            await this.deleteIngress(`${name}-cluster`, namespace);
+            await this.deleteCustomDomainIngress(`${name}-domain`, namespace);
+            await this.deleteTCPProxy(
+                container.networking.tcpProxy.enabled ? container.networking.tcpProxy.publicPort : null
+            );
+            await this.deleteTektonPipeline();
+        }
+    }
+
+    // Definition is storageConfig
+    async createStorage(definition, name, namespace) {
+        if (!definition.enabled) return;
+
+        const manifest = fs.readFileSync(`${__dirname}/manifests/pvc.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure name, namespace and labels
+        metadata.name = name;
+        metadata.namespace = namespace;
+
+        // Configure access modes
+        spec.accessModes = definition.accessModes;
+        // Configure volume capacity
+        spec.resources.requests.storage =
+            definition.sizeType === "mebibyte" ? `${definition.size}Mi` : `${definition.size}Gi`;
+
+        // Create the PVC
+        await k8sCoreApi.createNamespacedPersistentVolumeClaim(namespace, resource);
+
+        console.log(`PVC '${name}' in namespace '${namespace}' created successfully`);
+    }
+
+    // Definition is networking
+    async createService(definition, name, namespace) {
+        const manifest = fs.readFileSync(`${__dirname}/manifests/service.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure name, namespace and labels
+        metadata.name = name;
+        metadata.namespace = namespace;
+
+        // Configure target app
+        spec.selector.app = name;
+        // Set the port
+        spec.ports[0].port = definition.containerPort;
+        spec.ports[0].targetPort = definition.containerPort;
+
+        // Create the service
+        await k8sCoreApi.createNamespacedService(namespace, resource);
+
+        console.log(`Service '${name}' in namespace '${namespace}' created successfully`);
+    }
+
+    // Definition is container
+    async createDeployment(definition, namespace) {
+        const manifest = fs.readFileSync(`${__dirname}/manifests/deployment.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure name, namespace and labels
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.replicas = definition.deploymentConfig.desiredReplicas;
+        spec.selector.matchLabels.app = definition.iid;
+        spec.template.metadata.labels.app = definition.iid;
+
+        // Configure restart policy
+        spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.ports[0].containerPort = definition.networking.containerPort;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container probes
+        const { startup, readiness, liveness } = definition.probes;
+        if (startup.enabled) container.startupProbe = getProbeConfig(startup);
+        else delete container.startupProbe;
+
+        if (readiness.enabled) container.readinessProbe = getProbeConfig(readiness);
+        else delete container.readinessProbe;
+
+        if (liveness.enabled) container.livenessProbe = getProbeConfig(liveness);
+        else delete container.livenessProbe;
+
+        // Configure container volume mounts
+        const { storageConfig } = definition;
+        if (storageConfig.enabled) {
+            container.volumeMounts = [
+                {
+                    name: "storage",
+                    mountPath: storageConfig.mountPath,
+                },
+            ];
+
+            spec.template.spec.volumes = [
+                {
+                    name: "storage",
+                    persistentVolumeClaim: {
+                        claimName: definition.iid,
+                    },
+                },
+            ];
+        } else {
+            delete container.volumeMounts;
+            delete spec.template.spec.volumes;
+        }
+
+        await k8sAppsApi.createNamespacedDeployment(namespace, resource);
+        console.log(`Deployment '${definition.iid}' in namespace '${namespace}' created successfully`);
+    }
+
+    async deleteDeployment(name, namespace) {
+        if (!(await getK8SResource("Deployment", name, namespace))) return;
+
+        try {
+            await k8sAppsApi.deleteNamespacedDeployment(name, namespace);
+            console.log(`Deployment '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(
+                `Error deleting deployment '${name}' in namespace ${namespace}. ${err.response?.body?.message}`
+            );
+        }
+    }
+
+    async deletePVC(name, namespace) {
+        if (!(await getK8SResource("PVC", name, namespace))) return;
+
+        try {
+            await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(name, namespace);
+            console.log(`PVC '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting PVC '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
+        }
+    }
+
+    async deleteService(name, namespace) {
+        if (!(await getK8SResource("Service", name, namespace))) return;
+
+        try {
+            await k8sCoreApi.deleteNamespacedService(name, namespace);
+            console.log(`Service '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting service '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
+        }
+    }
+
+    async deleteIngress(name, namespace) {
+        if (!(await getK8SResource("Ingress", name, namespace))) return;
+
+        try {
+            await k8sNetworkingApi.deleteNamespacedIngress(name, namespace);
+            console.log(`Ingress '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting ingress '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
+        }
+    }
+
+    async deleteCustomDomainIngress(name, namespace) {
+        if (!(await getK8SResource("Ingress", name, namespace))) return;
+
+        try {
+            await k8sNetworkingApi.deleteNamespacedIngress(name, namespace);
+            console.log(`Ingress '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting ingress '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
+        }
+    }
+
+    async deleteTCPProxy(portNumber) {
+        if (!portNumber) return;
+
+        const kc = new k8s.KubeConfig();
+        kc.loadFromDefault();
+        const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
+        const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+        const configMapName = "tcp-services";
+        const resourceNamespace = "ingress-nginx";
+
+        try {
+            // patch configmap/tcp-service
+            const cfgmap = await k8sCoreApi.readNamespacedConfigMap(configMapName, resourceNamespace);
+            delete cfgmap.body.data[portNumber];
+            await k8sCoreApi.replaceNamespacedConfigMap(configMapName, resourceNamespace, cfgmap.body);
+
+            // patch service/ingress-nginx-controller
+            k8sCoreApi.listNamespacedService(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (service) => {
+                    if (service.metadata.name.includes("ingress-nginx-controller")) {
+                        const svcName = service.metadata.name;
+                        const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
+                        svc.body.spec.ports = svc.body.spec.ports.filter((svcPort) => svcPort.port !== portNumber);
+                        await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+                    }
+                });
+            });
+
+            // patch deployment/ingress-nginx-controller
+            k8sAppsApi.listNamespacedDeployment(resourceNamespace).then((res) => {
+                res.body.items.forEach(async (deployment) => {
+                    if (deployment.metadata.name.includes("ingress-nginx-controller")) {
+                        const deployName = deployment.metadata.name;
+                        const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
+                        dply.body.spec.template.spec.containers[0].ports =
+                            dply.body.spec.template.spec.containers[0].ports.filter(
+                                (contPort) => contPort.containerPort !== portNumber
+                            );
+                        await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+                    }
+                });
+            });
+
+            console.log(`TCP proxy port '${portNumber}' unexposed successfully`);
+        } catch (error) {
+            console.error(`Error unexposing tcp prosy port '${portNumber}'. ${err.response?.body?.message}`);
+        }
+    }
+
+    async createTektonPipeline() {
+        console.log("*************createTektonPipeline not implemented yet*************");
+    }
+
+    async deleteTektonPipeline() {
+        console.log("*************deleteTektonPipeline not implemented yet*************");
+    }
+}
+
+function getProbeConfig(config) {
+    const probe = {
+        initialDelaySeconds: config.initialDelaySeconds,
+        periodSeconds: config.periodSeconds,
+        timeoutSeconds: config.timeoutSeconds,
+        failureThreshold: config.failureThreshold,
+    };
+
+    if (config.checkMechanism === "exec") {
+        return {
+            exec: { command: config.execCommand.split("\n") },
+            ...probe,
+        };
+    } else if (config.checkMechanism === "httpGet") {
+        return {
+            httpGet: { path: config.httpPath, port: config.httpPort },
+            ...probe,
+        };
+    } else {
+        return {
+            tcpSocket: { port: config.tcpPort },
+            ...probe,
+        };
+    }
+}
+
+async function getK8SResource(kind, name, namespace) {
+    try {
+        switch (kind) {
+            case "Namespace":
+                return await k8sCoreApi.readNamespace(name);
+            case "Deployment":
+                return await k8sAppsApi.readNamespacedDeployment(name, namespace);
+            case "StatefulSet":
+                return await k8sAppsApi.readNamespacedStatefulSet(name, namespace);
+            case "CronJob":
+                return await k8sBatchApi.readNamespacedCronJob(name, namespace);
+            case "Job":
+                return await k8sBatchApi.readNamespacedJob(name, namespace);
+            case "KnativeService":
+                return await k8sCustomObjectApi.readNamespacedCustomObject(
+                    "serving.knative.dev",
+                    "v1",
+                    namespace,
+                    "services",
+                    name
+                );
+            case "Service":
+                return await k8sCoreApi.readNamespacedService(name, namespace);
+            case "Ingress":
+                return await k8sNetworkingApi.readNamespacedIngress(name, namespace);
+            case "ServiceAccount":
+                return await k8sCoreApi.readNamespacedServiceAccount(name, namespace);
+            case "Secret":
+                return await k8sCoreApi.readNamespacedSecret(name, namespace);
+            case "ConfigMap":
+                return await k8sCoreApi.readNamespacedConfigMap(name, namespace);
+            case "PVC":
+                return await k8sCoreApi.readNamespacedPersistentVolumeClaim(name, namespace);
+            default:
+                console.log(`Skipping: ${kind}`);
+                return null;
+        }
+    } catch (err) {
+        return null;
     }
 }
 

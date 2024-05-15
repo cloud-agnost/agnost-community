@@ -623,14 +623,6 @@ export const checkStorageConfig = (containerType, actionType) => {
 				"Not a valid mount path. Mount paths include alphanumeric characters, underscore, hyphens, and additional slashes."
 			) // Remove trailing slashes using custom sanitizer
 			.customSanitizer((value) => value.replace(/\/+$/, "")),
-		body("storageConfig.reclaimPolicy")
-			.if((value, { req }) => req.body.storageConfig.enabled === true)
-			.trim()
-			.notEmpty()
-			.withMessage(t("Required field, cannot be left empty"))
-			.bail()
-			.isIn(["retain", "delete"])
-			.withMessage(t("Unsupported storage reclaim policy")),
 		body("storageConfig.accessModes")
 			.if((value, { req }) => req.body.storageConfig.enabled === true)
 			.isArray()

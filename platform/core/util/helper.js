@@ -675,7 +675,6 @@ async function getNewTCPPortNumber() {
 	// Save new port number to database
 	await tcpProxyPortCtrl.create({ port: newPortNumber });
 	return newPortNumber;
-	x;
 }
 
 export default {

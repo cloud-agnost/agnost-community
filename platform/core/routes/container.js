@@ -116,6 +116,18 @@ router.post(
 				{ session, cacheKey: containerId }
 			);
 
+			// Create the container in the Kubernetes cluster
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container",
+				{ container, environment, action: "create" },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
 			// Commit the database transaction
 			await cntrCtrl.commit(session);
 
@@ -254,10 +266,22 @@ router.delete(
 
 		try {
 			const { org, project, environment, container, body, user } = req;
-			const updatedContainer = await cntrCtrl.deleteOneById(container._id, {
+			await cntrCtrl.deleteOneById(container._id, {
 				session,
 				cacheKey: container._id,
 			});
+
+			// Deletes the container in the Kubernetes cluster
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container",
+				{ container, environment, action: "delete" },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
 
 			// Commit the database transaction
 			await cntrCtrl.commit(session);
