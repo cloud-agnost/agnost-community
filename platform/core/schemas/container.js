@@ -126,10 +126,6 @@ export const ContainerModel = mongoose.model(
 						type: Boolean,
 						default: false,
 					},
-					added: {
-						type: Boolean,
-						default: false,
-					},
 					domain: {
 						type: String,
 					},

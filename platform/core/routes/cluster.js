@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import userCtrl from "../controllers/user.js";
 import clsCtrl from "../controllers/cluster.js";
 import resourceCtrl from "../controllers/resource.js";
+import cntrCtrl from "../controllers/container.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { handleError } from "../schemas/platformError.js";
@@ -656,6 +657,22 @@ router.post(
 				...apiServers.map((entry) => `${entry.iid}-ingress`),
 			];
 
+			// Get all container ingresses that will be impacted
+			const containers = await cntrCtrl.getManyByQuery(
+				{
+					"networking.ingress.enabled": true,
+				},
+				{ lookup: "environmentId" }
+			);
+
+			containers = containers.map((entry) => {
+				return {
+					containeriid: entry.iid,
+					namespace: entry.environmentId.iid,
+					containerPort: entry.networking.containerPort,
+				};
+			});
+
 			// Update ingresses
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/resource/cluster-domains-add",
@@ -664,6 +681,7 @@ router.post(
 					ingresses,
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
 					container: false,
+					containers,
 				},
 				{
 					headers: {
@@ -727,6 +745,18 @@ router.delete(
 				...apiServers.map((entry) => `${entry.iid}-ingress`),
 			];
 
+			// Get all container ingresses that will be impacted
+			const containers = await cntrCtrl.getManyByQuery(
+				{
+					"networking.ingress.enabled": true,
+				},
+				{ lookup: "environmentId" }
+			);
+
+			containers = containers.map((entry) => {
+				return { containeriid: entry.iid, namespace: entry.environmentId.iid };
+			});
+
 			// Update ingresses
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
@@ -734,6 +764,7 @@ router.delete(
 					domain,
 					ingresses,
 					container: false,
+					containers,
 				},
 				{
 					headers: {
@@ -838,10 +869,30 @@ router.put(
 				...apiServers.map((entry) => `${entry.iid}-container-ingress`),
 			];
 
+			// Get all container ingresses that will be impacted
+			const containers = await cntrCtrl.getManyByQuery(
+				{
+					$or: [
+						{ "networking.ingress.enabled": true },
+						{ "networking.customDomain.enabled": true },
+					],
+				},
+				{ lookup: "environmentId" }
+			);
+
+			containers = containers.map((entry) => {
+				return {
+					containeriid: entry.iid,
+					namespace: entry.environmentId.iid,
+					ingress: entry.networking.ingress.enabled,
+					customDomain: entry.networking.customDomain.enabled,
+				};
+			});
+
 			// Update ingresses
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/resource/cluster-enforce-ssl",
-				{ enforceSSLAccess, ingresses },
+				{ enforceSSLAccess, ingresses, containers },
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

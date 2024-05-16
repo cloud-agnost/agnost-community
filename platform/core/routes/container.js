@@ -233,6 +233,9 @@ router.put(
 						containerPort:
 							container.networking.containerPort !==
 							updatedContainer.networking.containerPort,
+						customDomain:
+							container.networking.customDomain.domain !==
+							updatedContainer.networking.customDomain.domain,
 					},
 					action: "update",
 				},
