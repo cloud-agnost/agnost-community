@@ -51,9 +51,9 @@ export default function CreateContainerButton() {
 								<DropdownMenuItem
 									key={containerType}
 									className='gap-2'
-									onSelect={() => openCreateContainerDialog(containerType)}
+									onSelect={() => openCreateContainerDialog(containerType as ContainerType)}
 								>
-									{getContainerIcon(containerType)}
+									{getContainerIcon(containerType as ContainerType)}
 									{toDisplayName(containerType)}
 								</DropdownMenuItem>
 							))}

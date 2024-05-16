@@ -154,14 +154,7 @@ const FormFieldGroup = React.forwardRef<HTMLDivElement, FormFieldGroupProps>(
 		return (
 			<div className='space-y-2' ref={ref} {...props}>
 				{label && <FormLabel>{label}</FormLabel>}
-				<div
-					className={cn(
-						'grid grid-cols-[4fr_1fr] divide-x-2 divide-wrapper-background-hover',
-						className,
-					)}
-				>
-					{props.children}
-				</div>
+				<div className={cn('grid grid-cols-[3fr_1fr]', className)}>{props.children}</div>
 			</div>
 		);
 	},

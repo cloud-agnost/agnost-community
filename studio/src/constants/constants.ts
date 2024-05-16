@@ -507,7 +507,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	'STATEFUL SET': 'orange',
 	'CRON JOB': 'purple',
 	'KNATIVE SERVICE': 'yellow',
-	SOURCE: 'blue',
+	REPO: 'blue',
 	REGISTRY: 'red',
 };
 

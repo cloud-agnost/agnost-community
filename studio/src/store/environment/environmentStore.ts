@@ -178,7 +178,6 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				},
 				reset: () => set(initialState),
 			}),
-
 			{
 				name: 'environment-store',
 				partialize: (state) =>

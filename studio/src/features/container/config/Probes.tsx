@@ -13,8 +13,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { CreateContainerParams } from '@/types/container';
 import { Pulse, Info } from '@phosphor-icons/react';
 import { useFormContext } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import ContainerFormTitle from './ContainerFormTitle';
+import { Trans, useTranslation } from 'react-i18next';
+import ContainerFormTitle from './ContainerFormLayout';
+import { Fragment } from 'react';
 
 const TOOLTIP_FIELDS = [
 	'initialDelaySeconds',
@@ -30,15 +31,13 @@ export default function Probes() {
 	const form = useFormContext<CreateContainerParams>();
 
 	return (
-		<div className='space-y-6'>
-			<ContainerFormTitle
-				title={t('container.probes.title')}
-				description={t('container.probes.description') ?? ''}
-			>
-				<Pulse size={20} />
-			</ContainerFormTitle>
+		<ContainerFormTitle
+			title={t('container.probes.title')}
+			descriptionI18nKey='container.probes.description'
+			icon={<Pulse size={20} />}
+		>
 			{PROBES_TYPES.map((type) => (
-				<div className='pl-12' key={type}>
+				<Fragment key={type}>
 					<FormField
 						control={form.control}
 						name={`probes.${type}.enabled`}
@@ -46,7 +45,7 @@ export default function Probes() {
 							<FormItem className='flex items-center space-y-0 gap-2'>
 								<div>
 									<FormLabel>{t(`container.probes.${type}`)}</FormLabel>
-									<FormDescription className='text-balance'>
+									<FormDescription className='text-pretty'>
 										{t(`container.probes.${type}_help`)}
 									</FormDescription>
 								</div>
@@ -68,11 +67,15 @@ export default function Probes() {
 							<>
 								<FormField
 									control={form.control}
-									name={`probes.${type}.checkMechanism.type`}
+									name={`probes.${type}.checkMechanism`}
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>{t('container.probes.check_mechanism')}</FormLabel>
-											<Select onValueChange={field.onChange}>
+											<Select
+												value={field.value}
+												defaultValue={field.value}
+												onValueChange={field.onChange}
+											>
 												<FormControl>
 													<SelectTrigger className='w-full'>
 														<SelectValue>{t(`container.probes.${field.value}`)}</SelectValue>
@@ -97,7 +100,7 @@ export default function Probes() {
 									)}
 								/>
 
-								{form.watch(`probes.${type}.checkMechanism.type`) === 'exec' && (
+								{form.watch(`probes.${type}.checkMechanism`) === 'exec' && (
 									<FormField
 										control={form.control}
 										name={`probes.${type}.execCommand`}
@@ -120,7 +123,7 @@ export default function Probes() {
 										)}
 									/>
 								)}
-								{form.watch(`probes.${type}.checkMechanism.type`) === 'tcpSocket' && (
+								{form.watch(`probes.${type}.checkMechanism`) === 'tcpSocket' && (
 									<FormField
 										control={form.control}
 										name={`probes.${type}.tcpPort`}
@@ -143,17 +146,16 @@ export default function Probes() {
 										)}
 									/>
 								)}
-								{form.watch(`probes.${type}.checkMechanism.type`) === 'httpGet' && (
-									<div className='flex items-center gap-4'>
+								{form.watch(`probes.${type}.checkMechanism`) === 'httpGet' && (
+									<div className='flex gap-4'>
 										<FormField
 											control={form.control}
 											name={`probes.${type}.httpPath`}
 											render={({ field }) => (
-												<FormItem>
+												<FormItem className='flex-1'>
 													<FormLabel>{t('container.probes.path')}</FormLabel>
 													<FormControl>
 														<Input
-															className='flex-1'
 															error={Boolean(form.formState.errors.name)}
 															placeholder={
 																t('forms.placeholder', {
@@ -171,11 +173,10 @@ export default function Probes() {
 											control={form.control}
 											name={`probes.${type}.httpPort`}
 											render={({ field }) => (
-												<FormItem>
+												<FormItem className='flex-1'>
 													<FormLabel>{t('container.probes.port')}</FormLabel>
 													<FormControl>
 														<Input
-															className='flex-1'
 															error={Boolean(form.formState.errors.name)}
 															placeholder={
 																t('forms.placeholder', {
@@ -206,7 +207,12 @@ export default function Probes() {
 																<TooltipTrigger>
 																	<Info size={16} />
 																</TooltipTrigger>
-																<TooltipContent>{t(`container.probes.${f}_help`)}</TooltipContent>
+																<TooltipContent align='end'>
+																	<Trans
+																		i18nKey={`container.probes.${f}_help`}
+																		components={{ 1: <br /> }}
+																	/>
+																</TooltipContent>
 															</Tooltip>
 														</TooltipProvider>
 													</div>
@@ -230,8 +236,8 @@ export default function Probes() {
 							</>
 						)}
 					</div>
-				</div>
+				</Fragment>
 			))}
-		</div>
+		</ContainerFormTitle>
 	);
 }

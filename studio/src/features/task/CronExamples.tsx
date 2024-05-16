@@ -1,4 +1,3 @@
-import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,38 +6,46 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/Dropdown';
 import { CRON_EXAMPLES } from '@/constants';
-import { CreateTaskSchema } from '@/types';
 import { describeCronExpression } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
-import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
+import { useEffect, useRef, useState } from 'react';
 
-export default function CronExamples() {
-	const form = useFormContext<z.infer<typeof CreateTaskSchema>>();
+interface CronExamplesProps {
+	selectCron: (cron: string) => void;
+	children: React.ReactNode;
+}
 
-	function selectCron(cron: string) {
-		form.setValue('cronExpression', cron);
-	}
+export default function CronExamples({ selectCron, children }: CronExamplesProps) {
+	const triggerRef = useRef<HTMLButtonElement>(null);
+	const [triggerWidth, setTriggerWidth] = useState(0);
+
+	useEffect(() => {
+		if (triggerRef.current) {
+			setTriggerWidth(triggerRef.current.offsetWidth);
+		}
+	}, [triggerRef.current]);
 	return (
-		<DropdownMenu modal={false}>
-			<DropdownMenuTrigger className='absolute top-1 right-2'>
-				<Button variant='icon' size='sm' rounded>
+		<DropdownMenu>
+			<DropdownMenuTrigger className='block w-full' ref={triggerRef}>
+				<div className='flex justify-between items-center rounded-sm bg-input-background pr-2'>
+					{children}
 					<CaretDown size={14} />
-				</Button>
+				</div>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align='start'
-				className='w-[687px] absolute top-1 -right-9 bg-input-background'
+				className='bg-input-background w-full'
+				style={{ width: triggerWidth }}
 			>
-				<DropdownMenuItemContainer className='w-full bg-input-background '>
+				<DropdownMenuItemContainer className='min-w-full bg-input-background h-96 overflow-auto'>
 					{CRON_EXAMPLES.map((cron) => (
 						<DropdownMenuItem
 							key={cron}
 							className='space-x-4 hover:bg-subtle'
 							onClick={() => selectCron(cron)}
 						>
-							<span className='text-default text-xs'>{cron}</span>
-							<span className='text-subtle text-xs'>{describeCronExpression(cron)}</span>
+							<p className='text-default text-xs whitespace-nowrap'>{cron}</p>
+							<p className='text-subtle text-xs'>{describeCronExpression(cron)}</p>
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuItemContainer>

@@ -1,7 +1,7 @@
 import { APPLICATION_SETTINGS } from '@/constants';
 import { AppRoles, Application } from '@/types';
 import { Project } from '@/types/project';
-import { DotsThreeVertical, Icon } from '@phosphor-icons/react';
+import { DotsThreeVertical } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

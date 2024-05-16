@@ -5,13 +5,12 @@ import { SettingsContainer } from '@/features/version/SettingsContainer';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import ClusterAddons from './ClusterAddons';
 import ClusterResources from './ClusterComponents';
 import ClusterSmtpForm from './ClusterSmtpForm';
 import CustomDomains from './CustomDomains';
 import TransferClusterOwnership from './TransferClusterOwnership';
-import ClusterAddons from './ClusterAddons';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();

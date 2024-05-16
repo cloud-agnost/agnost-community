@@ -13,20 +13,17 @@ import { Cube } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import ContainerFormTitle from './ContainerFormTitle';
+import ContainerFormTitle from './ContainerFormLayout';
 export default function PodConfiguration() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
-	console.log(form.getValues());
 	return (
-		<div className='space-y-6'>
-			<ContainerFormTitle
-				title={t('container.pod_config.title')}
-				description={t('container.pod_config.description') ?? ''}
-			>
-				<Cube size={20} />
-			</ContainerFormTitle>
-			<div className='grid grid-cols-2 gap-4 pl-12'>
+		<ContainerFormTitle
+			title={t('container.pod_config.title')}
+			descriptionI18nKey='container.pod_config.description'
+			icon={<Cube size={20} />}
+		>
+			<div className='grid grid-cols-2 gap-6'>
 				<FormFieldGroup label={t('container.pod_config.cpu_request') ?? ''}>
 					<FormField
 						control={form.control}
@@ -63,7 +60,7 @@ export default function PodConfiguration() {
 									>
 										<FormControl>
 											<SelectTrigger
-												className='w-full rounded-l-none'
+												className='w-full rounded-l-none space-x-2'
 												error={Boolean(form.formState.errors.podConfig?.cpuRequestType)}
 											>
 												<SelectValue />
@@ -119,7 +116,7 @@ export default function PodConfiguration() {
 									>
 										<FormControl>
 											<SelectTrigger
-												className='w-full rounded-l-none'
+												className='w-full rounded-l-none space-x-2'
 												error={Boolean(form.formState.errors.podConfig?.cpuLimitType)}
 											>
 												<SelectValue />
@@ -175,7 +172,7 @@ export default function PodConfiguration() {
 									>
 										<FormControl>
 											<SelectTrigger
-												className='w-full rounded-l-none'
+												className='w-full rounded-l-none space-x-2'
 												error={Boolean(form.formState.errors.podConfig?.memoryRequestType)}
 											>
 												<SelectValue />
@@ -195,7 +192,7 @@ export default function PodConfiguration() {
 						)}
 					/>
 				</FormFieldGroup>
-				<FormFieldGroup label={t('container.pod_config.limit') ?? ''}>
+				<FormFieldGroup label={t('container.pod_config.memory_limit') ?? ''}>
 					<FormField
 						control={form.control}
 						name='podConfig.memoryLimit'
@@ -231,7 +228,7 @@ export default function PodConfiguration() {
 									>
 										<FormControl>
 											<SelectTrigger
-												className='w-full rounded-l-none'
+												className='w-full rounded-l-none space-x-2'
 												error={Boolean(form.formState.errors.podConfig?.memoryLimitType)}
 											>
 												<SelectValue />
@@ -256,9 +253,9 @@ export default function PodConfiguration() {
 				control={form.control}
 				name='podConfig.restartPolicy'
 				render={({ field }) => (
-					<FormItem className='pl-12'>
+					<FormItem>
 						<FormLabel>{t('container.pod_config.restart_policy')}</FormLabel>
-						<Select onValueChange={field.onChange}>
+						<Select value={field.value} defaultValue={field.value} onValueChange={field.onChange}>
 							<FormControl>
 								<SelectTrigger className='w-full'>
 									<SelectValue>{field.value}</SelectValue>
@@ -282,6 +279,6 @@ export default function PodConfiguration() {
 					</FormItem>
 				)}
 			/>
-		</div>
+		</ContainerFormTitle>
 	);
 }

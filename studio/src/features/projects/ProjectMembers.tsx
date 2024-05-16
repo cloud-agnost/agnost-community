@@ -7,7 +7,6 @@ import useAuthorizeProject from '@/hooks/useAuthorizeProject';
 import { toast } from '@/hooks/useToast';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useProjectStore from '@/store/project/projectStore';
-import { ApplicationMember } from '@/types';
 import { Project, ProjectMember } from '@/types/project';
 import { useMutation } from '@tanstack/react-query';
 import { RoleDropdown } from 'components/RoleDropdown';

@@ -3,25 +3,24 @@ import ProjectService from '@/services/ProjectService';
 import {
 	APIError,
 	AppRoles,
+	ChangeProjectNameRequest,
+	CreateProjectRequest,
 	GetInvitationRequest,
 	Invitation,
 	InvitationRequest,
-	RemoveMemberRequest,
-	TransferRequest,
-	UpdateRoleRequest,
-} from '@/types';
-import {
-	ChangeProjectNameRequest,
-	CreateProjectRequest,
 	Project,
 	ProjectEnvironment,
 	ProjectInviteRequest,
 	ProjectMember,
 	ProjectRoleDefinition,
+	RemoveMemberRequest,
 	SetProjectAvatarRequest,
+	TransferRequest,
 	UpdateProjectMemberRoleRequest,
 	UpdateProjectParams,
-} from '@/types/project';
+	UpdateRoleRequest,
+} from '@/types';
+
 import { joinChannel, leaveChannel } from '@/utils';
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';

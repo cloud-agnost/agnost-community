@@ -78,7 +78,7 @@ export default function ProjectInviteMember() {
 					<DrawerTitle>{t('project.invite.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 space-y-6'>
-					{true ? (
+					{canClusterSendEmail ? (
 						<Form {...form}>
 							<form onSubmit={form.handleSubmit(onSubmit)}>
 								<InviteMemberForm

@@ -11,7 +11,6 @@ export default function useRealtime() {
 	useEffect(() => {
 		const cb = onChannelMessage('notification', (message) => {
 			const { data, object, action, identifiers, timestamp, message: log, id, type } = message;
-			console.log(message);
 			if (message?.actor?.userId !== user?._id || action !== 'create') {
 				const fn = realtimeObjectMapper(object);
 

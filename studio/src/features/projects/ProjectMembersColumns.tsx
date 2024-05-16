@@ -4,7 +4,6 @@ import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { TableConfirmation } from '@/components/Table';
 import { toast } from '@/hooks/useToast';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useProjectStore from '@/store/project/projectStore';

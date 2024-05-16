@@ -77,6 +77,12 @@ interface TypesStore {
 	resourceVersions: {
 		[key: string]: string[];
 	};
+	timezones: {
+		label: string;
+		name: string;
+		value: string;
+		utc: string;
+	}[];
 	getAllTypes: () => Promise<Types | APIError>;
 }
 
@@ -144,6 +150,7 @@ const useTypeStore = create<TypesStore>()(
 				resourceVersions: {},
 				isTypesOk: false,
 				resourceTypes: [],
+				timezones: [],
 				getAllTypes: async () => {
 					try {
 						const res = await TypesService.getAllTypes();

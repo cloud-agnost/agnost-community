@@ -4,8 +4,8 @@ import { DateText } from '@/components/DateText';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useProjectEnvironmentStore from '@/store/project/projectEnvironmentStore';
 import useProjectStore from '@/store/project/projectStore';
-import { ProjectEnvironment } from '@/types/project';
-import { cn, getAppPermission, getProjectPermission, translate } from '@/utils';
+import { ProjectEnvironment } from '@/types';
+import { getProjectPermission, translate } from '@/utils';
 import { GitBranch, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 

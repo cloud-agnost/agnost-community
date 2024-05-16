@@ -33,7 +33,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	const { t } = useTranslation();
 	const { members } = useOrganizationStore();
 	const { applicationTeam, application } = useApplicationStore();
-	const { projectTeam, project } = useProjectStore();
+	const { projectTeam } = useProjectStore();
 
 	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;

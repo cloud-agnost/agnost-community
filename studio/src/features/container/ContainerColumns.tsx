@@ -67,12 +67,12 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({ row: { original } }) => {
-			const { sourceOrRegistry } = original;
+			const { repoOrRegistry } = original;
 			return (
 				<Badge
 					className='min-w-[70px]'
-					variant={BADGE_COLOR_MAP[sourceOrRegistry.toUpperCase()]}
-					text={startCase(sourceOrRegistry)}
+					variant={BADGE_COLOR_MAP[repoOrRegistry.toUpperCase()]}
+					text={startCase(repoOrRegistry)}
 				/>
 			);
 		},
@@ -84,15 +84,15 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({ row: { original } }) => {
-			const { source, registry } = original;
+			const { repo, registry } = original;
 			return (
 				<Link
 					className='link'
-					to={source?.repo ?? registry?.image ?? ''}
+					to={repo.url ?? registry?.image ?? ''}
 					target='_blank'
 					rel='noopener noreferrer'
 				>
-					{startCase(source?.repoType ?? registry?.registryId)}
+					{startCase(repo?.type ?? registry?.registryId)}
 				</Link>
 			);
 		},

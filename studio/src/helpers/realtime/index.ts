@@ -22,7 +22,6 @@ import User from './User';
 import Version from './Version';
 import VersionProperties from './VersionProperties';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
-	console.log(type);
 	const keys = {
 		user: User,
 		org: Organization,

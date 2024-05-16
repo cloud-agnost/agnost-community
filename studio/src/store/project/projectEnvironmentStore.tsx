@@ -44,7 +44,7 @@ const useProjectEnvironmentStore = create<ProjectEnvironmentStore & Actions>((se
 			set({ environments, lastFetchedPage: req.page });
 		} else {
 			set((prev) => ({
-				endpoints: [...prev.environments, ...environments],
+				environments: [...prev.environments, ...environments],
 				lastFetchedPage: req.page,
 			}));
 		}

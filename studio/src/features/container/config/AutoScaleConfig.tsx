@@ -21,19 +21,30 @@ import { Package } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import ContainerFormTitle from './ContainerFormTitle';
+import ContainerFormTitle from './ContainerFormLayout';
+import { Fragment, useEffect } from 'react';
 export default function AutoScaleConfig() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
+
+	useEffect(() => {
+		form.setValue('deploymentConfig.desiredReplicas', 1);
+		form.setValue('deploymentConfig.minReplicas', 1);
+		form.setValue('deploymentConfig.maxReplicas', 5);
+		form.setValue('deploymentConfig.cpuMetric.enabled', true);
+		form.setValue('deploymentConfig.cpuMetric.metricValue', 80);
+		form.setValue('deploymentConfig.cpuMetric.metricType', 'AverageUtilization');
+		form.setValue('deploymentConfig.memoryMetric.enabled', true);
+		form.setValue('deploymentConfig.memoryMetric.metricValue', 100);
+		form.setValue('deploymentConfig.memoryMetric.metricType', 'AverageValueMebibyte');
+	}, []);
 	return (
-		<div className='space-y-6'>
-			<ContainerFormTitle
-				title={t('container.autoscale.title')}
-				description={t('container.autoscale.description') ?? ''}
-			>
-				<Package size={20} />
-			</ContainerFormTitle>
-			<div className='space-y-6 pl-12'>
+		<ContainerFormTitle
+			title={t('container.autoscale.title')}
+			descriptionI18nKey='container.autoscale.description'
+			icon={<Package size={20} />}
+		>
+			<Fragment>
 				<div className='grid grid-cols-2 gap-8'>
 					<div className='space-y-6'>
 						<FormField
@@ -90,7 +101,7 @@ export default function AutoScaleConfig() {
 											>
 												<FormControl>
 													<SelectTrigger
-														className='w-full rounded-l-none'
+														className='w-full rounded-l-none space-x-2'
 														error={Boolean(
 															form.formState.errors.deploymentConfig?.cpuMetric?.metricType,
 														)}
@@ -172,7 +183,7 @@ export default function AutoScaleConfig() {
 											>
 												<FormControl>
 													<SelectTrigger
-														className='w-full rounded-l-none'
+														className='w-full rounded-l-none space-x-2'
 														error={Boolean(
 															form.formState.errors.deploymentConfig?.memoryMetric?.metricType,
 														)}
@@ -201,13 +212,13 @@ export default function AutoScaleConfig() {
 					<div className='flex items-center gap-4'>
 						<FormField
 							control={form.control}
-							name='name'
+							name='deploymentConfig.minReplicas'
 							render={({ field }) => (
 								<FormItem className='flex-1'>
 									<FormLabel>{t('container.autoscale.min_replicas')}</FormLabel>
 									<FormControl>
 										<Input
-											error={Boolean(form.formState.errors.name)}
+											error={Boolean(form.formState.errors.deploymentConfig?.minReplicas)}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('container.autoscale.min_replicas'),
@@ -223,13 +234,13 @@ export default function AutoScaleConfig() {
 						/>
 						<FormField
 							control={form.control}
-							name='name'
+							name='deploymentConfig.maxReplicas'
 							render={({ field }) => (
 								<FormItem className='flex-1'>
 									<FormLabel>{t('container.autoscale.max_replicas')}</FormLabel>
 									<FormControl>
 										<Input
-											error={Boolean(form.formState.errors.name)}
+											error={Boolean(form.formState.errors.deploymentConfig?.maxReplicas)}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('container.autoscale.max_replicas'),
@@ -245,7 +256,7 @@ export default function AutoScaleConfig() {
 						/>
 					</div>
 				)}
-			</div>
-		</div>
+			</Fragment>
+		</ContainerFormTitle>
 	);
 }
