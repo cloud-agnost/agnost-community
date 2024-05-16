@@ -171,19 +171,10 @@ export const checkNetworking = (containerType, actionType) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
-				body("networking.customDomain.added")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
 				body("networking.customDomain.domain")
 					.if(
 						(value, { req }) =>
-							req.body.networking.customDomain.enabled === true &&
-							req.body.networking.customDomain.added === true
+							req.body.networking.customDomain.enabled === true
 					)
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
