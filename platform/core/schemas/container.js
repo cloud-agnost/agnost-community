@@ -194,6 +194,7 @@ export const ContainerModel = mongoose.model(
 				},
 				size: {
 					type: Number,
+					default: 1,
 				},
 				sizeType: {
 					type: String,
