@@ -530,9 +530,15 @@ export class CICDManager {
             }
         }
 
-        // Create the ingress with the provided spec
-        await k8sNetworkingApi.createNamespacedIngress(namespace, ingress);
-        console.log(`Ingress '${name}-cluster' in namespace '${namespace}' created successfully`);
+        try {
+            // Create the ingress with the provided spec
+            await k8sNetworkingApi.createNamespacedIngress(namespace, ingress);
+            console.log(`Ingress '${name}-cluster' in namespace '${namespace}' created successfully`);
+        } catch (err) {
+            console.log("***ingress", namespace, JSON.stringify(ingress, null, 2));
+            console.log("***err", err);
+            throw err;
+        }
     }
 
     // Definition is networking
@@ -1156,6 +1162,9 @@ async function applyManifest(localRegistryEnabled) {
                         resource
                     );
                     break;
+                case "CronJob":
+                    await k8sBatchApi.createNamespacedCronJob(resourceNamespace, resource);
+                    break;
                 default:
                     console.log(`Skipping: ${kind}`);
             }
@@ -1248,6 +1257,9 @@ async function deleteManifest(localRegistryEnabled) {
                         resource.metadata.name,
                         resourceNamespace
                     );
+                    break;
+                case "CronJob":
+                    await k8sBatchApi.deleteNamespacedCronJob(resource.metadata.name, resourceNamespace);
                     break;
                 default:
                     console.log(`Skipping: ${kind}`);
