@@ -210,6 +210,14 @@ router.put(
 				container.networking.tcpProxy.publicPort ??
 				(await helper.getNewTCPPortNumber());
 
+			// Once accesss mode for storage is set, it cannot be changed
+			if (
+				container.storageConfig.enabled === true &&
+				body.storageConfig.enabled === true
+			) {
+				body.storageConfig.accessModes = container.storageConfig.accessModes;
+			}
+
 			const updatedContainer = await cntrCtrl.updateOneById(
 				container._id,
 				{
