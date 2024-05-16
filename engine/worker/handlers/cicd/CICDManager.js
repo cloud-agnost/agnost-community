@@ -1476,10 +1476,9 @@ async function getClusterRecord() {
 async function initializeClusterCertificateIssuer() {
     try {
         // Check to see if we have the certificate issuer already
-        await k8sCustomObjectApi.getNamespacedCustomObject(
+        await k8sCustomObjectApi.getClusterCustomObject(
             "cert-manager.io",
             "v1",
-            agnostNamespace,
             "clusterissuers",
             "letsencrypt-clusterissuer"
         );
