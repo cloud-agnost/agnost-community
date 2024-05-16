@@ -80,6 +80,7 @@ router.post("/env/delete", checkContentType, authAccessToken, async (req, res) =
 router.post("/container", checkContentType, authAccessToken, async (req, res) => {
     try {
         return res.json();
+
         const cicdManager = new CICDManager();
         // The body of the request is and environment object
         const result = await cicdManager.manageContainer(req.body);

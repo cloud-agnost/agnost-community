@@ -2162,6 +2162,10 @@ export class ResourceManager {
                             targetPort: portNumber,
                             protocol: protocol,
                         };
+                        // To eliminate duplicates remove already exiting public port if any
+                        svc.body.spec.ports = svc.body.spec.ports.filter(
+                            (svcPort) => svcPort.port.toString() !== portNumber.toString()
+                        );
                         svc.body.spec.ports.push(newPort);
                         await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
                     }
@@ -2189,6 +2193,12 @@ export class ResourceManager {
                             hostPort: portNumber,
                             protocol: protocol,
                         };
+
+                        // To eliminate duplicates remove already exiting public port if any
+                        dply.body.spec.template.spec.containers[0].ports =
+                            dply.body.spec.template.spec.containers[0].ports.filter(
+                                (entry) => entry.containerPort.toString() !== portNumber.toString()
+                            );
                         dply.body.spec.template.spec.containers[0].ports.push(newContainerPort);
                         await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
                     }
@@ -2219,7 +2229,9 @@ export class ResourceManager {
                     if (service.metadata.name.includes("ingress-nginx-controller")) {
                         const svcName = service.metadata.name;
                         const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
-                        svc.body.spec.ports = svc.body.spec.ports.filter((svcPort) => svcPort.port !== portNumber);
+                        svc.body.spec.ports = svc.body.spec.ports.filter(
+                            (svcPort) => svcPort.port.toString() !== portNumber.toString()
+                        );
                         await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
                     }
                 });
@@ -2233,7 +2245,7 @@ export class ResourceManager {
                         const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
                         dply.body.spec.template.spec.containers[0].ports =
                             dply.body.spec.template.spec.containers[0].ports.filter(
-                                (contPort) => contPort.containerPort !== portNumber
+                                (contPort) => contPort.containerPort.toString() !== portNumber.toString()
                             );
                         await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
                     }

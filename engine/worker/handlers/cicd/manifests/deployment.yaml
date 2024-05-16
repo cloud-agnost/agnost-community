@@ -21,7 +21,8 @@ spec:
     spec:
       containers:
       - name: dummy-container
-        image: busybox
+        image: traefik/whoami
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 4000
         resources:
