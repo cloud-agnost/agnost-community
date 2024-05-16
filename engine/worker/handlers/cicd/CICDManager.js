@@ -543,12 +543,18 @@ export class CICDManager {
 
     // Definition is networking
     async updateIngress(definition, isContainerPortChanged, name, namespace) {
+        console.log("****here1", definition, isContainerPortChanged, name, namespace);
         if (definition.ingress.enabled) {
+            console.log("****here2");
             const payload = await getK8SResource("Ingress", `${name}-cluster`, namespace);
+            console.log("****here3", payload);
             if (!payload) {
+                console.log("****here4", definition, name, namespace);
                 await this.createIngress(definition, name, namespace);
+                console.log("****here5");
                 return;
             } else if (isContainerPortChanged) {
+                console.log("****here6");
                 // Update the ingress
                 const { spec } = payload.body;
                 spec.rules = spec.rules.map((entry) => {
@@ -561,6 +567,7 @@ export class CICDManager {
                 });
 
                 const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
+                console.log("****here7", JSON.stringify(payload.body, null, 2));
                 await k8sNetworkingApi.replaceNamespacedIngress(
                     `${name}-cluster`,
                     namespace,
@@ -576,7 +583,9 @@ export class CICDManager {
                 console.log(`Ingress '${name}-cluster' in namespace '${namespace}' updated successfully`);
             }
         } else {
+            console.log("****here8");
             await this.deleteIngress(`${name}-cluster`, namespace);
+            console.log("****here9");
             return;
         }
     }
