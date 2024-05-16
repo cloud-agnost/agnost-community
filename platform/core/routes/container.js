@@ -116,6 +116,18 @@ router.post(
 				{ session, cacheKey: containerId }
 			);
 
+			// Create the container in the Kubernetes cluster
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container",
+				{ container, environment, action: "create" },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
 			// Commit the database transaction
 			await cntrCtrl.commit(session);
 
@@ -193,6 +205,11 @@ router.put(
 
 		try {
 			const { org, project, environment, container, body, user } = req;
+			// If there already a port number assignment then use it otherwise generate a new one
+			body.networking.tcpProxy.publicPort =
+				container.networking.tcpProxy.publicPort ??
+				(await helper.getNewTCPPortNumber());
+
 			const updatedContainer = await cntrCtrl.updateOneById(
 				container._id,
 				{
@@ -203,6 +220,27 @@ router.put(
 				{
 					session,
 					cacheKey: container._id,
+				}
+			);
+
+			// Deletes the container in the Kubernetes cluster
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container",
+				{
+					container: updatedContainer,
+					environment,
+					changes: {
+						containerPort:
+							container.networking.containerPort !==
+							updatedContainer.networking.containerPort,
+					},
+					action: "update",
+				},
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
 				}
 			);
 
@@ -254,10 +292,22 @@ router.delete(
 
 		try {
 			const { org, project, environment, container, body, user } = req;
-			const updatedContainer = await cntrCtrl.deleteOneById(container._id, {
+			await cntrCtrl.deleteOneById(container._id, {
 				session,
 				cacheKey: container._id,
 			});
+
+			// Deletes the container in the Kubernetes cluster
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container",
+				{ container, environment, action: "delete" },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
 
 			// Commit the database transaction
 			await cntrCtrl.commit(session);

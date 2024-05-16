@@ -14,7 +14,6 @@ import { useMemo } from 'react';
 import { Range } from 'react-date-range';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
-import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
 
 interface VersionLogChartsProps {
@@ -55,7 +54,7 @@ export default function VersionLogCharts({ type, refetch }: VersionLogChartsProp
 			path: `${pathname}?${searchParams.toString()}`,
 		});
 	}
-	const handleClickChart = (e: CategoricalChartState) => {
+	const handleClickChart = (e: any) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
 			const diff = differenceInSeconds(new Date(currentData.end), new Date(currentData.start));

@@ -71,4 +71,24 @@ router.post("/env/delete", checkContentType, authAccessToken, async (req, res) =
     }
 });
 
+/*
+@route      /v1/cicd/container
+@method     POST
+@desc       Manages the container deployment, update or deletion
+@access     public
+*/
+router.post("/container", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        return res.json();
+
+        const cicdManager = new CICDManager();
+        // The body of the request is and environment object
+        const result = await cicdManager.manageContainer(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        console.log("***error***", error);
+        helper.handleError(req, res, error);
+    }
+});
+
 export default router;

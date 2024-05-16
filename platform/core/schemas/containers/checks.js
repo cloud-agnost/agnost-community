@@ -251,15 +251,6 @@ export const checkNetworking = (containerType, actionType) => {
           .isBoolean()
           .withMessage(t("Not a valid boolean value"))
           .toBoolean(),
-        body("networking.tcpProxy.publicPort")
-          .if((value, { req }) => req.body.tcpProxy.enabled === true)
-          .trim()
-          .notEmpty()
-          .withMessage(t("Required field, cannot be left empty"))
-          .bail()
-          .isInt({ min: 1, max: 65535 })
-          .withMessage("Port must be an integer between 1 and 65535")
-          .toInt(), // Converts the port number to an integer
       ];
     default:
       return [];
@@ -623,14 +614,6 @@ export const checkStorageConfig = (containerType, actionType) => {
         "Not a valid mount path. Mount paths include alphanumeric characters, underscore, hyphens, and additional slashes."
       ) // Remove trailing slashes using custom sanitizer
       .customSanitizer((value) => value.replace(/\/+$/, "")),
-    body("storageConfig.reclaimPolicy")
-      .if((value, { req }) => req.body.storageConfig.enabled === true)
-      .trim()
-      .notEmpty()
-      .withMessage(t("Required field, cannot be left empty"))
-      .bail()
-      .isIn(["retain", "delete"])
-      .withMessage(t("Unsupported storage reclaim policy")),
     body("storageConfig.accessModes")
       .if((value, { req }) => req.body.storageConfig.enabled === true)
       .isArray()
@@ -659,7 +642,34 @@ export const checkStorageConfig = (containerType, actionType) => {
       .withMessage(t("Required field, cannot be left empty"))
       .bail()
       .isIn(["mebibyte", "gibibyte"])
-      .withMessage(t("Unsupported storage size unit")),
+      .withMessage(t("Unsupported storage size unit"))
+      .bail()
+      .if((value, { req }) => actionType === "update")
+      .custom((value, { req }) => {
+        const existingSize = req.container.storageConfig.size;
+        const existingSizeType = req.container.storageConfig.sizeType;
+        const existingSizeInMiB =
+          existingSizeType === "mebibyte"
+            ? existingSize
+            : Math.round(existingSize * 1024);
+        // Calculate size in mebibytes
+        const newSize = req.body.storageConfig.size;
+        const newSizeType = req.body.storageConfig.sizeType;
+        const newSizeInMiB =
+          newSizeType === "mebibyte" ? newSize : Math.round(newSize * 1024);
+
+        if (newSizeInMiB < existingSizeInMiB) {
+          throw new AgnostError(
+            t(
+              "Storage size cannot be decreased. Current size is %s %s",
+              existingSize,
+              existingSizeType
+            )
+          );
+        }
+
+        return true;
+      }),
     body("storageConfig.size")
       .if((value, { req }) => req.body.storageConfig.enabled === true)
       .notEmpty()
