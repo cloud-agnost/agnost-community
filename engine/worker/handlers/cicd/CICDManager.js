@@ -447,7 +447,7 @@ export class CICDManager {
         console.log("****hereA", definition, name, namespace);
         // Get cluster info from the database
         const cluster = await getClusterRecord();
-        console.log("****hereB", JSON.stringify(cluster, null, 2);
+        console.log("****hereB", JSON.stringify(cluster, null, 2));
 
         const ingress = {
             apiVersion: "networking.k8s.io/v1",
@@ -1486,7 +1486,7 @@ async function initializeClusterCertificateIssuer() {
 
         return;
     } catch (err) {
-        console.log('***initializeClusterCertificateIssuer', err);
+        console.log("***initializeClusterCertificateIssuer", err);
         // If we get a 404, we need to create the issuer
         if (err.statusCode === 404) {
             const clusterIssuer = {
