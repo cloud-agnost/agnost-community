@@ -444,8 +444,10 @@ export class CICDManager {
 
     // Definition is networking
     async createIngress(definition, name, namespace) {
+        console.log("****hereA", definition, name, namespace);
         // Get cluster info from the database
         const cluster = await getClusterRecord();
+        console.log("****hereB", JSON.stringify(cluster, null, 2);
 
         const ingress = {
             apiVersion: "networking.k8s.io/v1",
@@ -484,6 +486,8 @@ export class CICDManager {
                 ],
             },
         };
+
+        console.log("****hereC");
 
         // If cluster has SSL settings and custom domains then also add these to the API server ingress
         if (cluster) {
@@ -1482,6 +1486,7 @@ async function initializeClusterCertificateIssuer() {
 
         return;
     } catch (err) {
+        console.log('***initializeClusterCertificateIssuer', err);
         // If we get a 404, we need to create the issuer
         if (err.statusCode === 404) {
             const clusterIssuer = {
@@ -1489,7 +1494,6 @@ async function initializeClusterCertificateIssuer() {
                 kind: "ClusterIssuer",
                 metadata: {
                     name: "letsencrypt-clusterissuer",
-                    namespace: agnostNamespace,
                 },
                 spec: {
                     acme: {
@@ -1510,10 +1514,9 @@ async function initializeClusterCertificateIssuer() {
                 },
             };
 
-            await k8sCustomObjectApi.createNamespacedCustomObject(
+            await k8sCustomObjectApi.createClusterCustomObject(
                 "cert-manager.io",
                 "v1",
-                agnostNamespace,
                 "clusterissuers",
                 clusterIssuer
             );
