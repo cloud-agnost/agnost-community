@@ -658,7 +658,7 @@ router.post(
 			];
 
 			// Get all container ingresses that will be impacted
-			const containers = await cntrCtrl.getManyByQuery(
+			let containers = await cntrCtrl.getManyByQuery(
 				{
 					"networking.ingress.enabled": true,
 				},
@@ -746,7 +746,7 @@ router.delete(
 			];
 
 			// Get all container ingresses that will be impacted
-			const containers = await cntrCtrl.getManyByQuery(
+			let containers = await cntrCtrl.getManyByQuery(
 				{
 					"networking.ingress.enabled": true,
 				},
@@ -870,7 +870,7 @@ router.put(
 			];
 
 			// Get all container ingresses that will be impacted
-			const containers = await cntrCtrl.getManyByQuery(
+			let containers = await cntrCtrl.getManyByQuery(
 				{
 					$or: [
 						{ "networking.ingress.enabled": true },
