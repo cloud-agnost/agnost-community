@@ -348,9 +348,46 @@ router.delete(
 );
 
 /*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/pods
+@method     GET
+@desc       Returns container pods
+@access     private
+*/
+router.get(
+	"/:containerId/pods",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/pods",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/events
 @method     GET
-@desc       Returns the list of container events
+@desc       Returns container events
 @access     private
 */
 router.get(
@@ -365,7 +402,19 @@ router.get(
 	authorizeProjectAction("project.container.view"),
 	async (req, res) => {
 		try {
-			res.json();
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/events",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -375,7 +424,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/logs
 @method     GET
-@desc       Returns the list of container events
+@desc       Returns container logs
 @access     private
 */
 router.get(
@@ -390,7 +439,19 @@ router.get(
 	authorizeProjectAction("project.container.view"),
 	async (req, res) => {
 		try {
-			res.json();
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/logs",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
 		} catch (err) {
 			handleError(req, res, err);
 		}

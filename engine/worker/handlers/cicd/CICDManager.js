@@ -77,6 +77,127 @@ export class CICDManager {
         return { status: "success" };
     }
 
+    // Payload includes container info and environment info
+    async getContainerPods({ container, environment }) {
+        try {
+            const { body } = await k8sCoreApi.listNamespacedPod(environment.iid);
+            const pods = body.items
+                .filter((pod) => pod.metadata.labels.app === container.iid)
+                .map((entry) => {
+                    const totalContainers = entry.spec.containers.length;
+                    const readyContainers = entry.status.containerStatuses
+                        ? entry.status.containerStatuses.filter((cs) => cs.ready).length
+                        : 0;
+                    const restarts = entry.status.containerStatuses
+                        ? entry.status.containerStatuses.reduce((acc, cs) => acc + cs.restartCount, 0)
+                        : 0;
+
+                    return {
+                        name: entry.metadata.name,
+                        status: entry.status.phase,
+                        totalContainers: totalContainers,
+                        readyContainers: readyContainers,
+                        restarts: restarts,
+                        createdOn: entry.metadata.creationTimestamp,
+                        conditions: entry.status.conditions.sort((a, b) => a.lastTransitionTime - b.lastTransitionTime),
+                    };
+                })
+                .sort((a, b) => {
+                    // Handle cases where lastTimestamp might not be present
+                    const dateA = a.createdOn ? new Date(a.createdOn) : 0;
+                    const dateB = b.createdOn ? new Date(b.createdOn) : 0;
+                    return dateB - dateA; // Descending order
+                });
+            return { status: "success", payload: pods };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot get pods of the ${container.type} named '${container.name}''. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    // Payload includes container info and environment info
+    async getContainerEvents({ container, environment }) {
+        try {
+            const { body } = await k8sCoreApi.listNamespacedEvent(environment.iid);
+            const events = body.items
+                .filter((event) => event.involvedObject.name.includes(container.iid))
+                .map((entry) => {
+                    return {
+                        name: entry.involvedObject.name,
+                        message: entry.message,
+                        reason: entry.reason,
+                        firstSeen: entry.firstTimestamp,
+                        lastSeen: entry.lastTimestamp,
+                        count: entry.count,
+                        kind: entry.involvedObject.kind,
+                        type: entry.type,
+                    };
+                })
+                .sort((a, b) => {
+                    // Handle cases where lastSeen might not be present
+                    const dateA = a.lastSeen ? new Date(a.lastSeen) : 0;
+                    const dateB = b.lastSeen ? new Date(b.lastSeen) : 0;
+                    return dateB - dateA; // Descending order
+                });
+            return { status: "success", payload: events };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot get pods of the ${container.type} named '${container.name}''. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    // Payload includes container info and environment info
+    async getContainerLogs({ container, environment }) {
+        try {
+            const { status, payload } = await this.getContainerPods({ container, environment });
+            if (status === "error") return { pods: [], logs: [] };
+
+            // For each pod we need to get the logs
+            const logPromises = payload.map((pod) => {
+                const podName = pod.name;
+                return k8sCoreApi
+                    .readNamespacedPodLog(podName, environment.iid)
+                    .then((logs) => ({
+                        podName: podName,
+                        logs: logs.body ? logs.body.split("\n") : [],
+                    }))
+                    .catch((error) => ({
+                        podName: podName,
+                        error: "Failed to fetch logs",
+                        details: error.message,
+                    }));
+            });
+
+            const logsResults = await Promise.all(logPromises);
+
+            return { status: "success", payload: { pods: payload, logs: logsResults } };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot get pods of the ${container.type} named '${container.name}''. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
     // Payload includes container info, environment info and action
     async manageContainer(payload) {
         try {

@@ -80,11 +80,61 @@ router.post("/env/delete", checkContentType, authAccessToken, async (req, res) =
 router.post("/container", checkContentType, authAccessToken, async (req, res) => {
     try {
         const cicdManager = new CICDManager();
-        // The body of the request is and environment object
+        // The body of the request is container and environment objects, changes and action type
         const result = await cicdManager.manageContainer(req.body);
         res.status(result.status === "success" ? 200 : 400).json(result);
     } catch (error) {
-        console.log("***error***", error);
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /v1/cicd/container/pods
+@method     POST
+@desc       Returns the pods of the container
+@access     public
+*/
+router.post("/container/pods", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is container and environment objects
+        const result = await cicdManager.getContainerPods(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /v1/cicd/container/events
+@method     POST
+@desc       Returns the events of the container
+@access     public
+*/
+router.post("/container/events", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is container and environment objects
+        const result = await cicdManager.getContainerEvents(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /v1/cicd/container/logs
+@method     POST
+@desc       Returns the logs of the container
+@access     public
+*/
+router.post("/container/logs", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is container and environment objects
+        const result = await cicdManager.getContainerLogs(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
         helper.handleError(req, res, error);
     }
 });
