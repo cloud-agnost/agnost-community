@@ -1512,9 +1512,13 @@ async function initializeClusterCertificateIssuer() {
  */
 export async function addClusterCustomDomain(containeriid, namespace, domainName, containerPort, enforceSSLAccess) {
     try {
+        console.log("*****here1", containeriid, namespace, domainName, containerPort, enforceSSLAccess);
         await initializeClusterCertificateIssuer();
+        console.log("*****here2");
 
         const ingress = await getK8SResource("Ingress", `${containeriid}-cluster`, namespace);
+
+        console.log("*****here3", ingress);
 
         if (enforceSSLAccess) {
             ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
@@ -1526,6 +1530,8 @@ export async function addClusterCustomDomain(containeriid, namespace, domainName
 
         ingress.metadata.annotations["cert-manager.io/cluster-issuer"] = "letsencrypt-clusterissuer";
         ingress.metadata.annotations["kubernetes.io/ingress.class"] = "nginx";
+
+        console.log("*****here4");
 
         if (ingress.body.spec.tls) {
             ingress.body.spec.tls.push({
@@ -1560,6 +1566,8 @@ export async function addClusterCustomDomain(containeriid, namespace, domainName
             },
         });
 
+        console.log("*****here5", JSON.stringify(ingress.body, null, 2));
+
         const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
         await k8sNetworkingApi.patchNamespacedIngress(
             `${containeriid}-cluster`,
@@ -1573,6 +1581,7 @@ export async function addClusterCustomDomain(containeriid, namespace, domainName
             requestOptions
         );
     } catch (err) {
+        console.log("*****here6", err);
         logger.error(`Cannot add custom domain '${domainName}' to ingress '${containeriid}-cluster'`, { details: err });
     }
 }
