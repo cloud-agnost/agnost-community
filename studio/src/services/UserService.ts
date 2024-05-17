@@ -22,11 +22,14 @@ export default class UserService {
 		return (await axios.post(`${this.url}/reset-pwd/${token}`, { newPassword })).data;
 	}
 
-	static async acceptInvite(token: string) {
+	static async appAcceptInvite(token: string) {
 		return (await axios.post(`${this.url}/app-invite-accept?token=${token}`, { token })).data;
 	}
 	static async orgAcceptInvite(token: string) {
 		return (await axios.post(`${this.url}/org-invite-accept?token=${token}`, { token })).data;
+	}
+	static async projectAcceptInvite(token: string) {
+		return (await axios.post(`${this.url}/project-invite-accept?token=${token}`, { token })).data;
 	}
 
 	static async changeName(name: string): Promise<User> {

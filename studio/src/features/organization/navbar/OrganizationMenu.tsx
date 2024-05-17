@@ -8,28 +8,27 @@ import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 export default function OrganizationMenu() {
 	const { pathname } = useLocation();
-	const { cluster, getClusterInfo } = useClusterStore();
+	const { cluster, checkCICDStatus, isCiCdEnabled } = useClusterStore();
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (pathname) {
 			if (pathname.split('/').length <= 3) {
-				navigate(cluster.cicdEnabled ? 'projects' : 'apps');
+				navigate(isCiCdEnabled ? 'projects' : 'apps');
 			}
 		}
-	}, [pathname, cluster.cicdEnabled]);
+	}, [pathname, isCiCdEnabled]);
 
 	useQuery({
-		queryFn: getClusterInfo,
-		queryKey: ['getClusterInfo'],
-		enabled: !_.isNil(cluster),
+		queryFn: checkCICDStatus,
+		queryKey: ['checkCICDStatus'],
 	});
 
 	const menuItems = useMemo(() => {
-		if (cluster.cicdEnabled) {
+		if (isCiCdEnabled) {
 			return ORGANIZATION_MENU_ITEMS;
 		}
 		return ORGANIZATION_MENU_ITEMS.slice(1);
-	}, [cluster.cicdEnabled]);
+	}, [isCiCdEnabled]);
 
 	return (
 		<nav className='org-menu'>

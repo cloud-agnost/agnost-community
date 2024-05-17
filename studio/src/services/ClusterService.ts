@@ -20,6 +20,9 @@ export default class ClusterService {
 	static async canClusterSendEmail() {
 		return (await axios.get(`${this.url}/smtp-status`)).data;
 	}
+	static async checkCICDStatus() {
+		return (await axios.get(`${this.url}/cicd-status`)).data;
+	}
 
 	static async getSMTPSettings() {
 		return (await axios.get(`${this.url}/smtp`)).data;

@@ -37,6 +37,13 @@ export default function ProjectInviteMember() {
 			handleCloseDrawer();
 		},
 		onError: (err: APIError) => {
+			if (err.fields === undefined) {
+				toast({
+					title: err.details,
+					action: 'error',
+				});
+				return;
+			}
 			err.fields?.forEach((field) => {
 				form.setError(`member.${field.param.replace(/\[|\]/g, '')}` as any, {
 					type: 'custom',
@@ -49,7 +56,7 @@ export default function ProjectInviteMember() {
 	const onSubmit = (data: z.infer<typeof InviteMemberSchema>) => {
 		inviteMutate({
 			orgId,
-			appId: project?._id as string,
+			projectId: project?._id,
 			members: data.member
 				.filter((item) => item.email !== '' && item.role !== '')
 				.map((member) => ({
@@ -93,10 +100,7 @@ export default function ProjectInviteMember() {
 					) : (
 						<EmptyState title={t('project.invite.email_disabled')} type='invitation'>
 							<p className='text-subtle'>{t('project.invite.email_disabled')}</p>
-							<Link
-								to={`/organization/${orgId}/profile/cluster-management`}
-								className='text-blue-600 hover:underline'
-							>
+							<Link to={`/profile/cluster-management`} className='text-blue-600 hover:underline'>
 								{t('project.invite.configure')}
 							</Link>
 						</EmptyState>
