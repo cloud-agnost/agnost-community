@@ -347,4 +347,54 @@ router.delete(
 	}
 );
 
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/events
+@method     GET
+@desc       Returns the list of container events
+@access     private
+*/
+router.get(
+	"/:containerId/events",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			res.json();
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/logs
+@method     GET
+@desc       Returns the list of container events
+@access     private
+*/
+router.get(
+	"/:containerId/logs",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			res.json();
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
 export default router;
