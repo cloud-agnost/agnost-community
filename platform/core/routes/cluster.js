@@ -665,6 +665,8 @@ router.post(
 				{ lookup: "environmentId" }
 			);
 
+			console.log("***containers", containers);
+
 			containers = containers.map((entry) => {
 				return {
 					containeriid: entry.iid,
@@ -752,6 +754,8 @@ router.delete(
 				},
 				{ lookup: "environmentId" }
 			);
+
+			console.log("***containers", containers);
 
 			containers = containers.map((entry) => {
 				return { containeriid: entry.iid, namespace: entry.environmentId.iid };
