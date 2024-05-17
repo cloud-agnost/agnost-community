@@ -426,7 +426,11 @@ export const checkPodConfig = (containerType, actionType) => {
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
 			.bail()
-			.isIn(["Always", "OnFailure", "Never"])
+			.isIn(
+				containerType === "cron job"
+					? ["OnFailure", "Never"]
+					: ["Always", "OnFailure", "Never"]
+			)
 			.withMessage(t("Unsupported restart policy")),
 		body("podConfig.cpuRequestType")
 			.trim()
@@ -1199,6 +1203,20 @@ export const checkStatefulSetConfig = (containerType, actionType) => {
 			.isInt({ min: 1, max: 100 })
 			.withMessage("Desired replicas must be an integer between 1 and 10")
 			.toInt(), // Converts the replica number to an integer
+		body("statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["Retain", "Delete"])
+			.withMessage(t("Unsupported storage retention policy")),
+		body("statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isIn(["Retain", "Delete"])
+			.withMessage(t("Unsupported storage retention policy")),
 	];
 };
 

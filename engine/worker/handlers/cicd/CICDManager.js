@@ -8,7 +8,6 @@ import yaml from "js-yaml";
 
 import { fileURLToPath } from "url";
 import { getDBClient } from "../../init/db.js";
-import { get } from "http";
 
 // Kubernetes client configuration
 var dbClient = null;
@@ -82,7 +81,10 @@ export class CICDManager {
         try {
             const { body } = await k8sCoreApi.listNamespacedPod(environment.iid);
             const pods = body.items
-                .filter((pod) => pod.metadata.labels.app === container.iid)
+                .filter((pod) => {
+                    if (container.type === "cron job") return pod.metadata.labels["job-name"]?.includes(container.iid);
+                    else return pod.metadata.labels.app === container.iid;
+                })
                 .map((entry) => {
                     const totalContainers = entry.spec.containers.length;
                     const readyContainers = entry.status.containerStatuses
@@ -92,9 +94,42 @@ export class CICDManager {
                         ? entry.status.containerStatuses.reduce((acc, cs) => acc + cs.restartCount, 0)
                         : 0;
 
+                    const containerStates = entry.status.containerStatuses
+                        ? entry.status.containerStatuses.map((cs) => {
+                              if (cs.state.running) return { state: "Running", startedAt: cs.state.running.startedAt };
+                              else if (cs.state.waiting)
+                                  return {
+                                      state: "Waiting",
+                                      reason: cs.state.waiting.reason,
+                                      message: cs.state.waiting.message,
+                                  };
+                              else if (cs.state.terminated)
+                                  return {
+                                      state: "Terminated",
+                                      reason: cs.state.terminated.reason,
+                                      message: cs.state.terminated.message,
+                                  };
+                              else return { state: "Unknown" };
+                          })
+                        : [];
+
+                    let status = "Unknown";
+                    if (entry.status.phase === "Pending") status = "Pending";
+                    else if (entry.status.phase === "Succeeded") status = "Succeeded";
+                    else if (entry.status.phase === "Failed") {
+                        status = "Failed";
+                    } else if (entry.status.phase === "Running") {
+                        if (containerStates.every((entry) => entry.state === "Running")) status = "Running";
+                        else if (containerStates.some((entry) => entry.state === "Waiting"))
+                            status = containerStates.find((entry) => entry.state === "Waiting").reason;
+                        else if (containerStates.some((entry) => entry.state === "Terminated"))
+                            status = containerStates.find((entry) => entry.state === "Terminated").reason;
+                    }
+
                     return {
                         name: entry.metadata.name,
-                        status: entry.status.phase,
+                        status: status,
+                        states: containerStates,
                         totalContainers: totalContainers,
                         readyContainers: readyContainers,
                         restarts: restarts,
@@ -203,6 +238,10 @@ export class CICDManager {
         try {
             if (payload.container.type === "deployment") {
                 await this.manageDeployment(payload);
+            } else if (payload.container.type === "stateful set") {
+                await this.manageStatefulSet(payload);
+            } else if (payload.container.type === "cron job") {
+                await this.manageCronJob(payload);
             }
 
             return { status: "success" };
@@ -217,6 +256,207 @@ export class CICDManager {
                 stack: err.stack,
             };
         }
+    }
+
+    async manageCronJob({ container, environment, changes, action }) {
+        const name = container.iid;
+        const namespace = environment.iid;
+        if (action === "create") {
+            await this.createPVC(container.storageConfig, name, namespace);
+            await this.createCronJob(container, namespace);
+            await this.createTektonPipeline();
+        } else if (action === "update") {
+            await this.updateCronJob(container, namespace);
+            await this.updatePVC(container.storageConfig, name, namespace);
+        } else if (action === "delete") {
+            await this.deleteCronJob(name, namespace);
+            await this.deletePVC(name, namespace);
+            await this.deleteTektonPipeline();
+        }
+    }
+
+    // Definition is container
+    async updateCronJob(definition, namespace) {
+        const payload = await getK8SResource("CronJob", definition.iid, namespace);
+        const { metadata, spec } = payload.body;
+
+        // Configure schedule timezone and concurrency policy
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.schedule = definition.cronJobConfig.schedule;
+        spec.timeZone = definition.cronJobConfig.timeZone;
+        spec.concurrencyPolicy = definition.cronJobConfig.concurrencyPolicy;
+        spec.suspend = definition.cronJobConfig.suspend;
+        spec.successfulJobsHistoryLimit = definition.cronJobConfig.successfulJobsHistoryLimit;
+        spec.failedJobsHistoryLimit = definition.cronJobConfig.failedJobsHistoryLimit;
+
+        // Configure restart policy
+        spec.jobTemplate.spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.jobTemplate.spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container volume mounts
+        const { storageConfig } = definition;
+        if (storageConfig.enabled) {
+            container.volumeMounts = [
+                {
+                    name: "storage",
+                    mountPath: storageConfig.mountPath,
+                },
+            ];
+
+            spec.jobTemplate.spec.template.spec.volumes = [
+                {
+                    name: "storage",
+                    persistentVolumeClaim: {
+                        claimName: definition.iid,
+                    },
+                },
+            ];
+        } else {
+            delete container.volumeMounts;
+            delete spec.jobTemplate.spec.template.spec.volumes;
+        }
+
+        await k8sBatchApi.replaceNamespacedCronJob(namespace, resource);
+        console.log(`CronJob '${definition.iid}' in namespace '${namespace}' updated successfully`);
+    }
+
+    async manageStatefulSet({ container, environment, changes, action }) {
+        const name = container.iid;
+        const namespace = environment.iid;
+        if (action === "create") {
+            await this.createService(container.networking, name, namespace, true);
+            await this.createStatefulSet(container, namespace);
+            await this.createTektonPipeline();
+        } else if (action === "update") {
+            await this.updateStatefulSet(container, namespace);
+            await this.updateService(container.networking, name, namespace);
+            await this.updateIngress(container.networking, changes.containerPort, name, namespace);
+            await this.updateCustomDomainIngress(
+                container.networking,
+                changes.containerPort,
+                changes.customDomain,
+                name,
+                namespace
+            );
+            await this.updateTCPProxy(container.networking, changes.containerPort, name, namespace);
+            await sleep(2000);
+            await this.updateStatefulSetPVC(container.storageConfig, container.statefulSetConfig, name, namespace);
+        } else if (action === "delete") {
+            await this.deleteStatefulSet(name, namespace);
+            await this.deleteService(name, namespace);
+            await this.deleteIngress(`${name}-cluster`, namespace);
+            await this.deleteCustomDomainIngress(`${name}-domain`, namespace);
+            await this.deleteTCPProxy(
+                container.networking.tcpProxy.enabled ? container.networking.tcpProxy.publicPort : null
+            );
+            await this.deleteTektonPipeline();
+            await this.deleteStatefulSetPVC(container.storageConfig, container.statefulSetConfig, name, namespace);
+        }
+    }
+
+    // Definition is container
+    async updateStatefulSet(definition, namespace) {
+        const payload = await getK8SResource("StatefulSet", definition.iid, namespace);
+        const { metadata, spec } = payload.body;
+
+        // Configure name, namespace and labels
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.replicas = definition.statefulSetConfig.desiredReplicas;
+        spec.serviceName = definition.iid;
+        spec.podManagementPolicy = definition.statefulSetConfig.podManagementPolicy;
+        spec.selector.matchLabels.app = definition.iid;
+        spec.template.metadata.labels.app = definition.iid;
+
+        // Configure restart policy
+        spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.ports[0].containerPort = definition.networking.containerPort;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container probes
+        const { startup, readiness, liveness } = definition.probes;
+        if (startup.enabled) container.startupProbe = getProbeConfig(startup);
+        else delete container.startupProbe;
+
+        if (readiness.enabled) container.readinessProbe = getProbeConfig(readiness);
+        else delete container.readinessProbe;
+
+        if (liveness.enabled) container.livenessProbe = getProbeConfig(liveness);
+        else delete container.livenessProbe;
+
+        // Configure container volume mounts, we cannot update persistent volume claims once they are created in a stateful set
+        const { storageConfig } = definition;
+        if (storageConfig.enabled) {
+            container.volumeMounts = [
+                {
+                    name: "storage",
+                    mountPath: storageConfig.mountPath,
+                },
+            ];
+
+            spec.persistentVolumeClaimRetentionPolicy = {
+                whenDeleted: definition.statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted,
+                whenScaled: definition.statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled,
+            };
+        } else {
+            delete container.volumeMounts;
+            delete spec.volumeClaimTemplates;
+            delete spec.persistentVolumeClaimRetentionPolicy;
+        }
+
+        await k8sAppsApi.replaceNamespacedStatefulSet(definition.iid, namespace, payload.body);
+        console.log(`StatefulSet '${definition.iid}' in namespace '${namespace}' updated successfully`);
     }
 
     async manageDeployment({ container, environment, changes, action }) {
@@ -516,11 +756,76 @@ export class CICDManager {
         console.log(`PVC '${name}' in namespace '${namespace}' updated successfully`);
     }
 
+    // Definition is storageConfig
+    async updateStatefulSetPVC(definition, statefulSetConfig, name, namespace) {
+        if (!definition.enabled) return;
+
+        // Get the list of PVCs in the namespace
+        const { body } = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+        // Filter the PVCs that belong to the stateful set
+        const pvcList = body.items.filter((pvc) => pvc.metadata.name.includes(name));
+        // For each PVC update the storage capacity
+        for (const pvc of pvcList) {
+            const { metadata, spec } = pvc;
+            let storageIndex = -1;
+            // Get the pod index from the PVC name
+            const lastPart = metadata.name.split("-").pop();
+            // Use a regular expression to find the last digit in the string
+            const match = lastPart.match(/\d$/);
+            if (match) {
+                // Convert the last digit to an integer
+                storageIndex = parseInt(match[0], 10);
+            }
+
+            if (
+                storageIndex > statefulSetConfig.desiredReplicas - 1 &&
+                statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled === "Delete"
+            ) {
+                await this.deletePVC(metadata.name, namespace);
+            } else {
+                // Configure volume capacity
+                spec.resources.requests.storage =
+                    definition.sizeType === "mebibyte" ? `${definition.size}Mi` : `${definition.size}Gi`;
+
+                try {
+                    // Update the PVC
+                    await k8sCoreApi.replaceNamespacedPersistentVolumeClaim(metadata.name, namespace, pvc);
+                    console.log(`PVC '${metadata.name}' in namespace '${namespace}' updated successfully`);
+                } catch (err) {
+                    console.error(
+                        `PVC '${metadata.name}' in namespace '${namespace}' cannot be updated. ${err.response?.body?.message}`
+                    );
+                }
+            }
+        }
+    }
+
+    // Definition is storageConfig
+    async deleteStatefulSetPVC(definition, statefulSetConfig, name, namespace) {
+        if (!definition.enabled || statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted === "Retain")
+            return;
+
+        // Get the list of PVCs in the namespace
+        const { body } = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+        // Filter the PVCs that belong to the stateful set
+        const pvcList = body.items.filter((pvc) => pvc.metadata.name.includes(name));
+        // For each PVC update the storage capacity
+        for (const pvc of pvcList) {
+            const { metadata } = pvc;
+            await this.deletePVC(metadata.name, namespace);
+        }
+    }
+
     // Definition is networking
-    async createService(definition, name, namespace) {
+    async createService(definition, name, namespace, isHeadless = false) {
         const manifest = fs.readFileSync(`${__dirname}/manifests/service.yaml`, "utf8");
         const resource = yaml.load(manifest);
         const { metadata, spec } = resource;
+
+        if (isHeadless) {
+            spec.clusterIP = "None";
+            delete spec.type;
+        }
 
         // Configure name, namespace and labels
         metadata.name = name;
@@ -886,6 +1191,174 @@ export class CICDManager {
         console.log(`Deployment '${definition.iid}' in namespace '${namespace}' created successfully`);
     }
 
+    // Definition is container
+    async createStatefulSet(definition, namespace) {
+        const manifest = fs.readFileSync(`${__dirname}/manifests/statefulSet.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure name, namespace and labels
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.replicas = definition.statefulSetConfig.desiredReplicas;
+        spec.serviceName = definition.iid;
+        spec.podManagementPolicy = definition.statefulSetConfig.podManagementPolicy;
+        spec.selector.matchLabels.app = definition.iid;
+        spec.template.metadata.labels.app = definition.iid;
+
+        // Configure restart policy
+        spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.ports[0].containerPort = definition.networking.containerPort;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container probes
+        const { startup, readiness, liveness } = definition.probes;
+        if (startup.enabled) container.startupProbe = getProbeConfig(startup);
+        else delete container.startupProbe;
+
+        if (readiness.enabled) container.readinessProbe = getProbeConfig(readiness);
+        else delete container.readinessProbe;
+
+        if (liveness.enabled) container.livenessProbe = getProbeConfig(liveness);
+        else delete container.livenessProbe;
+
+        // Configure container volume mounts
+        const { storageConfig } = definition;
+        if (storageConfig.enabled) {
+            container.volumeMounts = [
+                {
+                    name: "storage",
+                    mountPath: storageConfig.mountPath,
+                },
+            ];
+
+            spec.volumeClaimTemplates = [
+                {
+                    metadata: { name: "storage" },
+                    spec: {
+                        accessModes: storageConfig.accessModes,
+                        resources: {
+                            requests: {
+                                storage:
+                                    storageConfig.sizeType === "mebibyte"
+                                        ? `${storageConfig.size}Mi`
+                                        : `${storageConfig.size}Gi`,
+                            },
+                        },
+                    },
+                },
+            ];
+            spec.persistentVolumeClaimRetentionPolicy = {
+                whenDeleted: definition.statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted,
+                whenScaled: definition.statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled,
+            };
+        } else {
+            delete container.volumeMounts;
+            delete spec.volumeClaimTemplates;
+            delete spec.persistentVolumeClaimRetentionPolicy;
+        }
+
+        console.log("***here", JSON.stringify(resource, null, 2));
+        await k8sAppsApi.createNamespacedStatefulSet(namespace, resource);
+        console.log(`StatefulSet '${definition.iid}' in namespace '${namespace}' created successfully`);
+    }
+
+    // Definition is container
+    async createCronJob(definition, namespace) {
+        const manifest = fs.readFileSync(`${__dirname}/manifests/cronjob.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure schedule timezone and concurrency policy
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.schedule = definition.cronJobConfig.schedule;
+        spec.timeZone = definition.cronJobConfig.timeZone;
+        spec.concurrencyPolicy = definition.cronJobConfig.concurrencyPolicy;
+        spec.suspend = definition.cronJobConfig.suspend;
+        spec.successfulJobsHistoryLimit = definition.cronJobConfig.successfulJobsHistoryLimit;
+        spec.failedJobsHistoryLimit = definition.cronJobConfig.failedJobsHistoryLimit;
+        // Configure restart policy
+        spec.jobTemplate.spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.jobTemplate.spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container volume mounts
+        const { storageConfig } = definition;
+        if (storageConfig.enabled) {
+            container.volumeMounts = [
+                {
+                    name: "storage",
+                    mountPath: storageConfig.mountPath,
+                },
+            ];
+
+            spec.jobTemplate.spec.template.spec.volumes = [
+                {
+                    name: "storage",
+                    persistentVolumeClaim: {
+                        claimName: definition.iid,
+                    },
+                },
+            ];
+        } else {
+            delete container.volumeMounts;
+            delete spec.jobTemplate.spec.template.spec.volumes;
+        }
+
+        await k8sBatchApi.createNamespacedCronJob(namespace, resource);
+        console.log(`CronJob '${definition.iid}' in namespace '${namespace}' created successfully`);
+    }
+
     async deleteDeployment(name, namespace) {
         if (!(await getK8SResource("Deployment", name, namespace))) return;
 
@@ -896,6 +1369,30 @@ export class CICDManager {
             console.error(
                 `Error deleting deployment '${name}' in namespace ${namespace}. ${err.response?.body?.message}`
             );
+        }
+    }
+
+    async deleteStatefulSet(name, namespace) {
+        if (!(await getK8SResource("StatefulSet", name, namespace))) return;
+
+        try {
+            await k8sAppsApi.deleteNamespacedStatefulSet(name, namespace);
+            console.log(`StatefulSet '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(
+                `Error deleting StatefulSet '${name}' in namespace ${namespace}. ${err.response?.body?.message}`
+            );
+        }
+    }
+
+    async deleteCronJob(name, namespace) {
+        if (!(await getK8SResource("CronJob", name, namespace))) return;
+
+        try {
+            await k8sBatchApi.deleteNamespacedCronJob(name, namespace);
+            console.log(`CronJob '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting CronJob '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
         }
     }
 
@@ -1775,4 +2272,8 @@ export async function updateEnforceSSLAccessSettings(ingressName, namespace, enf
     } catch (err) {
         logger.error(`Cannot update ssl access settings of ingress '${ingressName}'`, { details: err });
     }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

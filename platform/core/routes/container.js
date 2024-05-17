@@ -48,8 +48,6 @@ router.get(
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
 
-			console.log(query, sort);
-
 			let containers = await cntrCtrl.getManyByQuery(query, {
 				sort,
 			});
@@ -210,12 +208,18 @@ router.put(
 				container.networking.tcpProxy.publicPort ??
 				(await helper.getNewTCPPortNumber());
 
-			// Once accesss mode for storage is set, it cannot be changed
-			if (
-				container.storageConfig.enabled === true &&
-				body.storageConfig.enabled === true
-			) {
+			// Once a stateful set is created, some storage properties cannot be changed
+			if (container.type === "stateful set") {
+				body.storageConfig.enabled = container.storageConfig.enabled;
 				body.storageConfig.accessModes = container.storageConfig.accessModes;
+			} else {
+				// Once accesss mode for storage is set, it cannot be changed
+				if (
+					container.storageConfig.enabled === true &&
+					body.storageConfig.enabled === true
+				) {
+					body.storageConfig.accessModes = container.storageConfig.accessModes;
+				}
 			}
 
 			const updatedContainer = await cntrCtrl.updateOneById(

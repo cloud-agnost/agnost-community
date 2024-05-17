@@ -321,7 +321,7 @@ export const ContainerModel = mongoose.model(
 					whenScaled: {
 						type: String,
 						enum: ["Retain", "Delete"],
-						default: "Retain",
+						default: "Delete",
 					},
 				},
 			},
@@ -344,11 +344,11 @@ export const ContainerModel = mongoose.model(
 				},
 				successfulJobsHistoryLimit: {
 					type: Number,
-					default: 10,
+					default: 3,
 				},
 				failedJobsHistoryLimit: {
 					type: Number,
-					default: 10,
+					default: 3,
 				},
 			},
 			knativeConfig: {
