@@ -3,6 +3,11 @@ import { authAccessToken } from "../middlewares/authAccessToken.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { manageResource } from "../init/queue.js";
 import { ResourceManager } from "../handlers/resources/resourceManager.js";
+import {
+    addClusterCustomDomain,
+    deleteClusterCustomDomains,
+    updateEnforceSSLAccessSettings,
+} from "../handlers/cicd/CICDManager.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -144,7 +149,7 @@ router.get("/cluster-ip", authAccessToken, async (req, res) => {
 */
 router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { domain, ingresses, enforceSSLAccess, container, containeriid } = req.body;
+        const { domain, ingresses, enforceSSLAccess, container, containeriid, containers } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
         const secretName = helper.getCertSecretName();
@@ -157,6 +162,18 @@ router.post("/cluster-domains-add", checkContentType, authAccessToken, async (re
                 container,
                 containeriid
             );
+        }
+
+        if (containers?.length > 0) {
+            for (const entry of containers) {
+                await addClusterCustomDomain(
+                    entry.containeriid,
+                    entry.namespace,
+                    domain,
+                    entry.containerPort,
+                    enforceSSLAccess
+                );
+            }
         }
 
         res.json();
@@ -173,12 +190,18 @@ router.post("/cluster-domains-add", checkContentType, authAccessToken, async (re
 */
 router.post("/cluster-domains-delete", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { domain, ingresses } = req.body;
+        const { domain, ingresses, containers } = req.body;
         const domains = Array.isArray(domain) ? domain : [domain];
 
         let manager = new ResourceManager(null);
         for (const ingress of ingresses) {
             await manager.deleteClusterCustomDomains(ingress, domains);
+        }
+
+        if (containers?.length > 0) {
+            for (const entry of containers) {
+                await deleteClusterCustomDomains(entry.containeriid, entry.namespace, domains);
+            }
         }
 
         res.json();
@@ -195,11 +218,29 @@ router.post("/cluster-domains-delete", checkContentType, authAccessToken, async 
 */
 router.post("/cluster-enforce-ssl", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { enforceSSLAccess, ingresses } = req.body;
+        const { enforceSSLAccess, ingresses, containers } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
         for (const ingress of ingresses) {
             await manager.updateEnforceSSLAccessSettings(ingress, enforceSSLAccess);
+        }
+
+        if (containers?.length > 0) {
+            for (const entry of containers) {
+                if (entry.ingress)
+                    await updateEnforceSSLAccessSettings(
+                        `${entry.containeriid}-cluster`,
+                        entry.namespace,
+                        enforceSSLAccess
+                    );
+
+                if (entry.customDomain)
+                    await updateEnforceSSLAccessSettings(
+                        `${entry.containeriid}-domain`,
+                        entry.namespace,
+                        enforceSSLAccess
+                    );
+            }
         }
 
         res.json();

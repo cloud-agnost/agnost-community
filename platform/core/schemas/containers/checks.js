@@ -606,7 +606,11 @@ export const checkStorageConfig = (containerType, actionType) => {
       ) // Remove trailing slashes using custom sanitizer
       .customSanitizer((value) => value.replace(/\/+$/, "")),
     body("storageConfig.accessModes")
-      .if((value, { req }) => req.body.storageConfig.enabled === true)
+      .if(
+        (value, { req }) =>
+          req.body.storageConfig.enabled === true &&
+          req.container.storageConfig.enabled === false
+      )
       .isArray()
       .withMessage(t("Access modes need to be an array of strings"))
       .custom((value, { req }) => {
@@ -619,7 +623,11 @@ export const checkStorageConfig = (containerType, actionType) => {
         return true;
       }),
     body("storageConfig.accessModes.*")
-      .if((value, { req }) => req.body.storageConfig.enabled === true)
+      .if(
+        (value, { req }) =>
+          req.body.storageConfig.enabled === true &&
+          req.container.storageConfig.enabled === false
+      )
       .trim()
       .notEmpty()
       .withMessage(t("Required field, cannot be left empty"))
@@ -635,7 +643,10 @@ export const checkStorageConfig = (containerType, actionType) => {
       .isIn(["mebibyte", "gibibyte"])
       .withMessage(t("Unsupported storage size unit"))
       .bail()
-      .if((value, { req }) => actionType === "update")
+      .if(
+        (value, { req }) =>
+          actionType === "update" && req.container.storageConfig.size > 0
+      )
       .custom((value, { req }) => {
         const existingSize = req.container.storageConfig.size;
         const existingSizeType = req.container.storageConfig.sizeType;
@@ -649,7 +660,11 @@ export const checkStorageConfig = (containerType, actionType) => {
         const newSizeInMiB =
           newSizeType === "mebibyte" ? newSize : Math.round(newSize * 1024);
 
-        if (newSizeInMiB < existingSizeInMiB) {
+        // When we disable storage we do not reset the size value for this reason we make this check only if storage is enabled already
+        if (
+          newSizeInMiB < existingSizeInMiB &&
+          req.container.storageConfig.enabled === true
+        ) {
           throw new AgnostError(
             t(
               "Storage size cannot be decreased. Current size is %s %s",

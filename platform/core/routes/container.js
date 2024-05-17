@@ -210,6 +210,14 @@ router.put(
 				container.networking.tcpProxy.publicPort ??
 				(await helper.getNewTCPPortNumber());
 
+			// Once accesss mode for storage is set, it cannot be changed
+			if (
+				container.storageConfig.enabled === true &&
+				body.storageConfig.enabled === true
+			) {
+				body.storageConfig.accessModes = container.storageConfig.accessModes;
+			}
+
 			const updatedContainer = await cntrCtrl.updateOneById(
 				container._id,
 				{
@@ -233,6 +241,9 @@ router.put(
 						containerPort:
 							container.networking.containerPort !==
 							updatedContainer.networking.containerPort,
+						customDomain:
+							container.networking.customDomain.domain !==
+							updatedContainer.networking.customDomain.domain,
 					},
 					action: "update",
 				},
@@ -331,6 +342,117 @@ router.delete(
 			);
 		} catch (err) {
 			await cntrCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/pods
+@method     GET
+@desc       Returns container pods
+@access     private
+*/
+router.get(
+	"/:containerId/pods",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/pods",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/events
+@method     GET
+@desc       Returns container events
+@access     private
+*/
+router.get(
+	"/:containerId/events",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/events",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/logs
+@method     GET
+@desc       Returns container logs
+@access     private
+*/
+router.get(
+	"/:containerId/logs",
+	checkContentType,
+	authSession,
+	validateGitOps,
+	validateOrg,
+	validateProject,
+	validateProjectEnvironment,
+	validateContainer,
+	authorizeProjectAction("project.container.view"),
+	async (req, res) => {
+		try {
+			const { container, environment } = req;
+			const result = await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/container/logs",
+				{ container, environment },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(result.data.payload);
+		} catch (err) {
 			handleError(req, res, err);
 		}
 	}
