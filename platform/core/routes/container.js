@@ -203,10 +203,56 @@ router.put(
 
 		try {
 			const { org, project, environment, container, body, user } = req;
-			// If there already a port number assignment then use it otherwise generate a new one
-			body.networking.tcpProxy.publicPort =
-				container.networking.tcpProxy.publicPort ??
-				(await helper.getNewTCPPortNumber());
+
+			// Remove the data that cannot be updated
+			delete body._id;
+			delete body.iid;
+			delete body.orgId;
+			delete body.projectId;
+			delete body.environmentId;
+			delete body.type;
+			delete body.createdBy;
+			delete body.createdAt;
+			delete body.updatedAt;
+			delete body.updatedBy;
+
+			// We do not support update for following values yet, make sure they are not updated
+			if (container.cronJobConfig && body.cronJobConfig) {
+				body.cronJobConfig.successfulJobsHistoryLimit =
+					container.cronJobConfig.successfulJobsHistoryLimit;
+				body.cronJobConfig.failedJobsHistoryLimit =
+					container.cronJobConfig.failedJobsHistoryLimit;
+			}
+			// We do not support update for following values yet, make sure they are not updated
+			if (container.statefulSetConfig && body.statefulSetConfig) {
+				body.statefulSetConfig.strategy = container.statefulSetConfig.strategy;
+				body.statefulSetConfig.rollingUpdate =
+					container.statefulSetConfig.rollingUpdate;
+				body.statefulSetConfig.revisionHistoryLimit =
+					container.statefulSetConfig.revisionHistoryLimit;
+				body.statefulSetConfig.podManagementPolicy =
+					container.statefulSetConfig.podManagementPolicy;
+			}
+
+			if (container.deploymentConfig && body.deploymentConfig) {
+				body.deploymentConfig.strategy = container.deploymentConfig.strategy;
+				body.deploymentConfig.rollingUpdate =
+					container.deploymentConfig.rollingUpdate;
+				body.deploymentConfig.revisionHistoryLimit =
+					container.deploymentConfig.revisionHistoryLimit;
+			}
+
+			if (container.knativeConfig && body.knativeConfig) {
+				body.knativeConfig.revisionHistoryLimit =
+					container.knativeConfig.revisionHistoryLimit;
+			}
+
+			if (container.type !== "cron job") {
+				// If there already a port number assignment then use it otherwise generate a new one
+				body.networking.tcpProxy.publicPort =
+					container.networking.tcpProxy.publicPort ??
+					(await helper.getNewTCPPortNumber());
+			}
 
 			// Once a stateful set is created, some storage properties cannot be changed
 			if (container.type === "stateful set") {

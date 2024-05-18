@@ -16,8 +16,7 @@ spec:
         spec:
           containers:
           - name: dummy
-            image: bash
-            command: ["bash", "-c", "echo 'Hello from Agnost!' && exit 1"]
+            image: alpine
             resources:
               requests:
                 memory: "64Mi"

@@ -214,6 +214,7 @@ export class CICDManager {
                         podName: podName,
                         error: "Failed to fetch logs",
                         details: error.message,
+                        logs: [],
                     }));
             });
 
@@ -278,6 +279,7 @@ export class CICDManager {
     // Definition is container
     async updateCronJob(definition, namespace) {
         const payload = await getK8SResource("CronJob", definition.iid, namespace);
+        console.log("***here", definition, namespace, payload);
         const { metadata, spec } = payload.body;
 
         // Configure schedule timezone and concurrency policy
@@ -342,7 +344,7 @@ export class CICDManager {
             delete spec.jobTemplate.spec.template.spec.volumes;
         }
 
-        await k8sBatchApi.replaceNamespacedCronJob(namespace, resource);
+        await k8sBatchApi.replaceNamespacedCronJob(definition.iid, namespace, payload.body);
         console.log(`CronJob '${definition.iid}' in namespace '${namespace}' updated successfully`);
     }
 
