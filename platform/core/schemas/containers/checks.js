@@ -235,6 +235,9 @@ export const checkNetworking = (containerType, actionType) => {
 						);
 					}),
 				body("networking.tcpProxy.enabled")
+					.if((value, { req }) =>
+						["deployment", "stateful set"].includes(req.container.type)
+					)
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -870,6 +873,9 @@ export const checkDeploymentConfig = (containerType, actionType) => {
 export const checkProbes = (containerType, actionType) => {
 	return [
 		body("probes.startup.enabled")
+			.if((value, { req }) =>
+				["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -878,7 +884,11 @@ export const checkProbes = (containerType, actionType) => {
 			.withMessage(t("Not a valid boolean value"))
 			.toBoolean(),
 		body("probes.startup.checkMechanism")
-			.if((value, { req }) => req.body.probes.startup.enabled === true)
+			.if(
+				(value, { req }) =>
+					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -886,7 +896,11 @@ export const checkProbes = (containerType, actionType) => {
 			.isIn(["exec", "httpGet", "tcpSocket"])
 			.withMessage(t("Unsupported startup probe check mechanism type")),
 		body("probes.startup.initialDelaySeconds")
-			.if((value, { req }) => req.body.probes.startup.enabled === true)
+			.if(
+				(value, { req }) =>
+					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -897,7 +911,11 @@ export const checkProbes = (containerType, actionType) => {
 			)
 			.toInt(),
 		body("probes.startup.periodSeconds")
-			.if((value, { req }) => req.body.probes.startup.enabled === true)
+			.if(
+				(value, { req }) =>
+					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -906,7 +924,11 @@ export const checkProbes = (containerType, actionType) => {
 			.withMessage("Period seconds need to be an integer between 1 and 600")
 			.toInt(),
 		body("probes.startup.timeoutSeconds")
-			.if((value, { req }) => req.body.probes.startup.enabled === true)
+			.if(
+				(value, { req }) =>
+					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -915,7 +937,11 @@ export const checkProbes = (containerType, actionType) => {
 			.withMessage("Timeout seconds need to be an integer between 1 and 600")
 			.toInt(),
 		body("probes.startup.failureThreshold")
-			.if((value, { req }) => req.body.probes.startup.enabled === true)
+			.if(
+				(value, { req }) =>
+					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type)
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -927,6 +953,7 @@ export const checkProbes = (containerType, actionType) => {
 			.if(
 				(value, { req }) =>
 					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type) &&
 					req.body.probes.startup.checkMechanism === "exec"
 			)
 			.trim()
@@ -936,6 +963,7 @@ export const checkProbes = (containerType, actionType) => {
 			.if(
 				(value, { req }) =>
 					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type) &&
 					req.body.probes.startup.checkMechanism === "tcpSocket"
 			)
 			.trim()
@@ -949,6 +977,7 @@ export const checkProbes = (containerType, actionType) => {
 			.if(
 				(value, { req }) =>
 					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type) &&
 					req.body.probes.startup.checkMechanism === "httpGet"
 			)
 			.trim()
@@ -967,6 +996,7 @@ export const checkProbes = (containerType, actionType) => {
 			.if(
 				(value, { req }) =>
 					req.body.probes.startup.enabled === true &&
+					["deployment", "stateful set"].includes(req.container.type) &&
 					req.body.probes.startup.checkMechanism === "httpGet"
 			)
 			.trim()
@@ -1292,12 +1322,12 @@ export const checkKnativeServiceConfig = (containerType, actionType) => {
 						throw new AgnostError(t("Concurrency target must be a number"));
 					}
 
-					const floatVal = parseFloat(value);
-					if (floatVal.toString() !== value.toString()) {
-						throw new AgnostError("Concurrency target must be a valid number");
+					const intVal = parseInt(value);
+					if (intVal.toString() !== value.toString()) {
+						throw new AgnostError("Concurrency target must be a valid integer");
 					}
 
-					if (floatVal < 0 || floatVal > 100) {
+					if (intVal < 0 || intVal > 100) {
 						throw new AgnostError(
 							"Concurrency target must be between 0 and 100"
 						);
@@ -1310,7 +1340,7 @@ export const checkKnativeServiceConfig = (containerType, actionType) => {
 
 					const intVal = parseInt(value);
 					if (intVal.toString() !== value.toString()) {
-						throw new AgnostError("RPS target must be a valid number");
+						throw new AgnostError("RPS target must be a valid integer");
 					}
 				} else if (req.body.knativeConfig.scalingMetric === "cpu") {
 					checkCPU(value, "millicores");
@@ -1320,6 +1350,14 @@ export const checkKnativeServiceConfig = (containerType, actionType) => {
 
 				return true;
 			}),
+		body("knativeConfig.initialScale")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isInt({ min: 1, max: 100 })
+			.withMessage("Initial scale must be an integer between 1 and 100")
+			.toInt(),
 		body("knativeConfig.minScale")
 			.trim()
 			.notEmpty()

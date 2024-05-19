@@ -243,6 +243,8 @@ export class CICDManager {
                 await this.manageStatefulSet(payload);
             } else if (payload.container.type === "cron job") {
                 await this.manageCronJob(payload);
+            } else if (payload.container.type === "knative service") {
+                await this.manageKnativeService(payload);
             }
 
             return { status: "success" };
@@ -257,6 +259,127 @@ export class CICDManager {
                 stack: err.stack,
             };
         }
+    }
+
+    async manageKnativeService({ container, environment, changes, action }) {
+        const name = container.iid;
+        const namespace = environment.iid;
+        if (action === "create") {
+            await this.createKnativeService(container, namespace);
+            await this.createTektonPipeline();
+        } else if (action === "update") {
+            await this.updateKnativeService(container, namespace);
+            await this.updateIngress(container.networking, changes.containerPort, name, namespace, true);
+            await this.updateCustomDomainIngress(
+                container.networking,
+                changes.containerPort,
+                changes.customDomain,
+                name,
+                namespace,
+                true
+            );
+        } else if (action === "delete") {
+            await this.deleteKnativeService(name, namespace);
+            await this.deleteIngress(`${name}-cluster`, namespace);
+            await this.deleteCustomDomainIngress(`${name}-domain`, namespace);
+            await this.deleteTektonPipeline();
+        }
+    }
+
+    // Definition is container
+    async updateKnativeService(definition, namespace) {
+        const payload = await getK8SResource("KnativeService", definition.iid, namespace);
+        const { metadata, spec } = payload.body;
+
+        // Configure name, namespace and labels
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.template.metadata.labels.app = definition.iid;
+
+        spec.template.metadata.annotations["autoscaling.knative.dev/class"] =
+            definition.knativeConfig.scalingMetric === "concurrency" || definition.knativeConfig.scalingMetric === "rps"
+                ? "kpa.autoscaling.knative.dev"
+                : "hpa.autoscaling.knative.dev";
+        spec.template.metadata.annotations["autoscaling.knative.dev/metric"] = definition.knativeConfig.scalingMetric;
+        // "Concurrency" specifies a percentage value, e.g. "70"
+        // "Requests per second" specifies an integer value,  e.g. "150"
+        // "CPU" specifies the integer value in millicore, e.g. "100m"
+        // "Memory" specifies the integer value in Mi, e.g. "75"
+        if (definition.knativeConfig.scalingMetric === "concurrency") {
+            delete spec.template.metadata.annotations["autoscaling.knative.dev/target"];
+            spec.template.metadata.annotations["autoscaling.knative.dev/target-utilization-percentage"] =
+                definition.knativeConfig.scalingMetricTarget.toString();
+        } else {
+            delete spec.template.metadata.annotations["autoscaling.knative.dev/target-utilization-percentage"];
+            spec.template.metadata.annotations["autoscaling.knative.dev/target"] =
+                definition.knativeConfig.scalingMetricTarget.toString();
+        }
+
+        spec.template.metadata.annotations[
+            "autoscaling.knative.dev/scale-down-delay"
+        ] = `${definition.knativeConfig.scaleDownDelay}s`;
+        spec.template.metadata.annotations[
+            "autoscaling.knative.dev/scale-to-zero-pod-retention-period"
+        ] = `${definition.knativeConfig.scaleToZeroPodRetentionPeriod}s`;
+
+        spec.template.metadata.annotations["autoscaling.knative.dev/initial-scale"] =
+            definition.knativeConfig.initialScale.toString();
+        spec.template.metadata.annotations["autoscaling.knative.dev/max-scale"] =
+            definition.knativeConfig.minScale.toString();
+        spec.template.metadata.annotations["autoscaling.knative.dev/min-scale"] =
+            definition.knativeConfig.maxScale.toString();
+
+        spec.template.spec.containerConcurrency = definition.knativeConfig.concurrency;
+
+        // Configure restart policy
+        spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.ports[0].containerPort = definition.networking.containerPort;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container probes
+        const { readiness, liveness } = definition.probes;
+        if (readiness.enabled) container.readinessProbe = getProbeConfig(readiness);
+        else delete container.readinessProbe;
+
+        if (liveness.enabled) container.livenessProbe = getProbeConfig(liveness);
+        else delete container.livenessProbe;
+
+        // Apply changes to the Knative Service
+        await k8sCustomObjectApi.replaceNamespacedCustomObject(
+            "serving.knative.dev",
+            "v1",
+            namespace,
+            "services",
+            definition.iid,
+            payload.body
+        );
+
+        console.log(`Knative Service '${definition.iid}' in namespace '${namespace}' updated successfully`);
     }
 
     async manageCronJob({ container, environment, changes, action }) {
@@ -353,6 +476,7 @@ export class CICDManager {
         const namespace = environment.iid;
         if (action === "create") {
             await this.createService(container.networking, name, namespace, true);
+            // Statefulset creates its own PVCs, no need to make a call to createPVC
             await this.createStatefulSet(container, namespace);
             await this.createTektonPipeline();
         } else if (action === "update") {
@@ -871,7 +995,7 @@ export class CICDManager {
     }
 
     // Definition is networking
-    async createIngress(definition, name, namespace) {
+    async createIngress(definition, name, namespace, isKnative = false) {
         // Get cluster info from the database
         const cluster = await getClusterRecord();
 
@@ -912,6 +1036,12 @@ export class CICDManager {
                 ],
             },
         };
+
+        if (isKnative) {
+            ingress.metadata.annotations[
+                "nginx.ingress.kubernetes.io/upstream-vhost"
+            ] = `${name}.${namespace}.svc.cluster.local`;
+        }
 
         // If cluster has SSL settings and custom domains then also add these to the API server ingress
         if (cluster) {
@@ -970,11 +1100,11 @@ export class CICDManager {
     }
 
     // Definition is networking
-    async updateIngress(definition, isContainerPortChanged, name, namespace) {
+    async updateIngress(definition, isContainerPortChanged, name, namespace, isKnative = false) {
         if (definition.ingress.enabled) {
             const payload = await getK8SResource("Ingress", `${name}-cluster`, namespace);
             if (!payload) {
-                await this.createIngress(definition, name, namespace);
+                await this.createIngress(definition, name, namespace, isKnative);
                 return;
             } else if (isContainerPortChanged) {
                 // Update the ingress
@@ -1010,7 +1140,7 @@ export class CICDManager {
     }
 
     // Definition is networking
-    async createCustomDomainIngress(definition, name, namespace) {
+    async createCustomDomainIngress(definition, name, namespace, isKnative = false) {
         // Get cluster info from the database
         const cluster = await getClusterRecord();
 
@@ -1053,6 +1183,12 @@ export class CICDManager {
             },
         };
 
+        if (isKnative) {
+            ingress.metadata.annotations[
+                "nginx.ingress.kubernetes.io/upstream-vhost"
+            ] = `${name}.${namespace}.svc.cluster.local`;
+        }
+
         if (cluster.enforceSSLAccess) {
             ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
             ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
@@ -1071,11 +1207,18 @@ export class CICDManager {
     }
 
     // Definition is networking
-    async updateCustomDomainIngress(definition, isContainerPortChanged, isCustomDomainChanged, name, namespace) {
+    async updateCustomDomainIngress(
+        definition,
+        isContainerPortChanged,
+        isCustomDomainChanged,
+        name,
+        namespace,
+        isKnative = false
+    ) {
         if (definition.customDomain.enabled) {
             const payload = await getK8SResource("Ingress", `${name}-domain`, namespace);
             if (!payload) {
-                await this.createCustomDomainIngress(definition, name, namespace);
+                await this.createCustomDomainIngress(definition, name, namespace, isKnative);
                 return;
             } else if (isContainerPortChanged || isCustomDomainChanged) {
                 // Update the ingress
@@ -1285,7 +1428,6 @@ export class CICDManager {
             delete spec.persistentVolumeClaimRetentionPolicy;
         }
 
-        console.log("***here", JSON.stringify(resource, null, 2));
         await k8sAppsApi.createNamespacedStatefulSet(namespace, resource);
         console.log(`StatefulSet '${definition.iid}' in namespace '${namespace}' created successfully`);
     }
@@ -1361,6 +1503,102 @@ export class CICDManager {
         console.log(`CronJob '${definition.iid}' in namespace '${namespace}' created successfully`);
     }
 
+    // Definition is container
+    async createKnativeService(definition, namespace) {
+        const manifest = fs.readFileSync(`${__dirname}/manifests/knative.yaml`, "utf8");
+        const resource = yaml.load(manifest);
+        const { metadata, spec } = resource;
+
+        // Configure name, namespace and labels
+        metadata.name = definition.iid;
+        metadata.namespace = namespace;
+        spec.template.metadata.labels.app = definition.iid;
+
+        spec.template.metadata.annotations["autoscaling.knative.dev/class"] =
+            definition.knativeConfig.scalingMetric === "concurrency" || definition.knativeConfig.scalingMetric === "rps"
+                ? "kpa.autoscaling.knative.dev"
+                : "hpa.autoscaling.knative.dev";
+        spec.template.metadata.annotations["autoscaling.knative.dev/metric"] = definition.knativeConfig.scalingMetric;
+        // "Concurrency" specifies a percentage value, e.g. "70"
+        // "Requests per second" specifies an integer value,  e.g. "150"
+        // "CPU" specifies the integer value in millicore, e.g. "100m"
+        // "Memory" specifies the integer value in Mi, e.g. "75"
+        if (definition.knativeConfig.scalingMetric === "concurrency") {
+            delete spec.template.metadata.annotations["autoscaling.knative.dev/target"];
+            spec.template.metadata.annotations["autoscaling.knative.dev/target-utilization-percentage"] =
+                definition.knativeConfig.scalingMetricTarget.toString();
+        } else {
+            delete spec.template.metadata.annotations["autoscaling.knative.dev/target-utilization-percentage"];
+            spec.template.metadata.annotations["autoscaling.knative.dev/target"] =
+                definition.knativeConfig.scalingMetricTarget.toString();
+        }
+
+        spec.template.metadata.annotations[
+            "autoscaling.knative.dev/scale-down-delay"
+        ] = `${definition.knativeConfig.scaleDownDelay}s`;
+        spec.template.metadata.annotations[
+            "autoscaling.knative.dev/scale-to-zero-pod-retention-period"
+        ] = `${definition.knativeConfig.scaleToZeroPodRetentionPeriod}s`;
+
+        spec.template.metadata.annotations["autoscaling.knative.dev/initial-scale"] =
+            definition.knativeConfig.initialScale.toString();
+        spec.template.metadata.annotations["autoscaling.knative.dev/max-scale"] =
+            definition.knativeConfig.minScale.toString();
+        spec.template.metadata.annotations["autoscaling.knative.dev/min-scale"] =
+            definition.knativeConfig.maxScale.toString();
+
+        spec.template.spec.containerConcurrency = definition.knativeConfig.concurrency;
+
+        // Configure restart policy
+        spec.template.spec.restartPolicy = definition.podConfig.restartPolicy;
+        // Configure container
+        const container = spec.template.spec.containers[0];
+        container.name = definition.iid;
+        container.ports[0].containerPort = definition.networking.containerPort;
+        container.resources.requests.cpu =
+            definition.podConfig.cpuRequestType === "millicores"
+                ? `${definition.podConfig.cpuRequest}m`
+                : definition.podConfig.cpuRequest;
+        container.resources.requests.memory =
+            definition.podConfig.memoryRequestType === "mebibyte"
+                ? `${definition.podConfig.memoryRequest}Mi`
+                : `${definition.podConfig.memoryRequest}Gi`;
+        container.resources.limits.cpu =
+            definition.podConfig.cpuLimitType === "millicores"
+                ? `${definition.podConfig.cpuLimit}m`
+                : definition.podConfig.cpuLimit;
+        container.resources.limits.memory =
+            definition.podConfig.memoryLimitType === "mebibyte"
+                ? `${definition.podConfig.memoryLimit}Mi`
+                : `${definition.podConfig.memoryLimit}Gi`;
+
+        // Define environment variables
+        container.env = [
+            { name: "AGNOST_ENVIRONMENT_IID", value: namespace },
+            { name: "AGNOST_CONTAINER_IID", value: definition.iid },
+            ...definition.variables,
+        ];
+
+        // Configure container probes
+        const { readiness, liveness } = definition.probes;
+        if (readiness.enabled) container.readinessProbe = getProbeConfig(readiness);
+        else delete container.readinessProbe;
+
+        if (liveness.enabled) container.livenessProbe = getProbeConfig(liveness);
+        else delete container.livenessProbe;
+
+        // Create the knative service
+        await k8sCustomObjectApi.createNamespacedCustomObject(
+            "serving.knative.dev",
+            "v1",
+            namespace,
+            "services",
+            resource
+        );
+
+        console.log(`Knative Service '${definition.iid}' in namespace '${namespace}' created successfully`);
+    }
+
     async deleteDeployment(name, namespace) {
         if (!(await getK8SResource("Deployment", name, namespace))) return;
 
@@ -1395,6 +1633,26 @@ export class CICDManager {
             console.log(`CronJob '${name}' in namespace ${namespace} deleted successfully`);
         } catch (err) {
             console.error(`Error deleting CronJob '${name}' in namespace ${namespace}. ${err.response?.body?.message}`);
+        }
+    }
+
+    async deleteKnativeService(name, namespace) {
+        if (!(await getK8SResource("KnativeService", name, namespace))) return;
+
+        try {
+            // Delete the deployment
+            await k8sCustomObjectApi.deleteNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
+                namespace,
+                "services",
+                name
+            );
+            console.log(`Knative Service '${name}' in namespace ${namespace} deleted successfully`);
+        } catch (err) {
+            console.error(
+                `Error deleting Knative Service '${name}' in namespace ${namespace}. ${err.response?.body?.message}`
+            );
         }
     }
 
@@ -1689,7 +1947,7 @@ async function getK8SResource(kind, name, namespace) {
             case "Job":
                 return await k8sBatchApi.readNamespacedJob(name, namespace);
             case "KnativeService":
-                return await k8sCustomObjectApi.readNamespacedCustomObject(
+                return await k8sCustomObjectApi.getNamespacedCustomObject(
                     "serving.knative.dev",
                     "v1",
                     namespace,
