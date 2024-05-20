@@ -19,7 +19,6 @@ export default (actionType) => {
 				...checkRepoOrRegistry("Knative service", actionType),
 				...checkRepo("Knative service", actionType),
 				...checkVariables("Knative service", actionType),
-				...checkStorageConfig("Knative service", actionType),
 				...checkNetworking("Knative service", actionType),
 				...checkPodConfig("Knative service", actionType),
 				...checkKnativeServiceConfig("Knative service", actionType),

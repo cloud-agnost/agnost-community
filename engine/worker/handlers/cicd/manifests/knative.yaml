@@ -1,23 +1,22 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-  name: dummy-deployment
-  namespace: dummy-namespace
+  name: example-service
+  namespace: default
 spec:
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 30%
-      maxUnavailable: 0
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: dummy-deployment
   template:
     metadata:
       labels:
-        app: dummy-deployment
+        app: example-service
+      annotations:
+        autoscaling.knative.dev/initial-scale: "1"
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/max-scale: "1"
+        autoscaling.knative.dev/min-scale: "10"
+        autoscaling.knative.dev/target-utilization-percentage: "80"
+        autoscaling.knative.dev/scale-down-delay: "5m00s"
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "10m00s"
     spec:
       containers:
       - name: dummy-container
@@ -39,16 +38,6 @@ spec:
           value: "dummy_value_2"
         - name: DUMMY_KEY_3
           value: "dummy_value_3"
-        startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - "random_exec_command"
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 60
-          failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /health
@@ -65,11 +54,3 @@ spec:
           periodSeconds: 30
           timeoutSeconds: 60
           failureThreshold: 3
-        volumeMounts:
-        - name: data-volume
-          mountPath: /usr/data
-        restartPolicy: Always
-      volumes:
-      - name: data-volume
-        persistentVolumeClaim:
-          claimName: data-pvc

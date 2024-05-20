@@ -321,7 +321,7 @@ export const ContainerModel = mongoose.model(
 					whenScaled: {
 						type: String,
 						enum: ["Retain", "Delete"],
-						default: "Retain",
+						default: "Delete",
 					},
 				},
 			},
@@ -344,11 +344,11 @@ export const ContainerModel = mongoose.model(
 				},
 				successfulJobsHistoryLimit: {
 					type: Number,
-					default: 10,
+					default: 3,
 				},
 				failedJobsHistoryLimit: {
 					type: Number,
-					default: 10,
+					default: 3,
 				},
 			},
 			knativeConfig: {
@@ -369,6 +369,10 @@ export const ContainerModel = mongoose.model(
 					type: Number,
 					default: 70,
 				},
+				initialScale: {
+					type: Number,
+					default: 1,
+				},
 				maxScale: {
 					type: Number,
 					default: 1,
@@ -378,10 +382,12 @@ export const ContainerModel = mongoose.model(
 					default: 0,
 				},
 				scaleDownDelay: {
-					type: String,
+					type: Number,
+					default: 300,
 				},
 				scaleToZeroPodRetentionPeriod: {
-					type: String,
+					type: Number,
+					default: 600,
 				},
 				revisionHistoryLimit: {
 					type: Number,
