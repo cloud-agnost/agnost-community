@@ -53,6 +53,9 @@ export const ContainerModel = mongoose.model(
 				immutable: true,
 				enum: containerTypes,
 			},
+			status: {
+				type: mongoose.Schema.Types.Mixed,
+			},
 			variables: [
 				{
 					name: {
@@ -98,6 +101,11 @@ export const ContainerModel = mongoose.model(
 				dockerfile: {
 					type: String,
 					default: "Dockerfile",
+				},
+				gitProviderId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "git_provider",
+					index: true,
 				},
 			},
 			registry: {

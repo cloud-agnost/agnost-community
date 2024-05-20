@@ -16,6 +16,10 @@ import { getDBClient } from "../init/db.js";
 // Create a Kubernetes core API client
 const kubeconfig = new k8s.KubeConfig();
 kubeconfig.loadFromDefault();
+const k8sApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+const k8sCoreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
+const k8sBatchApi = kubeconfig.makeApiClient(k8s.BatchV1Api);
+const k8sCustomApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
 /**
  * Iterates over all cluster resources and monitors their status
@@ -116,6 +120,7 @@ export default async function monitorResources() {
 		}
 
 		await checkClusterResourceStatus();
+		await checkContainerStatus();
 	} catch (err) {
 		logger.error(t("Cannot fetch cluster resources"), err);
 	}
@@ -773,14 +778,17 @@ async function checkAPIServer(connSettings) {
  * Returns availableReplica count if the API server is up and running. Please note that for each version we have a dedicated API server.
  * @param  {object} connSettings The connection settings needed to connect to the API server
  */
-async function checkDeployment(deploymentName) {
+async function checkDeployment(
+	deploymentName,
+	namespace = process.env.NAMESPACE
+) {
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
 	let result = null;
 	try {
 		result = await coreApi.readNamespacedDeployment(
 			`${deploymentName}-deployment`,
-			process.env.NAMESPACE
+			namespace
 		);
 
 		return {
@@ -1136,5 +1144,409 @@ async function upadateClusterDeploymentsStatus(deploymentsStatusInfo) {
 				}
 			)
 			.catch((error) => {});
+	}
+}
+
+/**
+ * Checks and updates cluster resource status
+ */
+async function checkContainerStatus() {
+	try {
+		let pageNumber = 0;
+		let pageSize = config.get("general.containerPaginationSize");
+		let containers = await getContainers(pageNumber, pageSize);
+
+		while (containers && containers.length) {
+			for (let i = 0; i < containers.length; i++) {
+				const container = containers[i];
+				const environment = container.environment[0];
+				if (!environment) continue;
+
+				let result = null;
+				let needsUpdate = container.status ? false : true;
+				if (container.type === "deployment") {
+					result = await getDeploymentStatus(container.iid, environment.iid);
+					if (result && container.status) {
+						if (
+							result.status !== container.status.status ||
+							result.availableReplicas !== container.status.availableReplicas ||
+							result.readyReplicas !== container.status.readyReplicas ||
+							result.replicas !== container.status.replicas ||
+							result.updatedReplicas !== container.status.updatedReplicas
+						)
+							needsUpdate = true;
+					}
+				} else if (container.type === "stateful set") {
+					result = await getStatefulSetStatus(container.iid, environment.iid);
+					if (result && container.status) {
+						if (
+							result.status !== container.status.status ||
+							result.availableReplicas !== container.status.availableReplicas ||
+							result.readyReplicas !== container.status.readyReplicas ||
+							result.replicas !== container.status.replicas ||
+							result.updatedReplicas !== container.status.updatedReplicas ||
+							result.currentReplicas !== container.status.currentReplicas
+						)
+							needsUpdate = true;
+					}
+				} else if (container.type === "cron job") {
+					result = await getCronJobStatus(container.iid, environment.iid);
+					if (result && container.status) {
+						if (
+							result.status !== container.status.status ||
+							result.lastScheduleTime.getTime() !==
+								new Date(container.status.lastScheduleTime).getTime() ||
+							result.lastSuccessfulTime.getTime() !==
+								new Date(container.status.lastSuccessfulTime).getTime()
+						)
+							needsUpdate = true;
+					}
+				} else if (container.type === "knative service") {
+					result = await getKnativeStatus(container.iid, environment.iid);
+					if (result && container.status) {
+						if (
+							result.status !== container.status.status ||
+							result.activeReplicas !== container.status.activeReplicas ||
+							result.errorReplicas !== container.status.errorReplicas ||
+							result.creatingReplicas !== container.status.creatingReplicas ||
+							result.updatingReplicas !== container.status.updatingReplicas ||
+							result.pendingReplicas !== container.status.pendingReplicas
+						)
+							needsUpdate = true;
+					}
+				}
+
+				if (result && needsUpdate) {
+					// Make api call to the platform to log the status of the container
+					axios
+						.post(
+							helper.getPlatformUrl() + "/v1/telemetry/update-container-status",
+							{ container, status: result },
+							{
+								headers: {
+									Authorization: process.env.MASTER_TOKEN,
+									"Content-Type": "application/json",
+								},
+							}
+						)
+						.catch((error) => {});
+				}
+			}
+
+			// Interate to the next page
+			pageNumber++;
+			containers = await getContainers(pageNumber, pageSize);
+		}
+	} catch (err) {
+		logger.error(t("Cannot fetch cluster containers"), err);
+	}
+}
+
+/**
+ * Returns the list of containers from the cluster database
+ * @param  {number} pageNumber Curent page number (used for pagination)
+ * @param  {number} pageSize The records per page
+ */
+async function getContainers(pageNumber, pageSize) {
+	let dbClient = getDBClient();
+
+	let pipeline = [
+		{
+			$match: {},
+		},
+		{
+			$lookup: {
+				from: "project_environments",
+				localField: "environmentId",
+				foreignField: "_id",
+				as: "environment",
+			},
+		},
+		{ $skip: pageSize * pageNumber },
+		{ $limit: pageSize },
+	];
+
+	return await dbClient
+		.db("agnost")
+		.collection("containers")
+		.aggregate(pipeline)
+		.toArray();
+}
+
+async function getDeploymentStatus(name, namespace) {
+	try {
+		// Get the deployment details
+		const deploymentResponse = await k8sApi.readNamespacedDeployment(
+			name,
+			namespace
+		);
+		const deployment = deploymentResponse.body;
+		const deploymentStatus = deployment.status;
+
+		// Get all pods for the deployment
+		const podResponse = await k8sCoreApi.listNamespacedPod(
+			namespace,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			`app=${name}`
+		);
+		const pods = podResponse.body.items;
+
+		// Calculate deployment state
+		const desiredReplicas = deployment.spec.replicas || 0;
+		const readyReplicas = deployment.status.readyReplicas || 0;
+		const updatedReplicas = deployment.status.updatedReplicas || 0;
+
+		const podStatuses = pods.map((pod) => pod.status.phase);
+		const errorPods = podStatuses.filter(
+			(status) => status === "Failed" || status === "Unknown"
+		).length;
+		const totalPods = podStatuses.length;
+
+		let status = "Unknown";
+		if (desiredReplicas > readyReplicas && readyReplicas === 0) {
+			status = "Creating";
+		} else if (desiredReplicas !== updatedReplicas) {
+			status = "Updating";
+		} else if (errorPods > 0 && errorPods < totalPods) {
+			status = "Warning";
+		} else if (errorPods === totalPods) {
+			status = "Error";
+		} else {
+			status = "Running";
+		}
+
+		return {
+			...deploymentStatus,
+			status,
+			creationTimestamp: deployment.metadata.creationTimestamp,
+		};
+	} catch (err) {
+		console.error("Error retrieving deployment status:", err);
+		return null;
+	}
+}
+
+async function getStatefulSetStatus(name, namespace) {
+	try {
+		// Get the StatefulSet details
+		const statefulSetResponse = await k8sApi.readNamespacedStatefulSet(
+			name,
+			namespace
+		);
+		const statefulSet = statefulSetResponse.body;
+		const statefulSetStatus = statefulSet.status;
+
+		// Get all pods for the StatefulSet
+		const podResponse = await k8sCoreApi.listNamespacedPod(
+			namespace,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			`app=${name}`
+		);
+		const pods = podResponse.body.items;
+
+		// Calculate StatefulSet state
+		const desiredReplicas = statefulSet.spec.replicas || 0;
+		const readyReplicas = statefulSet.status.readyReplicas || 0;
+		const updatedReplicas = statefulSet.status.updatedReplicas || 0;
+
+		const podStatuses = pods.map((pod) => pod.status.phase);
+		const errorPods = podStatuses.filter(
+			(status) => status === "Failed" || status === "Unknown"
+		).length;
+		const totalPods = podStatuses.length;
+
+		let status = "Unknown";
+		if (desiredReplicas > readyReplicas && readyReplicas === 0) {
+			status = "Creating";
+		} else if (desiredReplicas !== updatedReplicas) {
+			status = "Updating";
+		} else if (errorPods > 0 && errorPods < totalPods) {
+			status = "Warning";
+		} else if (errorPods === totalPods) {
+			status = "Error";
+		} else {
+			status = "Running";
+		}
+
+		return {
+			...statefulSetStatus,
+			status,
+			creationTimestamp: statefulSet.metadata.creationTimestamp,
+		};
+	} catch (err) {
+		console.error("Error retrieving statefulset status:", err);
+		return null;
+	}
+}
+
+async function getCronJobStatus(name, namespace) {
+	try {
+		// Get the CronJob details
+		const cronJobResponse = await k8sBatchApi.readNamespacedCronJob(
+			name,
+			namespace
+		);
+		const cronJob = cronJobResponse.body;
+
+		// Get all Jobs created by the CronJob
+		const jobResponse = await k8sBatchApi.listNamespacedJob(namespace);
+		const jobs = jobResponse.body.items.filter((job) =>
+			job.metadata.name.includes(name)
+		);
+
+		// Calculate CronJob state
+		const activeJobs = jobs.filter((job) => job.status.active).length;
+		const succeededJobs = jobs.filter((job) => job.status.succeeded).length;
+		const failedJobs = jobs.filter((job) => job.status.failed).length;
+		const lastJob = jobs.sort(
+			(a, b) => new Date(b.status.startTime) - new Date(a.status.startTime)
+		)[0];
+
+		let status = "Unknown";
+		if (!lastJob) {
+			status = "Creating";
+		} else if (activeJobs > 0) {
+			status = "Running";
+		} else if (lastJob && lastJob.status.succeeded) {
+			status = "Successful";
+		} else if (lastJob && lastJob.status.failed) {
+			status = "Failed";
+		} else if (failedJobs > 0 && succeededJobs > 0) {
+			status = "Warning";
+		} else {
+			status = "Unknown";
+		}
+
+		return {
+			...cronJob.status,
+			status,
+			creationTimestamp: cronJob.metadata.creationTimestamp,
+		};
+	} catch (err) {
+		console.error("Error retrieving cronjob status:", err);
+		return null;
+	}
+}
+
+async function getKnativeStatus(name, namespace) {
+	try {
+		// Get the Knative Service details
+		const response = await k8sCustomApi.getNamespacedCustomObject(
+			"serving.knative.dev", // group
+			"v1", // version
+			namespace, // namespace
+			"services", // plural of the resource
+			name // name of the Knative service
+		);
+		const service = response.body;
+
+		// Check status conditions
+		const conditions = service.status.conditions || [];
+		const readyCondition = conditions.find(
+			(condition) => condition.type === "Ready"
+		);
+		const latestCreatedRevision = service.status.latestCreatedRevisionName;
+		const latestReadyRevision = service.status.latestReadyRevisionName;
+
+		const isCreating = !readyCondition || readyCondition.status !== "True";
+		const isUpdating = latestCreatedRevision !== latestReadyRevision;
+		const isError = conditions.some(
+			(condition) =>
+				condition.status === "False" &&
+				(condition.type === "ConfigurationsReady" ||
+					condition.type === "RoutesReady")
+		);
+
+		// Get all revisions for the service
+		const revisionsResponse = await k8sCustomApi.listNamespacedCustomObject(
+			"serving.knative.dev",
+			"v1",
+			namespace,
+			"revisions",
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			`serving.knative.dev/service=${name}`
+		);
+		const revisions = revisionsResponse.body.items.map(
+			(revision) => revision.metadata.name
+		);
+
+		let activeReplicas = 0;
+		let errorReplicas = 0;
+		let creatingReplicas = 0;
+		let updatingReplicas = 0;
+		let pendingReplicas = 0;
+
+		// Iterate over all revisions to get pod statuses
+		for (const revisionName of revisions) {
+			const podResponse = await k8sCoreApi.listNamespacedPod(
+				namespace,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				`serving.knative.dev/revision=${revisionName}`
+			);
+			const pods = podResponse.body.items;
+
+			pods.forEach((pod) => {
+				if (
+					pod.status.phase === "Running" &&
+					pod.status.containerStatuses.every((cs) => cs.ready)
+				) {
+					activeReplicas += 1;
+				} else if (
+					pod.status.phase === "Failed" ||
+					pod.status.phase === "Unknown" ||
+					pod.status.containerStatuses.some(
+						(cs) => cs.state.terminated && cs.state.terminated.exitCode !== 0
+					)
+				) {
+					errorReplicas += 1;
+				} else if (pod.status.phase === "Pending") {
+					pendingReplicas += 1;
+				} else if (
+					pod.status.phase === "Running" &&
+					pod.status.containerStatuses.some((cs) => cs.ready === false)
+				) {
+					creatingReplicas += 1;
+				} else {
+					updatingReplicas += 1;
+				}
+			});
+		}
+
+		let status = "Unknown";
+		if (isCreating) {
+			status = "Creating";
+		} else if (isUpdating) {
+			status = "Updating";
+		} else if (isError || errorReplicas > 0) {
+			status = "Error";
+		} else {
+			status = "Running";
+		}
+
+		return {
+			status,
+			latestCreatedRevision,
+			latestReadyRevision,
+			activeReplicas,
+			errorReplicas,
+			creatingReplicas,
+			updatingReplicas,
+			pendingReplicas,
+		};
+	} catch (err) {
+		console.error("Error retrieving knative service status:", err);
+		return null;
 	}
 }

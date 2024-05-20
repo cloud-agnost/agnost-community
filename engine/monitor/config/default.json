@@ -10,6 +10,7 @@
     "general": {  
         "monitoringInterval": 3000,
         "resourcePaginationSize": 100,
+        "containerPaginationSize": 100,
         "initialDelaySeconds": 30,
         "maxResourceOpWaitMinues": 5,
         "gcSeconds": 30

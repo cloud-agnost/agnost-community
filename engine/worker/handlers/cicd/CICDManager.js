@@ -83,6 +83,8 @@ export class CICDManager {
             const pods = body.items
                 .filter((pod) => {
                     if (container.type === "cron job") return pod.metadata.labels["job-name"]?.includes(container.iid);
+                    else if (container.type === "knative service")
+                        return pod.metadata.labels["serving.knative.dev/service"] === container.iid;
                     else return pod.metadata.labels.app === container.iid;
                 })
                 .map((entry) => {
@@ -205,7 +207,7 @@ export class CICDManager {
             const logPromises = payload.map((pod) => {
                 const podName = pod.name;
                 return k8sCoreApi
-                    .readNamespacedPodLog(podName, environment.iid)
+                    .readNamespacedPodLog(podName, environment.iid, container.iid)
                     .then((logs) => ({
                         podName: podName,
                         logs: logs.body ? logs.body.split("\n") : [],
