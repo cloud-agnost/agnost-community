@@ -247,7 +247,10 @@ router.put(
 					container.knativeConfig.revisionHistoryLimit;
 			}
 
-			if (container.type !== "cron job") {
+			if (
+				container.type !== "cron job" &&
+				container.type !== "knative service"
+			) {
 				// If there already a port number assignment then use it otherwise generate a new one
 				body.networking.tcpProxy.publicPort =
 					container.networking.tcpProxy.publicPort ??

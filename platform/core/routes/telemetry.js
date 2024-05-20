@@ -1,6 +1,7 @@
 import express from "express";
 import resourceCtrl from "../controllers/resource.js";
 import resLogCtrl from "../controllers/resourceLog.js";
+import cntrCtrl from "../controllers/container.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { handleError } from "../schemas/platformError.js";
@@ -100,6 +101,53 @@ router.post(
 			});
 		} catch (error) {
 			await resourceCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/telemetry/update-container-status
+@method     POST
+@desc       Updates the status of the container
+@access     public
+*/
+router.post(
+	"/update-container-status",
+	checkContentType,
+	authMasterToken,
+	async (req, res) => {
+		try {
+			const { container, status } = req.body;
+			let updatedContainer = await cntrCtrl.updateOneById(
+				container._id,
+				{
+					status: status,
+				},
+				{},
+				{ cacheKey: container._id }
+			);
+
+			res.json();
+
+			// Send realtime message about the status change of the container
+			sendMessage(container._id, {
+				actor: null,
+				action: "telemetry",
+				object: "org.project.environment.container",
+				description: t("Container status updated to '%s'", status.status),
+				timestamp: Date.now(),
+				data: updatedContainer,
+				identifiers: {
+					orgId: updatedContainer.orgId,
+					projectId: updatedContainer.projectId,
+					environmentId: updatedContainer.environmentId,
+					containerId: updatedContainer._id,
+				},
+			});
+
+			console.log("***here", container.iid);
+		} catch (error) {
 			handleError(req, res, error);
 		}
 	}

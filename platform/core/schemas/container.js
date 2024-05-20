@@ -53,6 +53,9 @@ export const ContainerModel = mongoose.model(
 				immutable: true,
 				enum: containerTypes,
 			},
+			status: {
+				type: mongoose.Schema.Types.Mixed,
+			},
 			variables: [
 				{
 					name: {
