@@ -23,11 +23,13 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import ContainerFormTitle from './ContainerFormLayout';
 import { Fragment, useEffect } from 'react';
+import useContainerStore from '@/store/container/containerStore';
 export default function AutoScaleConfig() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
-
+	const { container } = useContainerStore();
 	useEffect(() => {
+		if (container) return;
 		form.setValue('deploymentConfig.desiredReplicas', 1);
 		form.setValue('deploymentConfig.minReplicas', 1);
 		form.setValue('deploymentConfig.maxReplicas', 5);

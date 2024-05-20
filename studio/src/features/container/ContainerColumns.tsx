@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { BADGE_COLOR_MAP } from '@/constants';
+import useContainerStore from '@/store/container/containerStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName } from '@/types';
 import { Container } from '@/types/container';
@@ -12,28 +13,6 @@ import { startCase } from 'lodash';
 import { Link } from 'react-router-dom';
 
 const ContainerColumns: ColumnDefWithClassName<Container>[] = [
-	{
-		id: 'select',
-		enableResizing: false,
-		className: '!max-w-[35px] !w-[35px]',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected()}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-		size: 40,
-	},
 	{
 		id: 'name',
 		header: () => <SortButton text={translate('general.name')} field='name' />,
@@ -152,14 +131,14 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			// const { openEditCacheModal, openDeleteCacheModal } = useCacheStore.getState();
+			const { openEditContainerDialog, openDeleteContainerDialog } = useContainerStore.getState();
 			const canDelete = true;
 			const canUpdate = true;
 			return (
 				<ActionsCell<Container>
 					original={original}
-					onEdit={() => {}}
-					onDelete={() => {}}
+					onEdit={() => openEditContainerDialog(original)}
+					onDelete={() => openDeleteContainerDialog(original)}
 					canDelete={canDelete}
 					canEdit={canUpdate}
 				/>

@@ -2,12 +2,16 @@ import { axios } from '@/helpers';
 import {
 	AddGitProviderParams,
 	Container,
+	ContainerLog,
+	ContainerPod,
 	CreateContainerParams,
+	DeleteContainerParams,
 	GetBranchesParams,
 	GetContainersInEnvParams,
 	GitBranch,
 	GitProvider,
 	GitRepo,
+	UpdateContainerParams,
 } from '@/types/container';
 export default class ContainerService {
 	static url = '/v1/org';
@@ -49,11 +53,79 @@ export default class ContainerService {
 		projectId,
 		envId,
 		...params
-	}: GetContainersInEnvParams) {
+	}: GetContainersInEnvParams): Promise<Container[]> {
 		return (
 			await axios.get(`${this.url}/${orgId}/project/${projectId}/env/${envId}/container`, {
 				params: params,
 			})
+		).data;
+	}
+
+	static async updateContainer({
+		orgId,
+		projectId,
+		envId,
+		containerId,
+		...req
+	}: UpdateContainerParams): Promise<Container> {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}`,
+				req,
+			)
+		).data;
+	}
+
+	static async deleteContainer({
+		orgId,
+		projectId,
+		envId,
+		containerId,
+	}: DeleteContainerParams): Promise<void> {
+		return await axios.delete(
+			`${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}`,
+			{
+				data: {},
+			},
+		);
+	}
+
+	static async getContainerPods({
+		orgId,
+		projectId,
+		envId,
+		containerId,
+	}: DeleteContainerParams): Promise<ContainerPod[]> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/pods`,
+			)
+		).data;
+	}
+
+	static async getContainerLogs({
+		orgId,
+		projectId,
+		envId,
+		containerId,
+	}: DeleteContainerParams): Promise<ContainerLog> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/logs`,
+			)
+		).data;
+	}
+
+	static async getContainerEvents({
+		orgId,
+		projectId,
+		envId,
+		containerId,
+	}: DeleteContainerParams): Promise<void> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/events`,
+			)
 		).data;
 	}
 }

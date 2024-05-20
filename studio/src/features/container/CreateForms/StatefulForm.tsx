@@ -14,13 +14,17 @@ import { useTranslation } from 'react-i18next';
 import { Networking, PodConfiguration, Probes, SourceConfig, StorageConfig } from '../config';
 import ContainerFormTitle from '../config/ContainerFormLayout';
 import { useEffect } from 'react';
+import useContainerStore from '@/store/container/containerStore';
 export default function StatefulForm() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
-
+	const { container } = useContainerStore();
 	useEffect(() => {
-		form.setValue('statefulSetConfig.desiredReplicas', 1);
-	}, []);
+		form.setValue(
+			'statefulSetConfig.desiredReplicas',
+			container?.statefulSetConfig?.desiredReplicas ?? 1,
+		);
+	}, [container]);
 
 	return (
 		<>

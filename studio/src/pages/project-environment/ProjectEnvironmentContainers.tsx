@@ -2,6 +2,8 @@ import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import ContainerColumns from '@/features/container/ContainerColumns';
 import CreateContainerButton from '@/features/container/CreateContainerButton';
+import DeleteContainer from '@/features/container/DeleteContainer';
+import EditContainer from '@/features/container/EditContainer';
 import { useInfiniteScroll, useTable } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useContainerStore from '@/store/container/containerStore';
@@ -38,27 +40,31 @@ export default function ProjectEnvironmentDetail() {
 		},
 	});
 	return (
-		<VersionTabLayout
-			searchable
-			type={TabTypes.Endpoint}
-			title={t('project.containers') as string}
-			isEmpty={!containers.length}
-			onMultipleDelete={() => {}}
-			disabled={!canCreate}
-			loading={isFetching && !containers.length}
-			selectedRowCount={table.getSelectedRowModel().rows.length}
-			onClearSelected={() => table.toggleAllRowsSelected(false)}
-			handlerButton={<CreateContainerButton />}
-		>
-			<InfiniteScroll
-				scrollableTarget='env-layout'
-				dataLength={containers.length}
-				next={fetchNextPage}
-				hasMore={hasNextPage}
-				loader={isFetchingNextPage && <TableLoading />}
+		<>
+			<VersionTabLayout
+				searchable
+				type={TabTypes.Endpoint}
+				title={t('project.containers') as string}
+				isEmpty={!containers.length}
+				onMultipleDelete={() => {}}
+				disabled={!canCreate}
+				loading={isFetching && !containers.length}
+				selectedRowCount={table.getSelectedRowModel().rows.length}
+				onClearSelected={() => table.toggleAllRowsSelected(false)}
+				handlerButton={<CreateContainerButton />}
 			>
-				<DataTable table={table} />
-			</InfiniteScroll>
-		</VersionTabLayout>
+				<InfiniteScroll
+					scrollableTarget='env-layout'
+					dataLength={containers.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isFetchingNextPage && <TableLoading />}
+				>
+					<DataTable table={table} />
+				</InfiniteScroll>
+			</VersionTabLayout>
+			<EditContainer />
+			<DeleteContainer />
+		</>
 	);
 }

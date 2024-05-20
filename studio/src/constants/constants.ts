@@ -509,6 +509,11 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	'KNATIVE SERVICE': 'yellow',
 	REPO: 'blue',
 	REGISTRY: 'red',
+	RUNNING: 'green',
+	INITIALIZED: 'green',
+	PODSCHEDULED: 'yellow',
+	CONTAINERSREADY: 'blue',
+	READY: 'orange',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -766,6 +771,32 @@ export const ADD_API_KEYS_MENU_ITEMS = [
 	},
 ];
 
+export const EDIT_CONTAINER_TABS = [
+	{
+		href: 'settings',
+		name: translate('general.settings'),
+	},
+	{
+		href: 'variables',
+		name: translate('container.variables'),
+	},
+	{
+		href: 'builds',
+		name: translate('container.builds'),
+	},
+	{
+		href: 'pods',
+		name: translate('container.pods'),
+	},
+	{
+		href: 'logs',
+		name: translate('container.logs'),
+	},
+	{
+		href: 'events',
+		name: translate('container.events'),
+	},
+];
 export const ADD_RESOURCE_TABS = [
 	{
 		href: 'settings',

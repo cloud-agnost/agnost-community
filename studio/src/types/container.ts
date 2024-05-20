@@ -15,7 +15,8 @@ export const DeploymentConfigSchema = z
 			.positive('Desired replicas should be greater than 0')
 			.max(100, 'Desired replicas should be less than 100')
 			.transform((value) => Math.round(value))
-			.default(1),
+			.default(1)
+			.optional(),
 		minReplicas: z
 			.number({
 				coerce: true,
@@ -75,7 +76,6 @@ export const DeploymentConfigSchema = z
 				maxUnavailableType: z.enum(['number', 'percentage']).optional(),
 			})
 			.optional(),
-		revisionHistoryLimit: z.number().optional(),
 	})
 	.superRefine((data, ctx) => {
 		if (data.cpuMetric?.enabled) {
@@ -171,7 +171,6 @@ export const StatefulSetConfigSchema = z.object({
 			partition: z.number().optional(),
 		})
 		.optional(),
-	revisionHistoryLimit: z.number().optional(),
 	podManagementPolicy: z.enum(['OrderedReady', 'Parallel']).optional(),
 	persistentVolumeClaimRetentionPolicy: z
 		.object({
@@ -196,14 +195,16 @@ export const CronJobConfigSchema = z.object({
 				});
 				return false;
 			}
-		}),
+		})
+		.optional(),
 	timeZone: z
 		.string()
 		.refine((value) => useTypeStore.getState().timezones.some((tz) => tz.value === value), {
 			message: 'Invalid timezone',
-		}),
-	concurrencyPolicy: z.enum(['Allow', 'Forbid', 'Replace']),
-	suspend: z.boolean(),
+		})
+		.optional(),
+	concurrencyPolicy: z.enum(['Allow', 'Forbid', 'Replace']).optional(),
+	suspend: z.boolean().optional(),
 	successfulJobsHistoryLimit: z.number().optional(),
 	failedJobsHistoryLimit: z.number().optional(),
 });
@@ -219,12 +220,15 @@ export const KnativeConfigSchema = z
 			.max(100, 'Concurrency should be less than 100')
 			.int()
 			.transform((value) => Math.round(value))
-			.default(100),
-		scalingMetric: z.enum(['concurrency', 'rps', 'cpu', 'memory']).optional(),
-		scalingMetricTarget: z.number({
-			coerce: true,
-			invalid_type_error: 'Scaling metric target should be a number',
-		}),
+			.default(100)
+			.optional(),
+		scalingMetric: z.enum(['concurrency', 'rps', 'cpu', 'memory']).optional().optional(),
+		scalingMetricTarget: z
+			.number({
+				coerce: true,
+				invalid_type_error: 'Scaling metric target should be a number',
+			})
+			.optional(),
 		minScale: z
 			.number({
 				coerce: true,
@@ -235,7 +239,8 @@ export const KnativeConfigSchema = z
 			})
 			.min(0, 'Min scale should be greater than or equal to 0')
 			.max(100, 'Min scale should be less than 100')
-			.transform((value) => Math.round(value)),
+			.transform((value) => Math.round(value))
+			.optional(),
 		maxScale: z
 			.number({
 				coerce: true,
@@ -248,7 +253,8 @@ export const KnativeConfigSchema = z
 				message: 'Max scale should be greater than 0',
 			})
 			.max(100, 'Max scale should be less than 100')
-			.transform((value) => Math.round(value)),
+			.transform((value) => Math.round(value))
+			.optional(),
 		scaleDownDelay: z
 			.number({
 				coerce: true,
@@ -259,7 +265,8 @@ export const KnativeConfigSchema = z
 			})
 			.min(0, 'Scale down delay should be greater than or equal to 0')
 			.max(3600, 'Scale down delay should be less than 3600')
-			.transform((value) => Math.round(value)),
+			.transform((value) => Math.round(value))
+			.optional(),
 		scaleToZeroPodRetentionPeriod: z
 			.number({
 				coerce: true,
@@ -270,24 +277,23 @@ export const KnativeConfigSchema = z
 			})
 			.min(0, 'Scale down delay should be greater than or equal to 0')
 			.max(3600, 'Scale down delay should be less than 3600')
-			.transform((value) => Math.round(value)),
-		revisionHistoryLimit: z.string().optional(),
+			.transform((value) => Math.round(value))
+			.optional(),
 	})
 	.superRefine((data, ctx) => {
 		// min scale should be less than or equal to max scale
-		if (data.minScale > data.maxScale) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: 'Min scale should be less than or equal to max scale',
-				path: ['minScale'],
-			});
-		}
-
-		if (data.scalingMetric === 'cpu') {
-			checkCPU(data.scalingMetricTarget, 'millicores', ctx, 'scalingMetricTarget');
-		} else if (data.scalingMetric === 'memory') {
-			checkMemory(data.scalingMetricTarget, 'mebibyte', ctx, 'scalingMetricTarget');
-		}
+		// if (data.minScale! > data.maxScale!) {
+		// 	ctx.addIssue({
+		// 		code: z.ZodIssueCode.custom,
+		// 		message: 'Min scale should be less than or equal to max scale',
+		// 		path: ['minScale'],
+		// 	});
+		// }
+		// if (data.scalingMetric === 'cpu') {
+		// 	checkCPU(data.scalingMetricTarget, 'millicores', ctx, 'scalingMetricTarget');
+		// } else if (data.scalingMetric === 'memory') {
+		// 	checkMemory(data.scalingMetricTarget, 'mebibyte', ctx, 'scalingMetricTarget');
+		// }
 	});
 
 export const NetworkingSchema = z.object({
@@ -301,19 +307,25 @@ export const NetworkingSchema = z.object({
 		.positive('Container port should be greater than 0')
 		.max(65535, 'Container port should be less than 65536')
 		.transform((value) => Math.round(value)),
-	// ingress: z.object({
-	// 	enabled: z.boolean().optional(),
-	// 	url: z.string().optional(),
-	// }),
-	// customDomain: z.object({
-	// 	enabled: z.boolean().optional(),
-	// 	domainAdded: z.boolean().optional(),
-	// 	domain: z.string().optional(),
-	// }),
-	// tcpProxy: z.object({
-	// 	enabled: z.boolean().optional(),
-	// 	publicPort: z.number().optional(),
-	// }),
+	ingress: z
+		.object({
+			enabled: z.boolean().optional(),
+			url: z.string().optional(),
+		})
+		.optional(),
+	customDomain: z
+		.object({
+			enabled: z.boolean().optional(),
+			added: z.boolean().optional(),
+			domain: z.string().optional(),
+		})
+		.optional(),
+	tcpProxy: z
+		.object({
+			enabled: z.boolean().optional(),
+			publicPort: z.number().optional(),
+		})
+		.optional(),
 });
 const ProbeConfigSchema = z
 	.object({
@@ -575,6 +587,8 @@ export const StorageConfigSchema = z
 					message: 'Size is required',
 					path: ['size'],
 				});
+			} else {
+				checkStorage(data.size, data.sizeType!, ctx, 'size');
 			}
 			if (!data.sizeType) {
 				ctx.addIssue({
@@ -590,8 +604,6 @@ export const StorageConfigSchema = z
 					path: ['accessModes'],
 				});
 			}
-
-			checkStorage(data.size!, data.sizeType!, ctx, 'size');
 		}
 	});
 
@@ -654,9 +666,13 @@ export enum ContainerType {
 
 export type CreateContainerParams = z.infer<typeof ContainerSchema>;
 export const ContainerUpdateSchema = ContainerSchema.partial();
-export type UpdateContainerParams = z.infer<typeof ContainerUpdateSchema>;
+export type UpdateContainerParams = z.infer<typeof ContainerUpdateSchema> & {
+	containerId: string;
+};
 export type Container = z.infer<typeof ContainerSchema> & {
 	_id: string;
+	iid: string;
+	environmentId: string;
 	createdAt: string;
 	updatedAt: string;
 	createdBy: string;
@@ -667,6 +683,13 @@ export interface GetContainersInEnvParams extends BaseGetRequest {
 	orgId: string;
 	projectId: string;
 	envId: string;
+}
+
+export interface DeleteContainerParams {
+	orgId: string;
+	projectId: string;
+	envId: string;
+	containerId: string;
 }
 export interface AddGitProviderParams {
 	provider: 'github' | 'gitlab' | 'bitbucket';
@@ -825,7 +848,7 @@ function checkStorage(
 			});
 		}
 	} else if (unit === 'gibibyte') {
-		if (value < 0.1 || 5000) {
+		if (value < 0.1 || value > 5000) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: 'Storage request must be between 0.1 and 5000 when using gibibytes',
@@ -835,4 +858,40 @@ function checkStorage(
 	}
 
 	return true;
+}
+export interface ContainerPod {
+	name: string;
+	status: string;
+	totalContainers: number;
+	readyContainers: number;
+	restarts: number;
+	createdOn: string;
+	conditions: PodCondition[];
+}
+
+export interface PodCondition {
+	lastProbeTime: null;
+	lastTransitionTime: string;
+	status: string;
+	type: 'PodScheduled' | 'ContainersReady' | 'Initialized' | 'Ready';
+	reason: string;
+	message: string;
+}
+
+export interface ContainerLog {
+	pods: ContainerPod[];
+	logs: {
+		podName: string;
+		logs: string[];
+	}[];
+}
+export interface ContainerEvent {
+	name: string;
+	message: string;
+	reason: 'SuccessfulCreate' | 'FailedGetResourceMetric';
+	firstSeen: string;
+	lastSeen: string;
+	count: number;
+	kind: string;
+	type: 'Normal' | 'Warning';
 }

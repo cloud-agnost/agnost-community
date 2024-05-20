@@ -12,7 +12,7 @@ const MonacoEditor = Loadable(() => import('@monaco-editor/react'));
 
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
-	defaultLanguage?: 'javascript' | 'json' | 'html';
+	defaultLanguage?: 'javascript' | 'json' | 'html' | 'plaintext';
 	readonly?: boolean;
 	onSave?: (logic: string) => void;
 	name: string;

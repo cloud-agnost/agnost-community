@@ -36,12 +36,10 @@ export default function SourceConfig() {
 		queryFn: () => getGitRepositories(gitProvider._id),
 		enabled: !_.isEmpty(gitProvider),
 	});
-
 	const selectedRepo = useMemo(
 		() => repositories?.find((repo) => repo.fullName === form.watch('repo.name')),
 		[form.watch('repo.name'), repositories],
 	);
-
 	const { data: branches } = useQuery({
 		queryKey: ['branches', gitProvider._id, form.watch('repo.name')],
 		queryFn: () =>
@@ -50,9 +48,8 @@ export default function SourceConfig() {
 				owner: selectedRepo?.owner as string,
 				repo: selectedRepo?.repo as string,
 			}),
-		enabled: !!form.watch('repo.name') && !_.isEmpty(gitProvider),
+		enabled: !!form.watch('repo.name') && !_.isEmpty(gitProvider) && !_.isNil(selectedRepo),
 	});
-
 	const { mutate: disconnectGitHandler, isPending } = useMutation({
 		mutationFn: () => disconnectGitProvider(gitProvider._id),
 	});

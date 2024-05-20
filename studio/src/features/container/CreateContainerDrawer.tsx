@@ -147,6 +147,7 @@ export default function CreateContainerDrawer() {
 			});
 		}
 	}, [isCreateContainerDialogOpen]);
+
 	return (
 		<Drawer open={isCreateContainerDialogOpen} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>

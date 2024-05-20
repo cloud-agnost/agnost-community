@@ -21,12 +21,14 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import ContainerFormTitle from './ContainerFormLayout';
 import { Separator } from '@/components/Separator';
+import useContainerStore from '@/store/container/containerStore';
 
 export default function KNativeConfig() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
-
+	const { container } = useContainerStore();
 	useEffect(() => {
+		if (container) return;
 		form.setValue('knativeConfig.concurrency', 100);
 		form.setValue('knativeConfig.scalingMetric', 'concurrency');
 		form.setValue('knativeConfig.scalingMetricTarget', 70);
