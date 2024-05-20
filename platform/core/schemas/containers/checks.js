@@ -3,6 +3,7 @@ import parser from "cron-parser";
 import cntrCtrl from "../../controllers/container.js";
 import domainCtrl from "../../controllers/domain.js";
 import clsCtrl from "../../controllers/cluster.js";
+import gitCtrl from "../../controllers/gitProvider.js";
 import { timezones } from "../../config/timezones.js";
 
 export const checkName = (containerType, actionType) => {
@@ -119,6 +120,33 @@ export const checkRepo = (containerType, actionType) => {
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty")),
+		body("repo.gitProviderId")
+			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.custom(async (value, { req }) => {
+				if (!helper.isValidId(value)) {
+					throw new AgnostError(t("Invalid Git provider ID"));
+				}
+				const gitProvider = await gitCtrl.getOneByQuery({
+					_id: value,
+				});
+				if (!gitProvider) {
+					throw new AgnostError(t("Git provider not found"));
+				}
+
+				if (gitProvider.accessToken)
+					gitProvider.accessToken = helper.decryptText(gitProvider.accessToken);
+				if (gitProvider.refreshToken)
+					gitProvider.refreshToken = helper.decryptText(
+						gitProvider.refreshToken
+					);
+
+				req.gitProvider = gitProvider;
+				return true;
+			}),
 	];
 };
 

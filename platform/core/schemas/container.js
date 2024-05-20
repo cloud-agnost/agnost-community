@@ -102,6 +102,11 @@ export const ContainerModel = mongoose.model(
 					type: String,
 					default: "Dockerfile",
 				},
+				gitProviderId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "git_provider",
+					index: true,
+				},
 			},
 			registry: {
 				// Internal iid or the image registry
