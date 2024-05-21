@@ -107,6 +107,9 @@ export const ContainerModel = mongoose.model(
 					ref: "git_provider",
 					index: true,
 				},
+				webHookId: {
+					type: String,
+				},
 			},
 			registry: {
 				// Internal iid or the image registry

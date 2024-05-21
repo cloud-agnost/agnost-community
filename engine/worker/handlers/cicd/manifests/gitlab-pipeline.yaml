@@ -21,6 +21,8 @@ spec:
       value: willbereplaced
     - name: imagename
       value: willbereplaced
+    - name: dockerfile
+      value: willbereplaced
     - name: gitrevision
       value: $(body.after)
     - name: gitrepourl
@@ -47,6 +49,7 @@ spec:
     - name: gitrepourl
     - name: gitreponame
     - name: imagename
+    - name: dockerfile
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
@@ -88,13 +91,15 @@ spec:
                   --destination=${IMAGE} \
                   --context=$(workspaces.ws.path)/$(tt.params.gitreponame) \
                   --context-sub-path=$(tt.params.gitsubpath) \
+                  --dockerfile=$(tt.params.dockerfile) \
                   --no-push \
                   --tar-path=$(workspaces.ws.path)/image.tar
               else
                 /kaniko/executor \
                   --destination=${IMAGE} \
                   --context=$(workspaces.ws.path)/$(tt.params.gitreponame) \
-                  --context-sub-path=$(tt.params.gitsubpath)
+                  --context-sub-path=$(tt.params.gitsubpath) \
+                  --dockerfile=$(tt.params.dockerfile) \
               fi
             volumeMounts:
             - name: regcred
@@ -189,6 +194,8 @@ spec:
           params:
             - name: "filter"
               value: "body.ref == 'refs/heads/master'"
+            - name: "filter"
+              value: "will be replaced or removed"
       bindings:
         - ref: gitlab-push-binding
       template:

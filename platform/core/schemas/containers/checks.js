@@ -76,20 +76,38 @@ export const checkRepoOrRegistry = (containerType, actionType) => {
 export const checkRepo = (containerType, actionType) => {
 	return [
 		body("repo.type")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
 			.bail()
 			.isIn(["github", "gitlab", "bitbucket"])
 			.withMessage(t("Unsupported Git provider")),
-		body("repo.name")
+		body("repo.connected")
 			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.trim()
+			.notEmpty()
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.isBoolean()
+			.withMessage(t("Not a valid boolean value"))
+			.toBoolean(),
+		body("repo.name")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty")),
 		body("repo.url")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -97,12 +115,18 @@ export const checkRepo = (containerType, actionType) => {
 			.isURL({ require_tld: false, require_protocol: true })
 			.withMessage(t("Invalid URL")),
 		body("repo.branch")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty")),
 		body("repo.path")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))
@@ -116,12 +140,18 @@ export const checkRepo = (containerType, actionType) => {
 			) // Remove trailing slashes using custom sanitizer
 			.customSanitizer((value) => value.replace(/\/+$/, "")),
 		body("repo.dockerfile")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty")),
 		body("repo.gitProviderId")
-			.if((value, { req }) => req.body.repoOrRegistry === "repo")
+			.if(
+				(value, { req }) =>
+					req.body.repoOrRegistry === "repo" && req.body.repo.connected
+			)
 			.trim()
 			.notEmpty()
 			.withMessage(t("Required field, cannot be left empty"))

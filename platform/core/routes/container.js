@@ -2,6 +2,7 @@ import axios from "axios";
 import express from "express";
 import auditCtrl from "../controllers/audit.js";
 import cntrCtrl from "../controllers/container.js";
+import gitCtrl from "../controllers/gitProvider.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -77,11 +78,11 @@ router.post(
 	applyRules("create"),
 	validate,
 	async (req, res) => {
-		const session = await cntrCtrl.startSession();
-
+		// We do not create a session here because the engine-worker send back the webhookid for the build pipeline
+		const containerId = helper.generateId();
 		try {
 			let prefix = "cnt";
-			const { org, project, environment, body, user } = req;
+			const { org, project, environment, gitProvider, body, user } = req;
 			// Sanitize values
 			switch (body.type) {
 				case "deployment":
@@ -100,7 +101,6 @@ router.post(
 					break;
 			}
 
-			const containerId = helper.generateId();
 			const container = await cntrCtrl.create(
 				{
 					...body,
@@ -111,13 +111,13 @@ router.post(
 					iid: helper.generateSlug(prefix),
 					createdBy: user._id,
 				},
-				{ session, cacheKey: containerId }
+				{ cacheKey: containerId }
 			);
 
 			// Create the container in the Kubernetes cluster
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/cicd/container",
-				{ container, environment, action: "create" },
+				{ container, environment, gitProvider, action: "create" },
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,
@@ -125,9 +125,6 @@ router.post(
 					},
 				}
 			);
-
-			// Commit the database transaction
-			await cntrCtrl.commit(session);
 
 			res.json(container);
 
@@ -147,7 +144,8 @@ router.post(
 				}
 			);
 		} catch (err) {
-			await cntrCtrl.rollback(session);
+			// Clean up
+			await cntrCtrl.deleteOneById(containerId, { cacheKey: containerId });
 			handleError(req, res, err);
 		}
 	}
@@ -202,7 +200,8 @@ router.put(
 		const session = await cntrCtrl.startSession();
 
 		try {
-			const { org, project, environment, container, body, user } = req;
+			const { org, project, environment, container, gitProvider, body, user } =
+				req;
 
 			// Remove the data that cannot be updated
 			delete body._id;
@@ -290,6 +289,7 @@ router.put(
 				{
 					container: updatedContainer,
 					environment,
+					gitProvider,
 					changes: {
 						containerPort:
 							container.networking.containerPort !==
@@ -297,6 +297,16 @@ router.put(
 						customDomain:
 							container.networking.customDomain.domain !==
 							updatedContainer.networking.customDomain.domain,
+						gitRepo:
+							container.repo.type !== updatedContainer.repo.type ||
+							container.repo.connected !== updatedContainer.repo.connected ||
+							container.repo.name !== updatedContainer.repo.name ||
+							container.repo.url !== updatedContainer.repo.url ||
+							container.repo.branch !== updatedContainer.repo.branch ||
+							container.repo.path !== updatedContainer.repo.path ||
+							container.repo.dockerfile !== updatedContainer.repo.dockerfile ||
+							container.repo.gitProviderId.toString() !==
+								updatedContainer.repo.gitProviderId.toString(),
 					},
 					action: "update",
 				},
@@ -361,10 +371,21 @@ router.delete(
 				cacheKey: container._id,
 			});
 
+			let gitProvider = null;
+			if (container.repo.gitProviderId) {
+				gitProvider = await gitCtrl.getOneById(container.repo.gitProviderId);
+
+				if (gitProvider?.accessToken)
+					gitProvider.accessToken = helper.decryptText(gitProvider.accessToken);
+				if (gitProvider?.refreshToken)
+					gitProvider.refreshToken = helper.decryptText(
+						gitProvider.refreshToken
+					);
+			}
 			// Deletes the container in the Kubernetes cluster
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/cicd/container",
-				{ container, environment, action: "delete" },
+				{ container, environment, gitProvider, action: "delete" },
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

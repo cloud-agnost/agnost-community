@@ -145,8 +145,62 @@ router.post(
 					containerId: updatedContainer._id,
 				},
 			});
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
 
-			console.log("***here", container.iid);
+/*
+@route      /v1/telemetry/set-webhook
+@method     POST
+@desc       Updates the webhook id of the container
+@access     public
+*/
+router.post(
+	"/set-webhook",
+	checkContentType,
+	authMasterToken,
+	async (req, res) => {
+		try {
+			const { container, webHookId } = req.body;
+			await cntrCtrl.updateOneById(
+				container._id,
+				{
+					"repo.webHookId": webHookId,
+				},
+				{},
+				{ cacheKey: container._id }
+			);
+
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/telemetry/remove-webhook
+@method     POST
+@desc       Updates the webhook id of the container
+@access     public
+*/
+router.post(
+	"/remove-webhook",
+	checkContentType,
+	authMasterToken,
+	async (req, res) => {
+		try {
+			const { container, webHookId } = req.body;
+			await cntrCtrl.updateOneById(
+				container._id,
+				{},
+				{ "repo.webHookId": "" },
+				{ cacheKey: container._id }
+			);
+
+			res.json();
 		} catch (error) {
 			handleError(req, res, error);
 		}

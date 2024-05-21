@@ -29,6 +29,7 @@
       "mysql2": "^3.6.2",
       "nanoid": "4.0.1",
       "nocache": "3.0.4",
+      "@octokit/core": "5.1.0",
       "pg": "8.10.0",
       "rate-limiter-flexible": "2.4.1",
       "redis": "3.1.2",
