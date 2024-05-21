@@ -16,6 +16,10 @@ import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
 import { createRateLimiter } from "./middlewares/rateLimiter.js";
 import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
 import { logRequest } from "./middlewares/logRequest.js";
+import {
+	watchBuildEvents,
+	stopWatchingBuildEvents,
+} from "./handler/watchTaskRuns.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,6 +39,11 @@ var processing = false;
 	const server = initExpress(i18n);
 	//Launch scheduler
 	initResourceMonitorScheduler();
+
+	watchBuildEvents().catch((err) => {
+		logger.error("Watch build events error:", err);
+	});
+
 	// Gracefull handle process exist
 	handleProcessExit(server);
 })();
@@ -148,5 +157,7 @@ function handleProcessExit(server) {
 		server.close(() => {
 			logger.info("Http server closed");
 		});
+		// Stop watching build events
+		stopWatchingBuildEvents();
 	});
 }

@@ -139,4 +139,38 @@ router.post("/container/logs", checkContentType, authAccessToken, async (req, re
     }
 });
 
+/*
+@route      /v1/cicd/container/pipelines
+@method     POST
+@desc       Returns the build & deploy pipeline runs of the container
+@access     public
+*/
+router.post("/container/pipelines", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is container and environment objects
+        const result = await cicdManager.getContainerTaskRuns(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /v1/cicd/container/pipelines
+@method     POST
+@desc       Returns logs of specific build & deploy pipeline run of a container
+@access     public
+*/
+router.post("/container/taskrun-logs", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const cicdManager = new CICDManager();
+        // The body of the request is container and environment objects
+        const result = await cicdManager.getTaskRunLogs(req.body);
+        res.status(result.status === "success" ? 200 : 400).json(result);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
 export default router;
