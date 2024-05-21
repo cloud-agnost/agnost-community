@@ -21,6 +21,8 @@ spec:
       value: willbereplaced
     - name: imagename
       value: willbereplaced
+    - name: dockerfile
+      value: willbereplaced
     - name: gitrevision
       value: $(body.head_commit.id)
     - name: gitrepo
@@ -44,6 +46,7 @@ spec:
     - name: gitrevision
     - name: gitrepo
     - name: imagename
+    - name: dockerfile
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
@@ -82,6 +85,7 @@ spec:
                   --context=${CONTEXT} \
                   --context-sub-path=$(tt.params.gitsubpath) \
                   --git branch=$(tt.params.gitbranch) \
+                  --dockerfile=$(tt.params.dockerfile) \
                   --no-push \
                   --tar-path=$(workspaces.ws.path)/image.tar
               else
@@ -89,6 +93,7 @@ spec:
                   --destination=${IMAGE} \
                   --context=${CONTEXT} \
                   --context-sub-path=$(tt.params.gitsubpath) \
+                  --dockerfile=$(tt.params.dockerfile) \
                   --git branch=$(tt.params.gitbranch)
               fi
             volumeMounts:
@@ -178,9 +183,6 @@ spec:
                 secretKey: secretToken
             - name: "eventTypes"
               value: ["push"]
-            - name: "addChangedFiles"
-              value:
-                enabled: true
         - name: "Only for the specific branch"
           ref:
             name: "cel"

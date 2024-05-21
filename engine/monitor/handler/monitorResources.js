@@ -1324,7 +1324,6 @@ async function getDeploymentStatus(name, namespace) {
 			creationTimestamp: deployment.metadata.creationTimestamp,
 		};
 	} catch (err) {
-		console.error("Error retrieving deployment status:", err);
 		return null;
 	}
 }
@@ -1380,7 +1379,6 @@ async function getStatefulSetStatus(name, namespace) {
 			creationTimestamp: statefulSet.metadata.creationTimestamp,
 		};
 	} catch (err) {
-		console.error("Error retrieving statefulset status:", err);
 		return null;
 	}
 }
@@ -1429,7 +1427,6 @@ async function getCronJobStatus(name, namespace) {
 			creationTimestamp: cronJob.metadata.creationTimestamp,
 		};
 	} catch (err) {
-		console.error("Error retrieving cronjob status:", err);
 		return null;
 	}
 }
@@ -1546,7 +1543,6 @@ async function getKnativeStatus(name, namespace) {
 			pendingReplicas,
 		};
 	} catch (err) {
-		console.error("Error retrieving knative service status:", err);
 		return null;
 	}
 }

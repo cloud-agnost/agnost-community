@@ -768,7 +768,6 @@ router.post(
 				return value;
 			}
 			const parsedFilter = JSON.parse(JSON.stringify(body.filter), dateReviver);
-			console.log(JSON.stringify(parsedFilter, null, 2));
 			const logs = await db
 				.collection(collectionName)
 				.find(parsedFilter, {

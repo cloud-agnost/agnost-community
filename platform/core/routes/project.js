@@ -93,7 +93,6 @@ router.post(
 				{ orgId: org._id, projectId: project._id }
 			);
 		} catch (err) {
-			console.log("***err", err);
 			await prjCtrl.rollback(session);
 			handleError(req, res, err);
 		}

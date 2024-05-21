@@ -180,7 +180,6 @@ router.delete("/", authSession, async (req, res) => {
 			});
 		}
 	} catch (error) {
-		console.log(error);
 		await userCtrl.rollback(session);
 		handleError(req, res, error);
 	}
