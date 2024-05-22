@@ -21,14 +21,14 @@ export default function DnsSettings() {
 				</div>
 				<Separator />
 				{cluster?.ips.map((ip) => (
-					<div className='flex justify-between' key={ip}>
-						<p className='flex-1'>A</p>
-						<p className='flex-1'>@</p>
-						<div className='flex items-center gap-3 flex-1 group'>
+					<div className='grid grid-cols-4' key={ip}>
+						<p className='mt-1'>A</p>
+						<p className='mt-1'>@</p>
+						<div className='flex items-center gap-3 group'>
 							<div className='truncate font-mono'>{ip}</div>
-							<CopyButton text={ip} className='w-6 h-6 invisible group-hover:visible' />
+							<CopyButton text={ip} className='invisible group-hover:visible' />
 						</div>
-						<p className='flex-1'>1 {t('general.hour')}</p>
+						<p className='mt-1'>1 {t('general.hour')}</p>
 					</div>
 				))}
 			</div>
