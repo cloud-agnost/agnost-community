@@ -13,7 +13,7 @@ import { Separator } from '@/components/Separator';
 import { Switch } from '@/components/Switch';
 import useContainerStore from '@/store/container/containerStore';
 import useProjectEnvironmentStore from '@/store/project/projectEnvironmentStore';
-import { CreateContainerParams } from '@/types/container';
+import { ContainerType, CreateContainerParams } from '@/types/container';
 import { ArrowDown, ShareNetwork, Trash } from '@phosphor-icons/react';
 import _ from 'lodash';
 import { useFormContext } from 'react-hook-form';
@@ -109,7 +109,7 @@ export default function Networking() {
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										{container?.networking?.customDomain.added ? (
+										{container?.networking?.customDomain?.added ? (
 											<div className='relative'>
 												<CopyInput
 													disabled={!form.watch('networking.customDomain.enabled')}
@@ -153,41 +153,43 @@ export default function Networking() {
 							)}
 						/>
 					)}
-					<FormField
-						control={form.control}
-						name='networking.tcpProxy.enabled'
-						render={({ field }) => (
-							<div className='space-y-4'>
-								<FormItem className='flex justify-between gap-4 items-center space-y-0'>
-									<div>
-										<FormLabel>{t('container.networking.tcp_proxy')}</FormLabel>
-										<FormDescription>{t('container.networking.tcp_proxy_help')}</FormDescription>
-									</div>
+					{container.type !== ContainerType.KNativeService && (
+						<FormField
+							control={form.control}
+							name='networking.tcpProxy.enabled'
+							render={({ field }) => (
+								<div className='space-y-4'>
+									<FormItem className='flex justify-between gap-4 items-center space-y-0'>
+										<div>
+											<FormLabel>{t('container.networking.tcp_proxy')}</FormLabel>
+											<FormDescription>{t('container.networking.tcp_proxy_help')}</FormDescription>
+										</div>
 
-									<FormControl>
-										<Switch checked={field.value} onCheckedChange={field.onChange} />
-									</FormControl>
-								</FormItem>
-								{form.watch('networking.tcpProxy.enabled') && (
-									<div className='flex items-center gap-2'>
-										<CopyInput
-											className='flex-1'
-											readOnly
-											value={`${window.location.hostname}:${
-												container?.networking?.tcpProxy.publicPort ?? ''
-											}`}
-										/>
-										<ArrowDown className='self-center' />
-										<CopyInput
-											className='flex-1'
-											readOnly
-											value={`${container?.iid}.${environment.iid}.svc.cluster.local:${container?.networking?.containerPort}`}
-										/>
-									</div>
-								)}
-							</div>
-						)}
-					/>
+										<FormControl>
+											<Switch checked={field.value} onCheckedChange={field.onChange} />
+										</FormControl>
+									</FormItem>
+									{form.watch('networking.tcpProxy.enabled') && (
+										<div className='flex items-center gap-2'>
+											<CopyInput
+												className='flex-1'
+												readOnly
+												value={`${window.location.hostname}:${
+													container?.networking?.tcpProxy?.publicPort ?? ''
+												}`}
+											/>
+											<ArrowDown className='self-center' />
+											<CopyInput
+												className='flex-1'
+												readOnly
+												value={`${container?.iid}.${environment.iid}.svc.cluster.local:${container?.networking?.containerPort}`}
+											/>
+										</div>
+									)}
+								</div>
+							)}
+						/>
+					)}
 					<FormField
 						control={form.control}
 						name='networking.ingress.enabled'

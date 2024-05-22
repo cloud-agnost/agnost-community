@@ -66,6 +66,7 @@ const useProjectEnvironmentStore = create<ProjectEnvironmentStore & Actions>((se
 	},
 	createEnvironment: async (req: CreateNewEnvironmentRequest) => {
 		const environment = await ProjectEnvironmentService.createEnvironment(req);
+
 		set((prev) => ({ environments: [...prev.environments, environment] }));
 		return environment;
 	},

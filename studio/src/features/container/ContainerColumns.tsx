@@ -3,12 +3,14 @@ import { Badge } from '@/components/Badge';
 import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
+import { Github } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useContainerStore from '@/store/container/containerStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName } from '@/types';
 import { Container } from '@/types/container';
 import { translate } from '@/utils';
+import { GitBranch, GitMerge } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { Link } from 'react-router-dom';
 
@@ -28,30 +30,22 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		enableSorting: true,
 		cell: ({ row: { original } }) => {
 			const { type } = original;
-			return (
-				<Badge
-					className='min-w-[100px]'
-					variant={BADGE_COLOR_MAP[type.toUpperCase()]}
-					text={startCase(type)}
-				/>
-			);
+			return <Badge className='min-w-[100px]' text={startCase(type)} />;
 		},
 	},
 	{
-		id: 'sourceOrRegistry',
-		header: () => (
-			<SortButton text={translate('project.sourceOrRegistry')} field='sourceOrRegistry' />
-		),
-		accessorKey: 'sourceOrRegistry',
+		id: 'status',
+		header: () => <SortButton text={translate('general.status')} field='type' />,
+		accessorKey: 'status',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({ row: { original } }) => {
-			const { repoOrRegistry } = original;
+			const { status } = original;
 			return (
 				<Badge
-					className='min-w-[70px]'
-					variant={BADGE_COLOR_MAP[repoOrRegistry.toUpperCase()]}
-					text={startCase(repoOrRegistry)}
+					variant={BADGE_COLOR_MAP[status.status.toUpperCase()]}
+					text={startCase(status.status)}
+					rounded
 				/>
 			);
 		},
@@ -64,15 +58,21 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		enableSorting: true,
 		cell: ({ row: { original } }) => {
 			const { repo, registry } = original;
+
 			return (
-				<Link
-					className='link'
-					to={repo.url ?? registry?.image ?? ''}
-					target='_blank'
-					rel='noopener noreferrer'
-				>
-					{startCase(repo?.type ?? registry?.registryId)}
-				</Link>
+				repo?.url && (
+					<Link
+						className='link'
+						to={repo?.url ?? registry?.image ?? ''}
+						target='_blank'
+						rel='noopener noreferrer'
+					>
+						<p className='flex items-center gap-2'>
+							<Github />
+							{repo?.name}/{repo?.branch}
+						</p>
+					</Link>
+				)
 			);
 		},
 	},

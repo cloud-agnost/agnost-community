@@ -6,7 +6,6 @@ import { CreateContainerParams } from '@/types/container';
 import { cn } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { isEmpty } from 'lodash';
-import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 export default function Variables() {
@@ -17,11 +16,6 @@ export default function Variables() {
 		name: 'variables',
 	});
 
-	useEffect(() => {
-		if (!fields.length) {
-			append({ name: '', value: '' });
-		}
-	}, [fields]);
 	return (
 		<div className='space-y-8'>
 			{fields.map((f, index) => (
@@ -97,7 +91,7 @@ export default function Variables() {
 						}}
 					>
 						<Plus size={16} className='text-brand-primary' />
-						<span className='text-brand-primary ml-2'>{t('general.add')}</span>
+						<span className='text-brand-primary ml-2'>{t('container.add_variable')}</span>
 					</Button>
 				)}
 			</div>

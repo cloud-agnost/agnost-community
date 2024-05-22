@@ -17,7 +17,7 @@ export default function Pods() {
 	const { getContainerPods, container, isPodInfoOpen, closePodInfo, selectedPod } =
 		useContainerStore();
 	const { orgId, envId, projectId } = useParams() as Record<string, string>;
-	const { data: pods, isPending } = useQuery({
+	const { data: pods, isPending } = useQuery<ContainerPod[]>({
 		queryKey: ['containerPods'],
 		queryFn: () =>
 			getContainerPods({
@@ -30,20 +30,20 @@ export default function Pods() {
 	});
 	const table = useTable<ContainerPod>({
 		columns: PodColumns,
-		data: pods || [],
+		data: pods ?? [],
 	});
 	const conditionTable = useTable<PodCondition>({
 		columns: PodInfoColumns,
 		data: selectedPod?.conditions || [],
 	});
 
-	if (isPending) {
+	if (isPending && !pods) {
 		return <Loading />;
 	}
-
+	console.log(pods?.length!);
 	return (
 		<div
-			className={cn('table-container overflow-auto', pods?.length! > 10 && 'h-full')}
+			className={cn('table-container overflow-auto', pods?.length! > 13 && 'h-full')}
 			id='scroll'
 		>
 			<DataTable
@@ -88,7 +88,6 @@ const PodColumns: ColumnDefWithClassName<ContainerPod>[] = [
 		id: 'status',
 		header: 'Status',
 		accessorKey: 'status',
-		enableSorting: true,
 		size: 100,
 		cell: ({ row }) => (
 			<Badge
@@ -102,19 +101,16 @@ const PodColumns: ColumnDefWithClassName<ContainerPod>[] = [
 		id: 'restarts',
 		header: 'Restarts',
 		accessorKey: 'restarts',
-		enableSorting: true,
 		size: 50,
 	},
 	{
 		id: 'createdOn',
 		header: 'Created On',
 		accessorKey: 'createdOn',
-		enableSorting: true,
 		cell: ({ row }) => getRelativeTime(row.original.createdOn),
 	},
 	{
 		id: 'actions',
-		enableSorting: true,
 		cell: ({ row }) => (
 			<Button
 				variant='icon'
@@ -133,7 +129,7 @@ const PodInfoColumns: ColumnDefWithClassName<PodCondition>[] = [
 		id: 'lastTransitionTime',
 		header: 'Last Transition Time',
 		accessorKey: 'lastTransitionTime',
-		enableSorting: true,
+
 		size: 300,
 		cell: ({ row }) => formatDate(row.original.lastTransitionTime, DATE_TIME_FORMAT),
 	},
@@ -141,7 +137,7 @@ const PodInfoColumns: ColumnDefWithClassName<PodCondition>[] = [
 		id: 'type',
 		header: 'Type',
 		accessorKey: 'type',
-		enableSorting: true,
+
 		cell: ({ row }) => (
 			<Badge
 				variant={BADGE_COLOR_MAP[row.original.type.toUpperCase()]}
@@ -154,12 +150,10 @@ const PodInfoColumns: ColumnDefWithClassName<PodCondition>[] = [
 		id: 'reason',
 		header: 'Reason',
 		accessorKey: 'reason',
-		enableSorting: true,
 	},
 	{
 		id: 'message',
 		header: 'Message',
 		accessorKey: 'message',
-		enableSorting: true,
 	},
 ];

@@ -31,28 +31,52 @@ export default function KnativeForm() {
 				descriptionI18nKey='container.knative.description'
 				icon={<IdentificationCard size={20} />}
 			>
-				<FormField
-					control={form.control}
-					name='name'
-					render={({ field }) => (
-						<FormItem className='flex-1'>
-							<FormLabel>{t('container.knative.name')}</FormLabel>
-							<FormControl>
-								<Input
-									error={Boolean(form.formState.errors.name)}
-									placeholder={
-										t('forms.placeholder', {
-											label: t('container.knative.name'),
-										}) ?? ''
-									}
-									{...field}
-								/>
-							</FormControl>
-							<FormDescription>{t('forms.max64.description')}</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				<div className='grid grid-cols-2 gap-2'>
+					<FormField
+						control={form.control}
+						name='name'
+						render={({ field }) => (
+							<FormItem className='flex-1'>
+								<FormLabel>{t('container.knative.name')}</FormLabel>
+								<FormControl>
+									<Input
+										error={Boolean(form.formState.errors.name)}
+										placeholder={
+											t('forms.placeholder', {
+												label: t('container.knative.name'),
+											}) ?? ''
+										}
+										{...field}
+									/>
+								</FormControl>
+								<FormDescription>{t('forms.max64.description')}</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='knativeConfig.initialScale'
+						render={({ field }) => (
+							<FormItem className='flex-1'>
+								<FormLabel>{t('container.knative.initial_scale')}</FormLabel>
+								<FormControl>
+									<Input
+										error={Boolean(form.formState.errors.name)}
+										type='number'
+										placeholder={
+											t('forms.placeholder', {
+												label: t('container.knative.initial_scale'),
+											}) ?? ''
+										}
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 			</ContainerFormTitle>
 
 			<SourceConfig />
@@ -60,7 +84,6 @@ export default function KnativeForm() {
 			<PodConfiguration />
 			<KNativeConfig />
 			<Probes />
-			<StorageConfig />
 		</>
 	);
 }

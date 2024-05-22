@@ -24,6 +24,14 @@ export default function StatefulForm() {
 			'statefulSetConfig.desiredReplicas',
 			container?.statefulSetConfig?.desiredReplicas ?? 1,
 		);
+		form.setValue(
+			'statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted',
+			container?.statefulSetConfig?.persistentVolumeClaimRetentionPolicy?.whenDeleted ?? 'Retain',
+		);
+		form.setValue(
+			'statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled',
+			container?.statefulSetConfig?.persistentVolumeClaimRetentionPolicy?.whenScaled ?? 'Retain',
+		);
 	}, [container]);
 
 	return (

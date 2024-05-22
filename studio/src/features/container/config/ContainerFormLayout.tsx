@@ -32,29 +32,23 @@ export default function ContainerFormTitle({
 				defaultValue={['General', 'Networking', 'Source']}
 			>
 				<AccordionItem value={title} className='space-y-6 border-none'>
-					<AccordionTrigger
-						className={cn(
-							'text-justify !p-0 flex items-center justify-between',
-							descriptionI18nKey ? 'mt-2.5' : 'mt-1.5',
-						)}
-					>
-						{
-							<Description
-								title={title}
-								className='[&>h2]:leading-none [&>p]:leading-5 text-pretty'
-							>
-								{descriptionI18nKey ? (
-									<Trans i18nKey={descriptionI18nKey} components={{ 1: <br /> }} />
-								) : null}
-							</Description>
-						}
+					<AccordionTrigger className={cn('text-justify !p-0 flex items-center justify-between')}>
+						<h2 className='text-default text-sm	leading-8 font-semibold font-sfCompact'>{title}</h2>
 						<CaretDown
 							size={20}
 							className='shrink-0 self-start text-icon-base transition-transform duration-200 group-data-[state=open]:rotate-180'
 						/>
 					</AccordionTrigger>
 					<AccordionContent className='overflow-visible'>
-						<div className='space-y-6'>{children}</div>
+						<div className='space-y-6'>
+							{' '}
+							<div className='text-xs text-subtle font-normal leading-6 font-sfCompact'>
+								{descriptionI18nKey && (
+									<Trans i18nKey={descriptionI18nKey} components={{ 1: <br /> }} />
+								)}
+							</div>
+							{children}
+						</div>
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>

@@ -28,6 +28,7 @@ const defaultValues: Partial<CreateContainerParams> = {
 	repo: {
 		type: 'github',
 		dockerfile: 'Dockerfile',
+		connected: false,
 		path: '/',
 	},
 	podConfig: {
@@ -75,8 +76,9 @@ const defaultValues: Partial<CreateContainerParams> = {
 	},
 	storageConfig: {
 		enabled: false,
-		sizeType: 'mebibyte',
+		sizeType: 'gibibyte',
 		accessModes: ['ReadWriteOnce'],
+		size: 1,
 	},
 	orgId: '',
 	projectId: '',
@@ -159,23 +161,23 @@ export default function CreateContainerDrawer() {
 					</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll space-y-12'>
-						{ContainerType.Deployment === createdContainerType && <DeploymentForm />}
-						{ContainerType.StatefulSet === createdContainerType && <StatefulForm />}
-						{ContainerType.KNativeService === createdContainerType && <KnativeForm />}
-						{ContainerType.CronJob === createdContainerType && <CronJobFrom />}
+					<form onSubmit={form.handleSubmit(onSubmit)} className='overflow-auto'>
+						<div className='p-6 scroll space-y-6 relative'>
+							{ContainerType.Deployment === createdContainerType && <DeploymentForm />}
+							{ContainerType.StatefulSet === createdContainerType && <StatefulForm />}
+							{ContainerType.KNativeService === createdContainerType && <KnativeForm />}
+							{ContainerType.CronJob === createdContainerType && <CronJobFrom />}
+						</div>
 
-						<DrawerFooter className='mt-8'>
-							<div className='flex justify-end'>
-								<DrawerClose asChild>
-									<Button variant='secondary' size='lg'>
-										{t('general.cancel')}
-									</Button>
-								</DrawerClose>
-								<Button className='ml-2' type='submit' size='lg' loading={isPending}>
-									{t('general.save')}
+						<DrawerFooter className='p-6 bg-subtle border-t'>
+							<DrawerClose asChild>
+								<Button variant='secondary' size='lg'>
+									{t('general.cancel')}
 								</Button>
-							</div>
+							</DrawerClose>
+							<Button className='ml-2' type='submit' size='lg' loading={isPending}>
+								{t('general.save')}
+							</Button>
 						</DrawerFooter>
 					</form>
 				</Form>

@@ -41,7 +41,7 @@ export default function CronExamples({ selectCron, children }: CronExamplesProps
 					{CRON_EXAMPLES.map((cron) => (
 						<DropdownMenuItem
 							key={cron}
-							className='space-x-4 hover:bg-subtle'
+							className='hover:bg-subtle grid grid-cols-[1fr_3fr] gap-2'
 							onClick={() => selectCron(cron)}
 						>
 							<p className='text-default text-xs whitespace-nowrap'>{cron}</p>

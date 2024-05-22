@@ -23,7 +23,7 @@ export default function Logs() {
 			}),
 		refetchInterval: 3000,
 	});
-	const [selectedPod, setSelectedPod] = useState<ContainerPod | undefined>(data.pods[0]);
+	const [selectedPod, setSelectedPod] = useState<ContainerPod | undefined>(data?.pods[0]);
 
 	function onSelect(podName: string) {
 		if (!data?.pods) return;
@@ -41,17 +41,18 @@ export default function Logs() {
 	}, [selectedPod, data]);
 
 	return (
-		<div className='h-full space-y-4'>
-			<Select defaultValue={selectedPod?.name} onValueChange={onSelect}>
+		<div className='h-full space-y-4 flex flex-col'>
+			<Select value={selectedPod?.name} onValueChange={onSelect}>
 				<SelectTrigger className='w-full'>
-					<SelectValue>
-						{selectedPod?.name}
+					<div className='flex justify-between w-full mr-4'>
+						<SelectValue />
 						<Badge
 							className='ml-4'
 							variant={BADGE_COLOR_MAP[selectedPod?.status.toUpperCase() ?? 'DEFAULT']}
 							text={selectedPod?.status!}
+							rounded
 						/>
-					</SelectValue>
+					</div>
 				</SelectTrigger>
 
 				<SelectContent>
@@ -62,21 +63,20 @@ export default function Logs() {
 					))}
 				</SelectContent>
 			</Select>
-			<div className='h-full flex-1'>
-				<CodeEditor
-					key={selectedLogs?.podName}
-					name='pod-logs'
-					language='plaintext'
-					value={selectedLogs?.logs?.join('\n') ?? ''}
-					containerClassName='h-full'
-					className='[&_.overflow-guard]:!h-full [&>:first-child]:!h-full'
-					options={{
-						readOnly: true,
-						wrappingIndent: 'indent',
-						lineNumbers: 'off',
-					}}
-				/>
-			</div>
+
+			<CodeEditor
+				key={selectedLogs?.podName}
+				name='pod-logs'
+				language='plaintext'
+				value={selectedLogs?.logs?.join('\n') ?? ''}
+				containerClassName='flex-1'
+				className='[&_.overflow-guard]:!h-full [&>:first-child]:!h-full'
+				options={{
+					readOnly: true,
+					wrappingIndent: 'indent',
+					lineNumbers: 'off',
+				}}
+			/>
 		</div>
 	);
 }

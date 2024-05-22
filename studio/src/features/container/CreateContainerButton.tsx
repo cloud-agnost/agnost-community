@@ -12,7 +12,7 @@ import { CONTAINER_TYPES } from '@/constants';
 import useContainerStore from '@/store/container/containerStore';
 import { ContainerType } from '@/types/container';
 import { toDisplayName } from '@/utils';
-import { CaretDown, Cloud, Plus, Timer } from '@phosphor-icons/react';
+import { CaretDown, Cloud, Package, Plus, Timer } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import CreateContainerDrawer from './CreateContainerDrawer';
 export default function CreateContainerButton() {
@@ -22,7 +22,7 @@ export default function CreateContainerButton() {
 	function getContainerIcon(type: ContainerType) {
 		switch (type) {
 			case 'deployment':
-				return <Cloud size={16} />;
+				return <Package size={16} />;
 			case 'knative service':
 				return <Knative className='size-4' />;
 			case 'cron job':

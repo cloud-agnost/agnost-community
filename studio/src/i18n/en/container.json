@@ -8,6 +8,7 @@
 	"logs": "Logs",
 	"events": "Events",
 	"variables": "Variables",
+	"add_variable": "Add Variable",
 	"unsaved_changes": "You have unsaved changes.",
 	"source": {
 		"title": "Source",
@@ -34,7 +35,11 @@
 	},
 	"stateful": {
 		"description": "A StatefulSet is used to manage stateful applications. It ensures that each pod in the set has a unique, stable identity and maintains persistent storage across restarts.",
-		"name": "StatefulSet Name"
+		"name": "StatefulSet Name",
+		"Retain": "Storage is not deleted when the app pod is deleted.",
+		"Delete": "Automatically deletes the storage when the app pod is deleted.",
+		"retention_policy_delete": "Retention Policy - On Delete",
+		"retention_policy_scale": "Retention Policy - On Scale Down"
 	},
 	"disconnect": "Disconnect your GitHub Account",
 	"networking": {
@@ -110,8 +115,6 @@
 		"storage_size": "Storage Size",
 		"reclaim": "Reclaim Policy",
 		"accessModes": "Access Modes",
-		"retain": "Stırage is nıot deleted when the app pod is deleted.",
-		"delete": "Automatically deletes the storage when the app pod is deleted.",
 		"ReadWriteOnce": "The storage can be mounted as read-write by a single node. ",
 		"ReadOnlyMany": "The storage can be mounted as read-only by many nodes.",
 		"ReadWriteMany": "The volume can be mounted as read-write by many nodes.",
@@ -138,7 +141,8 @@
 		"rps_postfix": "rps",
 		"cpu_postfix": "Millicores",
 		"memory_postfix": "Mebibytes",
-		"seconds": "Seconds"
+		"seconds": "Seconds",
+		"initial_scale": "Initial Scale"
 	},
 	"cronjob": {
 		"name": "CronJob Name",

@@ -9,13 +9,14 @@ import {
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
-import { CreateContainerParams, StateOption } from '@/types/container';
-import { Package } from '@phosphor-icons/react';
-import { startCase } from 'lodash';
+import { ContainerType, CreateContainerParams, StateOption } from '@/types/container';
+import { Database, Package } from '@phosphor-icons/react';
+import _, { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import MultiSelect, { OptionProps, components } from 'react-select';
 import ContainerFormTitle from './ContainerFormLayout';
+import useContainerStore from '@/store/container/containerStore';
 
 const accessModesOptions: StateOption[] = [
 	{ value: 'ReadWriteOnce', label: 'ReadWriteOnce' },
@@ -26,10 +27,11 @@ const accessModesOptions: StateOption[] = [
 export default function StorageConfig() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
+	const { container } = useContainerStore();
 	return (
 		<ContainerFormTitle
 			title={t('container.storage.title')}
-			icon={<Package size={20} />}
+			icon={<Database size={20} />}
 			descriptionI18nKey='container.storage.description'
 		>
 			<FormField
@@ -39,7 +41,11 @@ export default function StorageConfig() {
 					<FormItem className='flex justify-between gap-4 items-center space-y-0 self-start mt-2'>
 						<FormLabel>{t('container.storage.enable')}</FormLabel>
 						<FormControl>
-							<Switch checked={field.value} onCheckedChange={field.onChange} />
+							<Switch
+								disabled={!_.isNil(container) && container?.type === ContainerType.StatefulSet}
+								checked={field.value}
+								onCheckedChange={field.onChange}
+							/>
 						</FormControl>
 					</FormItem>
 				)}
@@ -132,6 +138,7 @@ export default function StorageConfig() {
 							<FormItem>
 								<FormLabel>{t('container.storage.accessModes')}</FormLabel>
 								<MultiSelect
+									isDisabled={container?.storageConfig?.enabled}
 									isMulti
 									components={{ Option }}
 									options={accessModesOptions}
@@ -154,6 +161,78 @@ export default function StorageConfig() {
 							</FormItem>
 						)}
 					/>
+					{form.watch('type') === ContainerType.StatefulSet && (
+						<div className='grid grid-cols-2 gap-4'>
+							<FormField
+								control={form.control}
+								name='statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenDeleted'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('container.stateful.retention_policy_delete')}</FormLabel>
+										<Select
+											value={field.value}
+											defaultValue={field.value}
+											onValueChange={field.onChange}
+										>
+											<FormControl>
+												<SelectTrigger className='w-full'>
+													<SelectValue>{field.value}</SelectValue>
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<div className='space-y-2'>
+													{['Retain', 'Delete'].map((policy) => (
+														<SelectItem key={policy} value={policy}>
+															{policy}
+															<p className='text-xs text-subtle whitespace-break-spaces'>
+																{t(`container.stateful.${policy}`)}
+															</p>
+														</SelectItem>
+													))}
+												</div>
+											</SelectContent>
+										</Select>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='statefulSetConfig.persistentVolumeClaimRetentionPolicy.whenScaled'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('container.stateful.retention_policy_scale')}</FormLabel>
+										<Select
+											value={field.value}
+											defaultValue={field.value}
+											onValueChange={field.onChange}
+										>
+											<FormControl>
+												<SelectTrigger className='w-full'>
+													<SelectValue>{field.value}</SelectValue>
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<div className='space-y-2'>
+													{['Retain', 'Delete'].map((policy) => (
+														<SelectItem key={policy} value={policy}>
+															{policy}
+															<p className='text-xs text-subtle whitespace-break-spaces'>
+																{t(`container.stateful.${policy}`)}
+															</p>
+														</SelectItem>
+													))}
+												</div>
+											</SelectContent>
+										</Select>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					)}
 				</div>
 			)}
 		</ContainerFormTitle>

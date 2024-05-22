@@ -36,10 +36,12 @@ export default function SourceConfig() {
 		queryFn: () => getGitRepositories(gitProvider._id),
 		enabled: !_.isEmpty(gitProvider),
 	});
+
 	const selectedRepo = useMemo(
 		() => repositories?.find((repo) => repo.fullName === form.watch('repo.name')),
 		[form.watch('repo.name'), repositories],
 	);
+
 	const { data: branches } = useQuery({
 		queryKey: ['branches', gitProvider._id, form.watch('repo.name')],
 		queryFn: () =>
@@ -56,6 +58,10 @@ export default function SourceConfig() {
 	const { mutate: addProvider } = useMutation({
 		mutationFn: () =>
 			addGitProvider({ accessToken: accessToken as string, provider: 'github', refreshToken: '' }),
+		onSuccess: (data) => {
+			form.setValue('repo.gitProviderId', data._id);
+			form.setValue('repo.connected', true);
+		},
 		onError: ({ details }) => {
 			toast({ action: 'error', title: details });
 		},
@@ -92,6 +98,11 @@ export default function SourceConfig() {
 			})) ?? [],
 		[branches],
 	);
+
+	useEffect(() => {
+		form.setValue('repo.connected', !_.isEmpty(gitProvider));
+		form.setValue('repo.gitProviderId', gitProvider._id);
+	}, [gitProvider]);
 
 	return (
 		<ContainerFormTitle

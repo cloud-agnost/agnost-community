@@ -30,7 +30,9 @@ export default function CronJobFrom() {
 	useEffect(() => {
 		form.setValue('cronJobConfig.timeZone', 'UTC');
 		form.setValue('cronJobConfig.concurrencyPolicy', 'Allow');
+		form.setValue('cronJobConfig.suspend', false);
 	}, [form]);
+
 	return (
 		<>
 			<ContainerFormTitle
@@ -77,7 +79,7 @@ export default function CronJobFrom() {
 											<SelectValue>{startCase(field.value)}</SelectValue>
 										</SelectTrigger>
 									</FormControl>
-									<SelectContent className='max-w-full'>
+									<SelectContent className=' max-w-xs'>
 										<div className='space-y-2'>
 											{['Allow', 'Forbid', 'Replace'].map((policy) => (
 												<SelectItem key={policy} value={policy}>
@@ -130,6 +132,7 @@ export default function CronJobFrom() {
 										className='select-container'
 										classNamePrefix='select'
 										defaultValue={timezones.find((option) => option.value === field.value)}
+										value={timezones.find((option) => option.value === field.value)}
 										// @ts-ignore
 										onChange={(selected) => field.onChange(selected?.value)}
 										isSearchable

@@ -10,12 +10,12 @@ import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
-import { CreateContainerParams } from '@/types/container';
-import { Pulse, Info } from '@phosphor-icons/react';
+import { ContainerType, CreateContainerParams } from '@/types/container';
+import { Info, Pulse } from '@phosphor-icons/react';
+import { Fragment, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import ContainerFormTitle from './ContainerFormLayout';
-import { Fragment } from 'react';
 
 const TOOLTIP_FIELDS = [
 	'initialDelaySeconds',
@@ -24,11 +24,16 @@ const TOOLTIP_FIELDS = [
 	'failureThreshold',
 ] as const;
 
-const PROBES_TYPES = ['startup', 'readiness', 'liveness'] as const;
-
 export default function Probes() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
+
+	const PROBES_TYPES = useMemo(() => {
+		if (form.watch('type') === ContainerType.KNativeService) {
+			return ['readiness', 'liveness'] as const;
+		}
+		return ['startup', 'readiness', 'liveness'] as const;
+	}, [form.watch('type')]);
 
 	return (
 		<ContainerFormTitle

@@ -36,9 +36,7 @@ export default function EditContainer() {
 
 	const { mutateAsync: createContainerHandler, isPending } = useMutation({
 		mutationFn: updateContainer,
-		onSuccess: () => {
-			// onClose();
-		},
+		onSuccess: onClose,
 		onError: (error) => {
 			console.error(error);
 		},
@@ -91,8 +89,6 @@ export default function EditContainer() {
 		}
 	}, [isEditContainerDialogOpen]);
 
-	console.log('container', form.formState);
-
 	return (
 		<Drawer open={isEditContainerDialogOpen} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full flex flex-col'>
@@ -117,9 +113,9 @@ export default function EditContainer() {
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className='grid grid-rows-[7fr_1fr] overflow-auto'
+						className='overflow-auto flex-1 flex flex-col'
 					>
-						<div className='px-6 pt-6 space-y-12 flex-1 overflow-auto'>
+						<div className='p-6 space-y-4 flex-1 overflow-auto'>
 							{searchParams.get('t') === 'settings' && (
 								<>
 									{ContainerType.Deployment === container?.type && <DeploymentForm />}
@@ -136,7 +132,7 @@ export default function EditContainer() {
 							{searchParams.get('t') === 'events' && <Events />}
 						</div>
 
-						<DrawerFooter className='mt-6 p-6 bg-subtle border-t flex-row justify-between'>
+						<DrawerFooter className='p-6 bg-subtle border-t flex-row justify-between'>
 							<div className='flex items-center gap-2 text-yellow-500'>
 								{form.formState.isDirty && (
 									<>

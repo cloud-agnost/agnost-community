@@ -8,15 +8,30 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { CreateContainerParams } from '@/types/container';
+import { ContainerType, CreateContainerParams } from '@/types/container';
 import { Cube } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import ContainerFormTitle from './ContainerFormLayout';
+import { useEffect, useMemo } from 'react';
+import useContainerStore from '@/store/container/containerStore';
 export default function PodConfiguration() {
 	const { t } = useTranslation();
 	const form = useFormContext<CreateContainerParams>();
+	const { container } = useContainerStore();
+	const RESTART_POLICIES = useMemo(() => {
+		if (form.watch('type') === ContainerType.CronJob) {
+			return ['OnFailure', 'Never'] as const;
+		}
+		return ['Always', 'OnFailure', 'Never'] as const;
+	}, [form.watch('type')]);
+
+	useEffect(() => {
+		if (form.watch('type') === ContainerType.CronJob) {
+			form.setValue('podConfig.restartPolicy', container?.podConfig?.restartPolicy ?? 'OnFailure');
+		}
+	}, []);
 	return (
 		<ContainerFormTitle
 			title={t('container.pod_config.title')}
@@ -263,7 +278,7 @@ export default function PodConfiguration() {
 							</FormControl>
 							<SelectContent>
 								<div className='space-y-2'>
-									{['Always', 'OnFailure', 'Never'].map((policy) => (
+									{RESTART_POLICIES.map((policy) => (
 										<SelectItem key={policy} value={policy}>
 											{policy}
 											<p className='text-xs text-subtle whitespace-break-spaces'>
