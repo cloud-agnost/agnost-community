@@ -27,6 +27,7 @@ interface ClusterStore {
 	error: APIError | null;
 	isCompleted: boolean;
 	canClusterSendEmail: boolean;
+	isCiCdEnabled: boolean;
 	clusterComponents: ClusterComponent[];
 	isEditClusterComponentOpen: boolean;
 	clusterComponent: ClusterComponent;
@@ -40,6 +41,7 @@ interface ClusterStore {
 type Actions = {
 	checkClusterSetup: (req?: BaseRequest) => Promise<boolean>;
 	checkClusterSmtpStatus: () => Promise<boolean>;
+	checkCICDStatus: () => Promise<boolean>;
 	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: (params: SetupCluster) => Promise<ClusterSetupResponse>;
 	getClusterComponents: () => Promise<ClusterComponent[]>;
@@ -60,6 +62,8 @@ type Actions = {
 	updateRemainingClusterComponents: (
 		data: UpdateRemainingClusterComponentsParams,
 	) => Promise<ClusterComponent>;
+	enabledCICD: () => Promise<Cluster>;
+	disabledCICD: () => Promise<Cluster>;
 	reset: () => void;
 };
 
@@ -67,6 +71,7 @@ const initialState: ClusterStore = {
 	loading: false,
 	isCompleted: false,
 	canClusterSendEmail: false,
+	isCiCdEnabled: false,
 	error: null,
 	clusterComponents: [],
 	clusterComponent: {} as ClusterComponent,
@@ -86,6 +91,16 @@ const useClusterStore = create<ClusterStore & Actions>()(
 				const { status } = await ClusterService.checkCompleted();
 				set({ isCompleted: status });
 				req?.onSuccess?.(status);
+				return status;
+			} catch (error) {
+				set({ error: error as APIError });
+				throw error;
+			}
+		},
+		checkCICDStatus: async () => {
+			try {
+				const { status } = await ClusterService.checkCICDStatus();
+				set({ isCiCdEnabled: status });
 				return status;
 			} catch (error) {
 				set({ error: error as APIError });
@@ -273,6 +288,16 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		},
 		getActiveUsers: async (params) => {
 			return await UserService.getActiveUsers(params);
+		},
+		enabledCICD: async () => {
+			const cluster = await ClusterService.enabledCICD();
+			set({ cluster });
+			return cluster;
+		},
+		disabledCICD: async () => {
+			const cluster = await ClusterService.disabledCICD();
+			set({ cluster });
+			return cluster;
 		},
 		reset: () => set(initialState),
 	})),

@@ -7,8 +7,12 @@ import { Button } from '../Button';
 import './copyInput.scss';
 import { useUpdateEffect } from '@/hooks';
 
-const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<'input'>>(
-	({ className, value, readOnly, placeholder, ...props }, ref) => {
+interface CopyInputProps extends React.ComponentPropsWithoutRef<'input'> {
+	hasError?: boolean;
+}
+
+const CopyInput = React.forwardRef<HTMLInputElement, CopyInputProps>(
+	({ className, value, readOnly, hasError, placeholder, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState<string>(value as string);
 
 		useUpdateEffect(() => {
@@ -23,7 +27,7 @@ const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithout
 					readOnly={readOnly}
 					onChange={(e) => setInputValue(e.target.value)}
 					placeholder={placeholder}
-					className='copy-input'
+					className={cn('copy-input', hasError && 'input-error')}
 				/>
 				<Button
 					className='copy-input-button'

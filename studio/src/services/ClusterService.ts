@@ -20,6 +20,9 @@ export default class ClusterService {
 	static async canClusterSendEmail() {
 		return (await axios.get(`${this.url}/smtp-status`)).data;
 	}
+	static async checkCICDStatus() {
+		return (await axios.get(`${this.url}/cicd-status`)).data;
+	}
 
 	static async getSMTPSettings() {
 		return (await axios.get(`${this.url}/smtp`)).data;
@@ -73,5 +76,12 @@ export default class ClusterService {
 		data: UpdateRemainingClusterComponentsParams,
 	): Promise<ClusterComponent> {
 		return (await axios.put(`${this.url}/${data.componentName}/update`, data)).data;
+	}
+
+	static async enabledCICD() {
+		return (await axios.post(`${this.url}/cicd/enable`, {})).data;
+	}
+	static async disabledCICD() {
+		return (await axios.post(`${this.url}/cicd/disable`, {})).data;
 	}
 }

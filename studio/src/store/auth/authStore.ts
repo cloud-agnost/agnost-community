@@ -13,6 +13,7 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import useApplicationStore from '../app/applicationStore';
 import useOrganizationStore from '../organization/organizationStore';
+import useProjectStore from '../project/projectStore';
 
 interface AuthState {
 	accessToken: string | null | undefined;
@@ -50,10 +51,13 @@ type Actions = {
 		onError: (err: APIError) => void,
 	) => Promise<void>;
 	finalizeAccountSetup: (data: FinalizeAccountSetupRequest) => Promise<User | APIError>;
-	acceptInvite: (token: string) => Promise<{
+	appAcceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
 	orgAcceptInvite: (token: string) => Promise<{
+		user: User;
+	}>;
+	projectAcceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
 	changeName: (name: string) => Promise<User>;
@@ -183,9 +187,9 @@ const useAuthStore = create<AuthState & Actions>()(
 							throw error as APIError;
 						}
 					},
-					async acceptInvite(token: string) {
+					async appAcceptInvite(token: string) {
 						try {
-							const res = await UserService.acceptInvite(token);
+							const res = await UserService.appAcceptInvite(token);
 							set({ isAccepted: true, user: res.user });
 							if (get().isAuthenticated()) {
 								joinChannel(res.app._id);
@@ -208,6 +212,24 @@ const useAuthStore = create<AuthState & Actions>()(
 								useOrganizationStore.setState?.({
 									organizations: [...useOrganizationStore.getState().organizations, res.org],
 								});
+							}
+							return res;
+						} catch (err) {
+							set({ error: err as APIError });
+							throw err;
+						}
+					},
+					async projectAcceptInvite(token: string) {
+						try {
+							const res = await UserService.projectAcceptInvite(token);
+							set({ isAccepted: true, user: res.user });
+							joinChannel(res.project._id);
+							if (get().isAuthenticated()) {
+								if (get().isAuthenticated()) {
+									useProjectStore.setState?.((state) => ({
+										projects: [...state.projects, res.project],
+									}));
+								}
 							}
 							return res;
 						} catch (err) {

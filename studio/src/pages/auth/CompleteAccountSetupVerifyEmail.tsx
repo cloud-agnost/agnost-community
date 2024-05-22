@@ -91,14 +91,16 @@ export default function CompleteAccountSetupVerifyEmail() {
 	const [error, setError] = useState<APIError | null>();
 	const isVerified = searchParams.has('isVerified');
 	const token = searchParams.get('token');
+	const type = searchParams.get('type');
 	const {
 		completeAccountSetup,
 		finalizeAccountSetup,
 		email,
 		user,
 		isAuthenticated,
-		acceptInvite,
+		appAcceptInvite,
 		orgAcceptInvite,
+		projectAcceptInvite,
 	} = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -110,7 +112,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 		data,
 		isPending,
 	} = useMutation({
-		mutationFn: searchParams.get('type') === 'org' ? orgAcceptInvite : acceptInvite,
+		mutationFn: handleAcceptInvitation,
 		onError: (err: APIError) => setError(err),
 	});
 	const { mutate: finalizeAccountSetupMutate, isPending: finalizeLoading } = useMutation({
@@ -124,10 +126,20 @@ export default function CompleteAccountSetupVerifyEmail() {
 		onSuccess: () => navigate('/organization'),
 	});
 
+	function handleAcceptInvitation(token: string) {
+		if (type === 'org') {
+			return orgAcceptInvite(token);
+		}
+		if (type === 'app') {
+			return appAcceptInvite(token);
+		}
+		return projectAcceptInvite(token);
+	}
+
 	const successDesc =
 		data?.user?.status === 'Active'
 			? t('login.you_have_been_added', {
-					name: data?.org?.name ?? data?.app?.name,
+					name: data?.org?.name ?? data?.app?.name ?? data?.project?.name,
 					role: data?.role,
 				})
 			: t('login.complete_account_setup_desc');

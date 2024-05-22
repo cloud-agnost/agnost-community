@@ -24,40 +24,40 @@ const router = express.Router({ mergeParams: true });
 @access     private
 */
 router.get(
-	"/",
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { environment } = req;
-			const { search, sortBy, sortDir } = req.query;
+  "/",
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { environment } = req;
+      const { search, sortBy, sortDir } = req.query;
 
-			let query = { environmentId: environment._id };
-			if (search) {
-				query.name = {
-					$regex: helper.escapeStringRegexp(search),
-					$options: "i",
-				};
-			}
+      let query = { environmentId: environment._id };
+      if (search) {
+        query.name = {
+          $regex: helper.escapeStringRegexp(search),
+          $options: "i",
+        };
+      }
 
-			let sort = {};
-			if (sortBy && sortDir) {
-				sort[sortBy] = sortDir;
-			} else sort = { createdAt: "desc" };
+      let sort = {};
+      if (sortBy && sortDir) {
+        sort[sortBy] = sortDir;
+      } else sort = { createdAt: "desc" };
 
-			let containers = await cntrCtrl.getManyByQuery(query, {
-				sort,
-			});
+      let containers = await cntrCtrl.getManyByQuery(query, {
+        sort,
+      });
 
-			res.json(containers);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(containers);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -67,94 +67,94 @@ router.get(
 @access     private
 */
 router.post(
-	"/",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	authorizeProjectAction("project.container.create"),
-	applyRules("create"),
-	validate,
-	async (req, res) => {
-		// We do not create a session here because the engine-worker send back the webhookid for the build pipeline
-		const containerId = helper.generateId();
-		try {
-			let prefix = "cnt";
-			const { org, project, environment, gitProvider, body, user } = req;
+  "/",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  authorizeProjectAction("project.container.create"),
+  applyRules("create"),
+  validate,
+  async (req, res) => {
+    // We do not create a session here because the engine-worker send back the webhookid for the build pipeline
+    const containerId = helper.generateId();
+    try {
+      let prefix = "cnt";
+      const { org, project, environment, gitProvider, body, user } = req;
 
-			// Remove the data that cannot be updated
-			delete body.status;
-			delete body.pipelineStatus;
-			delete body.updatedBy;
+      // Remove the data that cannot be updated
+      delete body.status;
+      delete body.pipelineStatus;
+      delete body.updatedBy;
 
-			// Sanitize values
-			switch (body.type) {
-				case "deployment":
-					prefix = "dpl";
-					break;
-				case "stateful set":
-					prefix = "sts";
-					break;
-				case "cron job":
-					prefix = "crj";
-					break;
-				case "knative service":
-					prefix = "kns";
-					break;
-				default:
-					break;
-			}
+      // Sanitize values
+      switch (body.type) {
+        case "deployment":
+          prefix = "dpl";
+          break;
+        case "stateful set":
+          prefix = "sts";
+          break;
+        case "cron job":
+          prefix = "crj";
+          break;
+        case "knative service":
+          prefix = "kns";
+          break;
+        default:
+          break;
+      }
 
-			const container = await cntrCtrl.create(
-				{
-					...body,
-					_id: containerId,
-					orgId: org._id,
-					projectId: project._id,
-					environmentId: environment._id,
-					iid: helper.generateSlug(prefix),
-					createdBy: user._id,
-				},
-				{ cacheKey: containerId }
-			);
+      const container = await cntrCtrl.create(
+        {
+          ...body,
+          _id: containerId,
+          orgId: org._id,
+          projectId: project._id,
+          environmentId: environment._id,
+          iid: helper.generateSlug(prefix),
+          createdBy: user._id,
+        },
+        { cacheKey: containerId }
+      );
 
-			// Create the container in the Kubernetes cluster
-			await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container",
-				{ container, environment, gitProvider, action: "create" },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+      // Create the container in the Kubernetes cluster
+      await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container",
+        { container, environment, gitProvider, action: "create" },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			res.json(container);
+      res.json(container);
 
-			// Log action
-			auditCtrl.logAndNotify(
-				environment._id,
-				user,
-				"org.project.environment.container",
-				"create",
-				t("Created new '%s' named '%s'", body.type, body.name),
-				container,
-				{
-					orgId: org._id,
-					projectId: project._id,
-					environmentId: environment._id,
-					containerId: container._id,
-				}
-			);
-		} catch (err) {
-			// Clean up
-			await cntrCtrl.deleteOneById(containerId, { cacheKey: containerId });
-			handleError(req, res, err);
-		}
-	}
+      // Log action
+      auditCtrl.logAndNotify(
+        environment._id,
+        user,
+        "org.project.environment.container",
+        "create",
+        t("Created new '%s' named '%s'", body.type, body.name),
+        container,
+        {
+          orgId: org._id,
+          projectId: project._id,
+          environmentId: environment._id,
+          containerId: container._id,
+        }
+      );
+    } catch (err) {
+      // Clean up
+      await cntrCtrl.deleteOneById(containerId, { cacheKey: containerId });
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -164,24 +164,24 @@ router.post(
 @access     private
 */
 router.get(
-	"/:containerId",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { container } = req;
+  "/:containerId",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container } = req;
 
-			res.json(container);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(container);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -191,168 +191,168 @@ router.get(
 @access     private
 */
 router.put(
-	"/:containerId",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.update"),
-	applyRules("update"),
-	validate,
-	async (req, res) => {
-		const session = await cntrCtrl.startSession();
+  "/:containerId",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.update"),
+  applyRules("update"),
+  validate,
+  async (req, res) => {
+    const session = await cntrCtrl.startSession();
 
-		try {
-			const { org, project, environment, container, gitProvider, body, user } =
-				req;
+    try {
+      const { org, project, environment, container, gitProvider, body, user } =
+        req;
 
-			// Remove the data that cannot be updated
-			delete body._id;
-			delete body.iid;
-			delete body.orgId;
-			delete body.projectId;
-			delete body.environmentId;
-			delete body.type;
-			delete body.status;
-			delete body.pipelineStatus;
-			delete body.createdBy;
-			delete body.createdAt;
-			delete body.updatedAt;
-			delete body.updatedBy;
+      // Remove the data that cannot be updated
+      delete body._id;
+      delete body.iid;
+      delete body.orgId;
+      delete body.projectId;
+      delete body.environmentId;
+      delete body.type;
+      delete body.status;
+      delete body.pipelineStatus;
+      delete body.createdBy;
+      delete body.createdAt;
+      delete body.updatedAt;
+      delete body.updatedBy;
 
-			// We do not support update for following values yet, make sure they are not updated
-			if (container.cronJobConfig && body.cronJobConfig) {
-				body.cronJobConfig.successfulJobsHistoryLimit =
-					container.cronJobConfig.successfulJobsHistoryLimit;
-				body.cronJobConfig.failedJobsHistoryLimit =
-					container.cronJobConfig.failedJobsHistoryLimit;
-			}
-			// We do not support update for following values yet, make sure they are not updated
-			if (container.statefulSetConfig && body.statefulSetConfig) {
-				body.statefulSetConfig.strategy = container.statefulSetConfig.strategy;
-				body.statefulSetConfig.rollingUpdate =
-					container.statefulSetConfig.rollingUpdate;
-				body.statefulSetConfig.revisionHistoryLimit =
-					container.statefulSetConfig.revisionHistoryLimit;
-				body.statefulSetConfig.podManagementPolicy =
-					container.statefulSetConfig.podManagementPolicy;
-			}
+      // We do not support update for following values yet, make sure they are not updated
+      if (container.cronJobConfig && body.cronJobConfig) {
+        body.cronJobConfig.successfulJobsHistoryLimit =
+          container.cronJobConfig.successfulJobsHistoryLimit;
+        body.cronJobConfig.failedJobsHistoryLimit =
+          container.cronJobConfig.failedJobsHistoryLimit;
+      }
+      // We do not support update for following values yet, make sure they are not updated
+      if (container.statefulSetConfig && body.statefulSetConfig) {
+        body.statefulSetConfig.strategy = container.statefulSetConfig.strategy;
+        body.statefulSetConfig.rollingUpdate =
+          container.statefulSetConfig.rollingUpdate;
+        body.statefulSetConfig.revisionHistoryLimit =
+          container.statefulSetConfig.revisionHistoryLimit;
+        body.statefulSetConfig.podManagementPolicy =
+          container.statefulSetConfig.podManagementPolicy;
+      }
 
-			if (container.deploymentConfig && body.deploymentConfig) {
-				body.deploymentConfig.strategy = container.deploymentConfig.strategy;
-				body.deploymentConfig.rollingUpdate =
-					container.deploymentConfig.rollingUpdate;
-				body.deploymentConfig.revisionHistoryLimit =
-					container.deploymentConfig.revisionHistoryLimit;
-			}
+      if (container.deploymentConfig && body.deploymentConfig) {
+        body.deploymentConfig.strategy = container.deploymentConfig.strategy;
+        body.deploymentConfig.rollingUpdate =
+          container.deploymentConfig.rollingUpdate;
+        body.deploymentConfig.revisionHistoryLimit =
+          container.deploymentConfig.revisionHistoryLimit;
+      }
 
-			if (container.knativeConfig && body.knativeConfig) {
-				body.knativeConfig.revisionHistoryLimit =
-					container.knativeConfig.revisionHistoryLimit;
-			}
+      if (container.knativeConfig && body.knativeConfig) {
+        body.knativeConfig.revisionHistoryLimit =
+          container.knativeConfig.revisionHistoryLimit;
+      }
 
-			if (
-				container.type !== "cron job" &&
-				container.type !== "knative service"
-			) {
-				// If there already a port number assignment then use it otherwise generate a new one
-				body.networking.tcpProxy.publicPort =
-					container.networking.tcpProxy.publicPort ??
-					(await helper.getNewTCPPortNumber());
-			}
+      if (
+        container.type !== "cron job" &&
+        container.type !== "knative service"
+      ) {
+        // If there already a port number assignment then use it otherwise generate a new one
+        body.networking.tcpProxy.publicPort =
+          container.networking.tcpProxy.publicPort ??
+          (await helper.getNewTCPPortNumber());
+      }
 
-			// Once a stateful set is created, some storage properties cannot be changed
-			if (container.type === "stateful set") {
-				body.storageConfig.enabled = container.storageConfig.enabled;
-				body.storageConfig.accessModes = container.storageConfig.accessModes;
-			} else {
-				// Once accesss mode for storage is set, it cannot be changed
-				if (
-					container.storageConfig.enabled === true &&
-					body.storageConfig.enabled === true
-				) {
-					body.storageConfig.accessModes = container.storageConfig.accessModes;
-				}
-			}
+      // Once a stateful set is created, some storage properties cannot be changed
+      if (container.type === "stateful set") {
+        body.storageConfig.enabled = container.storageConfig.enabled;
+        body.storageConfig.accessModes = container.storageConfig.accessModes;
+      } else {
+        // Once accesss mode for storage is set, it cannot be changed
+        if (
+          container.storageConfig.enabled === true &&
+          body.storageConfig.enabled === true
+        ) {
+          body.storageConfig.accessModes = container.storageConfig.accessModes;
+        }
+      }
 
-			if (!body.repo.connected) body.pipelineStatus = "Disconnected";
+      if (!body.repo.connected) body.pipelineStatus = "Disconnected";
 
-			const updatedContainer = await cntrCtrl.updateOneById(
-				container._id,
-				{
-					...body,
-					updatedBy: user._id,
-				},
-				{},
-				{
-					session,
-					cacheKey: container._id,
-				}
-			);
+      const updatedContainer = await cntrCtrl.updateOneById(
+        container._id,
+        {
+          ...body,
+          updatedBy: user._id,
+        },
+        {},
+        {
+          session,
+          cacheKey: container._id,
+        }
+      );
 
-			// Deletes the container in the Kubernetes cluster
-			await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container",
-				{
-					container: updatedContainer,
-					environment,
-					gitProvider,
-					changes: {
-						containerPort:
-							container.networking.containerPort !==
-							updatedContainer.networking.containerPort,
-						customDomain:
-							container.networking.customDomain.domain !==
-							updatedContainer.networking.customDomain.domain,
-						gitRepo:
-							container.repo.type !== updatedContainer.repo.type ||
-							container.repo.connected !== updatedContainer.repo.connected ||
-							container.repo.name !== updatedContainer.repo.name ||
-							container.repo.url !== updatedContainer.repo.url ||
-							container.repo.branch !== updatedContainer.repo.branch ||
-							container.repo.path !== updatedContainer.repo.path ||
-							container.repo.dockerfile !== updatedContainer.repo.dockerfile ||
-							container.repo.gitProviderId?.toString() !==
-								updatedContainer.repo.gitProviderId?.toString(),
-					},
-					action: "update",
-				},
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+      // Deletes the container in the Kubernetes cluster
+      await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container",
+        {
+          container: updatedContainer,
+          environment,
+          gitProvider,
+          changes: {
+            containerPort:
+              container.networking.containerPort !==
+              updatedContainer.networking.containerPort,
+            customDomain:
+              container.networking.customDomain.domain !==
+              updatedContainer.networking.customDomain.domain,
+            gitRepo:
+              container.repo.type !== updatedContainer.repo.type ||
+              container.repo.connected !== updatedContainer.repo.connected ||
+              container.repo.name !== updatedContainer.repo.name ||
+              container.repo.url !== updatedContainer.repo.url ||
+              container.repo.branch !== updatedContainer.repo.branch ||
+              container.repo.path !== updatedContainer.repo.path ||
+              container.repo.dockerfile !== updatedContainer.repo.dockerfile ||
+              container.repo.gitProviderId?.toString() !==
+                updatedContainer.repo.gitProviderId?.toString(),
+          },
+          action: "update",
+        },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			// Commit the database transaction
-			await cntrCtrl.commit(session);
+      // Commit the database transaction
+      await cntrCtrl.commit(session);
 
-			res.json(updatedContainer);
+      res.json(updatedContainer);
 
-			// Log action
-			auditCtrl.logAndNotify(
-				environment._id,
-				user,
-				"org.project.environment.container",
-				"update",
-				t("Updated '%s' named '%s'", body.type, body.name),
-				container,
-				{
-					orgId: org._id,
-					projectId: project._id,
-					environmentId: environment._id,
-					containerId: container._id,
-				}
-			);
-		} catch (err) {
-			await cntrCtrl.rollback(session);
-			handleError(req, res, err);
-		}
-	}
+      // Log action
+      auditCtrl.logAndNotify(
+        environment._id,
+        user,
+        "org.project.environment.container",
+        "update",
+        t("Updated '%s' named '%s'", body.type, body.name),
+        container,
+        {
+          orgId: org._id,
+          projectId: project._id,
+          environmentId: environment._id,
+          containerId: container._id,
+        }
+      );
+    } catch (err) {
+      await cntrCtrl.rollback(session);
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -362,73 +362,73 @@ router.put(
 @access     private
 */
 router.delete(
-	"/:containerId",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.delete"),
-	async (req, res) => {
-		const session = await cntrCtrl.startSession();
+  "/:containerId",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.delete"),
+  async (req, res) => {
+    const session = await cntrCtrl.startSession();
 
-		try {
-			const { org, project, environment, container, body, user } = req;
-			await cntrCtrl.deleteOneById(container._id, {
-				session,
-				cacheKey: container._id,
-			});
+    try {
+      const { org, project, environment, container, body, user } = req;
+      await cntrCtrl.deleteOneById(container._id, {
+        session,
+        cacheKey: container._id,
+      });
 
-			let gitProvider = null;
-			if (container.repo.gitProviderId) {
-				gitProvider = await gitCtrl.getOneById(container.repo.gitProviderId);
+      let gitProvider = null;
+      if (container.repo.gitProviderId) {
+        gitProvider = await gitCtrl.getOneById(container.repo.gitProviderId);
 
-				if (gitProvider?.accessToken)
-					gitProvider.accessToken = helper.decryptText(gitProvider.accessToken);
-				if (gitProvider?.refreshToken)
-					gitProvider.refreshToken = helper.decryptText(
-						gitProvider.refreshToken
-					);
-			}
-			// Deletes the container in the Kubernetes cluster
-			await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container",
-				{ container, environment, gitProvider, action: "delete" },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+        if (gitProvider?.accessToken)
+          gitProvider.accessToken = helper.decryptText(gitProvider.accessToken);
+        if (gitProvider?.refreshToken)
+          gitProvider.refreshToken = helper.decryptText(
+            gitProvider.refreshToken
+          );
+      }
+      // Deletes the container in the Kubernetes cluster
+      await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container",
+        { container, environment, gitProvider, action: "delete" },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			// Commit the database transaction
-			await cntrCtrl.commit(session);
+      // Commit the database transaction
+      await cntrCtrl.commit(session);
 
-			res.json();
+      res.json();
 
-			// Log action
-			auditCtrl.logAndNotify(
-				environment._id,
-				user,
-				"org.project.environment.container",
-				"delete",
-				t("Deleted '%s' named '%s'", body.type, body.name),
-				{},
-				{
-					orgId: org._id,
-					projectId: project._id,
-					environmentId: environment._id,
-					containerId: container._id,
-				}
-			);
-		} catch (err) {
-			await cntrCtrl.rollback(session);
-			handleError(req, res, err);
-		}
-	}
+      // Log action
+      auditCtrl.logAndNotify(
+        environment._id,
+        user,
+        "org.project.environment.container",
+        "delete",
+        t("Deleted '%s' named '%s'", body.type, body.name),
+        {},
+        {
+          orgId: org._id,
+          projectId: project._id,
+          environmentId: environment._id,
+          containerId: container._id,
+        }
+      );
+    } catch (err) {
+      await cntrCtrl.rollback(session);
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -438,34 +438,33 @@ router.delete(
 @access     private
 */
 router.get(
-	"/:containerId/pods",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { container, environment } = req;
-			const result = await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container/pods",
-				{ container, environment },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+  "/:containerId/pods",
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/pods",
+        { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			res.json(result.data.payload);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -475,34 +474,34 @@ router.get(
 @access     private
 */
 router.get(
-	"/:containerId/events",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { container, environment } = req;
-			const result = await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container/events",
-				{ container, environment },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+  "/:containerId/events",
 
-			res.json(result.data.payload);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/events",
+        { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -512,34 +511,33 @@ router.get(
 @access     private
 */
 router.get(
-	"/:containerId/logs",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { container, environment } = req;
-			const result = await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container/logs",
-				{ container, environment },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+  "/:containerId/logs",
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/logs",
+        { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			res.json(result.data.payload);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -549,34 +547,34 @@ router.get(
 @access     private
 */
 router.get(
-	"/:containerId/pipelines",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { container, environment } = req;
-			const result = await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container/pipelines",
-				{ container, environment },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+  "/:containerId/pipelines",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/pipelines",
+        { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			res.json(result.data.payload);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 /*
@@ -586,35 +584,35 @@ router.get(
 @access     private
 */
 router.get(
-	"/:containerId/pipelines/:pipelineName",
-	checkContentType,
-	authSession,
-	validateGitOps,
-	validateOrg,
-	validateProject,
-	validateProjectEnvironment,
-	validateContainer,
-	authorizeProjectAction("project.container.view"),
-	async (req, res) => {
-		try {
-			const { pipelineName } = req.params;
-			const { container, environment } = req;
-			const result = await axios.post(
-				helper.getWorkerUrl() + "/v1/cicd/container/taskrun-logs",
-				{ container, environment, taskRunName: pipelineName },
-				{
-					headers: {
-						Authorization: process.env.ACCESS_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+  "/:containerId/pipelines/:pipelineName",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { pipelineName } = req.params;
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/taskrun-logs",
+        { container, environment, taskRunName: pipelineName },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-			res.json(result.data.payload);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
 );
 
 export default router;

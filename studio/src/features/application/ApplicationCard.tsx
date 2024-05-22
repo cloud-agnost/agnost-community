@@ -1,37 +1,48 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
-import { BADGE_COLOR_MAP } from '@/constants';
-import useApplicationStore from '@/store/app/applicationStore';
+import { APPLICATION_SETTINGS, BADGE_COLOR_MAP, PROJECT_SETTINGS } from '@/constants';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application } from '@/types';
 import { cn, getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
 
+import { Loading } from '@/components/Loading';
+import { Project } from '@/types/project';
 import ApplicationSettings from './ApplicationSettings';
 import ApplicationTeam from './ApplicationTeam';
 import './application.scss';
-import { Loading } from '@/components/Loading';
-interface ApplicationCardProps {
-	application: Application;
+
+interface ApplicationCardProps<T extends Application | Project> {
+	data: T;
+	onClick: (data: T) => void;
+	loading: boolean;
+	selectedData?: Application;
+	type: 'app' | 'project';
 }
 
-export default function ApplicationCard({ application }: ApplicationCardProps) {
+export default function ApplicationCard<T>({
+	data,
+	loading,
+	onClick,
+	selectedData,
+	type,
+}: ApplicationCardProps<T extends Application | Project ? T : never>) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
-	const { onAppClick, loading, application: selectedApp } = useApplicationStore();
+
 	const role = user.isClusterOwner
 		? AppRoles.Admin
-		: (application.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
+		: (data.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
 	return (
 		<button
 			className='application-card relative'
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
-				if (e.target.id === 'open-version' || !e.target.id) onAppClick(application);
+				if (e.target.id === 'open-version' || !e.target.id) onClick(data);
 			}}
 		>
-			{loading && application._id === selectedApp?._id && (
+			{loading && data._id === selectedData?._id && (
 				<>
 					<Loading loading={loading} />
 					<div
@@ -45,21 +56,25 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 			<div className='space-y-4'>
 				<div className='flex items-center gap-2'>
 					<Avatar size='md' square>
-						<AvatarImage src={application.pictureUrl} />
-						<AvatarFallback name={application.name} color={application.color} />
+						<AvatarImage src={data?.pictureUrl} />
+						<AvatarFallback name={data.name} color={data.color} />
 					</Avatar>
-					<p className='text-default font-semibold block truncate'>{application.name}</p>
+					<p className='text-default font-semibold block truncate'>{data.name}</p>
 				</div>
 
-				<ApplicationTeam team={application.team} />
+				<ApplicationTeam team={data.team} />
 
 				<div className='flex items-center justify-between'>
 					<span className='text-subtle font-sfCompact text-xs'>
-						{t('general.created')} {getRelativeTime(application.createdAt)}
+						{t('general.created')} {getRelativeTime(data.createdAt)}
 					</span>
 					<div className='flex items-center gap-2'>
 						<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} className='!h-5' />
-						<ApplicationSettings appId={application._id} role={role as AppRoles} />
+						<ApplicationSettings
+							application={data}
+							role={role as AppRoles}
+							settings={type === 'app' ? APPLICATION_SETTINGS : PROJECT_SETTINGS}
+						/>
 					</div>
 				</div>
 			</div>

@@ -25,7 +25,7 @@ export default function ApplicationSelectDropdown() {
 
 	return (
 		<>
-			<SelectionDropdown
+			<SelectionDropdown<Application>
 				selectedData={application as Application}
 				data={applications}
 				onSelect={(app) => onSelect(app as Application)}

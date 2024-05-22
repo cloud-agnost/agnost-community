@@ -94,10 +94,7 @@ export default function AppInviteMember() {
 					) : (
 						<EmptyState title={t('application.invite_member.email_disabled')} type='invitation'>
 							<p className='text-subtle'>{t('application.invite_member.email_disabled')}</p>
-							<Link
-								to={`/organization/${orgId}/profile/cluster-management`}
-								className='text-blue-600 hover:underline'
-							>
+							<Link to={`/profile/cluster-management`} className='text-blue-600 hover:underline'>
 								{t('application.invite_member.configure')}
 							</Link>
 						</EmptyState>

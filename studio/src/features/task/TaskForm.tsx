@@ -53,7 +53,7 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 					<FormItem>
 						<FormLabel>{t('task.syntax')}</FormLabel>
 						<FormControl>
-							<div className='relative'>
+							<CronExamples selectCron={(cron: string) => form.setValue('cronExpression', cron)}>
 								<Input
 									error={Boolean(form.formState.errors.cronExpression)}
 									placeholder={
@@ -63,8 +63,7 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 									}
 									{...field}
 								/>
-								<CronExamples />
-							</div>
+							</CronExamples>
 						</FormControl>
 						<CronDescription />
 						<FormMessage />

@@ -145,6 +145,21 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = 'FormMessage';
 
+type FormFieldGroupProps = React.HTMLAttributes<HTMLDivElement> & {
+	className?: string;
+	label?: string;
+};
+const FormFieldGroup = React.forwardRef<HTMLDivElement, FormFieldGroupProps>(
+	({ className, label, ...props }, ref) => {
+		return (
+			<div className='space-y-2' ref={ref} {...props}>
+				{label && <FormLabel>{label}</FormLabel>}
+				<div className={cn('grid grid-cols-[3fr_1fr]', className)}>{props.children}</div>
+			</div>
+		);
+	},
+);
+
 export {
 	useFormField,
 	Form,
@@ -154,4 +169,5 @@ export {
 	FormDescription,
 	FormMessage,
 	FormField,
+	FormFieldGroup,
 };

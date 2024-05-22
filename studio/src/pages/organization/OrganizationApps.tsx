@@ -31,6 +31,8 @@ export default function OrganizationApps() {
 		isLeaveModalOpen,
 		closeLeaveModal,
 		getAppsByOrgId,
+		loading,
+		onAppClick,
 	} = useApplicationStore();
 
 	const { t } = useTranslation();
@@ -92,7 +94,14 @@ export default function OrganizationApps() {
 							)}
 						>
 							{filteredApps.map((application: Application) => (
-								<ApplicationCard key={application._id} application={application} />
+								<ApplicationCard<Application>
+									key={application._id}
+									data={application}
+									onClick={onAppClick}
+									loading={loading}
+									selectedData={application}
+									type='app'
+								/>
 							))}
 						</div>
 					) : (

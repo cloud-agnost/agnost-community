@@ -4,6 +4,8 @@ import { resetAfterOrgChange } from '@/utils';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 const REDIRECT_URLS = {
+	'project-invite':
+		'/complete-account-setup/verify-email?token=:token&isVerified=true&type=project',
 	'app-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true&type=app',
 	'org-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true&type=org',
 	'change-email': '/confirm-change-email?token=:token',

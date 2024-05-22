@@ -11,6 +11,7 @@ import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import useProjectStore from '@/store/project/projectStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -220,6 +221,11 @@ export const getAppPermission = (path: string, role?: AppRoles): boolean => {
 	const { appAuthorization, application } = useApplicationStore.getState();
 	const key = `${application?.role ?? role}.app.${path}`;
 	return _.get(appAuthorization, key);
+};
+export const getProjectPermission = (path: string, role?: AppRoles): boolean => {
+	const { projectAuthorization, project } = useProjectStore.getState();
+	const key = `${project?.role ?? role}.project.${path}`;
+	return _.get(projectAuthorization, key);
 };
 
 export const getOrgPermission = (path: string): boolean => {

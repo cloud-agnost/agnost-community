@@ -1,6 +1,6 @@
 import { APPLICATION_SETTINGS } from '@/constants';
-import useApplicationStore from '@/store/app/applicationStore.ts';
 import { AppRoles, Application } from '@/types';
+import { Project } from '@/types/project';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
@@ -12,13 +12,16 @@ import {
 } from 'components/Dropdown';
 
 interface ApplicationSettingsProps {
-	appId: string;
+	application: Application | Project;
 	role: AppRoles;
+	settings: any[];
 }
 
-export default function ApplicationSettings({ appId, role }: ApplicationSettingsProps) {
-	const { applications } = useApplicationStore();
-
+export default function ApplicationSettings({
+	application,
+	role,
+	settings,
+}: ApplicationSettingsProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -33,18 +36,13 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 				onClick={(e) => e.stopPropagation()}
 			>
 				<DropdownMenuItemContainer>
-					{APPLICATION_SETTINGS.map((setting, index) => (
+					{settings.map((setting, index) => (
 						<div key={setting.id}>
 							<DropdownMenuItem
 								id={setting.id}
-								disabled={setting.isDisabled(
-									role,
-									applications.find((app) => app._id === appId) as Application,
-								)}
+								disabled={setting.isDisabled(role, application)}
 								className='font-sfCompact px-3'
-								onClick={() =>
-									setting.onClick(applications.find((app) => app._id === appId) as Application)
-								}
+								onClick={() => setting.onClick(application)}
 							>
 								<setting.icon className='w-5 h-5 mr-2' />
 								{setting.name}

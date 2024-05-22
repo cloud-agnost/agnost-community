@@ -15,8 +15,10 @@ import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
 	orgRoles: string[];
 	appRoles: string[];
+	projectRoles: string[];
 	orgRoleDesc: Record<string, string>;
 	appRoleDesc: Record<string, string>;
+	projectRoleDesc: Record<string, string>;
 	bvlTypes: string[];
 	fieldTypes: FieldType[];
 	databaseTypes: string[];
@@ -75,6 +77,12 @@ interface TypesStore {
 	resourceVersions: {
 		[key: string]: string[];
 	};
+	timezones: {
+		label: string;
+		name: string;
+		value: string;
+		utc: string;
+	}[];
 	getAllTypes: () => Promise<Types | APIError>;
 }
 
@@ -84,8 +92,10 @@ const useTypeStore = create<TypesStore>()(
 			(set) => ({
 				orgRoles: [],
 				appRoles: [],
+				projectRoles: [],
 				orgRoleDesc: {},
 				appRoleDesc: {},
+				projectRoleDesc: {},
 				bvlTypes: [],
 				fieldTypes: [],
 				databaseTypes: [],
@@ -140,6 +150,7 @@ const useTypeStore = create<TypesStore>()(
 				resourceVersions: {},
 				isTypesOk: false,
 				resourceTypes: [],
+				timezones: [],
 				getAllTypes: async () => {
 					try {
 						const res = await TypesService.getAllTypes();

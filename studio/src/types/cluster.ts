@@ -92,6 +92,7 @@ export interface Cluster {
 	clusterResourceStatus: ClusterResourceStatus[];
 	createdAt: string;
 	updatedAt: string;
+	cicdEnabled: boolean;
 	smtp: {
 		fromEmail: string;
 		fromName: string;

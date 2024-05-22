@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { SortButton } from '@/components/DataTable';
-import { BADGE_COLOR_MAP } from '@/constants';
+import { APPLICATION_SETTINGS, BADGE_COLOR_MAP, PROJECT_SETTINGS } from '@/constants';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
@@ -83,9 +83,15 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		id: 'actions',
 		className: '!w-[50px]',
 		cell: ({ row }) => {
-			const { _id, team } = row.original;
+			const { team, iid } = row.original;
 			const me = team.find((member) => member.userId._id === user?._id);
-			return <ApplicationSettings appId={_id} role={me?.role as AppRoles} />;
+			return (
+				<ApplicationSettings
+					application={row.original}
+					role={me?.role as AppRoles}
+					settings={iid.includes('app') ? APPLICATION_SETTINGS : PROJECT_SETTINGS}
+				/>
+			);
 		},
 	},
 ];

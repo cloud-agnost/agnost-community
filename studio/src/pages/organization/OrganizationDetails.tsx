@@ -3,7 +3,9 @@ import { Layout } from '@/layouts/Layout';
 import { Outlet, useMatch } from 'react-router-dom';
 
 export default function OrganizationDetails() {
-	const hideTabMenu = useMatch('/organization/:orgId/apps/:appId/*');
+	const isProject = useMatch('/organization/:orgId/projects/:projectId/*');
+	const isApp = useMatch('/organization/:orgId/apps/:appId/*');
+	const hideTabMenu = isProject || isApp;
 	const isProfile = useMatch('/organization/:orgId/profile/*');
 	return (
 		<Layout>
