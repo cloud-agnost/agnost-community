@@ -195,7 +195,7 @@ export class CICDManager {
             return {
                 status: "error",
                 message: t(
-                    `Cannot get pods of the ${container.type} named '${container.name}''. ${
+                    `Cannot get events of the ${container.type} named '${container.name}''. ${
                         err.response?.body?.message ?? err.message
                     }`
                 ),
@@ -234,9 +234,138 @@ export class CICDManager {
             return {
                 status: "error",
                 message: t(
-                    `Cannot get pods of the ${container.type} named '${container.name}''. ${
+                    `Cannot get logs of the ${container.type} named '${container.name}''. ${
                         err.response?.body?.message ?? err.message
                     }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    // Payload includes container info
+    async getContainerTaskRuns({ container }) {
+        try {
+            const { body } = await k8sCustomObjectApi.listNamespacedCustomObject(
+                "tekton.dev",
+                "v1beta1",
+                "tekton-builds",
+                "taskruns"
+            );
+            const taskruns = body.items
+                .filter((taskrun) =>
+                    taskrun.metadata.labels["triggers.tekton.dev/eventlistener"]?.includes(container.iid)
+                )
+                .map((taskrun) => {
+                    const { status, metadata } = taskrun;
+                    let runStatus = "Unknown";
+                    if (status && status.conditions) {
+                        const condition = status.conditions.find((cond) => cond.type === "Succeeded");
+                        if (condition) {
+                            if (condition.status === "True") {
+                                runStatus = "Succeeded";
+                            } else if (condition.status === "False") {
+                                runStatus = "Failed";
+                            } else {
+                                runStatus = "Running";
+                            }
+                        } else {
+                            runStatus = "Pending";
+                        }
+                    }
+
+                    const setupStep = taskrun.spec.taskSpec.steps.find((step) => step.name === "setup");
+                    const variables = {};
+                    if (setupStep) {
+                        setupStep.env.forEach((env) => {
+                            variables[env.name] = env.value ?? null;
+                        });
+                    }
+
+                    return {
+                        name: taskrun.metadata.name,
+                        status: runStatus,
+                        completionTime: taskrun.status.completionTime,
+                        startTime: taskrun.status.startTime,
+                        durationSeconds:
+                            taskrun.status.completionTime && taskrun.status.startTime
+                                ? Math.floor(
+                                      (new Date(taskrun.status.completionTime) - new Date(taskrun.status.startTime)) /
+                                          1000
+                                  )
+                                : undefined,
+                        ...variables,
+                        GIT_COMMIT_ID: variables.GIT_REVISION ? variables.GIT_REVISION.slice(0, 7) : "",
+                    };
+                })
+                .sort((a, b) => {
+                    // Handle cases where lastSeen might not be present
+                    const dateA = a.startTime ? new Date(a.startTime) : 0;
+                    const dateB = b.startTime ? new Date(b.startTime) : 0;
+                    return dateB - dateA; // Descending order
+                });
+            return { status: "success", payload: taskruns };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot get build & deploy task runs of the ${container.type} named '${container.name}''. ${
+                        err.response?.body?.message ?? err.message
+                    }`
+                ),
+                stack: err.stack,
+            };
+        }
+    }
+
+    // Payload includes container info and environment info
+    async getTaskRunLogs({ container, environment, taskRunName }) {
+        try {
+            // Get the pod information
+            const resource = await k8sCoreApi.readNamespacedPod(`${taskRunName}-pod`, "tekton-builds");
+
+            const containerStatuses = resource.body.status.containerStatuses;
+            if (!containerStatuses || containerStatuses.length === 0) return { status: "success", payload: [] };
+
+            const setup = containerStatuses?.find((entry) => entry.name === "step-setup");
+            const build = containerStatuses?.find((entry) => entry.name === "step-build");
+            const push = containerStatuses?.find((entry) => entry.name === "step-local-push");
+            const deploy = containerStatuses?.find((entry) => entry.name === "step-deploy");
+
+            const stepPromises = [
+                getStepInfo(`${taskRunName}-pod`, "step-setup", "setup", setup),
+                getStepInfo(`${taskRunName}-pod`, "step-build", "build", build),
+                getStepInfo(`${taskRunName}-pod`, "step-local-push", "push", push),
+                getStepInfo(`${taskRunName}-pod`, "step-deploy", "deploy", deploy),
+            ];
+
+            const steps = await Promise.all(stepPromises);
+
+            // Find the last step either in success or error state, there can be other steps in success or error state we are looking to the last one
+            let lastIndex = -1;
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                if (step.status === "success" || step.status === "error") {
+                    lastIndex = i;
+                }
+            }
+
+            // Set the status of all steps after lastIndex to pending
+            if (lastIndex >= 0) {
+                for (let i = lastIndex + 1; i < steps.length; i++) {
+                    if (steps[lastIndex].status === "success" && lastIndex + 1 === i) steps[i].status = "running";
+                    else steps[i].status = "pending";
+                }
+            }
+
+            return { status: "success", payload: steps };
+        } catch (err) {
+            return {
+                status: "error",
+                message: t(
+                    `Cannot get build & deploy logs of task run named '${taskRunName}' for ${container.type} named '${
+                        container.name
+                    }''. ${err.response?.body?.message ?? err.message}`
                 ),
                 stack: err.stack,
             };
@@ -439,7 +568,6 @@ export class CICDManager {
     // Definition is container
     async updateCronJob(definition, namespace) {
         const payload = await getK8SResource("CronJob", definition.iid, namespace);
-        console.log("***here", definition, namespace, payload);
         const { metadata, spec } = payload.body;
 
         // Configure schedule timezone and concurrency policy
@@ -2149,9 +2277,7 @@ export class CICDManager {
         let webHookId = null;
         switch (gitRepoType) {
             case "github":
-                console.log("***createGithubWebhook");
                 webHookId = await createGithubWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, sslVerification);
-                console.log("***githubhookid", webHookId);
                 break;
             case "gitlab":
                 webHookId = await createGitlabWebhook(
@@ -2162,7 +2288,6 @@ export class CICDManager {
                     gitBranch,
                     sslVerification
                 );
-                console.log("***gitlabhookid", webHookId);
                 break;
             default:
                 throw new AgnostError("Unknown repo type: " + gitRepoType);
@@ -2703,7 +2828,7 @@ async function generateHtpasswd(username, password) {
  * Retrieves the cluster record from the database.
  * @returns {Promise<Object>} The cluster record.
  */
-async function getClusterRecord() {
+export async function getClusterRecord() {
     if (!dbClient) {
         dbClient = getDBClient();
     }
@@ -2731,7 +2856,6 @@ async function initializeClusterCertificateIssuer() {
 
         return;
     } catch (err) {
-        console.log("***initializeClusterCertificateIssuer", err);
         // If we get a 404, we need to create the issuer
         if (err.statusCode === 404) {
             const clusterIssuer = {
@@ -2939,8 +3063,6 @@ async function createGithubWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
     const octokit = new Octokit({ auth: gitPat });
     const path = new URL(gitRepoUrl).pathname;
 
-    console.log(gitPat, gitRepoUrl, webhookUrl, secretToken, sslVerification);
-
     var githubHook = await octokit.request("POST /repos" + path + "/hooks", {
         owner: path.split("/")[1],
         repo: path.split("/")[2],
@@ -3092,4 +3214,28 @@ async function deleteGitlabWebhook(gitPat, gitRepoUrl, hookId) {
     } catch (err) {
         console.error("Error deleting GitLab repo webhook", err);
     }
+}
+
+async function getStepInfo(podName, containerName, stepName, containerStatus) {
+    let status = "pending";
+    if (containerStatus) {
+        if (containerStatus.state.running) status = "running";
+        else if (containerStatus.state.terminated) {
+            if (containerStatus.state.terminated.exitCode === 0) status = "success";
+            else status = "error";
+        }
+    }
+
+    return k8sCoreApi
+        .readNamespacedPodLog(podName, "tekton-builds", containerName)
+        .then((logs) => ({
+            step: stepName,
+            status: status,
+            logs: logs.body ? logs.body.split("\n") : ["No log available"],
+        }))
+        .catch((error) => ({
+            step: stepName,
+            status: status,
+            logs: ["No log available"],
+        }));
 }

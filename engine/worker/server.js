@@ -10,7 +10,7 @@ import { I18n } from "i18n";
 import { fileURLToPath } from "url";
 import logger from "./init/logger.js";
 import helper from "./util/helper.js";
-import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
+import { connectToDatabase, disconnectFromDatabase, getDBClient } from "./init/db.js";
 import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
 import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
 import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";

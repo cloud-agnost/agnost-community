@@ -29,7 +29,19 @@ spec:
       value: $(body.repository.git_http_url)
     - name: gitreponame
       value: $(body.repository.name)
-
+    - name: gitcommitter
+      value: $(body.head_commit.committer.username)
+    - name: gitcommiturl
+      value: $(body.head_commit.url)
+    - name: gitrepourl
+      value: $(body.repository.html_url)
+    - name: gitreponame
+      value: $(body.repository.full_name)
+    - name: gitcommitmessage
+      value: $(body.head_commit.message)
+    - name: gitcommittimestamp
+      value: $(body.head_commit.timestamp)
+    
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
@@ -42,14 +54,19 @@ spec:
     - name: resourcename
     - name: resourcenamespace
     - name: containerregistry
-    - name: gitlabpat
+    - name: githubpat
     - name: gitbranch
     - name: gitsubpath
     - name: gitrevision
-    - name: gitrepourl
-    - name: gitreponame
+    - name: gitrepo
     - name: imagename
     - name: dockerfile
+    - name: gitcommitter
+    - name: gitcommiturl
+    - name: gitrepourl
+    - name: gitreponame
+    - name: gitcommitmessage
+    - name: gitcommittimestamp
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
@@ -73,6 +90,27 @@ spec:
           steps:
           - name: setup
             image: bitnami/git:2.44.0
+            env:
+            - name: GIT_REPO
+              value: $(tt.params.gitrepo)
+            - name: GIT_BRANCH
+              value: $(tt.params.gitbranch)
+            - name: GIT_REVISION
+              value: $(tt.params.gitrevision)
+            - name: GIT_COMMITTER_USERNAME
+              value: $(tt.params.gitcommitter)
+            - name: SUB_PATH
+              value: $(tt.params.gitsubpath)
+            - name: GIT_COMMIT_URL
+              value: $(tt.params.gitcommiturl)
+            - name: GIT_REPO_URL
+              value: $(tt.params.gitrepourl)
+            - name: GIT_REPO_NAME
+              value: $(tt.params.gitreponame)
+            - name: GIT_COMMIT_MESSAGE
+              value: $(tt.params.gitcommitmessage)
+            - name: GIT_COMMIT_TIMESTAMP
+              value: $(tt.params.gitcommittimestamp)
             script: |
               #!/bin/bash
               export URL=$(echo $(tt.params.gitrepourl) | sed "s|://|://oauth2:$(tt.params.gitlabpat)@|")

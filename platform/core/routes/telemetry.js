@@ -207,4 +207,55 @@ router.post(
 	}
 );
 
+/*
+@route      /v1/telemetry/pipeline-status
+@method     POST
+@desc       Sets the pipeline status of the container
+@access     public
+*/
+router.post(
+	"/pipeline-status",
+	checkContentType,
+	authMasterToken,
+	async (req, res) => {
+		try {
+			const { containeriid, status } = req.body;
+			const container = await cntrCtrl.getOneByQuery({ iid: containeriid });
+			if (!container) return res.json();
+
+			let updatedContainer = await cntrCtrl.updateOneById(
+				container._id,
+				{
+					pipelineStatus: status,
+				},
+				{},
+				{ cacheKey: container._id }
+			);
+
+			res.json();
+
+			// Send realtime message about the status change of the container
+			sendMessage(container._id, {
+				actor: null,
+				action: "telemetry",
+				object: "org.project.environment.container",
+				description: t(
+					"Container build pipeline status updated to '%s'",
+					status
+				),
+				timestamp: Date.now(),
+				data: updatedContainer,
+				identifiers: {
+					orgId: updatedContainer.orgId,
+					projectId: updatedContainer.projectId,
+					environmentId: updatedContainer.environmentId,
+					containerId: updatedContainer._id,
+				},
+			});
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
 export default router;

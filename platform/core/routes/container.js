@@ -83,6 +83,12 @@ router.post(
     try {
       let prefix = "cnt";
       const { org, project, environment, gitProvider, body, user } = req;
+
+      // Remove the data that cannot be updated
+      delete body.status;
+      delete body.pipelineStatus;
+      delete body.updatedBy;
+
       // Sanitize values
       switch (body.type) {
         case "deployment":
@@ -210,6 +216,8 @@ router.put(
       delete body.projectId;
       delete body.environmentId;
       delete body.type;
+      delete body.status;
+      delete body.pipelineStatus;
       delete body.createdBy;
       delete body.createdAt;
       delete body.updatedAt;
@@ -270,6 +278,8 @@ router.put(
         }
       }
 
+      if (!body.repo.connected) body.pipelineStatus = "Disconnected";
+
       const updatedContainer = await cntrCtrl.updateOneById(
         container._id,
         {
@@ -305,8 +315,8 @@ router.put(
               container.repo.branch !== updatedContainer.repo.branch ||
               container.repo.path !== updatedContainer.repo.path ||
               container.repo.dockerfile !== updatedContainer.repo.dockerfile ||
-              container.repo.gitProviderId.toString() !==
-                updatedContainer.repo.gitProviderId.toString(),
+              container.repo.gitProviderId?.toString() !==
+                updatedContainer.repo.gitProviderId?.toString(),
           },
           action: "update",
         },
@@ -515,6 +525,81 @@ router.get(
       const result = await axios.post(
         helper.getWorkerUrl() + "/v1/cicd/container/logs",
         { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/pipelines
+@method     GET
+@desc       Returns container build & deploy pipeline runs
+@access     private
+*/
+router.get(
+  "/:containerId/pipelines",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/pipelines",
+        { container, environment },
+        {
+          headers: {
+            Authorization: process.env.ACCESS_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      res.json(result.data.payload);
+    } catch (err) {
+      handleError(req, res, err);
+    }
+  }
+);
+
+/*
+@route      /v1/org/:orgId/project/:projectId/env/:envId/containers/:containerId/pipelines/:pipelineName
+@method     GET
+@desc       Returns logs of specific build & deploy pipeline run of a container
+@access     private
+*/
+router.get(
+  "/:containerId/pipelines/:pipelineName",
+  checkContentType,
+  authSession,
+  validateGitOps,
+  validateOrg,
+  validateProject,
+  validateProjectEnvironment,
+  validateContainer,
+  authorizeProjectAction("project.container.view"),
+  async (req, res) => {
+    try {
+      const { pipelineName } = req.params;
+      const { container, environment } = req;
+      const result = await axios.post(
+        helper.getWorkerUrl() + "/v1/cicd/container/taskrun-logs",
+        { container, environment, taskRunName: pipelineName },
         {
           headers: {
             Authorization: process.env.ACCESS_TOKEN,
