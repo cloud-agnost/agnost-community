@@ -205,7 +205,8 @@ export const CronJobConfigSchema = z.object({
         });
         return false;
       }
-    }),
+    })
+    .optional(),
   timeZone: z
     .string()
     .refine(
@@ -214,7 +215,8 @@ export const CronJobConfigSchema = z.object({
       {
         message: "Invalid timezone",
       }
-    ),
+    )
+    .optional(),
   concurrencyPolicy: z.enum(["Allow", "Forbid", "Replace"]).optional(),
   suspend: z.boolean().default(false),
   successfulJobsHistoryLimit: z.number().optional(),
