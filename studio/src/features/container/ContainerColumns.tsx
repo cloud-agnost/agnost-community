@@ -1,6 +1,5 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
-import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { Github } from '@/components/icons';
@@ -10,7 +9,6 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName } from '@/types';
 import { Container } from '@/types/container';
 import { translate } from '@/utils';
-import { GitBranch, GitMerge } from '@phosphor-icons/react';
 import { startCase } from 'lodash';
 import { Link } from 'react-router-dom';
 

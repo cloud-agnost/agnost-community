@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 export default function OrganizationMenu() {
 	const { pathname } = useLocation();
-	const { cluster, checkCICDStatus, isCiCdEnabled } = useClusterStore();
+	const { checkCICDStatus, isCiCdEnabled } = useClusterStore();
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (pathname) {

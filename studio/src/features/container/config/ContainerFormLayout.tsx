@@ -1,13 +1,12 @@
-import { Description } from '@/components/Description';
-import { cn } from '@/utils';
-import React from 'react';
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/Accordion';
+import { cn } from '@/utils';
 import { CaretDown } from '@phosphor-icons/react';
+import React from 'react';
 import { Trans } from 'react-i18next';
 
 interface DescriptionProps {

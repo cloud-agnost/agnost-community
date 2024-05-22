@@ -9,14 +9,14 @@ import {
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
+import useContainerStore from '@/store/container/containerStore';
 import { ContainerType, CreateContainerParams, StateOption } from '@/types/container';
-import { Database, Package } from '@phosphor-icons/react';
+import { Database } from '@phosphor-icons/react';
 import _, { startCase } from 'lodash';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import MultiSelect, { OptionProps, components } from 'react-select';
 import ContainerFormTitle from './ContainerFormLayout';
-import useContainerStore from '@/store/container/containerStore';
 
 const accessModesOptions: StateOption[] = [
 	{ value: 'ReadWriteOnce', label: 'ReadWriteOnce' },

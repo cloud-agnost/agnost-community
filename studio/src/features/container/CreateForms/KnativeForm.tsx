@@ -11,14 +11,7 @@ import { CreateContainerParams } from '@/types/container';
 import { IdentificationCard } from '@phosphor-icons/react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import {
-	KNativeConfig,
-	Networking,
-	PodConfiguration,
-	Probes,
-	SourceConfig,
-	StorageConfig,
-} from '../config';
+import { KNativeConfig, Networking, PodConfiguration, Probes, SourceConfig } from '../config';
 import ContainerFormTitle from '../config/ContainerFormLayout';
 
 export default function KnativeForm() {
