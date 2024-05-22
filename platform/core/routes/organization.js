@@ -1,4 +1,5 @@
 import express from "express";
+import axios from "axios";
 import sharp from "sharp";
 import orgCtrl from "../controllers/organization.js";
 import appCtrl from "../controllers/app.js";
@@ -11,6 +12,8 @@ import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
 import deployCtrl from "../controllers/deployment.js";
 import clsCtrl from "../controllers/cluster.js";
+import prjEnvCtrl from "../controllers/projectEnv.js";
+import cntrCtrl from "../controllers/container.js";
 import { applyRules } from "../schemas/organization.js";
 import { applyRules as invitationApplyRules } from "../schemas/orgInvitation.js";
 import { applyRules as memberApplyRules } from "../schemas/organizationMember.js";
@@ -259,8 +262,35 @@ router.delete(
 			const apps = await appCtrl.getManyByQuery({ orgId: org._id });
 			const versions = await versionCtrl.getManyByQuery({ orgId: org._id });
 
+			const environments = await prjEnvCtrl.getManyByQuery({
+				orgId: org._id,
+			});
+			const environmentiids = environments.map((env) => env.iid);
+
+			const containers = await cntrCtrl.getManyByQuery({
+				orgId: org._id,
+				"networking.tcpProxy.enabled": true,
+				"networking.tcpProxy.publicPort": { $exists: true },
+			});
+			const tcpProxyPorts = containers.map(
+				(c) => c.networking.tcpProxy.publicPort
+			);
+
 			// Delete all organization related data
 			await orgCtrl.deleteOrganization(session, org);
+
+			// Deletes the Kubernetes namespaces of the environments
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/env/delete",
+				{ environmentiids, tcpProxyPorts },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
 			// Commit transaction
 			await orgCtrl.commit(session);
 

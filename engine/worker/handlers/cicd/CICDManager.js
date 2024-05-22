@@ -68,8 +68,8 @@ export class CICDManager {
         }
     }
 
-    async deleteNamespaces(iids) {
-        for (const iid of iids) {
+    async deleteNamespaces({ environmentiids, tcpProxyPorts }) {
+        for (const iid of environmentiids) {
             k8sCoreApi.deleteNamespace(iid).then(
                 (response) => {
                     console.log(`Namespace '${iid}' deleted successfully`);
@@ -80,6 +80,7 @@ export class CICDManager {
             );
         }
 
+        this.deleteTCPProxyPorts(tcpProxyPorts).catch((err) => {});
         return { status: "success" };
     }
 
@@ -2087,6 +2088,51 @@ export class CICDManager {
         });
 
         console.log(`TCP proxy port '${portNumber}' unexposed successfully`);
+    }
+
+    async deleteTCPProxyPorts(portNumbers) {
+        if (!portNumbers || portNumbers.length === 0) return;
+        const configMapName = "tcp-services";
+        const resourceNamespace = "ingress-nginx";
+        portNumbers = portNumbers.map((portNumber) => portNumber.toString());
+
+        // patch configmap/tcp-service
+        const cfgmap = await k8sCoreApi.readNamespacedConfigMap(configMapName, resourceNamespace);
+        portNumbers.forEach((portNumber) => {
+            delete cfgmap.body.data[portNumber];
+        });
+        await k8sCoreApi.replaceNamespacedConfigMap(configMapName, resourceNamespace, cfgmap.body);
+
+        // patch service/ingress-nginx-controller
+        k8sCoreApi.listNamespacedService(resourceNamespace).then((res) => {
+            res.body.items.forEach(async (service) => {
+                if (service.metadata.name.includes("ingress-nginx-controller")) {
+                    const svcName = service.metadata.name;
+                    const svc = await k8sCoreApi.readNamespacedService(svcName, resourceNamespace);
+                    svc.body.spec.ports = svc.body.spec.ports.filter(
+                        (svcPort) => !portNumbers.includes(svcPort.port.toString())
+                    );
+                    await k8sCoreApi.replaceNamespacedService(svcName, resourceNamespace, svc.body);
+                }
+            });
+        });
+
+        // patch deployment/ingress-nginx-controller
+        k8sAppsApi.listNamespacedDeployment(resourceNamespace).then((res) => {
+            res.body.items.forEach(async (deployment) => {
+                if (deployment.metadata.name.includes("ingress-nginx-controller")) {
+                    const deployName = deployment.metadata.name;
+                    const dply = await k8sAppsApi.readNamespacedDeployment(deployName, resourceNamespace);
+                    dply.body.spec.template.spec.containers[0].ports =
+                        dply.body.spec.template.spec.containers[0].ports.filter(
+                            (contPort) => !portNumbers.includes(contPort.containerPort.toString())
+                        );
+                    await k8sAppsApi.replaceNamespacedDeployment(deployName, resourceNamespace, dply.body);
+                }
+            });
+        });
+
+        console.log(`TCP proxy ports '${portNumbers.join(", ")}' unexposed successfully`);
     }
 
     // Container is container object and environment is environment object

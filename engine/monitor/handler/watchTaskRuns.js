@@ -75,7 +75,7 @@ export async function watchBuildEvents() {
 				(err) => {
 					console.error("Watch error:", err);
 					// Retry the watch after a delay
-					setTimeout(startWatching, 1000).catch((error) => {});
+					setTimeout(startWatching, 1000);
 				}
 			);
 		} catch (err) {

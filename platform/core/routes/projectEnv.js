@@ -2,6 +2,7 @@ import axios from "axios";
 import express from "express";
 import auditCtrl from "../controllers/audit.js";
 import prjEnvCtrl from "../controllers/projectEnv.js";
+import cntrCtrl from "../controllers/container.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -289,13 +290,23 @@ router.delete(
 				});
 			}
 
+			const containers = await cntrCtrl.getManyByQuery({
+				environmentId: environment._id,
+				"networking.tcpProxy.enabled": true,
+				"networking.tcpProxy.publicPort": { $exists: true },
+			});
+
+			const tcpProxyPorts = containers.map(
+				(c) => c.networking.tcpProxy.publicPort
+			);
+
 			// Delete all environment related data
 			await prjEnvCtrl.deleteEnvironment(session, org, project, environment);
 
 			// Deletes the Kubernetes namespace of the environment
 			await axios.post(
 				helper.getWorkerUrl() + "/v1/cicd/env/delete",
-				[environment.iid],
+				{ environmentiids: [environment.iid], tcpProxyPorts },
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

@@ -1,8 +1,11 @@
 import express from "express";
+import axios from "axios";
 import sharp from "sharp";
 import prjCtrl from "../controllers/project.js";
 import auditCtrl from "../controllers/audit.js";
 import userCtrl from "../controllers/user.js";
+import prjEnvCtrl from "../controllers/projectEnv.js";
+import cntrCtrl from "../controllers/container.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -441,8 +444,35 @@ router.delete(
 				});
 			}
 
+			const environments = await prjEnvCtrl.getManyByQuery({
+				projectId: project._id,
+			});
+			const environmentiids = environments.map((env) => env.iid);
+
+			const containers = await cntrCtrl.getManyByQuery({
+				projectId: project._id,
+				"networking.tcpProxy.enabled": true,
+				"networking.tcpProxy.publicPort": { $exists: true },
+			});
+			const tcpProxyPorts = containers.map(
+				(c) => c.networking.tcpProxy.publicPort
+			);
+
 			// Delete all project related data, associted environments and containers
 			await prjCtrl.deleteProject(session, org, project);
+
+			// Deletes the Kubernetes namespaces of the environments
+			await axios.post(
+				helper.getWorkerUrl() + "/v1/cicd/env/delete",
+				{ environmentiids, tcpProxyPorts },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
 			// Commit transaction
 			await prjCtrl.commit(session);
 
