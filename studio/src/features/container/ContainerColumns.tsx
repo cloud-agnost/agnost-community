@@ -1,5 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
+import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { Github } from '@/components/icons';
@@ -19,6 +20,22 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
+	},
+	{
+		id: 'iid',
+		header: () => <SortButton text={translate('general.id')} field='type' />,
+		accessorKey: 'iid',
+		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
+		cell: ({ row: { original } }) => {
+			const { iid } = original;
+			return (
+				<div className='flex items-center gap-2 group'>
+					<p>{iid}</p>
+					<CopyButton text={iid} className='invisible group-hover:visible' />
+				</div>
+			);
+		},
 	},
 	{
 		id: 'type',
@@ -77,15 +94,20 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 			return (
 				repo?.url && (
 					<Link
-						className='link'
 						to={repo?.url ?? registry?.image ?? ''}
 						target='_blank'
 						rel='noopener noreferrer'
+						className='hover:underline'
 					>
-						<p className='flex items-center gap-2'>
-							<Github className='shrink-0' />
-							{repo?.name}/{repo?.branch}
-						</p>
+						<div className='flex items-center gap-2'>
+							<Github className='shrink-0 size-6' />
+							<div>
+								<p className='truncate whitespace-nowrap'>{repo.name?.split('/')[0]}</p>
+								<p className='truncate whitespace-nowrap'>
+									{repo.name?.split('/')[1]}/{repo?.branch}
+								</p>
+							</div>
+						</div>
 					</Link>
 				)
 			);

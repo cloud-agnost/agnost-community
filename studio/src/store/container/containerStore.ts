@@ -170,7 +170,7 @@ const useContainerStore = create<ContainerState & Actions>()(
             }));
           }
           containers.forEach((container) => {
-            joinChannel(container.iid);
+            joinChannel(container._id);
           });
           return containers;
         },
