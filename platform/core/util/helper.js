@@ -581,23 +581,52 @@ async function revokeGitProviderAccessToken(
 	} catch (err) {}
 }
 
+async function fetchAllPages(url, config) {
+	let results = [];
+	let page = 1;
+	let moreData = true;
+
+	while (moreData) {
+		const response = await axios.get(
+			`${url}?page=${page}&per_page=100`,
+			config
+		);
+		if (response.data.length > 0) {
+			results = results.concat(response.data);
+			page++;
+		} else {
+			moreData = false;
+		}
+	}
+
+	return results;
+}
+
 async function getGitProviderRepos(gitProvider) {
 	if (gitProvider.provider === "github") {
 		try {
-			const result = await axios.get("https://api.github.com/user/repos", {
-				headers: { Authorization: `token ${gitProvider.accessToken}` },
-			});
+			const config = {
+				headers: {
+					Authorization: `Bearer ${gitProvider.accessToken}`,
+					"X-GitHub-Api-Version": "2022-11-28",
+				},
+			};
 
-			return result.data.map((entry) => {
-				return {
-					repoId: entry.id,
-					owner: entry.owner.login,
-					repo: entry.name,
-					fullName: entry.full_name,
-					private: entry.private,
-					url: entry.html_url,
-				};
-			});
+			const userRepos = await fetchAllPages(
+				"https://api.github.com/user/repos",
+				config
+			);
+
+			const userReposData = userRepos.map((entry) => ({
+				repoId: entry.id,
+				owner: entry.owner.login,
+				repo: entry.name,
+				fullName: entry.full_name,
+				private: entry.private,
+				url: entry.html_url,
+			}));
+
+			return userReposData;
 		} catch (error) {
 			return [];
 		}
