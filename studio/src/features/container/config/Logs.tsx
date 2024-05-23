@@ -30,15 +30,15 @@ export default function Logs() {
 		setSelectedPod(data.pods.find((pod) => pod.name === podName));
 	}
 
-	useEffect(() => {
-		if (data?.pods) {
-			setSelectedPod(data.pods[0]);
-		}
-	}, [data]);
-
 	const selectedLogs = useMemo(() => {
 		return data?.logs.find((log) => log.podName === selectedPod?.name);
 	}, [selectedPod, data]);
+
+	useEffect(() => {
+		if (data?.pods && !selectedPod) {
+			setSelectedPod(data.pods[0]);
+		}
+	}, [data]);
 
 	return (
 		<div className='h-full space-y-4 flex flex-col'>

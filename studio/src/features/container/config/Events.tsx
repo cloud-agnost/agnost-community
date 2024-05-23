@@ -1,10 +1,10 @@
 import { DataTable } from '@/components/DataTable';
+import { Warning, SuccessCheck } from '@/components/icons';
 import { useTable } from '@/hooks';
 import useContainerStore from '@/store/container/containerStore';
 import { ColumnDefWithClassName } from '@/types';
 import { ContainerEvent } from '@/types/container';
 import { cn } from '@/utils';
-import { CheckCircle, Warning } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
@@ -61,9 +61,9 @@ const EventColumns: ColumnDefWithClassName<ContainerEvent>[] = [
 		cell: ({ row }) => (
 			<div className='flex items-center gap-2'>
 				{row.original.type === 'Normal' ? (
-					<CheckCircle size={16} className='text-elements-green' />
+					<SuccessCheck className='size-5' />
 				) : (
-					<Warning size={16} className='text-elements-yellow' />
+					<Warning className='size-5' />
 				)}{' '}
 				{row.original.type}
 			</div>

@@ -137,13 +137,7 @@ const PodInfoColumns: ColumnDefWithClassName<PodCondition>[] = [
 		header: 'Type',
 		accessorKey: 'type',
 
-		cell: ({ row }) => (
-			<Badge
-				variant={BADGE_COLOR_MAP[row.original.type.toUpperCase()]}
-				text={row.original.type}
-				rounded
-			/>
-		),
+		cell: ({ row }) => <Badge text={row.original.type} />,
 	},
 	{
 		id: 'reason',

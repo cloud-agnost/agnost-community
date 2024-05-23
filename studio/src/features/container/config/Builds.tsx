@@ -1,27 +1,24 @@
+import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
+import { Github } from '@/components/icons';
+import { BADGE_COLOR_MAP } from '@/constants';
 import { useTable, useUpdateEffect } from '@/hooks';
 import useContainerStore from '@/store/container/containerStore';
 import { ColumnDefWithClassName } from '@/types';
 import { ContainerPipeline } from '@/types/container';
-import { cn, getRelativeTime, getStatusClass, secondsToRelativeTime } from '@/utils';
-import {
-	CheckCircle,
-	CircleNotch,
-	GitBranch,
-	GitCommit,
-	GithubLogo,
-	WarningCircle,
-} from '@phosphor-icons/react';
+import { cn, getRelativeTime, secondsToRelativeTime } from '@/utils';
+import { GitBranch, GitCommit } from '@phosphor-icons/react';
 import { File } from '@phosphor-icons/react/dist/ssr';
 import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
+import _, { startCase } from 'lodash';
 import { Link, useParams } from 'react-router-dom';
 import BuildLogs from './BuildLogs';
 
 export default function Builds() {
 	const { getContainerPipelines, container, selectPipeline, selectedPipeline } =
 		useContainerStore();
+	console.log('selectedPipeline', selectedPipeline);
 	const { orgId, envId, projectId } = useParams() as Record<string, string>;
 	const { data: pipelines } = useQuery<ContainerPipeline[]>({
 		queryKey: ['containerPipelines'],
@@ -42,7 +39,7 @@ export default function Builds() {
 	useUpdateEffect(() => {
 		if (selectedPipeline) {
 			selectPipeline(pipelines?.find((pipeline) => pipeline.name === selectedPipeline.name));
-		} else selectPipeline(pipelines?.[0]);
+		}
 	}, [pipelines]);
 
 	if (!_.isNil(selectedPipeline)) {
@@ -75,23 +72,19 @@ const PipelineColumns: ColumnDefWithClassName<ContainerPipeline>[] = [
 		accessorKey: 'GIT_COMMITTER_USERNAME',
 		size: 200,
 		cell: ({ row }) => (
-			<div className='space-y-1'>
-				<Link
-					to={`https://github.com/${row.original.GIT_COMMITTER_USERNAME}`}
-					target='_blank'
-					rel='noopener noreferrer'
-					className='space-y-2 text-default hover:underline hover:text-elements-blue'
-				>
-					<div className='flex items-center'>
-						<GithubLogo size={16} />
-						<div>
-							<p className='text-subtle'>
-								<span className='ml-2'>{row.original.GIT_COMMITTER_USERNAME}</span>
-								{getRelativeTime(row.original.GIT_COMMIT_TIMESTAMP)}
-							</p>
-						</div>
-					</div>
-				</Link>
+			<div className='flex items-center gap-2'>
+				<Github className='size-6' />
+				<div className='space-y-1'>
+					<Link
+						to={`https://github.com/${row.original.GIT_COMMITTER_USERNAME}`}
+						target='_blank'
+						rel='noopener noreferrer'
+						className='space-y-2 text-default hover:underline hover:text-elements-blue'
+					>
+						{row.original.GIT_COMMITTER_USERNAME}
+					</Link>
+					<p>{getRelativeTime(row.original.GIT_COMMIT_TIMESTAMP)}</p>
+				</div>
 			</div>
 		),
 	},
@@ -117,7 +110,7 @@ const PipelineColumns: ColumnDefWithClassName<ContainerPipeline>[] = [
 						to={`${row.original?.GIT_REPO_URL}/tree/${row.original?.GIT_BRANCH}`}
 						target='_blank'
 						rel='noopener noreferrer'
-						className='bg-elements-blue truncate  text-xs px-1 rounded flex items-center gap-0.5 hover:underline'
+						className='bg-elements-blue truncate text-xs px-1 rounded flex items-center gap-0.5 hover:underline text-gray-100'
 					>
 						<GitBranch size={10} />
 						<span>{row.original?.GIT_BRANCH}</span>
@@ -130,14 +123,13 @@ const PipelineColumns: ColumnDefWithClassName<ContainerPipeline>[] = [
 		id: 'status',
 		header: 'Status',
 		accessorKey: 'status',
-		size: 200,
+		size: 100,
 		cell: ({ row }) => (
-			<div className={cn('flex items-center gap-2', getStatusClass(row.original.status))}>
-				{row.original.status === 'Succeeded' && <CheckCircle size={16} />}
-				{row.original.status === 'Failed' && <WarningCircle size={16} />}
-				{row.original.status === 'Running' && <CircleNotch size={16} className='animate-spin' />}
-				<p>{row.original.status}</p>
-			</div>
+			<Badge
+				variant={BADGE_COLOR_MAP[row.original.status.toUpperCase()]}
+				text={startCase(row.original.status)}
+				rounded
+			/>
 		),
 	},
 	{
