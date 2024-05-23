@@ -1073,7 +1073,7 @@ export type ContainerPipelineLogStatus =
   | "pending"
   | "running"
   | "success"
-  | "failed";
+  | "error";
 export type ContainerPipelineLogStep = "setup" | "build" | "deploy" | "push";
 export interface ContainerPipelineLogs {
   step: ContainerPipelineLogStep;
