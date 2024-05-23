@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button';
+import { LogViewer } from '@/components/LogViewer';
 import { Github } from '@/components/icons';
 import useContainerStore from '@/store/container/containerStore';
 import { ContainerPipelineLogStatus, ContainerPipelineLogs } from '@/types/container';
@@ -13,7 +14,6 @@ import {
 	WarningCircle,
 } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import AnsiToHtml from 'ansi-to-html';
 import { startCase } from 'lodash';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ export default function BuildLogs() {
 		useContainerStore();
 	const { orgId, envId, projectId } = useParams() as Record<string, string>;
 	const [selectedStep, setSelectedStep] = useState('setup');
-	const [logs, setLogs] = useState('');
+	const [logs, setLogs] = useState<string[]>([]);
 	const { data: pipelineLogs } = useQuery<ContainerPipelineLogs[]>({
 		queryKey: ['containerPipelineLogs'],
 		queryFn: () =>
@@ -40,10 +40,8 @@ export default function BuildLogs() {
 	});
 
 	const selectedLog = useMemo(() => {
-		const convert = new AnsiToHtml();
 		const step = pipelineLogs?.find((log) => log.step === selectedStep);
-		const html = step?.logs.map((log) => convert.toHtml(log)).join('<br/>');
-		setLogs(html ?? '');
+		setLogs(step?.logs ?? []);
 		return step;
 	}, [pipelineLogs, selectedStep]);
 
@@ -150,9 +148,7 @@ export default function BuildLogs() {
 					</Button>
 				))}
 			</div>
-			<div className='log-viewer bg-gray-900 text-gray-100 p-4 flex-1 overflow-auto text-xs'>
-				<div dangerouslySetInnerHTML={{ __html: logs }} className='whitespace-nowrap' />
-			</div>
+			{/* <LogViewer logs={logs} className='flex-1' /> */}
 			<p
 				className={cn(
 					'font-sfCompact text-xs',
