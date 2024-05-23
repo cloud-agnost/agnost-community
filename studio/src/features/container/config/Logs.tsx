@@ -67,7 +67,7 @@ export default function Logs() {
 			<CodeEditor
 				key={selectedLogs?.podName}
 				name='pod-logs'
-				language='plaintext'
+				language='text'
 				value={selectedLogs?.logs?.join('\n') ?? ''}
 				containerClassName='flex-1'
 				className='[&_.overflow-guard]:!h-full [&>:first-child]:!h-full'

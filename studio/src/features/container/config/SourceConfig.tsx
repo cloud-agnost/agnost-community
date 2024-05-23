@@ -28,12 +28,11 @@ export default function SourceConfig() {
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
 	const accessToken = searchParams.get('access_token');
-	const { addGitProvider, getBranches, getGitRepositories, gitProvider, disconnectGitProvider } =
-		useContainerStore();
+	const { addGitProvider, getBranches, getGitRepositories, gitProvider } = useContainerStore();
 
 	const { data: repositories } = useQuery({
-		queryKey: ['git-repositories', gitProvider._id],
-		queryFn: () => getGitRepositories(gitProvider._id),
+		queryKey: ['git-repositories', gitProvider?._id],
+		queryFn: () => getGitRepositories(gitProvider?._id as string),
 		enabled: !_.isEmpty(gitProvider),
 	});
 
@@ -41,26 +40,25 @@ export default function SourceConfig() {
 		() => repositories?.find((repo) => repo.fullName === form.watch('repo.name')),
 		[form.watch('repo.name'), repositories],
 	);
-
 	const { data: branches } = useQuery({
-		queryKey: ['branches', gitProvider._id, form.watch('repo.name')],
+		queryKey: ['branches', gitProvider?._id, form.watch('repo.name')],
 		queryFn: () =>
 			getBranches({
-				gitProviderId: gitProvider._id,
+				gitProviderId: gitProvider?._id as string,
 				owner: selectedRepo?.owner as string,
 				repo: selectedRepo?.repo as string,
 			}),
 		enabled: !!form.watch('repo.name') && !_.isEmpty(gitProvider) && !_.isNil(selectedRepo),
 	});
-	const { mutate: disconnectGitHandler, isPending } = useMutation({
-		mutationFn: () => disconnectGitProvider(gitProvider._id),
-	});
+
 	const { mutate: addProvider } = useMutation({
 		mutationFn: () =>
 			addGitProvider({ accessToken: accessToken as string, provider: 'github', refreshToken: '' }),
 		onSuccess: (data) => {
 			form.setValue('repo.gitProviderId', data._id);
-			form.setValue('repo.connected', true);
+			form.setValue('repo.connected', true, {
+				shouldDirty: true,
+			});
 		},
 		onError: ({ details }) => {
 			toast({ action: 'error', title: details });
@@ -71,6 +69,12 @@ export default function SourceConfig() {
 		localStorage.setItem('createDeployment', JSON.stringify(form.getValues()));
 	}
 
+	function disconnectGitHandler() {
+		form.setValue('repo.connected', false, {
+			shouldDirty: true,
+		});
+		useContainerStore.setState({ gitProvider: undefined });
+	}
 	useEffect(() => {
 		if (accessToken && _.isEmpty(gitProvider)) {
 			addProvider({ accessToken, provider: 'github', refreshToken: '' });
@@ -100,8 +104,12 @@ export default function SourceConfig() {
 	);
 
 	useEffect(() => {
-		form.setValue('repo.connected', !_.isEmpty(gitProvider));
-		form.setValue('repo.gitProviderId', gitProvider._id);
+		if (!_.isNil(gitProvider)) {
+			form.setValue('repo.connected', true, {
+				shouldDirty: true,
+			});
+			form.setValue('repo.gitProviderId', gitProvider._id);
+		}
 	}, [gitProvider]);
 
 	return (
@@ -111,7 +119,7 @@ export default function SourceConfig() {
 			icon={<Code size={20} />}
 		>
 			<Fragment>
-				{_.isEmpty(gitProvider) ? (
+				{!form.watch('repo.connected') && _.isNil(gitProvider) ? (
 					<Button
 						variant='primary'
 						onClick={connectGithubHandler}
@@ -122,7 +130,7 @@ export default function SourceConfig() {
 					</Button>
 				) : (
 					<>
-						<Button variant='destructive' onClick={disconnectGitHandler} loading={isPending}>
+						<Button variant='destructive' onClick={disconnectGitHandler}>
 							<Github className='size-5 mr-2' />
 							{t('container.disconnect')}
 						</Button>

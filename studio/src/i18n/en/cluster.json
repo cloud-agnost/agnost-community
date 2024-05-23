@@ -55,5 +55,7 @@
 	"gitOpsEnabled": "GitOps Enabled Successfully",
 	"gitOpsDisabled": "GitOps Disabled Successfully",
 	"activate": "Activate",
-	"deactivate": "Deactivate"
+	"deactivate": "Deactivate",
+	"gitOpsActive": "GitOps is active for this cluster.",
+	"gitOpsActiveDescription": "You can  deploy any app in any programming language hosted on your Git repository automatically."
 }

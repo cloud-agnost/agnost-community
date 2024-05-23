@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
-export default function CreateProject() {
+export default function CreateProject({ className }: { className?: string }) {
 	const { createProject } = useProjectStore();
 	const canProjectCreate = useAuthorizeOrg('project.create');
 	const { t } = useTranslation();
@@ -69,7 +69,7 @@ export default function CreateProject() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant='primary' size='lg' disabled={!canProjectCreate}>
+				<Button variant='primary' size='lg' disabled={!canProjectCreate} className={className}>
 					<Plus size={14} className='mr-1 text-icon-default' />
 					{t('project.create')}
 				</Button>

@@ -101,7 +101,7 @@ export default function VersionTabLayout({
 					type={type}
 					className='flex-1'
 					title={t('general.module_empty', {
-						module: type,
+						module: type.toLowerCase(),
 					})}
 				>
 					{openCreateModal ? (

@@ -137,7 +137,7 @@
 	"invitation_accepted": "Invitation accepted successfully",
 	"hour": "Hour",
 	"no_member_found": "No eligible member found",
-	"module_empty": "You do not have any {{module}}s for this app version",
+	"module_empty": "You do not have any {{module}}s.",
 	"module_create": "Create {{module}}",
 	"uploadedAt": "Uploaded At",
 	"chooseOne": "Choose One",

@@ -49,6 +49,23 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 		},
 	},
 	{
+		id: 'pipelineStatus',
+		header: () => <SortButton text={translate('container.pipelineStatus')} field='type' />,
+		accessorKey: 'pipelineStatus',
+		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
+		cell: ({ row: { original } }) => {
+			const { pipelineStatus } = original;
+			return (
+				<Badge
+					variant={BADGE_COLOR_MAP[pipelineStatus.toUpperCase()]}
+					text={startCase(pipelineStatus)}
+					rounded
+				/>
+			);
+		},
+	},
+	{
 		id: 'source',
 		header: () => <SortButton text={translate('project.source')} field='source' />,
 		accessorKey: 'source',
@@ -66,7 +83,7 @@ const ContainerColumns: ColumnDefWithClassName<Container>[] = [
 						rel='noopener noreferrer'
 					>
 						<p className='flex items-center gap-2'>
-							<Github />
+							<Github className='shrink-0' />
 							{repo?.name}/{repo?.branch}
 						</p>
 					</Link>

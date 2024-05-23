@@ -59,7 +59,7 @@ const useProjectEnvironmentStore = create<ProjectEnvironmentStore & Actions>((se
 	selectEnvironment: (environment) => {
 		set({ environment });
 		joinChannel(environment._id);
-		// resetAfterVersionChange();
+		// TODO: resetAfterVersionChange();
 		history.navigate?.(
 			`/organization/${environment.orgId}/projects/${environment.projectId}/env/${environment._id}`,
 		);

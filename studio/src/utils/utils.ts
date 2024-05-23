@@ -15,7 +15,7 @@ import useProjectStore from '@/store/project/projectStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles, RealtimeData } from '@/types';
+import { AppRoles, ContainerPipelineStatus, RealtimeData } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import copy from 'copy-to-clipboard';
 import cronstrue from 'cronstrue';
@@ -527,3 +527,23 @@ export function isWithinParentBounds(el: Element, parent: Element) {
 		elRect.right <= parentRect.right
 	);
 }
+
+
+export function getStatusClass(status: ContainerPipelineStatus) {
+		switch (status) {
+			case 'Succeeded':
+				return 'text-elements-green';
+			case 'Failed':
+				return 'text-elements-red';
+			case 'Running':
+				return 'text-elements-yellow';
+			case 'Error':
+				return 'text-elements-red';
+			case 'Started':
+				return 'text-elements-blue';
+			case 'Connected':
+				return 'text-elements-blue';
+			default:
+				return 'text-default';
+		}
+	}

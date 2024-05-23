@@ -62,7 +62,7 @@
 	&-gray {
 		@apply dark:bg-lighter;
 		.badge-dot {
-			@apply bg-lighter;
+			@apply bg-subtle-reverse;
 		}
 		.badge-clear {
 			@apply hover:bg-base;

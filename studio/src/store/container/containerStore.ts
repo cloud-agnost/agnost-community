@@ -4,11 +4,14 @@ import {
   Container,
   ContainerEvent,
   ContainerLog,
+  ContainerPipeline,
+  ContainerPipelineLogs,
   ContainerPod,
   ContainerType,
   CreateContainerParams,
   DeleteContainerParams,
   GetBranchesParams,
+  GetContainerPipelineLogsParams,
   GetContainersInEnvParams,
   GitBranch,
   GitProvider,
@@ -27,10 +30,11 @@ type ContainerState = {
   isCreateContainerDialogOpen: boolean;
   isEditContainerDialogOpen: boolean;
   createdContainerType: ContainerType | null;
-  gitProvider: GitProvider;
+  gitProvider?: GitProvider;
   lastFetchedPage?: number;
   selectedPod?: ContainerPod;
   isPodInfoOpen: boolean;
+  selectedPipeline?: ContainerPipeline;
 };
 
 type Actions = {
@@ -42,6 +46,7 @@ type Actions = {
   closeDeleteContainerDialog: () => void;
   openPodInfo: (pod: ContainerPod) => void;
   closePodInfo: () => void;
+  selectPipeline: (pipeline?: ContainerPipeline) => void;
   addGitProvider: (req: AddGitProviderParams) => Promise<GitProvider>;
   disconnectGitProvider: (providerId: string) => Promise<void>;
   getGitRepositories: (providerId: string) => Promise<GitRepo[]>;
@@ -53,6 +58,12 @@ type Actions = {
   getContainerPods: (req: DeleteContainerParams) => Promise<ContainerPod[]>;
   getContainerLogs: (req: DeleteContainerParams) => Promise<ContainerLog>;
   getContainerEvents: (req: DeleteContainerParams) => Promise<ContainerEvent[]>;
+  getContainerPipelines: (
+    req: DeleteContainerParams
+  ) => Promise<ContainerPipeline[]>;
+  getContainerPipelineLogs: (
+    req: GetContainerPipelineLogsParams
+  ) => Promise<ContainerPipelineLogs[]>;
   reset: () => void;
 };
 
@@ -62,7 +73,6 @@ const initialState: ContainerState = {
   isDeleteContainerDialogOpen: false,
   container: null,
   createdContainerType: null,
-  gitProvider: {} as GitProvider,
   containers: [],
   lastFetchedPage: undefined,
   toDeleteContainer: null,
@@ -88,7 +98,11 @@ const useContainerStore = create<ContainerState & Actions>()(
           set({ isEditContainerDialogOpen: true, container });
         },
         closeEditContainerDialog: () => {
-          set({ isEditContainerDialogOpen: false, container: null });
+          set({
+            isEditContainerDialogOpen: false,
+            container: null,
+            selectedPipeline: undefined,
+          });
         },
         openDeleteContainerDialog: (container) => {
           set({
@@ -104,6 +118,9 @@ const useContainerStore = create<ContainerState & Actions>()(
         },
         closePodInfo: () => {
           set({ selectedPod: undefined, isPodInfoOpen: false });
+        },
+        selectPipeline: (pipeline) => {
+          set({ selectedPipeline: pipeline });
         },
         addGitProvider: async (req) => {
           const provider = await ContainerService.addGitProvider(req);
@@ -159,11 +176,13 @@ const useContainerStore = create<ContainerState & Actions>()(
         },
         updateContainer: async (req) => {
           const container = await ContainerService.updateContainer(req);
+
           set((state) => ({
             containers: state.containers.map((c) =>
-              c.iid === container.iid ? container : c
+              c._id === container._id ? container : c
             ),
           }));
+
           return container;
         },
         deleteContainer: async (req) => {
@@ -184,14 +203,23 @@ const useContainerStore = create<ContainerState & Actions>()(
         getContainerEvents: async (req) => {
           return await ContainerService.getContainerEvents(req);
         },
+        getContainerPipelines: async (req) => {
+          return await ContainerService.getContainerPipelines(req);
+        },
+        getContainerPipelineLogs: async (req) => {
+          return await ContainerService.getContainerPipelineLogs(req);
+        },
+
         reset: () => set(initialState),
       }),
       {
         name: "container-store",
         partialize: (state) => ({
           isCreateContainerDialogOpen: state.isCreateContainerDialogOpen,
+          isEditContainerDialogOpen: state.isEditContainerDialogOpen,
           createdContainerType: state.createdContainerType,
           gitProvider: state.gitProvider,
+          container: state.container,
         }),
       }
     )

@@ -24,6 +24,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Builds, Events, Logs, Pods, Variables } from './config';
 import { useMutation } from '@tanstack/react-query';
 import { Warning } from '@phosphor-icons/react';
+import { cn } from '@/utils';
 
 export default function EditContainer() {
 	const { t } = useTranslation();
@@ -70,11 +71,11 @@ export default function EditContainer() {
 	}, [container]);
 
 	useEffect(() => {
-		if (!searchParams.has('t')) {
+		if (isEditContainerDialogOpen) {
 			searchParams.set('t', 'settings');
 			setSearchParams(searchParams);
 		}
-	}, [searchParams]);
+	}, [isEditContainerDialogOpen]);
 
 	useEffect(() => {
 		const storedData = localStorage.getItem('createDeployment');
@@ -115,7 +116,12 @@ export default function EditContainer() {
 						onSubmit={form.handleSubmit(onSubmit)}
 						className='overflow-auto flex-1 flex flex-col'
 					>
-						<div className='p-6 space-y-4 flex-1 overflow-auto'>
+						<div
+							className={cn(
+								'space-y-4 flex-1 overflow-auto',
+								searchParams.get('t') === 'builds' ? 'px-6 pt-6 pb-1' : 'p-6',
+							)}
+						>
 							{searchParams.get('t') === 'settings' && (
 								<>
 									{ContainerType.Deployment === container?.type && <DeploymentForm />}
