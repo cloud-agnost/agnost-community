@@ -6,7 +6,7 @@ import OrganizationMenuItem from './OrganizationMenuItem';
 import './organizationMenu.scss';
 export default function OrganizationMenu() {
 	const { pathname } = useLocation();
-	const { checkCICDStatus, isCiCdEnabled } = useClusterStore();
+	const { isCiCdEnabled } = useClusterStore();
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (pathname) {

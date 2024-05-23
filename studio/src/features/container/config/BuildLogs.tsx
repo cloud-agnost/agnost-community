@@ -148,7 +148,7 @@ export default function BuildLogs() {
 					</Button>
 				))}
 			</div>
-			{/* <LogViewer logs={logs} className='flex-1' /> */}
+			<LogViewer logs={logs} className='flex-1' />
 			<p
 				className={cn(
 					'font-sfCompact text-xs',

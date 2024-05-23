@@ -1,5 +1,4 @@
 import { Badge } from '@/components/Badge';
-import { CodeEditor } from '@/components/CodeEditor';
 import { LogViewer } from '@/components/LogViewer';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { BADGE_COLOR_MAP } from '@/constants';
