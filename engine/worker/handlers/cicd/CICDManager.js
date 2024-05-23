@@ -357,10 +357,11 @@ export class CICDManager {
                 }
             }
 
+            console.log("***lastindex", lastIndex);
             // Set the status of all steps after lastIndex to pending
             if (lastIndex >= 0) {
                 for (let i = lastIndex + 1; i < steps.length; i++) {
-                    if (steps[lastIndex].status === "success") steps[i].status = "running";
+                    if (steps[lastIndex].status === "success" && i === lastIndex + 1) steps[i].status = "running";
                     else steps[i].status = "pending";
                 }
             }
@@ -2465,7 +2466,7 @@ export class CICDManager {
                 }
             )
             .catch((error) => {
-                console.log("***error updaing github webhook", error);
+                console.log("Error updating github webhook in platform-core", error);
             });
     }
 }
@@ -3139,7 +3140,6 @@ async function createGithubWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
 }
 
 async function deleteGithubWebhook(gitPat, gitRepoUrl, hookId) {
-    console.log("***deleting github webhook", gitPat, gitRepoUrl, hookId);
     if (!gitPat || !gitRepoUrl || !hookId) return;
     try {
         const octokit = new Octokit({ auth: gitPat });

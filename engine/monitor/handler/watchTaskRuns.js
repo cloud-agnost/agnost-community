@@ -56,6 +56,11 @@ export async function watchBuildEvents() {
 								const regex = /[a-zA-Z]+-[a-zA-Z0-9]+$/;
 								const match = eventListenerName.match(regex);
 								let containeriid = match ? match[0] : null;
+								console.log(
+									"***here",
+									containeriid,
+									event.reason?.replace("TaskRun", "")
+								);
 								if (containeriid) {
 									//Make api call to the platform to update the build status of the container
 									axios
@@ -63,7 +68,7 @@ export async function watchBuildEvents() {
 											helper.getPlatformUrl() + "/v1/telemetry/pipeline-status",
 											{
 												containeriid,
-												status: event.reason?.replac(TaskRun, ""),
+												status: event.reason?.replace("TaskRun", ""),
 											},
 											{
 												headers: {
