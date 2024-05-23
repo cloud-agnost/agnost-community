@@ -35,7 +35,7 @@ export default function Root() {
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 	const { orgId, versionId, appId } = useParams();
-	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
+	const { checkClusterSmtpStatus, checkClusterSetup, checkCICDStatus } = useClusterStore();
 	const { getOrganizationMembers, getOrganizationById, members, organization } =
 		useOrganizationStore();
 	const { getUser, isAuthenticated } = useAuthStore();
@@ -80,6 +80,7 @@ export default function Root() {
 
 	useEffect(() => {
 		checkClusterSmtpStatus();
+		checkCICDStatus();
 		checkClusterSetup({
 			onSuccess: (isCompleted) => {
 				if (!isCompleted) {

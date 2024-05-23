@@ -1,27 +1,21 @@
 import { ORGANIZATION_MENU_ITEMS } from '@/constants';
+import useClusterStore from '@/store/cluster/clusterStore';
 import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OrganizationMenuItem from './OrganizationMenuItem';
 import './organizationMenu.scss';
-import useClusterStore from '@/store/cluster/clusterStore';
-import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
 export default function OrganizationMenu() {
 	const { pathname } = useLocation();
-	const { checkCICDStatus, isCiCdEnabled } = useClusterStore();
+	const { isCiCdEnabled } = useClusterStore();
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (pathname) {
 			if (pathname.split('/').length <= 3) {
+				console.log(isCiCdEnabled);
 				navigate(isCiCdEnabled ? 'projects' : 'apps');
 			}
 		}
 	}, [pathname, isCiCdEnabled]);
-
-	useQuery({
-		queryFn: checkCICDStatus,
-		queryKey: ['checkCICDStatus'],
-	});
 
 	const menuItems = useMemo(() => {
 		if (isCiCdEnabled) {

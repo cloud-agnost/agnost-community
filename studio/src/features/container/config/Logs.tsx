@@ -1,5 +1,5 @@
 import { Badge } from '@/components/Badge';
-import { CodeEditor } from '@/components/CodeEditor';
+import { LogViewer } from '@/components/LogViewer';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useContainerStore from '@/store/container/containerStore';
@@ -63,20 +63,7 @@ export default function Logs() {
 					))}
 				</SelectContent>
 			</Select>
-
-			<CodeEditor
-				key={selectedLogs?.podName}
-				name='pod-logs'
-				language='text'
-				value={selectedLogs?.logs?.join('\n') ?? ''}
-				containerClassName='flex-1'
-				className='[&_.overflow-guard]:!h-full [&>:first-child]:!h-full'
-				options={{
-					readOnly: true,
-					wrappingIndent: 'indent',
-					lineNumbers: 'off',
-				}}
-			/>
+			<LogViewer className='flex-1' logs={selectedLogs?.logs ?? []} />
 		</div>
 	);
 }
