@@ -18,7 +18,7 @@ export default function ProjectEnvironmentDetail() {
 	const { containers, getContainersInEnv, lastFetchedPage } = useContainerStore();
 	const { orgId, projectId, envId } = useParams() as Record<string, string>;
 	const [searchParams] = useSearchParams();
-	const isFetching = false;
+	// Todo
 	const canCreate = true;
 
 	const table = useTable<Container>({
@@ -26,7 +26,7 @@ export default function ProjectEnvironmentDetail() {
 		columns: ContainerColumns,
 	});
 
-	const { fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteScroll({
+	const { fetchNextPage, isFetchingNextPage, hasNextPage, isFetching } = useInfiniteScroll({
 		queryFn: getContainersInEnv,
 		queryKey: 'getContainersInEnv',
 		lastFetchedPage,
@@ -43,7 +43,7 @@ export default function ProjectEnvironmentDetail() {
 		<>
 			<VersionTabLayout
 				searchable
-				type={TabTypes.Endpoint}
+				type={TabTypes.Container}
 				title={t('project.containers') as string}
 				isEmpty={!containers.length}
 				onMultipleDelete={() => {}}

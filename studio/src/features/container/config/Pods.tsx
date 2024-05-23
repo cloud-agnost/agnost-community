@@ -40,7 +40,6 @@ export default function Pods() {
 	if (isPending && !pods) {
 		return <Loading />;
 	}
-	console.log(pods?.length!);
 	return (
 		<div
 			className={cn('table-container overflow-auto', pods?.length! > 13 && 'h-full')}

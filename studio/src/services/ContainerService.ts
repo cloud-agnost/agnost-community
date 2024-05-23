@@ -4,10 +4,13 @@ import {
   Container,
   ContainerEvent,
   ContainerLog,
+  ContainerPipeline,
+  ContainerPipelineLogs,
   ContainerPod,
   CreateContainerParams,
   DeleteContainerParams,
   GetBranchesParams,
+  GetContainerPipelineLogsParams,
   GetContainersInEnvParams,
   GitBranch,
   GitProvider,
@@ -132,6 +135,31 @@ export default class ContainerService {
     return (
       await axios.get(
         `${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/events`
+      )
+    ).data;
+  }
+  static async getContainerPipelines({
+    orgId,
+    projectId,
+    envId,
+    containerId,
+  }: DeleteContainerParams): Promise<ContainerPipeline[]> {
+    return (
+      await axios.get(
+        `${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/pipelines`
+      )
+    ).data;
+  }
+  static async getContainerPipelineLogs({
+    orgId,
+    projectId,
+    envId,
+    containerId,
+    pipelineName,
+  }: GetContainerPipelineLogsParams): Promise<ContainerPipelineLogs[]> {
+    return (
+      await axios.get(
+        `${this.url}/${orgId}/project/${projectId}/env/${envId}/container/${containerId}/pipelines/${pipelineName}`
       )
     ).data;
   }

@@ -775,6 +775,7 @@ export type Container = z.infer<typeof ContainerSchema> & {
   createdBy: string;
   updatedBy: string;
   status: ContainerStatus;
+  pipelineStatus: ContainerPipelineStatus;
 };
 
 export interface ContainerStatus {
@@ -810,6 +811,10 @@ export interface DeleteContainerParams {
   projectId: string;
   envId: string;
   containerId: string;
+}
+
+export interface GetContainerPipelineLogsParams extends DeleteContainerParams {
+  pipelineName: string;
 }
 export interface AddGitProviderParams {
   provider: "github" | "gitlab" | "bitbucket";
@@ -1036,4 +1041,42 @@ export interface ContainerEvent {
   count: number;
   kind: string;
   type: "Normal" | "Warning";
+}
+
+export type ContainerPipelineStatus =
+  | "Failed"
+  | "Succeeded"
+  | "Running"
+  | "Error"
+  | "Started"
+  | "Connected"
+  | "Unknown";
+export interface ContainerPipeline {
+  name: string;
+  status: ContainerPipelineStatus;
+  durationSeconds: number;
+  startTime: string;
+  GIT_REPO: string;
+  GIT_BRANCH: string;
+  GIT_REVISION: string;
+  GIT_COMMITTER_USERNAME: string;
+  SUB_PATH: string;
+  GIT_COMMIT_URL: string;
+  GIT_REPO_URL: string;
+  GIT_REPO_NAME: string;
+  GIT_COMMIT_MESSAGE: string;
+  GIT_COMMIT_TIMESTAMP: string;
+  GIT_COMMIT_ID: string;
+}
+
+export type ContainerPipelineLogStatus =
+  | "pending"
+  | "running"
+  | "success"
+  | "failed";
+export type ContainerPipelineLogStep = "setup" | "build" | "deploy" | "push";
+export interface ContainerPipelineLogs {
+  step: ContainerPipelineLogStep;
+  status: ContainerPipelineLogStatus;
+  logs: string[];
 }

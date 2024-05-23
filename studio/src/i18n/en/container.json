@@ -10,6 +10,7 @@
 	"variables": "Variables",
 	"add_variable": "Add Variable",
 	"unsaved_changes": "You have unsaved changes.",
+	"pipelineStatus": "Pipeline Status",
 	"source": {
 		"title": "Source",
 		"description": "Set up the repository, branch and root folder (if you have a monorepo) of your application source code and Dockerfile that will be downloaded and used to build the Docker image",
@@ -161,5 +162,12 @@
 		"alert": "Are you sure you want to delete this {{type}}?",
 		"description": "This action cannot be undone. This will permanently delete the {{type}} and all of its data.",
 		"confirm": "Confirm by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+	},
+	"pipeline": {
+		"triggered": "Triggered By",
+		"commit": "Commit",
+		"status": "Status",
+		"duration": "Duration",
+		"back": "Back to Builds"
 	}
 }

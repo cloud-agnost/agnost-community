@@ -29,16 +29,7 @@ export default function useInfiniteScroll({
 	const { application } = useApplicationStore();
 	const { version } = useVersionStore();
 	const result = useInfiniteQuery({
-		queryKey: [
-			queryKey,
-			disableVersionParams,
-			orgId,
-			version?._id,
-			versionId,
-			application?._id,
-			appId,
-			params,
-		],
+		queryKey: [queryKey],
 		initialPageParam: 0,
 		queryFn: ({ pageParam }) =>
 			queryFn({
@@ -79,8 +70,8 @@ export default function useInfiniteScroll({
 	]);
 
 	useUpdateEffect(() => {
-		result.refetch();
-	}, [orgId, orgId, versionId, appId]);
+		if (orgId && versionId && appId) result.refetch();
+	}, [orgId, versionId, appId]);
 
 	return result;
 }

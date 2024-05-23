@@ -29,7 +29,7 @@ export default function ProjectSelectDropdown() {
 			onClick={() => openEditProjectDrawer(project as Project)}
 		>
 			<CommandItem>
-				<CreateProject />
+				<CreateProject className='!w-full' />
 			</CommandItem>
 		</SelectionDropdown>
 	);

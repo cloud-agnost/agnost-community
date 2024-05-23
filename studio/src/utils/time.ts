@@ -61,6 +61,30 @@ export function getRelativeTime(isoDate: string): string {
   return "just now";
 }
 
+export function secondsToRelativeTime(seconds: number): string {
+  const units = [
+    { name: "y", value: 60 * 60 * 24 * 365 },
+    { name: "mo", value: 60 * 60 * 24 * 30 },
+    { name: "w", value: 60 * 60 * 24 * 7 },
+    { name: "d", value: 60 * 60 * 24 },
+    { name: "h", value: 60 * 60 },
+    { name: "m", value: 60 },
+    { name: "s", value: 1 },
+  ];
+
+  let timeString = "";
+
+  for (const unit of units) {
+    const count = Math.floor(seconds / unit.value);
+    if (count >= 1) {
+      timeString += `${count}${unit.name} `;
+      seconds -= count * unit.value;
+    }
+  }
+
+  return timeString.trim();
+}
+
 export function convertDateToMilliseconds(dateString: string): number {
   return new Date(dateString).getTime();
 }

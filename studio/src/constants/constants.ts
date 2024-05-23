@@ -105,6 +105,7 @@ import {
   ProjectorScreenChart,
   Share,
   ShareNetwork,
+  ShippingContainer,
   SignOut,
   Signpost,
   SkipForward,
@@ -513,6 +514,9 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
   CONTAINERSREADY: "blue",
   READY: "orange",
   PENDING: "yellow",
+  SUCCEEDED: "green",
+  CONNECTED: "blue",
+  STARTED: "blue",
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -960,6 +964,7 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
   [TabTypes.NPMPackages]: ArchiveBox,
   [TabTypes.RateLimits]: Gauge,
   [TabTypes.Realtime]: ShareNetwork,
+  [TabTypes.Container]: ShippingContainer,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {

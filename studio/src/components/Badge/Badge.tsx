@@ -20,20 +20,12 @@ const badgeVariants = cva('badge', {
 		},
 	},
 	defaultVariants: {
-		variant: 'default',
+		variant: 'gray',
 		rounded: false,
 	},
 });
 
-export type BadgeColors =
-	| 'green'
-	| 'blue'
-	| 'yellow'
-	| 'purple'
-	| 'red'
-	| 'orange'
-	| 'gray'
-	| 'default';
+export type BadgeColors = 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'orange' | 'gray';
 
 interface BadgeProps {
 	variant?: BadgeColors;

@@ -28,6 +28,7 @@ export default function useTabIcon(className: string) {
 		[TabTypes.NPMPackages]: '',
 		[TabTypes.RateLimits]: '',
 		[TabTypes.Realtime]: '',
+		[TabTypes.Container]: 'text-cache',
 	};
 	function getTabIcon(type: TabTypes) {
 		const Icon = TAB_ICON_MAP[type];

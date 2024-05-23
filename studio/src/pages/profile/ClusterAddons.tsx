@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { useToast } from '@/hooks';
@@ -7,16 +8,10 @@ import { useTranslation } from 'react-i18next';
 export default function ClusterAddons() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
-	const { cluster, enabledCICD, disabledCICD } = useClusterStore();
+	const { cluster, enabledCICD } = useClusterStore();
 
 	const { isPending, mutate } = useMutation({
-		mutationFn: () => {
-			if (cluster.cicdEnabled) {
-				return disabledCICD();
-			} else {
-				return enabledCICD();
-			}
-		},
+		mutationFn: enabledCICD,
 		onSuccess: () => {
 			toast({
 				title: t(`cluster.${cluster.cicdEnabled ? 'gitOpsEnabled' : 'gitOpsDisabled'}`) as string,
@@ -30,6 +25,7 @@ export default function ClusterAddons() {
 			});
 		},
 	});
+
 	return (
 		<SettingsFormItem
 			className='space-y-0 py-0 pb-6'
@@ -37,13 +33,16 @@ export default function ClusterAddons() {
 			title={t('cluster.gitOps')}
 			description={t('cluster.gitOpsDescription')}
 		>
-			<Button
-				variant={!cluster.cicdEnabled ? 'primary' : 'destructive'}
-				onClick={mutate}
-				loading={isPending}
-			>
-				{!cluster.cicdEnabled ? t('cluster.activate') : t('cluster.deactivate')}
-			</Button>
+			{cluster.cicdEnabled ? (
+				<Alert variant='success'>
+					<AlertTitle>{t('cluster.gitOpsActive')}</AlertTitle>
+					<AlertDescription>{t('cluster.gitOpsActiveDescription')}</AlertDescription>
+				</Alert>
+			) : (
+				<Button variant='primary' onClick={mutate} loading={isPending}>
+					{t('cluster.activate')}
+				</Button>
+			)}
 		</SettingsFormItem>
 	);
 }
