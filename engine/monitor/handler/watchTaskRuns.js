@@ -14,9 +14,9 @@ export async function watchBuildEvents() {
 	const watch = new k8s.Watch(kubeconfig);
 	const namespace = "tekton-builds";
 
-	logger.info("Started watching build events...");
 	async function startWatching() {
 		try {
+			logger.info("Started watching build events...");
 			let now = new Date().getTime();
 			watchRequest = watch.watch(
 				`/api/v1/namespaces/${namespace}/events`,
@@ -37,7 +37,10 @@ export async function watchBuildEvents() {
 						event.reason === "Succeeded" ||
 						event.reason === "Error" ||
 						event.reason === "Started" ||
-						event.reason === "Running"
+						event.reason === "Running" ||
+						event.reason === "TaskRunCancelled" ||
+						event.reason === "TaskRunTimeout" ||
+						event.reason === "TaskRunImagePullFailed"
 					) {
 						// Get task run name from the involved object
 						let taskRunName = event.involvedObject.name;
@@ -58,7 +61,10 @@ export async function watchBuildEvents() {
 									axios
 										.post(
 											helper.getPlatformUrl() + "/v1/telemetry/pipeline-status",
-											{ containeriid, status: event.reason },
+											{
+												containeriid,
+												status: event.reason?.replac(TaskRun, ""),
+											},
 											{
 												headers: {
 													Authorization: process.env.MASTER_TOKEN,

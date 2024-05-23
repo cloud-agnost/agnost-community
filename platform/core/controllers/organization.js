@@ -20,6 +20,11 @@ import funcCtrl from "../controllers/function.js";
 import cacheCtrl from "../controllers/cache.js";
 import dmnCtrl from "../controllers/domain.js";
 import vBackupCtrl from "../controllers/versionBackup.js";
+import prjCtrl from "../controllers/project.js";
+import prjEnvCtrl from "../controllers/projectEnv.js";
+import prjInvitationCtrl from "../controllers/projectInvitation.js";
+import cntrCtrl from "../controllers/container.js";
+
 import { OrganizationModel } from "../schemas/organization.js";
 
 class OrganizationController extends BaseController {
@@ -55,6 +60,10 @@ class OrganizationController extends BaseController {
 		await cacheCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await dmnCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await vBackupCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await prjCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await prjEnvCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await prjInvitationCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await cntrCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 	}
 }
 

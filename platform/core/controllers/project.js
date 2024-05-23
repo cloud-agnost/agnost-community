@@ -3,6 +3,7 @@ import BaseController from "./base.js";
 import prjEnvCtrl from "./projectEnv.js";
 import auditCtrl from "../controllers/audit.js";
 import prjInvitationCtrl from "../controllers/projectInvitation.js";
+import cntrCtrl from "../controllers/container.js";
 import { ProjectModel } from "../schemas/project.js";
 
 class ProjectController extends BaseController {
@@ -74,6 +75,10 @@ class ProjectController extends BaseController {
 			{ session }
 		);
 		await prjEnvCtrl.deleteManyByQuery(
+			{ orgId: org._id, projectId: project._id },
+			{ session }
+		);
+		await cntrCtrl.deleteManyByQuery(
 			{ orgId: org._id, projectId: project._id },
 			{ session }
 		);

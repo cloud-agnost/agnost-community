@@ -1,6 +1,7 @@
 import BaseController from "./base.js";
 import { ProjectEnvModel } from "../schemas/projectEnv.js";
 import auditCtrl from "../controllers/audit.js";
+import cntrCtrl from "../controllers/container.js";
 
 class ProjectEnvController extends BaseController {
 	constructor() {
@@ -19,6 +20,15 @@ class ProjectEnvController extends BaseController {
 			session,
 			cacheKey: environment._id,
 		});
+
+		await cntrCtrl.deleteManyByQuery(
+			{
+				orgId: org._id,
+				projectId: project._id,
+				environmentId: environment._id,
+			},
+			{ session }
+		);
 
 		await auditCtrl.deleteManyByQuery(
 			{

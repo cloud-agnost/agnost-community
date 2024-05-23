@@ -323,7 +323,13 @@ export class CICDManager {
     async getTaskRunLogs({ container, environment, taskRunName }) {
         try {
             // Get the pod information
-            const resource = await k8sCoreApi.readNamespacedPod(`${taskRunName}-pod`, "tekton-builds");
+            let resource = null;
+            try {
+                resource = await k8sCoreApi.readNamespacedPod(`${taskRunName}-pod`, "tekton-builds");
+            } catch (err) {
+                // This means the TektonRun object has not created a pod yet
+                return { status: "success", payload: [] };
+            }
 
             const containerStatuses = resource.body.status.containerStatuses;
             if (!containerStatuses || containerStatuses.length === 0) return { status: "success", payload: [] };
@@ -354,7 +360,7 @@ export class CICDManager {
             // Set the status of all steps after lastIndex to pending
             if (lastIndex >= 0) {
                 for (let i = lastIndex + 1; i < steps.length; i++) {
-                    if (steps[lastIndex].status === "success" && lastIndex + 1 === i) steps[i].status = "running";
+                    if (steps[lastIndex].status === "success") steps[i].status = "running";
                     else steps[i].status = "pending";
                 }
             }
@@ -2271,9 +2277,9 @@ export class CICDManager {
                         resource.spec.params[3].value = "local-registry." + agnostNamespace + ":5000";
                         resource.spec.params[4].value = gitPat;
                         resource.spec.params[5].value = gitBranch;
-                        resource.spec.params[6].value = gitSubPath;
+                        resource.spec.params[6].value = gitSubPath.replace(/^\/+/, ""); // remove leading slash, if exists
                         resource.spec.params[7].value = containerImageName;
-                        resource.spec.params[8].value = dockerfile;
+                        resource.spec.params[8].value = dockerfile.replace(/^\/+/, ""); // remove leading slash, if exists
                         await k8sCustomObjectApi.createNamespacedCustomObject(
                             group,
                             version,
@@ -2458,7 +2464,9 @@ export class CICDManager {
                     },
                 }
             )
-            .catch((error) => {});
+            .catch((error) => {
+                console.log("***error updaing github webhook", error);
+            });
     }
 }
 
@@ -3131,6 +3139,7 @@ async function createGithubWebhook(gitPat, gitRepoUrl, webhookUrl, secretToken, 
 }
 
 async function deleteGithubWebhook(gitPat, gitRepoUrl, hookId) {
+    console.log("***deleting github webhook", gitPat, gitRepoUrl, hookId);
     if (!gitPat || !gitRepoUrl || !hookId) return;
     try {
         const octokit = new Octokit({ auth: gitPat });

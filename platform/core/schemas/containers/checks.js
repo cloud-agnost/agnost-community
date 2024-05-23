@@ -149,7 +149,16 @@ export const checkRepo = (containerType, actionType) => {
 			)
 			.trim()
 			.notEmpty()
-			.withMessage(t("Required field, cannot be left empty")),
+			.withMessage(t("Required field, cannot be left empty"))
+			.bail()
+			.matches(/^[\w\-\/]*$/)
+			.withMessage(
+				"Not a valid dockerfile path. Dockerfile path names include alphanumeric characters, underscore, hyphens, and additional slashes."
+			) // Rem
+			.customSanitizer((value) => {
+				// Remove trailing slashes using custom sanitizer
+				return value.replace(/\/+$/, "");
+			}),
 		body("repo.gitProviderId")
 			.if(
 				(value, { req }) =>
