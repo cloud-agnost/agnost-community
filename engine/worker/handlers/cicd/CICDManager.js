@@ -357,7 +357,6 @@ export class CICDManager {
                 }
             }
 
-            console.log("***lastindex", lastIndex);
             // Set the status of all steps after lastIndex to pending
             if (lastIndex >= 0) {
                 for (let i = lastIndex + 1; i < steps.length; i++) {
