@@ -27,6 +27,8 @@ spec:
           db: admin
         - name: readWriteAnyDatabase
           db: admin
+        - name: root
+          db: admin
       scramCredentialsSecretName: mongo-user
   additionalMongodConfig:
     storage.wiredTiger.engineConfig.journalCompressor: zlib

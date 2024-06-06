@@ -1012,3 +1012,86 @@ curl -XDELETE http://localhost:3000/exposeService -d '{
     "portNumber": 10010
 }' -H "Content-type: application/json"
 ```
+
+## Database Backups
+
+### MongoDB backup to GCS
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "mongodb",
+    "serverName": "mymongo",
+    "bucketType": "gs",
+    "bucketName": "agnost-mymongo-backup"
+}' -H "Content-type: application/json"
+```
+
+### MongoDB backup to S3
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "mongodb",
+    "serverName": "mymongo",
+    "bucketType": "s3",
+    "awsAccessKeyId": "accessId",
+    "awsSecretAccessKey": "secretKey",
+    "bucketName": "agnost-mymongo-backup"
+}' -H "Content-type: application/json"
+```
+
+### MongoDB backup to MinIO
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "mongodb",
+    "serverName": "mymongo",
+    "bucketType": "minio",
+    "bucketName": "agnost-mymongo-backup",
+    "jobSchedule": "25 17 * * *"
+}' -H "Content-type: application/json"
+```
+
+### PostgreSQL backup to MinIO
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "postgresql",
+    "serverName": "pgsql",
+    "dbName": "app",
+    "bucketType": "minio",
+    "bucketName": "agnost-pgsql-backup",
+    "jobSchedule": "25 17 * * *"
+}' -H "Content-type: application/json"
+```
+
+### MySQL backup to S3
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "mysql",
+    "serverName": "mycluster",
+    "bucketType": "s3",
+    "bucketName": "agnost-mysql-backup",
+    "jobSchedule": "25 17 * * *",
+    "awsAccessKeyId": "<aws access key id",
+    "awsSecretAccessKey": "<aws secret access key>"
+}' -H "Content-type: application/json"
+```
+
+### MySQL backup to MinIO
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "mysql",
+    "serverName": "mycluster",
+    "bucketType": "minio",
+    "bucketName": "agnost-mysql-backup",
+    "jobSchedule": "25 17 * * *"
+}' -H "Content-type: application/json"
+```
