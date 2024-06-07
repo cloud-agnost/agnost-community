@@ -1037,6 +1037,7 @@ curl -XPOST http://localhost:3000/dbBackup -d '{
     "bucketType": "s3",
     "awsAccessKeyId": "accessId",
     "awsSecretAccessKey": "secretKey",
+    "awsRegion": "eu-central-1",
     "bucketName": "agnost-mymongo-backup"
 }' -H "Content-type: application/json"
 ```

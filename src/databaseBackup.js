@@ -113,18 +113,8 @@ async function createBackupJob(backupJobId, dbType, serverName, dbName, bucketTy
             // we need google credentials only for gcs
             if (bucketType === 'gs') {
               resource.metadata.name += '-' + backupJobId;
-              //await k8sCoreApi.createNamespacedSecret(namespace, resource);
+              await k8sCoreApi.createNamespacedSecret(namespace, resource);
               console.log('Google Credentials Secret is created');
-            }
-            break;
-          case 'ConfigMap':
-            // we need boto.cfg only for s3 and minio
-            if (bucketType === 's3') {
-              resource.metadata.name += '-' + backupJobId;
-              resource.data = {"boto.cfg": "[Credentials]\naws_access_key_id = " + awsAccessKeyId + "\naws_secret_access_key = " + awsSecretAccessKey + "\n    \n[s3]\nhost = s3.amazonaws.com\n"}
-              //await k8sCoreApi.createNamespacedConfigMap(namespace, resource);
-              console.log(JSON.stringify(resource));
-              console.log('boto.cfg ConfigMap is created');
             }
             break;
           case 'CronJob':
@@ -160,9 +150,8 @@ async function createBackupJob(backupJobId, dbType, serverName, dbName, bucketTy
               resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "gcs-key", "mountPath": "/secrets"});
               resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "gcs-key", "secret": {"secretName": "gcs-secret"}});
             } else if (bucketType === 's3') {
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "BOTO_PATH", "value": "/configs/boto.cfg"});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "boto-config", "mountPath": "/configs"});
-              resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "boto-config", "configMap": {"name": "boto-config"}});
+              resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "s3-secrets", "mountPath": "/root/.aws"});
+              resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "s3-secrets", "secret": {"secretName": "s3-secrets-" + backupJobId}});
             } else if (bucketType === 'minio') {
               resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_HOST","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "endpoint"}}});
               resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_PORT","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "port"}}});

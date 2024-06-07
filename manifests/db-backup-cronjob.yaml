@@ -10,28 +10,13 @@ spec:
         spec:
           containers:
           - name: db-backup
-            image: gcr.io/agnost-community/db-backup-tooling:v0.1.0
+            image: gcr.io/agnost-community/db-backup-tooling:v0.1.2
             env: []
             command: ["/bin/bash"]
             args: ["-c", "/scripts/backup.sh -t ${DB_TYPE} -b ${BUCKET_TYPE} -n ${BUCKET_NAME}"]
             volumeMounts: []
           restartPolicy: OnFailure
           volumes: []
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: boto-config
-data:
-  boto.cfg: |
-    [Credentials]
-    aws_access_key_id = YOUR_AWS_ACCESS_KEY_ID
-    aws_secret_access_key = YOUR_AWS_SECRET_ACCESS_KEY
-    s3_host = http://minio-storage.default
-    s3_port = 9000
-        
-    [s3]
-    host = s3.amazonaws.com
 ---
 apiVersion: v1
 kind: Secret

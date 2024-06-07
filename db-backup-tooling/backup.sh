@@ -5,7 +5,7 @@ function echodate {
 }
 
 function help_message {
-  echo "Usage: $(basename "$0") -t [mongodb|postgresql] -b [s3|gs] -n <bucket name>"
+  echo "Usage: $(basename "$0") -t [mongodb|postgresql] -b [s3|gs|minio] -n <bucket name>"
   echo "Parameters:"
   echo "  -t, --db-type     : Mandatory, which type of db to backup [mongodb|postgresql|mysql]"
   echo "  -b, --bucket-type : Mandatory, which bucket will be used [s3|gs] (MinIO is also type 's3')"
@@ -39,8 +39,10 @@ function copy_to_bucket() {
     mcli alias set minio http://${MINIO_HOST}.svc.cluster.local:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
     mcli mb --ignore-existing minio/${BUCKET_NAME}
     mcli cp ${BACKUP_FILE}.tar.gz minio/${BUCKET_NAME}/${BACKUP_FILE}.tar.gz
-  else
-    /google-cloud-sdk/bin/gsutil cp ${BACKUP_FILE}.tar.gz ${BUCKET_TYPE}://${BUCKET_NAME}/backup/${BACKUP_FILE}
+  elif [ ${BUCKET_TYPE} == "s3" ]; then
+    aws s3 cp ${BACKUP_FILE}.tar.gz ${BUCKET_TYPE}://${BUCKET_NAME}/${BACKUP_FILE}
+  elif [ ${BUCKET_TYPE} == "gs" ]; then
+    /google-cloud-sdk/bin/gsutil cp ${BACKUP_FILE}.tar.gz ${BUCKET_TYPE}://${BUCKET_NAME}/${BACKUP_FILE}
   fi
   rm -rf ${BACKUP_FILE} ${BACKUP_FILE}.tar.gz
 }
