@@ -84,99 +84,177 @@ async function createS3Secrets(backupJobId, awsAccessKeyId, awsSecretAccessKey, 
   }
 }
 
-async function createBackupJob(backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule="0 21 * * *", awsAccessKeyId, awsSecretAccessKey, awsRegion="us-east-1") {
-  const manifest = fs.readFileSync('/manifests/db-backup-cronjob.yaml', 'utf8');
-  const resources = k8s.loadAllYaml(manifest);
-
-  if (bucketType === 's3') {
-    await createS3Secrets(backupJobId, awsAccessKeyId, awsSecretAccessKey, awsRegion);
-  } else if (bucketType === 'minio') {
-    minioCredentials = await k8sCoreApi.readNamespacedSecret('minio-credentials', namespace);
-    var accessKey = Buffer.from(minioCredentials.body.data.rootUser, 'base64');
-    var secretKey = Buffer.from(minioCredentials.body.data.rootPassword, 'base64');
-    var minioEndpoint = Buffer.from(minioCredentials.body.data.endpoint, 'base64');
-    var minioPort = Buffer.from(minioCredentials.body.data.port, 'base64');
-    var endpoint = 'http://' + minioEndpoint + '.svc.cluster.local:' + minioPort;
-    await createS3Secrets(backupJobId, accessKey, secretKey, awsRegion);
-  }
-
-  if (dbType === 'mysql') {  // Update MySQL operator configuration
-    await enableMysqlBackup(backupJobId, serverName, bucketType, bucketName, jobSchedule, endpoint);
-
-  } else { // Create CronJob for MongoDB and PosgreSQL
-    for (const resource of resources) {
-      try {
-        const { kind, metadata } = resource;
-
-        switch(kind) {
-          case 'Secret':
-            // we need google credentials only for gcs
-            if (bucketType === 'gs') {
-              resource.metadata.name += '-' + backupJobId;
-              await k8sCoreApi.createNamespacedSecret(namespace, resource);
-              console.log('Google Credentials Secret is created');
-            }
-            break;
-          case 'CronJob':
-            // Common configuration
-            resource.metadata.name += '-' + backupJobId;
-            resource.spec.schedule = jobSchedule;
-            resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "DB_TYPE", "value": dbType});
-            resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "SERVER_NAME", "value": serverName});
-            resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "BUCKET_TYPE", "value": bucketType});
-            resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "BUCKET_NAME", "value": bucketName});
-
-            // Configure CronJob based on the database type
-            if (dbType === 'mongodb') {
-              const secrets = await k8sCoreApi.listNamespacedSecret(namespace);
-              secrets.body.items.forEach(async (secret) => {
-                var secretName = secret.metadata.name;
-                if (secretName.startsWith(serverName + '-admin-')) {
-                  resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MONGODB_URI", "valueFrom": {"secretKeyRef": {"name": secretName, "key": "connectionString\.standard"}}});
-                }
-              });
-            } else if (dbType === 'postgresql') {
-              var secretName = 'postgres.' + serverName + '.credentials.postgresql.acid.zalan.do';
-              var hostName = serverName + '.' + namespace + '.svc.cluster.local'
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_USER","valueFrom": {"secretKeyRef": {"name": secretName, "key": "username"}}});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_PASSWORD","valueFrom": {"secretKeyRef": {"name": secretName, "key": "password"}}});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_HOST", "value": hostName});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_DB", "value": dbName});
-            }
-
-            // Configure CronJob based on the bucket type
-            if (bucketType === 'gs') {
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "GOOGLE_APPLICATION_CREDENTIALS", "value": "/secrets/gcs-key.json"});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "gcs-key", "mountPath": "/secrets"});
-              resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "gcs-key", "secret": {"secretName": "gcs-secret"}});
-            } else if (bucketType === 's3') {
-              resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "s3-secrets", "mountPath": "/root/.aws"});
-              resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "s3-secrets", "secret": {"secretName": "s3-secrets-" + backupJobId}});
-            } else if (bucketType === 'minio') {
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_HOST","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "endpoint"}}});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_PORT","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "port"}}});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_ACCESS_KEY","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "rootUser"}}});
-              resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_SECRET_KEY","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "rootPassword"}}});
-            }
-
-            // Create the CronJob
-            await batchApi.createNamespacedCronJob(namespace, resource);
-            console.log('Backup CronJob is created');
-            break;
-        }
-      } catch (error) {
-        console.error('Error applying resource:', error.body);
-        throw new Error(JSON.stringify(error.body));
-      }
+// Creates Google Cloud Storage secrets when using GS buckets
+async function createGcsSecrets(backupJobId, gcpServiceAccountKey) {
+  const secret = {
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "name": "gcs-secret-" + backupJobId
+    },
+    "data": {
+        "gcs-key.json": gcpServiceAccountKey
     }
+  };
+
+  try {
+    await k8sCoreApi.createNamespacedSecret(namespace, secret);
+    console.log('GCS Secret is created');
+  } catch (error) {
+    console.error('Error applying resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
   }
 }
 
-router.post('/dbbackup', async (req, res) => {
-  const { backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule, awsAccessKeyId, awsSecretAccessKey, awsRegion} = req.body;
+async function createBackupJob(backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule="0 21 * * *", awsAccessKeyId, awsSecretAccessKey, awsRegion="us-east-1", gcpServiceAccountKey) {
+  const manifest = fs.readFileSync('/manifests/db-backup-cronjob.yaml', 'utf8');
+  const resource = k8s.loadYaml(manifest);
 
   try {
-    await createBackupJob( backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule, awsAccessKeyId, awsSecretAccessKey, awsRegion);
+    const { kind, metadata } = resource;
+    // Common configuration
+    resource.metadata.name += '-' + backupJobId;
+    resource.spec.schedule = jobSchedule;
+    resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "DB_TYPE", "value": dbType});
+    resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "SERVER_NAME", "value": serverName});
+    resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "BUCKET_TYPE", "value": bucketType});
+    resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "BUCKET_NAME", "value": bucketName})
+
+    // Configure CronJob based on the database type
+    switch(dbType) {
+      case 'mysql':
+        await enableMysqlBackup(backupJobId, serverName, bucketType, bucketName, jobSchedule, endpoint);
+        break;
+      case 'mongodb':
+        const secrets = await k8sCoreApi.listNamespacedSecret(namespace);
+        secrets.body.items.forEach(async (secret) => {
+          var secretName = secret.metadata.name;
+          if (secretName.startsWith(serverName + '-admin-')) {
+            resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MONGODB_URI", "valueFrom": {"secretKeyRef": {"name": secretName, "key": "connectionString\.standard"}}});
+          }
+        });
+        break;
+      case 'postgresql':
+        var secretName = 'postgres.' + serverName + '.credentials.postgresql.acid.zalan.do';
+        var hostName = serverName + '.' + namespace + '.svc.cluster.local'
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_USER","valueFrom": {"secretKeyRef": {"name": secretName, "key": "username"}}});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_PASSWORD","valueFrom": {"secretKeyRef": {"name": secretName, "key": "password"}}});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_HOST", "value": hostName});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "POSTGRES_DB", "value": dbName});
+        break;
+    }
+
+    // Configure CronJob based on the bucket type
+    switch(bucketType) {
+      case 'gs':
+        await createGcsSecrets(backupJobId, gcpServiceAccountKey);
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "GOOGLE_APPLICATION_CREDENTIALS", "value": "/secrets/gcs-key.json"});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "gcs-key", "mountPath": "/secrets"});
+        resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "gcs-key", "secret": {"secretName": "gcs-secret-" + backupJobId}});
+        break;
+      case 's3':
+        await createS3Secrets(backupJobId, awsAccessKeyId, awsSecretAccessKey, awsRegion);
+        resource.spec.jobTemplate.spec.template.spec.containers[0].volumeMounts.push({"name": "s3-secrets", "mountPath": "/root/.aws"});
+        resource.spec.jobTemplate.spec.template.spec.volumes.push({"name": "s3-secrets", "secret": {"secretName": "s3-secrets-" + backupJobId}});
+        break;
+      case 'minio':
+        minioCredentials = await k8sCoreApi.readNamespacedSecret('minio-credentials', namespace);
+        var accessKey = Buffer.from(minioCredentials.body.data.rootUser, 'base64');
+        var secretKey = Buffer.from(minioCredentials.body.data.rootPassword, 'base64');
+        var minioEndpoint = Buffer.from(minioCredentials.body.data.endpoint, 'base64');
+        var minioPort = Buffer.from(minioCredentials.body.data.port, 'base64');
+        var endpoint = 'http://' + minioEndpoint + '.svc.cluster.local:' + minioPort;
+        await createS3Secrets(backupJobId, accessKey, secretKey, awsRegion);
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_HOST","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "endpoint"}}});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_PORT","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "port"}}});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_ACCESS_KEY","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "rootUser"}}});
+        resource.spec.jobTemplate.spec.template.spec.containers[0].env.push({"name": "MINIO_SECRET_KEY","valueFrom": {"secretKeyRef": {"name": "minio-credentials","key": "rootPassword"}}});
+        break;
+    }
+
+    // Create the CronJob
+    await batchApi.createNamespacedCronJob(namespace, resource);
+    console.log('Backup CronJob is created');
+  } catch (error) {
+    console.error('Error applying resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
+  }
+}
+
+/**
+ * @swagger
+ * /dbbackup:
+ *   post:
+ *     summary: Create Database Backup Jobs
+ *     description: DB Backup
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               backupJobId:
+ *                 type: string
+ *                 description: Unique Job ID - can be randomly generated
+ *               dbType:
+ *                 type: string
+ *                 description: mongodb | postgresql | mysql
+ *               serverName:
+ *                 type: string
+ *                 description: Name of the server - object name on Kubernetes
+ *               dbName:
+ *                 type: string
+ *                 description: Database name on the server. Required for PostgreSQL
+ *               bucketType:
+ *                 type: string
+ *                 description: s3 | gs | minio
+ *               bucketName:
+ *                 type: string
+ *                 description: Name of the bucket (without s3:// or other prefixes)
+ *               jobSchedule:
+ *                 type: string
+ *                 description: Cron schedule. Default value is "0 21 * * *" --> Everyday at 21:00 GMT+0 (Midnight in TR)
+ *               awsAccessKeyId:
+ *                 type: string
+ *                 description: AWS Access Key ID - Required for S3 buckets
+ *               awsSecretAccessKey:
+ *                 type: string
+ *                 description: AWS Secret Key ID - Required for S3 buckets
+ *               awsRegion:
+ *                 type: string
+ *                 description: AWS Bucket Region - Required for S3 buckets
+ *               gcpServiceAccountKey:
+ *                 type: string
+ *                 description: Service account key for GCP. Must be base64 encoded. Required for GS buckets
+ *             required:
+ *               - backupJobId
+ *               - dbType
+ *               - serverName
+ *               - bucketType
+ *               - bucketName
+ *     responses:
+ *       200:
+ *         description: Deployed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   description: success message.
+ *       400:
+ *         description: Bad request. Invalid input data.
+ *       500:
+ *         description: Internal server error.
+ */
+
+router.post('/dbbackup', async (req, res) => {
+  const { backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule, awsAccessKeyId, awsSecretAccessKey, awsRegion, gcpServiceAccountKey} = req.body;
+
+  try {
+    await createBackupJob( backupJobId, dbType, serverName, dbName, bucketType, bucketName, jobSchedule, awsAccessKeyId, awsSecretAccessKey, awsRegion, gcpServiceAccountKey);
     res.json({ 'result': 'backup job created' });
   } catch (err) {
     console.error(err);

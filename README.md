@@ -1023,7 +1023,9 @@ curl -XPOST http://localhost:3000/dbBackup -d '{
     "dbType": "mongodb",
     "serverName": "mymongo",
     "bucketType": "gs",
-    "bucketName": "agnost-mymongo-backup"
+    "bucketName": "agnost-mymongo-backup",
+    "jobSchedule": "00 07 * * *",
+    "gcpServiceAccountKey":"ewog..."
 }' -H "Content-type: application/json"
 ```
 
@@ -1052,6 +1054,37 @@ curl -XPOST http://localhost:3000/dbBackup -d '{
     "bucketType": "minio",
     "bucketName": "agnost-mymongo-backup",
     "jobSchedule": "25 17 * * *"
+}' -H "Content-type: application/json"
+```
+
+### PostgreSQL backup to GCS
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "postgresql",
+    "serverName": "pgsql",
+    "dbName": "app",
+    "bucketType": "gs",
+    "bucketName": "agnost-pgsql-backup",
+    "jobSchedule": "00 07 * * *",
+    "gcpServiceAccountKey":"ewog..."
+}' -H "Content-type: application/json"
+```
+
+### PostgreSQL backup to S3
+
+```bash
+curl -XPOST http://localhost:3000/dbBackup -d '{
+    "backupJobId": "12sdaf231",
+    "dbType": "postgresql",
+    "serverName": "pgsql",
+    "dbName": "app",
+    "bucketType": "s3",
+    "awsAccessKeyId": "accessId",
+    "awsSecretAccessKey": "secretKey",
+    "awsRegion": "eu-central-1",
+    "bucketName": "agnost-pgsql-backup"
 }' -H "Content-type: application/json"
 ```
 

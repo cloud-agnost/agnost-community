@@ -10,18 +10,10 @@ spec:
         spec:
           containers:
           - name: db-backup
-            image: gcr.io/agnost-community/db-backup-tooling:v0.1.2
+            image: gcr.io/agnost-community/db-backup-tooling:v0.1.3
             env: []
             command: ["/bin/bash"]
             args: ["-c", "/scripts/backup.sh -t ${DB_TYPE} -b ${BUCKET_TYPE} -n ${BUCKET_NAME}"]
             volumeMounts: []
           restartPolicy: OnFailure
           volumes: []
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: gcs-secret
-type: Opaque
-data:
-  gcs-key.json: <base64-encoded-json-key>

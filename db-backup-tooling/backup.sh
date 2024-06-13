@@ -42,6 +42,7 @@ function copy_to_bucket() {
   elif [ ${BUCKET_TYPE} == "s3" ]; then
     aws s3 cp ${BACKUP_FILE}.tar.gz ${BUCKET_TYPE}://${BUCKET_NAME}/${BACKUP_FILE}
   elif [ ${BUCKET_TYPE} == "gs" ]; then
+    /google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
     /google-cloud-sdk/bin/gsutil cp ${BACKUP_FILE}.tar.gz ${BUCKET_TYPE}://${BUCKET_NAME}/${BACKUP_FILE}
   fi
   rm -rf ${BACKUP_FILE} ${BACKUP_FILE}.tar.gz
