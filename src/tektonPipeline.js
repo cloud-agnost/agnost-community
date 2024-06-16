@@ -256,7 +256,7 @@ async function createPipeline(pipelineId, gitRepoType, gitRepoUrl, gitSubPath='/
             resource.spec.triggers[0].interceptors[1].params[1].name = 'filter'
             // remove leading slash, if exists
             var path = gitSubPath.replace(/^\/+/, '')
-            resource.spec.triggers[0].interceptors[1].params[1].value = `body.commits.all(c, c.modified.exists(m, m.startsWith("${path}")) || c.added.exists(a, a.startsWith("${path}")) || c.removed.exists(r, r.startsWith("${path}")))`
+            resource.spec.triggers[0].interceptors[1].params[1].value = `body.commits.exists(c, c.modified.exists(m, m.startsWith("${path}")) || c.added.exists(a, a.startsWith("${path}")) || c.removed.exists(r, r.startsWith("${path}")))`
           } else {
             delete resource.spec.triggers[0].interceptors[1].params[1];
           }
